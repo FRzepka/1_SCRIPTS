@@ -1,0 +1,306 @@
+{
+  "specs_path": "DL_Models/LFP_SOH_Optimization_Study/base_size_study_specs.json",
+  "test_cell": "MGFarm_18650_C11",
+  "variants": [
+    {
+      "family": "LSTM",
+      "version": "0.1.2.6",
+      "tag": "s1_h128",
+      "role": "smaller_1",
+      "source_model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/LSTM/Base/0.1.2.5_base_h160",
+      "training_dir": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.1.2.6",
+      "model_overrides": {
+        "embed_size": 96,
+        "hidden_size": 128,
+        "mlp_hidden": 128
+      }
+    },
+    {
+      "family": "LSTM",
+      "version": "0.1.2.9",
+      "tag": "s2_h96",
+      "role": "smaller_2",
+      "source_model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/LSTM/Base/0.1.2.5_base_h160",
+      "training_dir": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.1.2.9",
+      "model_overrides": {
+        "embed_size": 64,
+        "hidden_size": 96,
+        "mlp_hidden": 96
+      }
+    },
+    {
+      "family": "LSTM",
+      "version": "0.1.2.11",
+      "tag": "s3_h64",
+      "role": "smaller_3",
+      "source_model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/LSTM/Base/0.1.2.5_base_h160",
+      "training_dir": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.1.2.11",
+      "model_overrides": {
+        "embed_size": 32,
+        "hidden_size": 64,
+        "mlp_hidden": 64
+      }
+    },
+    {
+      "family": "LSTM",
+      "version": "0.1.2.4",
+      "tag": "l1_h192",
+      "role": "larger_1",
+      "source_model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/LSTM/Base/0.1.2.5_base_h160",
+      "training_dir": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.1.2.4",
+      "model_overrides": {
+        "embed_size": 160,
+        "hidden_size": 192,
+        "mlp_hidden": 192
+      }
+    },
+    {
+      "family": "LSTM",
+      "version": "0.1.2.7",
+      "tag": "l2_h224",
+      "role": "larger_2",
+      "source_model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/LSTM/Base/0.1.2.5_base_h160",
+      "training_dir": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.1.2.7",
+      "model_overrides": {
+        "embed_size": 192,
+        "hidden_size": 224,
+        "mlp_hidden": 224
+      }
+    },
+    {
+      "family": "LSTM",
+      "version": "0.1.2.8",
+      "tag": "l3_h256",
+      "role": "larger_3",
+      "source_model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/LSTM/Base/0.1.2.5_base_h160",
+      "training_dir": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.1.2.8",
+      "model_overrides": {
+        "embed_size": 224,
+        "hidden_size": 256,
+        "mlp_hidden": 256
+      }
+    },
+    {
+      "family": "TCN",
+      "version": "0.2.2.3",
+      "tag": "s1_h80",
+      "role": "smaller_1",
+      "source_model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/TCN/Base/0.2.2.2",
+      "training_dir": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.2.2.3",
+      "model_overrides": {
+        "hidden_size": 80,
+        "mlp_hidden": 96
+      }
+    },
+    {
+      "family": "TCN",
+      "version": "0.2.2.4",
+      "tag": "s2_h64",
+      "role": "smaller_2",
+      "source_model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/TCN/Base/0.2.2.2",
+      "training_dir": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.2.2.4",
+      "model_overrides": {
+        "hidden_size": 64,
+        "mlp_hidden": 80
+      }
+    },
+    {
+      "family": "TCN",
+      "version": "0.2.2.5",
+      "tag": "l1_h112",
+      "role": "larger_1",
+      "source_model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/TCN/Base/0.2.2.2",
+      "training_dir": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.2.2.5",
+      "model_overrides": {
+        "hidden_size": 112,
+        "mlp_hidden": 160
+      }
+    },
+    {
+      "family": "TCN",
+      "version": "0.2.2.6",
+      "tag": "l2_h128",
+      "role": "larger_2",
+      "source_model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/TCN/Base/0.2.2.2",
+      "training_dir": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.2.2.6",
+      "model_overrides": {
+        "hidden_size": 128,
+        "mlp_hidden": 192
+      }
+    },
+    {
+      "family": "TCN",
+      "version": "0.2.2.7",
+      "tag": "s3_h48",
+      "role": "smaller_3",
+      "source_model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/TCN/Base/0.2.2.2",
+      "training_dir": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.2.2.7",
+      "model_overrides": {
+        "hidden_size": 48,
+        "mlp_hidden": 64
+      }
+    },
+    {
+      "family": "TCN",
+      "version": "0.2.2.8",
+      "tag": "l3_h144",
+      "role": "larger_3",
+      "source_model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/TCN/Base/0.2.2.2",
+      "training_dir": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.2.2.8",
+      "model_overrides": {
+        "hidden_size": 144,
+        "mlp_hidden": 224
+      }
+    },
+    {
+      "family": "GRU",
+      "version": "0.3.1.4",
+      "tag": "s1_h96",
+      "role": "smaller_1",
+      "source_model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/GRU/Base/0.3.1.3_base_h128",
+      "training_dir": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.3.1.4",
+      "model_overrides": {
+        "embed_size": 64,
+        "hidden_size": 96,
+        "mlp_hidden": 160
+      }
+    },
+    {
+      "family": "GRU",
+      "version": "0.3.1.7",
+      "tag": "s2_h64",
+      "role": "smaller_2",
+      "source_model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/GRU/Base/0.3.1.3_base_h128",
+      "training_dir": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.3.1.7",
+      "model_overrides": {
+        "embed_size": 64,
+        "hidden_size": 64,
+        "mlp_hidden": 128
+      }
+    },
+    {
+      "family": "GRU",
+      "version": "0.3.1.9",
+      "tag": "s3_h48",
+      "role": "smaller_3",
+      "source_model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/GRU/Base/0.3.1.3_base_h128",
+      "training_dir": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.3.1.9",
+      "model_overrides": {
+        "embed_size": 48,
+        "hidden_size": 48,
+        "mlp_hidden": 96
+      }
+    },
+    {
+      "family": "GRU",
+      "version": "0.3.1.2",
+      "tag": "l1_h160",
+      "role": "larger_1",
+      "source_model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/GRU/Base/0.3.1.3_base_h128",
+      "training_dir": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.3.1.2",
+      "model_overrides": {
+        "embed_size": 128,
+        "hidden_size": 160,
+        "mlp_hidden": 224
+      }
+    },
+    {
+      "family": "GRU",
+      "version": "0.3.1.5",
+      "tag": "l2_h192",
+      "role": "larger_2",
+      "source_model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/GRU/Base/0.3.1.3_base_h128",
+      "training_dir": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.3.1.5",
+      "model_overrides": {
+        "embed_size": 160,
+        "hidden_size": 192,
+        "mlp_hidden": 256
+      }
+    },
+    {
+      "family": "GRU",
+      "version": "0.3.1.6",
+      "tag": "l3_h224",
+      "role": "larger_3",
+      "source_model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/GRU/Base/0.3.1.3_base_h128",
+      "training_dir": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.3.1.6",
+      "model_overrides": {
+        "embed_size": 192,
+        "hidden_size": 224,
+        "mlp_hidden": 288
+      }
+    },
+    {
+      "family": "CNN",
+      "version": "0.4.2.2_hp",
+      "tag": "s1_h96",
+      "role": "smaller_1",
+      "source_model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/CNN/Base/0.4.2.1_hp",
+      "training_dir": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.4.2.2_hp",
+      "model_overrides": {
+        "hidden_size": 96,
+        "mlp_hidden": 48
+      }
+    },
+    {
+      "family": "CNN",
+      "version": "0.4.2.3_hp",
+      "tag": "s2_h80",
+      "role": "smaller_2",
+      "source_model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/CNN/Base/0.4.2.1_hp",
+      "training_dir": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.4.2.3_hp",
+      "model_overrides": {
+        "hidden_size": 80,
+        "mlp_hidden": 40
+      }
+    },
+    {
+      "family": "CNN",
+      "version": "0.4.2.4_hp",
+      "tag": "l1_h160",
+      "role": "larger_1",
+      "source_model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/CNN/Base/0.4.2.1_hp",
+      "training_dir": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.4.2.4_hp",
+      "model_overrides": {
+        "hidden_size": 160,
+        "mlp_hidden": 80
+      }
+    },
+    {
+      "family": "CNN",
+      "version": "0.4.2.5_hp",
+      "tag": "l2_h192",
+      "role": "larger_2",
+      "source_model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/CNN/Base/0.4.2.1_hp",
+      "training_dir": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.4.2.5_hp",
+      "model_overrides": {
+        "hidden_size": 192,
+        "mlp_hidden": 96
+      }
+    },
+    {
+      "family": "CNN",
+      "version": "0.4.2.6_hp",
+      "tag": "s3_h64",
+      "role": "smaller_3",
+      "source_model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/CNN/Base/0.4.2.1_hp",
+      "training_dir": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.4.2.6_hp",
+      "model_overrides": {
+        "hidden_size": 64,
+        "mlp_hidden": 32
+      }
+    },
+    {
+      "family": "CNN",
+      "version": "0.4.2.7_hp",
+      "tag": "l3_h224",
+      "role": "larger_3",
+      "source_model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/CNN/Base/0.4.2.1_hp",
+      "training_dir": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.4.2.7_hp",
+      "model_overrides": {
+        "hidden_size": 224,
+        "mlp_hidden": 112
+      }
+    }
+  ]
+}

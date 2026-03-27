@@ -1,0 +1,269 @@
+{
+  "screen_timestamp": "20260318_150635",
+  "models": [
+    {
+      "family": "LSTM",
+      "role": "base",
+      "version": "0.1.2.4",
+      "tag": "base_h192",
+      "model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/LSTM/Base/0.1.2.4_base_h192",
+      "source": "DL_Models/LFP_SOH_Optimization_Study/2_models/LSTM/Base/0.1.2.4"
+    },
+    {
+      "family": "LSTM",
+      "role": "smaller_1",
+      "version": "0.1.2.5",
+      "tag": "s1_h160",
+      "model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/LSTM/Base/0.1.2.5_s1_h160",
+      "source_run": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.1.2.5/outputs/soh/size_20260318_150635_s1_h160",
+      "best_ckpt": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.1.2.5/outputs/soh/size_20260318_150635_s1_h160/checkpoints/best_epoch0045_rmse0.01516.pt",
+      "model_overrides": {
+        "embed_size": 128,
+        "hidden_size": 160,
+        "mlp_hidden": 160
+      },
+      "screen_timestamp": "20260318_150635"
+    },
+    {
+      "family": "LSTM",
+      "role": "smaller_2",
+      "version": "0.1.2.6",
+      "tag": "s2_h128",
+      "model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/LSTM/Base/0.1.2.6_s2_h128",
+      "source_run": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.1.2.6/outputs/soh/size_20260318_150635_s2_h128",
+      "best_ckpt": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.1.2.6/outputs/soh/size_20260318_150635_s2_h128/checkpoints/best_epoch0030_rmse0.01734.pt",
+      "model_overrides": {
+        "embed_size": 96,
+        "hidden_size": 128,
+        "mlp_hidden": 128
+      },
+      "screen_timestamp": "20260318_150635"
+    },
+    {
+      "family": "LSTM",
+      "role": "larger_1",
+      "version": "0.1.2.7",
+      "tag": "l1_h224",
+      "model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/LSTM/Base/0.1.2.7_l1_h224",
+      "source_run": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.1.2.7/outputs/soh/size_20260318_150635_l1_h224",
+      "best_ckpt": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.1.2.7/outputs/soh/size_20260318_150635_l1_h224/checkpoints/best_epoch0036_rmse0.01137.pt",
+      "model_overrides": {
+        "embed_size": 192,
+        "hidden_size": 224,
+        "mlp_hidden": 224
+      },
+      "screen_timestamp": "20260318_150635"
+    },
+    {
+      "family": "LSTM",
+      "role": "larger_2",
+      "version": "0.1.2.8",
+      "tag": "l2_h256",
+      "model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/LSTM/Base/0.1.2.8_l2_h256",
+      "source_run": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.1.2.8/outputs/soh/size_20260318_150635_l2_h256",
+      "best_ckpt": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.1.2.8/outputs/soh/size_20260318_150635_l2_h256/checkpoints/best_epoch0030_rmse0.01501.pt",
+      "model_overrides": {
+        "embed_size": 224,
+        "hidden_size": 256,
+        "mlp_hidden": 256
+      },
+      "screen_timestamp": "20260318_150635"
+    },
+    {
+      "family": "TCN",
+      "role": "base",
+      "version": "0.2.2.2",
+      "tag": "base_h96",
+      "model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/TCN/Base/0.2.2.2_base_h96",
+      "source": "DL_Models/LFP_SOH_Optimization_Study/2_models/TCN/Base/0.2.2.2"
+    },
+    {
+      "family": "TCN",
+      "role": "smaller_1",
+      "version": "0.2.2.3",
+      "tag": "s1_h80",
+      "model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/TCN/Base/0.2.2.3_s1_h80",
+      "source_run": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.2.2.3/outputs/soh/size_20260318_150635_s1_h80",
+      "best_ckpt": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.2.2.3/outputs/soh/size_20260318_150635_s1_h80/checkpoints/best_epoch0030_rmse0.01017.pt",
+      "model_overrides": {
+        "hidden_size": 80,
+        "mlp_hidden": 96
+      },
+      "screen_timestamp": "20260318_150635"
+    },
+    {
+      "family": "TCN",
+      "role": "smaller_2",
+      "version": "0.2.2.4",
+      "tag": "s2_h64",
+      "model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/TCN/Base/0.2.2.4_s2_h64",
+      "source_run": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.2.2.4/outputs/soh/size_20260318_150635_s2_h64",
+      "best_ckpt": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.2.2.4/outputs/soh/size_20260318_150635_s2_h64/checkpoints/best_epoch0036_rmse0.01247.pt",
+      "model_overrides": {
+        "hidden_size": 64,
+        "mlp_hidden": 80
+      },
+      "screen_timestamp": "20260318_150635"
+    },
+    {
+      "family": "TCN",
+      "role": "larger_1",
+      "version": "0.2.2.5",
+      "tag": "l1_h112",
+      "model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/TCN/Base/0.2.2.5_l1_h112",
+      "source_run": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.2.2.5/outputs/soh/size_20260318_150635_l1_h112",
+      "best_ckpt": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.2.2.5/outputs/soh/size_20260318_150635_l1_h112/checkpoints/best_epoch0045_rmse0.01168.pt",
+      "model_overrides": {
+        "hidden_size": 112,
+        "mlp_hidden": 160
+      },
+      "screen_timestamp": "20260318_150635"
+    },
+    {
+      "family": "TCN",
+      "role": "larger_2",
+      "version": "0.2.2.6",
+      "tag": "l2_h128",
+      "model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/TCN/Base/0.2.2.6_l2_h128",
+      "source_run": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.2.2.6/outputs/soh/size_20260318_150635_l2_h128",
+      "best_ckpt": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.2.2.6/outputs/soh/size_20260318_150635_l2_h128/checkpoints/best_epoch0030_rmse0.00919.pt",
+      "model_overrides": {
+        "hidden_size": 128,
+        "mlp_hidden": 192
+      },
+      "screen_timestamp": "20260318_150635"
+    },
+    {
+      "family": "GRU",
+      "role": "base",
+      "version": "0.3.1.2",
+      "tag": "base_h160",
+      "model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/GRU/Base/0.3.1.2_base_h160",
+      "source": "DL_Models/LFP_SOH_Optimization_Study/2_models/GRU/Base/0.3.1.2"
+    },
+    {
+      "family": "GRU",
+      "role": "smaller_1",
+      "version": "0.3.1.3",
+      "tag": "s1_h128",
+      "model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/GRU/Base/0.3.1.3_s1_h128",
+      "source_run": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.3.1.3/outputs/soh/size_20260318_150635_s1_h128",
+      "best_ckpt": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.3.1.3/outputs/soh/size_20260318_150635_s1_h128/checkpoints/best_epoch0006_rmse0.01566.pt",
+      "model_overrides": {
+        "embed_size": 96,
+        "hidden_size": 128,
+        "mlp_hidden": 192
+      },
+      "screen_timestamp": "20260318_150635"
+    },
+    {
+      "family": "GRU",
+      "role": "smaller_2",
+      "version": "0.3.1.4",
+      "tag": "s2_h96",
+      "model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/GRU/Base/0.3.1.4_s2_h96",
+      "source_run": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.3.1.4/outputs/soh/size_20260318_150635_s2_h96",
+      "best_ckpt": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.3.1.4/outputs/soh/size_20260318_150635_s2_h96/checkpoints/best_epoch0015_rmse0.01622.pt",
+      "model_overrides": {
+        "embed_size": 64,
+        "hidden_size": 96,
+        "mlp_hidden": 160
+      },
+      "screen_timestamp": "20260318_150635"
+    },
+    {
+      "family": "GRU",
+      "role": "larger_1",
+      "version": "0.3.1.5",
+      "tag": "l1_h192",
+      "model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/GRU/Base/0.3.1.5_l1_h192",
+      "source_run": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.3.1.5/outputs/soh/size_20260318_150635_l1_h192",
+      "best_ckpt": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.3.1.5/outputs/soh/size_20260318_150635_l1_h192/checkpoints/best_epoch0006_rmse0.01659.pt",
+      "model_overrides": {
+        "embed_size": 160,
+        "hidden_size": 192,
+        "mlp_hidden": 256
+      },
+      "screen_timestamp": "20260318_150635"
+    },
+    {
+      "family": "GRU",
+      "role": "larger_2",
+      "version": "0.3.1.6",
+      "tag": "l2_h224",
+      "model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/GRU/Base/0.3.1.6_l2_h224",
+      "source_run": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.3.1.6/outputs/soh/size_20260318_150635_l2_h224",
+      "best_ckpt": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.3.1.6/outputs/soh/size_20260318_150635_l2_h224/checkpoints/best_epoch0006_rmse0.01699.pt",
+      "model_overrides": {
+        "embed_size": 192,
+        "hidden_size": 224,
+        "mlp_hidden": 288
+      },
+      "screen_timestamp": "20260318_150635"
+    },
+    {
+      "family": "CNN",
+      "role": "base",
+      "version": "0.4.2.1_hp",
+      "tag": "base_h128",
+      "model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/CNN/Base/0.4.2.1_hp_base_h128",
+      "source": "DL_Models/LFP_SOH_Optimization_Study/2_models/CNN/Base/0.4.2.1_hp"
+    },
+    {
+      "family": "CNN",
+      "role": "smaller_1",
+      "version": "0.4.2.2_hp",
+      "tag": "s1_h96",
+      "model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/CNN/Base/0.4.2.2_hp_s1_h96",
+      "source_run": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.4.2.2_hp/outputs/soh/size_20260318_150635_s1_h96",
+      "best_ckpt": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.4.2.2_hp/outputs/soh/size_20260318_150635_s1_h96/checkpoints/best_epoch0021_rmse0.01679.pt",
+      "model_overrides": {
+        "hidden_size": 96,
+        "mlp_hidden": 48
+      },
+      "screen_timestamp": "20260318_150635"
+    },
+    {
+      "family": "CNN",
+      "role": "smaller_2",
+      "version": "0.4.2.3_hp",
+      "tag": "s2_h80",
+      "model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/CNN/Base/0.4.2.3_hp_s2_h80",
+      "source_run": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.4.2.3_hp/outputs/soh/size_20260318_150635_s2_h80",
+      "best_ckpt": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.4.2.3_hp/outputs/soh/size_20260318_150635_s2_h80/checkpoints/best_epoch0036_rmse0.01198.pt",
+      "model_overrides": {
+        "hidden_size": 80,
+        "mlp_hidden": 40
+      },
+      "screen_timestamp": "20260318_150635"
+    },
+    {
+      "family": "CNN",
+      "role": "larger_1",
+      "version": "0.4.2.4_hp",
+      "tag": "l1_h160",
+      "model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/CNN/Base/0.4.2.4_hp_l1_h160",
+      "source_run": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.4.2.4_hp/outputs/soh/size_20260318_150635_l1_h160",
+      "best_ckpt": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.4.2.4_hp/outputs/soh/size_20260318_150635_l1_h160/checkpoints/best_epoch0015_rmse0.03466.pt",
+      "model_overrides": {
+        "hidden_size": 160,
+        "mlp_hidden": 80
+      },
+      "screen_timestamp": "20260318_150635"
+    },
+    {
+      "family": "CNN",
+      "role": "larger_2",
+      "version": "0.4.2.5_hp",
+      "tag": "l2_h192",
+      "model_dir": "DL_Models/LFP_SOH_Optimization_Study/2_models/CNN/Base/0.4.2.5_hp_l2_h192",
+      "source_run": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.4.2.5_hp/outputs/soh/size_20260318_150635_l2_h192",
+      "best_ckpt": "DL_Models/LFP_SOH_Optimization_Study/1_training/0.4.2.5_hp/outputs/soh/size_20260318_150635_l2_h192/checkpoints/best_epoch0012_rmse0.01586.pt",
+      "model_overrides": {
+        "hidden_size": 192,
+        "mlp_hidden": 96
+      },
+      "screen_timestamp": "20260318_150635"
+    }
+  ]
+}

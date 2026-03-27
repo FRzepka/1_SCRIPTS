@@ -1,0 +1,194 @@
+### ============================================
+### .gitignore - MG_Farm/1_Scripts
+### Ziel: Code-only Repository
+### ============================================
+
+# ── Python ──
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+*.egg
+.eggs/
+dist/
+build/
+*.whl
+.venv/
+venv/
+env/
+
+# ── Große Daten- und Ergebnisdateien ──
+*.csv
+*.log
+**/training.log
+**/screenlog_*.txt
+*.parquet
+*.npz
+*.npy
+*.pt
+*.pth
+*.ckpt
+*.joblib
+*.pkl
+*.onnx
+*.tflite
+*.bin
+*.hex
+*.srec
+*.exe
+*.zip
+*.7z
+*.rar
+*.a
+*.so
+*.dll
+*.db
+*.lock
+*.snap
+*.history
+*.index
+*.location
+*.tree
+*.resources
+*.version
+*.xmi
+*.ldupdatedone
+
+# ── Bilder / Reports / Exporte ──
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.pdf
+*.svg
+*.ipynb
+
+# ── LaTeX Build-Artefakte ──
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.lot
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.nav
+*.snm
+
+# ── STM32 / C Build Artifacts ──
+*.o
+*.d
+*.su
+*.cyclo
+*.md5
+*.map
+*.list
+*.elf
+
+# ── Doxygen generierte Dateien ──
+**/doxygen/html/
+**/doxygen/latex/
+
+# ── IDE / Editor ──
+.vscode/
+*.swp
+*.swo
+*~
+.idea/
+*.DS_Store
+._*
+.metadata/
+.settings/
+*.pdom
+*.prefs
+*.launch
+*.mxproject
+*.ioc
+.project
+.cproject
+
+# ── Temporäre Dateien ──
+_pytemp/
+*.tmp
+*.bak
+
+# ── Jupyter ──
+.ipynb_checkpoints/
+
+# ── OS ──
+Thumbs.db
+.Trash-*
+
+# ── Benchmark / Training / Generated Artifacts ──
+DL_Models/**/runs/
+DL_Models/**/outputs/
+DL_Models/**/checkpoints/
+DL_Models/**/campaigns/
+DL_Models/**/cache/
+DL_Models/**/analysis_local_focus/
+DL_Models/**/results/*/
+DL_Models/**/archive/
+**/archive/
+**/_archive*/
+STM32/**/backup/
+STM32/**/.metadata/
+Arduino/**/Arduino_CLI/
+archive/
+
+# ── Embedded / IDE Build Folders ──
+**/Debug/
+**/Release/
+**/.ai/
+
+# ── Hardware CAD / Manufacturing Exports ──
+*.step
+*.stl
+*.gbr
+*.gbrjob
+*.drl
+*.kicad_pcb
+*.kicad_prl
+*.kicad_pro
+*.kicad_sch
+*.kicad_sym
+*.mat
+*.docx
+fp-info-cache
+**/gerber/
+**/bom/
+**/3dModels/
+**/readme_res/
+
+# ── Benchmark / Test Metadata ──
+**/metrics.json
+**/*metrics*.json
+**/summary.json
+**/*summary*.json
+**/result_*.json
+**/*results*.json
+**/*manifest.json
+**/*meta.json
+**/trials.json
+**/hpo_summary.json
+**/stderr.txt
+**/stdout.txt
+**/device_log.txt
+**/log.txt
+**/testlog_*.txt
+**/source_run.txt
+**/SESSIONS.txt
+**/*generate_report.txt
+**/*analysis.json
+LATEX/**/bib/*.json
+**/best_model*
+
+# ── Lokale Kopier- und Cleanup-Logs ──
+cleanup_candidates_overview_*.txt
+1_Scripts_copy_to_synnaseet_*.log

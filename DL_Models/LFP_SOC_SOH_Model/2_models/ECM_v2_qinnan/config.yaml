@@ -1,0 +1,49 @@
+window:
+  size: 168
+  stride: 24
+
+split:
+  idx_tr: [1,2,3,5,7,9,13,14]
+  idx_va: [4,8,11]
+  idx_te: [6,10,12]
+
+model:
+  rnn_unit: 32
+  lstm_layers: 1
+  input_size: 15
+  output_size: 1
+  dropout: 0.1
+
+train:
+  lr: 0.0005
+  batch_size: 64
+  max_epochs: 250
+  max_grad_norm: 1.0
+  #early stopping
+  patience: 30 
+  min_delta: 0.0001
+
+
+data:
+  feature_cols:
+    - Temp_mean
+    - Temp_max
+    - Temp_std
+    - Volt_mean
+    - Volt_max
+    - Volt_min
+    - Volt_std
+    - Curr_mean
+    - Curr_abs_mean
+    - Curr_rms
+    - Curr_max_abs
+    - Qc_sum
+    - Qc_mean
+    - EFC_delta
+    - EFC_mean
+  target_col: SOH
+  target_ext: delta_SOH
+
+paths:
+  data_dir: data/features_1h_scaled
+  parquet_pattern: "df_FE_C{num:02d}_features_1h_scaled.parquet"

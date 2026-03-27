@@ -1,0 +1,52 @@
+# For PCBs designed using KiCad: http://www.kicad-pcb.org/
+# Format documentation: http://kicad-pcb.org/help/file-formats/
+
+# Temporary files
+*.000
+*.bak
+*.bck
+*.kicad_pcb-bak
+*.kicad_sch-bak
+*.log
+*~
+_autosave-*
+*.tmp
+*-rescue.lib
+*-save.pro
+*-save.kicad_pcb
+
+# Netlist files (exported from Eeschema)
+*.net
+
+# Autorouter files (exported from Pcbnew)
+*.dsn
+*.ses
+
+# Exported BOM files
+*.xml
+*.csv
+
+#C files
+
+!*.doxyfile
+*.o
+*.obj
+*.db
+*.swp
+.metadata
+
+#Ordner
+__pycache__/
+
+#Zip Files
+*.zip
+
+PC_Software/cellView_ui.py
+PC_Software/CellWidget_ui.py
+PC_Software/CellWidget.ui
+PC_Software/guimain.py
+PC_Software/QtGUI_ui.py
+PC_Software/QtGUI.ui
+PC_Software/components/CellEntry.qml
+PC_Software/components/cellView.qml
+PC_Software/components/cellView.ui

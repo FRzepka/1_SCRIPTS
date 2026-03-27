@@ -1,0 +1,68 @@
+# 2.1.0.0 SOH training config (reproducible)
+seed: 42
+
+paths:
+  # Can be overridden by --data-root or $DATA_ROOT
+  data_root: ${DATA_ROOT:-/home/florianr/MG_Farm/0_Data/MGFarm_18650_FE}
+  # Base output root (site + run-id will be appended dynamically). Override via --out-root or $OUT_ROOT.
+  out_root: ${OUT_ROOT:-/home/florianr/MG_Farm/1_Scripts/DL_Models/LFP_LSTM_MLP/1_training/2.1.0.0/outputs}
+
+model:
+  type: LSTM_MLP
+  # 7 SOH features (order matters)
+  # Removed "Capacity[Ah]" (direct SOH proxy not available in deployment)
+  features: ["Testtime[s]", "Voltage[V]", "Current[A]", "Temperature[°C]", "EFC", "Q_c"]
+  hidden_size: 128
+  mlp_hidden: 128
+  num_layers: 1
+  dropout: 0.05
+
+training:
+  target: SOH
+  seq_chunk_size: 2048
+  lr: 0.0002
+  weight_decay: 0.0001
+  max_grad_norm: 1.0
+  epochs: 150
+  val_interval: 5
+  early_stopping: 25
+  batch_size: 128
+  accum_steps: 1
+  window_stride: 1  # stride between sequential windows for dataset sampling
+  scheduler:
+    type: cosine_warm_restarts
+    T_0: 150
+    eta_min_factor: 0.05
+  compile: false
+
+cells:
+  # reuse similar split pattern; adjust if desired
+  train: ["MGFarm_18650_C01", "MGFarm_18650_C03", "MGFarm_18650_C05", "MGFarm_18650_C11", "MGFarm_18650_C17", "MGFarm_18650_C23"]
+  val:   ["MGFarm_18650_C07", "MGFarm_18650_C19", "MGFarm_18650_C21"]
+
+export:
+  save_best_only: true
+  save_every_n: 25
+  to_onnx: true
+  onnx_opset: 17
+  stateful_onnx: true
+
+tracking:
+  csv_log: true
+  # csv_file will be rewritten to the dynamic out_root during runtime
+  csv_file: ${OUT_ROOT:-/home/florianr/MG_Farm/1_Scripts/DL_Models/LFP_LSTM_MLP/1_training/2.1.0.0/outputs}/training_log.csv
+  tensorboard: false
+
+metrics:
+  primary: rmse   # selection metric is RMSE
+
+performance_targets:
+  excellent_mae: 0.02
+  good_mae: 0.035
+  acceptable_mae: 0.05
+
+dataloader:
+  num_workers: 12
+  prefetch_factor: 6
+  persistent_workers: true
+  pin_memory: true

@@ -1,0 +1,33 @@
+SUBMISSION CHECKLIST
+====================
+
+[x] Title & Author Information
+    - Full names: Florian Rzepka, Julia Kowal
+    - Affiliation: Technische Universität Berlin (Chair of Electrical Energy Storage Technology)
+    - Corresponding author details included in Title Page.
+
+[x] Files for Upload
+    - Manuscript_Blind.pdf (Anonymized, includes Data Availability & AI Declaration)
+    - Manuscript_Full.pdf (For reference/preprint)
+    - Title_Page.pdf (With Author Details, Acknowledgements, CRediT, Competing Interest)
+    - Cover_Letter.pdf
+    - Highlights.pdf (Created)
+    - Figures/ (15 files)
+
+[ ] Graphical Abstract
+    - Encouraged but not mandatory. Please check if you have a specific image for this.
+
+[ ] Inspec Classification Codes
+    - Guide asks for up to 6 codes. Not currently in manuscript.
+    - Suggested: C1230 (AI), C3340 (Neural nets), B8210 (Control), B8340 (Batteries).
+
+[x] Declarations
+    - Generative AI: Added to both manuscripts.
+    - Data Availability: Added to both manuscripts.
+    - Competing Interest: In Title Page and Full Manuscript.
+    - Funding: In Title Page and Full Manuscript.
+    - CRediT: In Title Page and Full Manuscript.
+
+[x] Formatting
+    - Single column (Word) or Double column (LaTeX) -> LaTeX Double Column used (Allowed).
+    - Line numbering -> Included in Blind Manuscript.

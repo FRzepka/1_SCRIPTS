@@ -1,0 +1,90 @@
+seed: 42
+
+paths:
+  out_root: /home/florianr/MG_Farm/1_Scripts/DL_Models/LFP_SOC_SOH_Model/1_training/1.7.0.0_HPT/outputs
+
+base_train_config:
+  seed: 42
+  paths:
+    data_root: /home/florianr/MG_Farm/0_Data/MGFarm_18650_FE
+    out_root: /home/florianr/MG_Farm/1_Scripts/DL_Models/LFP_SOC_SOH_Model/1_training/1.7.0.0/outputs
+    model_out_root: /home/florianr/MG_Farm/1_Scripts/DL_Models/LFP_SOC_SOH_Model/2_models/SOC_1.7.0.0
+  model:
+    type: GRU_MLP
+    features: ["Voltage[V]", "Current[A]", "Temperature[°C]", "SOH", "Q_c", "dU_dt[V/s]", "dI_dt[A/s]", "dt_s"]
+    hidden_size: 96
+    mlp_hidden: 96
+    num_layers: 1
+    dropout: 0.08
+  augmentation:
+    time_warp_prob: 0.85
+    dt_jitter_std_s: 0.02
+    dt_jitter_clip_s: 0.05
+    min_dt_s: 0.90
+    max_dt_s: 1.10
+    current_channel_dropout_prob: 0.05
+  training:
+    seq_chunk_size: 2024
+    lr: 0.00012
+    weight_decay: 0.0001
+    max_grad_norm: 1.0
+    epochs: 120
+    val_interval: 5
+    early_stopping: 40
+    batch_size: 512
+    accum_steps: 1
+    window_stride: 1
+    compile: false
+    scheduler:
+      type: cosine_warm_restarts
+      T_0: 150
+      eta_min_factor: 0.05
+  cells:
+    train: ["MGFarm_18650_C01", "MGFarm_18650_C03", "MGFarm_18650_C05", "MGFarm_18650_C11", "MGFarm_18650_C17", "MGFarm_18650_C23"]
+    val:   ["MGFarm_18650_C07", "MGFarm_18650_C19", "MGFarm_18650_C21"]
+  export:
+    save_best_only: true
+    save_every_n: 25
+    to_onnx: true
+    onnx_opset: 17
+    stateful_onnx: true
+  tracking:
+    csv_log: true
+    csv_file: /home/florianr/MG_Farm/1_Scripts/DL_Models/LFP_SOC_SOH_Model/1_training/1.7.0.0/outputs/training_log.csv
+    tensorboard: false
+  dataloader:
+    num_workers: 12
+    prefetch_factor: 6
+    persistent_workers: true
+    pin_memory: true
+    scaler_fit_stride: 8
+    scaler_fit_max_rows_per_cell: 750000
+
+model:
+  features: ["Voltage[V]", "Current[A]", "Temperature[°C]", "SOH", "Q_c", "dU_dt[V/s]", "dI_dt[A/s]", "dt_s"]
+
+training:
+  seq_chunk_size: 2024
+  val_interval: 1
+  epochs: 20
+  early_stopping: 5
+  max_grad_norm: 1.0
+
+hpt:
+  n_trials: 16
+  direction: minimize
+  metric: val_rmse
+  max_train_batches: 1500
+  max_val_batches: 400
+
+search_space:
+  hidden_size: [64, 96, 128]
+  mlp_hidden: [64, 96, 128]
+  num_layers: [1, 2]
+  dropout: [0.05, 0.08, 0.12]
+  lr: [0.00008, 0.00010, 0.00012, 0.00015]
+  weight_decay: [0.0, 0.00001, 0.0001]
+  batch_size: [256, 512]
+  accum_steps: [1, 2]
+  dt_jitter_std_s: [0.01, 0.02, 0.03]
+  current_channel_dropout_prob: [0.0, 0.03, 0.05, 0.08]

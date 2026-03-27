@@ -1,0 +1,23 @@
+/*
+ * RobustScaler parameters for SOH preprocessing
+ * DO NOT EDIT MANUALLY
+ */
+
+#ifndef SCALER_PARAMS_SOH_H
+#define SCALER_PARAMS_SOH_H
+
+#define SCALER_NUM_FEATURES 6
+
+static const float SCALER_SOH_CENTER[SCALER_NUM_FEATURES] = {
+    7241780.0000000000f, 3.3155999184f, 0.0000000000f, 28.3999996185f, 1504.9871826172f, -0.6168743968f
+};
+
+static const float SCALER_SOH_SCALE[SCALER_NUM_FEATURES] = {
+    7241922.0000000000f, 0.2427000999f, 3.4180998802f, 0.8000011444f, 1507.6235351562f, 0.6415136456f
+};
+
+static inline void scaler_soh_transform(const float in[SCALER_NUM_FEATURES], float out[SCALER_NUM_FEATURES]){
+    for (int i=0;i<SCALER_NUM_FEATURES;i++){ out[i] = (in[i] - SCALER_SOH_CENTER[i]) / SCALER_SOH_SCALE[i]; }
+}
+
+#endif /* SCALER_PARAMS_SOH_H */

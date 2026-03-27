@@ -1,0 +1,43 @@
+# 1.6.0.2_HPT - hyperparameter tuning config
+seed: 42
+
+paths:
+  data_root: /home/florianr/MG_Farm/0_Data/MGFarm_18650_FE
+  out_root: /home/florianr/MG_Farm/1_Scripts/DL_Models/LFP_SOC_SOH_Model/1_training/1.6.0.2_HPT/outputs
+
+model:
+  features: ["Voltage[V]", "Current[A]", "Temperature[°C]", "SOH", "Q_c", "dU_dt[V/s]", "dI_dt[A/s]"]
+
+training:
+  seq_chunk_size: 2024
+  val_interval: 1
+  epochs: 30
+  early_stopping: 5
+  max_grad_norm: 1.0
+  window_stride: 1
+  compile: false
+
+hpt:
+  n_trials: 20
+  timeout_min: 0
+  direction: minimize
+  metric: val_rmse
+  max_train_batches: 3000
+  max_val_batches: 800
+
+cells:
+  train: ["MGFarm_18650_C01", "MGFarm_18650_C03", "MGFarm_18650_C05", "MGFarm_18650_C09", "MGFarm_18650_C13", "MGFarm_18650_C17", "MGFarm_18650_C25", "MGFarm_18650_C27", "MGFarm_18650_C29"]
+  val:   ["MGFarm_18650_C07", "MGFarm_18650_C15", "MGFarm_18650_C21"]
+
+search_space:
+  hidden_size: [32, 64, 96, 128]
+  mlp_hidden: [32, 64, 96, 128]
+  num_layers: [1, 2]
+  dropout: [0.02, 0.05, 0.10, 0.15]
+  lr: [0.00005, 0.0001, 0.00015, 0.0002]
+  weight_decay: [0.0, 1e-5, 1e-4]
+  batch_size: [256, 512]
+  accum_steps: [1, 2]
+
+tracking:
+  csv_log: true

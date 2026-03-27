@@ -1,0 +1,104 @@
+seed: 42
+paths:
+  data_root: /home/florianr/MG_Farm/0_Data/MGFarm_18650_FE
+  out_root: ${OUT_ROOT:-/home/florianr/MG_Farm/1_Scripts/DL_Models/LFP_SOH_Optimization_Study/1_training/0.4.2.2_hp/outputs/soh}
+model:
+  type: CNN_Causal_Seq2Seq
+  features:
+  - Voltage[V]
+  - Current[A]
+  - "Temperature[\xB0C]"
+  - EFC
+  - Q_c
+  hidden_size: 96
+  mlp_hidden: 48
+  kernel_size: 5
+  num_blocks: 3
+  dilations:
+  - 1
+  - 2
+  - 4
+  dropout: 0.1287508912961257
+  output_kernel_size: 1
+training:
+  target: SOH
+  seq_chunk_size: 96
+  loss_mode: seq2seq
+  warmup_steps: 12
+  smooth_loss_weight: 0.08432939111699322
+  smooth_loss_type: l1
+  lr: 0.0003232083737009309
+  weight_decay: 3.7594990140411304e-05
+  max_grad_norm: 0.6581819551711794
+  epochs: 50
+  val_interval: 3
+  early_stopping: 10
+  batch_size: 48
+  accum_steps: 1
+  window_stride: 1
+  scheduler:
+    type: cosine_warm_restarts
+    T_0: 150
+    T_mult: 1
+    eta_min_factor: 0.01
+  compile: false
+  warmup_epochs: 0
+cells:
+  train:
+  - MGFarm_18650_C01
+  - MGFarm_18650_C03
+  - MGFarm_18650_C05
+  - MGFarm_18650_C07
+  - MGFarm_18650_C09
+  - MGFarm_18650_C13
+  - MGFarm_18650_C17
+  - MGFarm_18650_C19
+  - MGFarm_18650_C25
+  - MGFarm_18650_C27
+  val:
+  - MGFarm_18650_C15
+  - MGFarm_18650_C21
+  test:
+  - MGFarm_18650_C11
+  - MGFarm_18650_C23
+  - MGFarm_18650_C29
+sampling:
+  enabled: true
+  interval_seconds: 3600
+  feature_aggs:
+  - mean
+  - std
+  - min
+  - max
+  target_agg: last
+export:
+  save_best_only: false
+  save_every_n: 15
+  to_onnx: true
+  onnx_opset: 17
+  stateful_onnx: true
+tracking:
+  csv_log: true
+  csv_file: ${OUT_ROOT:-/home/florianr/MG_Farm/1_Scripts/DL_Models/LFP_SOH_Optimization_Study/1_training/0.4.2.2_hp/outputs/soh}/training_log.csv
+  tensorboard: false
+  plot_interval: 10
+metrics:
+  primary: rmse
+  secondary:
+  - mae
+  - r2
+  - max_error
+performance_targets:
+  excellent_mae: 0.015
+  good_mae: 0.025
+  acceptable_mae: 0.04
+dataloader:
+  num_workers: 2
+  prefetch_factor: 2
+  persistent_workers: true
+  pin_memory: true
+study_variant:
+  family: CNN
+  role: smaller_1
+  tag: s1_h96
+  source_model_dir: DL_Models/LFP_SOH_Optimization_Study/2_models/CNN/Base/0.4.2.1_hp

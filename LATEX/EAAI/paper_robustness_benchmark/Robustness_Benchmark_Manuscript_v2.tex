@@ -1,0 +1,385 @@
+\documentclass[review]{elsarticle}
+\usepackage{lineno}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{placeins}
+\usepackage{dblfloatfix}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\journal{Engineering Applications of Artificial Intelligence}
+\date{}
+\newcommand{\code}[1]{\path{#1}}
+\newcommand{\benchfig}[2]{%
+\IfFileExists{#1}{\includegraphics[width=\columnwidth]{#1}}{\fbox{\parbox{0.9\columnwidth}{#2\\\path{#1}}}}%
+}
+\makeatletter
+\renewcommand{\topfraction}{0.85}
+\renewcommand{\bottomfraction}{0.85}
+\renewcommand{\textfraction}{0.15}
+\renewcommand{\floatpagefraction}{0.90}
+\renewcommand{\dbltopfraction}{0.85}
+\renewcommand{\dblfloatpagefraction}{0.90}
+\setcounter{topnumber}{2}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}
+\setcounter{dbltopnumber}{2}
+\makeatother
+\raggedbottom
+
+\begin{document}
+\linenumbers
+\begin{frontmatter}
+\title{Robustness Benchmarking of Embedded Battery State Estimation: A Measurement-Only Comparison of Direct-Measurement, Hybrid, and Data-Driven Estimators}
+\author[1]{[Author Placeholder]}
+\affiliation[1]{organization={[Institution Placeholder]}, city={[City Placeholder]}, country={[Country Placeholder]}}
+\begin{abstract}
+This paper presents a measurement-only robustness benchmark for embedded battery state estimation under realistic Battery Management System (BMS) constraints. Four embedded-ready estimators are compared on the same Lithium Iron Phosphate (LFP) full-cell trajectory: a direct-measurement model (DM), a hybrid direct-measurement model with learned State-of-Health support (HDM), a hybrid equivalent-circuit model with voltage feedback (HECM), and a data-driven neural model with joint SOC/SOH inference (DD). The benchmark perturbs only measurable inputs and timing information, including current bias, current noise, voltage noise, temperature noise, missing samples, irregular sampling, burst dropouts, spikes, and initial-state mismatch, so that all disturbances remain physically interpretable and reproducible without introducing artificial model-parameter mismatch. On the benchmark trajectory, HDM provides the best clean-condition baseline with an MAE of $0.0042$, followed by HECM with $0.0087$, DD with $0.0106$, and DM with $0.0311$. Under realistic current bias, HECM is clearly the most robust estimator, reaching an MAE of $0.0945$, compared with $0.2822$ for DD, $0.3042$ for HDM, and $0.3143$ for DM. Under missing samples, DD remains particularly stable, changing only from $0.0106$ to $0.0124$ MAE, whereas the integration-based estimators degrade much more strongly. A local recovery analysis in a reset-free evaluation window further reveals model-specific re-synchronization behavior after initialization errors, including persistent mismatch for HDM and delayed recovery for the remaining estimator classes. The benchmark therefore exposes complementary failure modes of direct-measurement, hybrid physics-based, and data-driven estimators and supports decision-oriented model selection for embedded BMS deployment.
+\end{abstract}
+\begin{keyword}
+Battery management system \sep State of charge \sep State of health \sep Robustness benchmark \sep Direct measurement \sep Equivalent circuit model \sep Data-driven estimation \sep Embedded artificial intelligence
+\end{keyword}
+\end{frontmatter}
+
+\section*{Nomenclature}
+\small
+\subsection*{Acronyms}
+\begin{description}[style=multiline,leftmargin=1.7cm,font=\bfseries]
+\item[BMS] Battery management system
+\item[SOC] State of charge
+\item[SOH] State of health
+\item[DM] Direct-measurement model
+\item[HDM] Hybrid direct-measurement model
+\item[HECM] Hybrid equivalent-circuit model
+\item[DD] Data-driven neural model
+\item[ECM] Equivalent circuit model
+\item[EKF] Extended Kalman filter
+\item[MAE] Mean absolute error
+\item[RMSE] Root-mean-square error
+\item[ADC] Analog-to-digital converter
+\item[CV] Constant-voltage phase
+\item[OCV] Open-circuit voltage
+\item[GRU] Gated recurrent unit
+\item[LFP] Lithium iron phosphate
+\end{description}
+\medskip
+\subsection*{Symbols}
+\begin{description}[style=multiline,leftmargin=1.7cm,font=\bfseries]
+\item[$t$] Time
+\item[$I(t)$] Current signal at time $t$
+\item[$U(t)$] Voltage signal at time $t$
+\item[$T(t)$] Temperature signal at time $t$
+\item[$\widehat{\mathrm{SOC}}(t)$] Estimated state of charge at time $t$
+\item[$\widehat{\mathrm{SOH}}(t)$] Estimated state of health at time $t$
+\item[$\mathrm{SOC}_{\mathrm{ref}}(t)$] Reference SOC target at time $t$
+\item[$\mathrm{SOH}_{\mathrm{ref}}(t)$] Reference SOH target at time $t$
+\item[$\Delta I$] Current bias or offset
+\item[$\Delta U$] Voltage bias or offset
+\item[$\Delta T$] Temperature bias or offset
+\item[$\sigma_I$] Standard deviation of injected current noise
+\item[$\sigma_U$] Standard deviation of injected voltage noise
+\item[$\sigma_T$] Standard deviation of injected temperature noise
+\item[$Q_c$] Online cumulative charge proxy used by the SOC models
+\item[$C_{\mathrm{nom}}$] Nominal capacity
+\item[$C_{\mathrm{eff}}$] Effective capacity used inside the estimator
+\item[$\Delta\mathrm{MAE}$] Error increase relative to baseline
+\end{description}
+\normalsize
+
+\section{Introduction}
+\subsection{Motivation and practical relevance}
+\begin{itemize}[leftmargin=*]
+    \item Reliable battery state estimation is a core BMS function because SOC and SOH determine safety margins, usable energy, operating limits, charge control, and degradation-aware system management in both mobile and stationary lithium-ion battery applications \cite{shrivastavaReviewTechnologicalAdvancement2023,guoSystematicReviewElectrochemical2024,yaoSmarterBatteryManagement2025b}.
+    \item Practical deployment quality is not defined by clean-condition accuracy alone, because real BMS operation is exposed to sensor bias, additive noise, ADC quantization, initialization uncertainty after restart, missing samples, timing jitter, communication interruptions, and transient signal spikes caused by measurement-chain limitations or disturbances in the surrounding system \cite{liRobustnessSOCEstimation2015,naseriReliableWirelessBMS2025,bergerBenchmarkingBatteryManagement2024}.
+    \item The relevant engineering question is therefore not only whether an estimator achieves low MAE under nominal measurements, but also whether it remains stable, limits drift, and recovers after physically plausible measurement corruption.
+    \item This distinction is already visible in the benchmark evidence: the hybrid direct-measurement model yields the best clean-condition baseline with $\mathrm{MAE}=0.0042$, the hybrid ECM model is markedly more robust under current bias with $\mathrm{MAE}=0.0945$, the data-driven model changes only from $0.0106$ to $0.0124$ under missing samples, and voltage noise strongly degrades the direct, hybrid direct, and data-driven estimators while leaving the hybrid ECM almost unchanged.
+\end{itemize}
+
+\subsection{State of the art in battery state estimation}
+\begin{itemize}[leftmargin=*]
+    \item The literature commonly groups battery-state estimators into direct-measurement or integration-based approaches, model-based approaches based on equivalent-circuit or electrochemical models, hybrid approaches that combine physical structure with learned components, and purely data-driven models based on neural sequence learning \cite{khanComparativeStudyDifferent2022,shrivastavaReviewTechnologicalAdvancement2023,guoSystematicReviewElectrochemical2024,yaoSmarterBatteryManagement2025b}.
+    \item Direct-measurement approaches, typically based on Coulomb counting, are attractive because they are simple, computationally inexpensive, and easy to deploy, but they are structurally sensitive to current bias, missing data, and initialization errors because they lack an internal correction mechanism \cite{khanComparativeStudyDifferent2022,liRobustnessSOCEstimation2015}.
+    \item Model-based approaches, especially ECM- and observer-based estimators, offer physical interpretability and voltage-based correction capability, but their practical behavior depends on the quality of model parametrization, operating-point observability, and measurement quality \cite{gaoEnhancedStateofchargeEstimation2022,guoSystematicReviewElectrochemical2024,liRobustnessSOCEstimation2015}.
+    \item Hybrid estimators seek to combine the strengths of both worlds by retaining physically meaningful state propagation while adapting capacity, parameters, or auxiliary states through learned components, which has made joint SOC/SOH estimation an active research direction \cite{gaoCoEstimationStateofChargeStateof2022,shenAlternativeCombinedCoestimation2022,wangFusionEstimationLithiumion2022}.
+    \item Data-driven approaches based on recurrent or sequence models can exploit nonlinear cross-relations between current, voltage, temperature, and derived online features, and recent work has also demonstrated their embedded feasibility through TinyML-oriented implementations, pruning, and quantization \cite{mondalEstimatingStateofChargeLithiumIon2024,Embedded_AI_only_SOC_mobile,giazitzisCaseStudyTiny2024,mazziStateChargeEstimation2022,yaoSmarterBatteryManagement2025b}.
+\end{itemize}
+
+\subsection{Robustness and embedded deployment gap}
+\begin{itemize}[leftmargin=*]
+    \item A large share of the SOC estimation literature still emphasizes clean-data accuracy, average error metrics, or computational efficiency, while comparatively fewer studies analyze how estimators behave under realistic measurement faults and timing corruption \cite{shrivastavaReviewTechnologicalAdvancement2023,Embedded_AI_only_SOC_mobile,giazitzisCaseStudyTiny2024,mazziStateChargeEstimation2022}.
+    \item Existing robustness studies often remain confined to a single model family, for example observer-based robustness against modeling and measurement errors \cite{liRobustnessSOCEstimation2015} or robust estimation concepts for specific BMS architectures under noise and uncertainty \cite{naseriReliableWirelessBMS2025}, whereas cross-family comparisons under the same disturbance protocol remain limited.
+    \item Benchmarking studies in the broader BMS context underline the importance of reproducible scenario design and deployment-relevant validation, but they do not by themselves close the gap between clean-data estimator comparison and measurement-level robustness benchmarking across fundamentally different estimator classes \cite{bergerBenchmarkingBatteryManagement2024}.
+    \item The embedded context further sharpens this gap, because estimator selection in a real BMS must simultaneously consider accuracy, robustness, interpretability, computational simplicity, and graceful degradation under disturbed measurements rather than only nominal prediction quality.
+\end{itemize}
+
+\subsection{Contribution and study objectives}
+\begin{itemize}[leftmargin=*]
+    \item This work defines robustness as a joint property of bounded global error increase, stable local behavior, limited drift, and recoverability after realistic disturbances applied only to measurable inputs and their timing.
+    \item The study compares four representative estimator classes, namely a direct-measurement model (DM), a hybrid direct-measurement model with learned SOH support (HDM), a hybrid equivalent-circuit model with voltage feedback (HECM), and a data-driven neural model with joint SOC/SOH inference (DD), under identical online execution conditions.
+    \item The disturbances are deliberately restricted to measurement-level and signal-integrity scenarios, including current bias, current noise, voltage noise, temperature noise, missing samples, irregular sampling, burst dropouts, voltage spikes, and initialization errors, so that the benchmark remains physically interpretable and experimentally reproducible.
+    \item The core contribution is therefore a measurement-only robustness benchmark that separates baseline accuracy from robustness behavior and translates the observed failure modes into deployment-oriented guidance for estimator selection in embedded BMS applications.
+\end{itemize}
+
+\section{Methodology}
+\subsection{Estimator classes under test}
+\begin{itemize}[leftmargin=*]
+    \item The direct-measurement model (DM, implementation \texttt{CC\_1.0.0}) represents the canonical embedded Coulomb-counting approach with fixed nominal capacity and explicit full-charge reset logic, and serves as the low-complexity reference for integration-driven SOC estimation.
+    \item The hybrid direct-measurement model (HDM, implementation \texttt{CC\_SOH\_1.0.0}) preserves the same Coulomb-counting core but replaces the fixed capacity assumption with an online effective capacity derived from a learned SOH estimator, which makes it representative of lightweight hybrid estimation.
+    \item The hybrid equivalent-circuit model (HECM, implementation \texttt{ECM\_0.0.3}) represents physics-based state estimation with observer correction, because it combines current-driven state propagation with voltage-residual feedback and SOH-dependent parameterization \cite{gaoEnhancedStateofchargeEstimation2022,guoSystematicReviewElectrochemical2024}.
+    \item The data-driven model (DD, implementation \texttt{SOC\_SOH\_1.6.0.0\_GRU\_0.3.1.2}) represents a neural sequence estimator in which SOH is inferred by a recurrent model and SOC is estimated by rolling LSTM inference from measured and derived online features \cite{mondalEstimatingStateofChargeLithiumIon2024,yaoSmarterBatteryManagement2025b}.
+\end{itemize}
+
+\subsection{SOC estimation methods}
+\begin{itemize}[leftmargin=*]
+    \item The direct-measurement SOC formulation used in DM and, in modified form, in HDM follows online Coulomb counting with the internal charge state update $Q_m(k)=Q_m(k-1)+I_k \Delta t_k / 3600$ and the SOC mapping $\widehat{\mathrm{SOC}}(k)=\mathrm{clip}\!\left(1+Q_m(k)/C,0,1\right)$, where $C$ is either a fixed nominal capacity or an SOH-adapted effective capacity.
+    \item In both direct-measurement variants, a sustained near-maximum voltage condition is interpreted as a constant-voltage full-charge event; if the voltage remains above $V_{\max}-V_{\mathrm{tol}}$ for the configured CV duration, the internal charge state is reset so that $\widehat{\mathrm{SOC}}=1$, which reflects the practical assumption that a completed CV phase provides a physically anchored full-charge reference.
+    \item The hybrid ECM model uses an EKF-style state update with a state vector containing SOC and polarization states; the prediction step propagates current-dependent RC dynamics, and the correction step uses the voltage residual between the measured terminal voltage and the model-based estimate $\widehat{U}_k = \mathrm{OCV}(\widehat{\mathrm{SOC}}_k,\widehat{\mathrm{SOH}}_k,I_k) + V_{1,k} + V_{2,k} + R_i I_k$ to update the internal state.
+    \item The data-driven SOC model performs rolling LSTM inference on the feature vector \{Voltage[V], Current[A], Temperature[$^\circ$C], SOH, $Q_c$, $dU/dt$, $dI/dt$\}, which means that the estimator is not tied to a single direct integration variable but still remains sensitive to disturbance propagation through the online auxiliary and derivative channels.
+\end{itemize}
+
+\subsection{SOH estimation method}
+\begin{itemize}[leftmargin=*]
+    \item The shared SOH estimator is a GRU-based sequence model that operates on hourly aggregated online features derived from \{Voltage[V], Current[A], Temperature[$^\circ$C], EFC, $Q_c$\}, where the aggregation uses the statistics mean, standard deviation, minimum, and maximum for each feature \cite{Embedded_AI_SOH_badData,gouEnsembleLearningBasedDataDriven2021,liOnlineCapacityEstimation2021,rzepkaNeuralNetworkArchitecture2023a}.
+    \item The SOH prediction is updated at hourly cadence and then held piecewise constant between update points, which enforces an online deployment constraint and avoids sample-wise access to future information.
+    \item In the HDM, the predicted SOH enters the SOC computation through the effective capacity relation $C_{\mathrm{eff}} = C_{\mathrm{nom}} \cdot \widehat{\mathrm{SOH}}$, so the method remains structurally close to direct measurement while replacing the fixed-capacity assumption.
+    \item In the HECM, the predicted SOH affects the capacity scaling and the lookup-based ECM parametrization, while in the DD model it is provided as an explicit SOC input feature that contextualizes the current measurement trajectory.
+\end{itemize}
+
+\subsection{Robustness benchmark design}
+\begin{itemize}[leftmargin=*]
+    \item The benchmark follows a strict measurement-only principle: only quantities that a real BMS measures or derives online from measured data are manipulated, namely current, voltage, temperature, sample availability, and sampling time, whereas artificial parameter mismatch and synthetic hidden-state corruption are deliberately excluded \cite{bergerBenchmarkingBatteryManagement2024}.
+    \item The considered disturbance classes comprise input disturbances, initialization errors, and signal-integrity problems, which together cover sensor bias, additive noise, ADC quantization, transient spikes, unknown start states, isolated frozen samples, irregular timing, and burst-like data gaps.
+    \item These disturbances were selected because they correspond to realistic failure mechanisms in measurement chains and embedded systems, including sensor tolerances, limited ADC resolution, electromagnetic interference, communication dropouts, scheduler jitter, or estimator restarts after unavailable battery history \cite{liRobustnessSOCEstimation2015,naseriReliableWirelessBMS2025,bergerBenchmarkingBatteryManagement2024}.
+    \item The compact matrix used for the current manuscript phase contains baseline, current bias, current noise, initial SOC error, missing samples, irregular sampling, burst dropout, voltage spikes, voltage noise, and temperature noise, while the extended runner infrastructure also supports additional offset and quantization scenarios for later expansion.
+    \item The benchmark is executed as a controlled laboratory-style scenario study rather than as an uncontrolled field test, so that disturbance magnitudes and timing remain reproducible and comparable across model classes and runs.
+\end{itemize}
+
+\subsection{Metrics and evaluation criteria}
+\begin{itemize}[leftmargin=*]
+    \item Global robustness is quantified through MAE, RMSE, bias, maximum error, and the $95$th percentile absolute error, because these metrics provide a compact view of average performance, systematic deviation, and tail behavior across the full trajectory.
+    \item Local robustness is analyzed through scenario-specific metrics such as jump counts, output variance, absolute-error variance, and excess rolling MAE, because several disturbances do not primarily manifest as full-run MAE collapse but as short-term jitter, delayed drift, or slow re-synchronization.
+    \item Whenever a disturbance mask exists, the analysis further separates pre-disturbance, disturbed, and post-disturbance behavior in order to quantify disturbance-window error growth, recovery time, and residual post-disturbance error.
+    \item Recovery after initialization errors is interpreted through two baseline-band criteria: a strict band defined as $\max(\mathrm{P95}_{\mathrm{base}},1.5 \cdot \mathrm{MAE}_{\mathrm{base}})$ and a fair band defined as $\max(2 \cdot \mathrm{P95}_{\mathrm{base}},3 \cdot \mathrm{MAE}_{\mathrm{base}},0.02)$, both with sustained re-entry over a fixed time horizon.
+    \item This multi-scale metric design ensures that robustness is not reduced to a single scalar quantity but evaluated as a combination of global degradation, local disturbance response, long-term drift, and recovery behavior.
+\end{itemize}
+
+\begin{figure*}[t]
+    \centering
+    \benchfig{figures/Schematics/benchmark_pipeline_overview.pdf}{Placeholder for the overall benchmark pipeline: raw cell measurements $\rightarrow$ scenario manipulation $\rightarrow$ online estimator execution $\rightarrow$ global/local metrics $\rightarrow$ paper result package.}
+    \caption{Overview of the robustness benchmark pipeline from measured cell signals to disturbed online execution and paper-facing robustness metrics.}
+    \label{fig:benchmark_pipeline}
+\end{figure*}
+
+\section{Experimental Setup}
+\subsection{Dataset and data acquisition}
+\begin{itemize}[leftmargin=*]
+    \item The benchmark is based on the MGFarm LFP 18650 dataset, which was generated in a laboratory environment as a controlled design-of-experiments study on cyclic aging and operating conditions and provides a suitable basis for robustness analysis because it combines long full-cell trajectories with high-resolution measured signals and repeated checkup structures \cite{aqachtoulMGFARMIoTEdgeDriven2026,LFP_DoE_Cycle_Aging_Dataset,siebertzStatistischeVersuchsplanung2017}.
+    \item The current manuscript phase uses one representative full-cell trajectory from this dataset in order to isolate estimator behavior under controlled measurement corruption before extending the analysis to additional cells.
+    \item The available raw measurements comprise current, voltage, temperature, and test time, while the feature-engineered dataset also contains offline reference targets and derived variables such as capacity, SOH, equivalent full cycles, and cumulative charge state.
+    \item This setup is well suited for the present study because it combines realistic laboratory measurements with enough structure to derive reproducible disturbance scenarios without introducing external domain shift.
+\end{itemize}
+
+\subsection{Reference targets and preprocessing}
+\begin{itemize}[leftmargin=*]
+    \item The reference preprocessing first computes the signed transferred charge as $Q_k = I_k \Delta t_k / 3600$ and the absolute transferred charge as $|Q_k|$, from which the capacity during dedicated capacity-test intervals is obtained as $C_{\mathrm{ref}} = \sum_k |Q_k|$.
+    \item The reference SOH target is then defined offline as $\mathrm{SOH}_{\mathrm{ref}} = C_{\mathrm{ref}} / C_{\mathrm{ref},0}$, where $C_{\mathrm{ref},0}$ denotes the first measured reference capacity of the trajectory, and the resulting capacity and SOH columns are interpolated between the dedicated capacity-test anchors.
+    \item The reference SOC target used in the benchmark corresponds to the offline Coulomb-counting target $\mathrm{SOC}_{\mathrm{ref}} = 1 + Q_c / C_{\mathrm{ref},0}$, where the cumulative charge state $Q_c$ is propagated from the signed charge and reset to $0$ at the upper voltage anchor and to $-C_{\mathrm{ref},0}$ at the lower voltage anchor during preprocessing.
+    \item These reference targets are intentionally treated as offline evaluation quantities, because they rely on dataset-side processing and anchor logic that are not fully available to an online estimator during deployment.
+\end{itemize}
+
+\subsection{Test trajectory and benchmark scenarios}
+\begin{itemize}[leftmargin=*]
+    \item All estimators are evaluated on the same benchmark trajectory and with the same disturbance protocol so that performance differences can be attributed to estimator structure rather than to different data sources or target definitions.
+    \item The reported benchmark scenarios comprise the nominal baseline, current bias, additive current noise, voltage noise, temperature noise, initial SOC error, missing samples, irregular sampling, burst dropout, and voltage spikes, which together cover both measurement corruption and signal-integrity faults.
+    \item Input disturbances are applied directly to the measured channels, initialization errors are injected only where structurally meaningful, and signal-integrity scenarios manipulate sample availability or timing while preserving the online execution logic of the estimators.
+    \item The scenario set is designed to expose different failure mechanisms, including long-term integration drift, loss of voltage-based correction, transient overshoot, robustness against frozen inputs, and the ability to recover after local disturbances.
+\end{itemize}
+
+\subsection{Implementation details}
+\begin{itemize}[leftmargin=*]
+    \item Every estimator is executed under online conditions, meaning that the disturbed measurement stream is processed sample by sample and all auxiliary quantities required by the models are rebuilt from the disturbed inputs instead of being copied from the clean dataset.
+    \item This applies in particular to the derived online features $Q_c$, EFC, $dU/dt$, $dI/dt$, and the hourly SOH aggregates, which are recalculated after disturbance injection so that no hidden dataset-side variables leak into the benchmark runs.
+    \item In freeze and dropout scenarios, the disturbance propagation is handled consistently by freezing or distorting the derived online features together with the corresponding measured inputs, which is necessary for a physically meaningful comparison between model classes.
+    \item The direct-measurement estimators include the same CV-triggered reset mechanism that is also used to define a physically anchored full-charge point in preprocessing, whereas the data-driven initial-SOC test is implemented through an initial offset of the online $Q_c$ feature because the neural model does not expose an explicit SOC state variable.
+    \item The simulation environment enforces identical nominal capacity assumptions, identical disturbed input streams, shared evaluation targets, and the same global and local robustness metrics across all estimators, which makes the resulting comparison directly attributable to estimator design rather than to inconsistent execution conditions.
+\end{itemize}
+
+\begin{figure*}[t]
+    \centering
+    \benchfig{figures/Schematics/scenario_taxonomy.pdf}{Placeholder for a scenario taxonomy figure grouping input disturbances, initialization errors, and signal-integrity faults.}
+    \caption{Taxonomy of the robustness scenarios used in the benchmark, grouped into input disturbances, initialization errors, and signal-integrity faults.}
+    \label{fig:scenario_taxonomy}
+\end{figure*}
+
+\section{Results}
+\subsection{Baseline performance}
+\begin{itemize}[leftmargin=*]
+    \item On the selected benchmark trajectory, the hybrid direct-measurement model achieves the lowest baseline error with $\mathrm{MAE}=0.0042$, followed by the hybrid equivalent-circuit model with $0.0087$, the data-driven model with $0.0106$, and the direct-measurement model with $0.0311$.
+    \item The baseline ranking therefore favors HDM for nominal operation, but this ordering does not persist under biased or corrupted measurements.
+    \item This separation between clean-condition accuracy and robustness is one of the central findings of the benchmark.
+\end{itemize}
+
+\begin{figure}[t]
+    \centering
+    \benchfig{../../../DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/results/paper_figures/Figure_1_baseline_performance.png}{Baseline comparison figure missing.}
+    \caption{Baseline performance on the selected full-cell benchmark trajectory. The hybrid direct-measurement model provides the lowest clean-condition error, whereas the direct-measurement model shows the largest baseline deviation.}
+    \label{fig:baseline_mae}
+\end{figure}
+
+\subsection{Current bias robustness}
+\begin{itemize}[leftmargin=*]
+    \item Current bias is the clearest discriminator of integration-driven drift in the benchmark.
+    \item Across the matched bias sweep ($0.5\%$, $1.5\%$, and $3.0\%$ of $|I|_{\max}$), the hybrid equivalent-circuit model remains the most robust estimator, the data-driven model is intermediate, and both direct-measurement models degrade strongly.
+    \item The result is structurally consistent with the estimator classes: HECM can correct through voltage feedback, whereas DM and HDM remain dominated by current integration drift.
+    \item The HDM keeps the best clean-condition baseline but does not gain practical protection against current bias once the current stream is systematically shifted.
+\end{itemize}
+
+\begin{figure*}[t]
+    \centering
+    \benchfig{../../../DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/results/paper_figures/Figure_2_current_bias.png}{Current-bias robustness figure missing.}
+    \caption{Robustness against current measurement bias. (a) Example of the applied current bias ($+3\%$) in a representative 30~min window. (b) Global degradation of SOC estimation accuracy as a function of bias magnitude. (c) SOC trajectory divergence over the first 12~h for a $+3\%$ current bias.}
+    \label{fig:offset_sensitivity}
+\end{figure*}
+
+\subsection{Noise robustness}
+\begin{itemize}[leftmargin=*]
+    \item Current noise is weaker than current bias in global MAE, but it remains informative through local behavior and output jitter.
+    \item Under the high-noise case, the hybrid equivalent-circuit model shows the largest global penalty ($\Delta\mathrm{MAE}=0.0081$), whereas DM, HDM, and DD remain close to their baseline MAE values.
+    \item The local noise story differs from the global metric: the data-driven model exhibits the strongest output jitter because current noise propagates into several derived input channels, whereas the hybrid equivalent-circuit model is the most sensitive in the error domain.
+    \item The broader noise block is not limited to current noise: temperature noise is almost neutral for DM and HECM but increases the error of HDM and DD, while voltage noise is one of the strongest discriminators because HECM remains nearly unaffected whereas DM, HDM, and DD degrade strongly.
+    \item The figure therefore separates the applied current disturbance, a matched SOC comparison in the same window, the global MAE penalty, and the local output-jitter summary, while the cross-scenario tables provide the complementary evidence for voltage and temperature noise.
+\end{itemize}
+
+\begin{figure*}[t]
+    \centering
+    \benchfig{../../../DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/results/paper_figures/Figure_3_noise_robustness.png}{Noise robustness figure missing.}
+    \caption{Noise robustness under additive current noise. The figure combines an applied current-noise example, a matched SOC comparison in the same 30~min window, the global MAE penalty, and the local output-jitter sensitivity across noise levels.}
+    \label{fig:noise_sensitivity}
+\end{figure*}
+
+\subsection{Initialization error and recovery}
+\begin{itemize}[leftmargin=*]
+    \item Initialization robustness must be analyzed locally and in an evaluation window without constant-voltage reset events, because global MAE hides the actual re-synchronization behavior after a wrong initial SOC.
+    \item DM recovers to the strict baseline band after about $1.17$~h, HECM recovers after about $2.37$~h under the strict criterion and after about $1.16$~h under the fair criterion, whereas HDM does not re-enter either band in the inspected window.
+    \item The data-driven model is evaluated through an initial perturbation of the online $Q_c$ feature rather than through an explicit hard SOC-state reset, which keeps the test aligned with deployment-time observables; under this formulation it recovers under the fair-band criterion after about $1.16$~h but not under the strict criterion.
+\end{itemize}
+
+\begin{figure*}[t]
+    \centering
+    \benchfig{../../../DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/results/paper_figures/Figure_7_initial_state_recovery.png}{Initial-state recovery figure missing.}
+    \caption{Initial-state recovery in a reset-free evaluation window. The top panel shows SOC trajectories after the imposed state mismatch, and the lower panel shows the corresponding absolute SOC error over time.}
+    \label{fig:init_recovery}
+\end{figure*}
+
+\subsection{Missing samples and signal integrity}
+\begin{itemize}[leftmargin=*]
+    \item Missing samples are the strongest global signal-integrity stressor in the benchmark, particularly for DM and HDM, whereas the data-driven model changes only marginally from $0.0106$ to $0.0124$ MAE.
+    \item The irregular-sampling scenario is nearly neutral for all models under the current resampled implementation, with only very small signed MAE changes around zero.
+    \item The one-hour burst dropout remains globally moderate, but all models require roughly $27$--$29$~h to return to the baseline error band, making the post-gap recovery behavior more informative than the global MAE alone.
+    \item The signal-integrity block therefore needs both global and local views: Figure~\ref{fig:signal_integrity} summarizes the global penalties, while the two following figures show the transition into the gap and the long recovery afterwards.
+\end{itemize}
+
+\begin{figure*}[t]
+    \centering
+    \benchfig{../../../DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/results/paper_figures/Figure_4_signal_integrity.png}{Signal-integrity summary figure missing.}
+    \caption{Signal-integrity robustness summary. The left panel compares the global MAE penalties for missing samples, irregular sampling, and burst dropout, whereas the right panel summarizes the burst-dropout recovery time.}
+    \label{fig:signal_integrity}
+\end{figure*}
+
+\begin{figure*}[t]
+    \centering
+    \benchfig{../../../DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/results/paper_figures/Figure_5_missing_gap_transition.png}{Missing-gap transition figure missing.}
+    \caption{Local transition into the burst-dropout window. The shaded region marks the missing-data interval, and the lower panel shows how the estimators behave while the measurements are frozen.}
+    \label{fig:missing_gap_transition}
+\end{figure*}
+
+\begin{figure*}[t]
+    \centering
+    \benchfig{../../../DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/results/paper_figures/Figure_6_missing_gap_recovery.png}{Missing-gap recovery figure missing.}
+    \caption{Post-gap recovery after the burst dropout. The upper panel shows the SOC trajectories after the gap, and the lower panel shows the corresponding absolute SOC error together with the recovery markers.}
+    \label{fig:missing_gap_recovery}
+\end{figure*}
+
+\subsection{Spike robustness}
+\begin{itemize}[leftmargin=*]
+    \item Single voltage spikes have very different local effects across model classes, even when the full-run MAE changes remain small for DM, HDM, and HECM.
+    \item The data-driven model shows the clearest spike sensitivity, both in the representative SOC window and in the local aligned error response, with a noticeable global increase from $0.0106$ to $0.0138$ MAE in the current spike protocol.
+    \item To avoid misleading signed full-run averages, the compact spike summary is reported as the $95$th percentile of the post-spike peak excess error rather than as signed $\Delta\mathrm{MAE}$.
+\end{itemize}
+
+\begin{figure*}[t]
+    \centering
+    \benchfig{../../../DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/results/paper_figures/Figure_8_spike_response.png}{Spike-response figure missing.}
+    \caption{Voltage-spike robustness. The figure combines a representative SOC window around a spike, a local spike-severity summary based on the $95$th percentile of the post-spike peak excess error, and the aligned local excess-error response across repeated spikes.}
+    \label{fig:spike_recovery}
+\end{figure*}
+
+\subsection{Cross-scenario comparison}
+\begin{itemize}[leftmargin=*]
+    \item The cross-scenario view confirms that baseline ranking and robustness ranking do not coincide, because HDM is best under nominal conditions, HECM is most resilient under current bias and voltage noise, and DD is the most stable estimator under missing samples.
+    \item Current bias and voltage noise are the most discriminative scenarios in the present benchmark phase because they most clearly separate correction-capable estimators from purely integration-driven or fully data-driven alternatives.
+    \item The combined evidence from baseline, disturbed MAE, and local recovery therefore supports model selection by expected fault profile rather than by clean-data accuracy alone.
+    \item A cross-scenario heatmap remains useful as a compact summary because it visualizes where the robustness ranking changes across disturbance classes and where estimator strengths are scenario-specific rather than universal.
+\end{itemize}
+
+\begin{figure*}[t]
+    \centering
+    \benchfig{figures/Results/02_delta_mae_heatmap.png}{Placeholder for delta-MAE heatmap across models and scenarios.}
+    \caption{Planned cross-scenario heatmap showing error increase relative to baseline.}
+    \label{fig:delta_heatmap}
+\end{figure*}
+
+\section{Discussion}
+\subsection{Model-specific robustness behavior}
+\begin{itemize}[leftmargin=*]
+    \item The direct-measurement model acts as the canonical drift-prone estimator, because every persistent current disturbance directly accumulates in the SOC estimate and missing measurement information cannot be corrected by an additional feedback mechanism.
+    \item The hybrid direct-measurement model improves nominal calibration through online capacity adaptation, but it remains structurally exposed to the same current-integration failure mode and additionally inherits the dynamics of the learned SOH support.
+    \item The hybrid ECM model benefits from voltage-residual correction and therefore handles current bias and voltage noise much better than the integration-based alternatives, although it becomes more sensitive when noise perturbs the current-dependent parameter selection and observer update.
+    \item The data-driven model behaves as a context-rich general-purpose estimator whose robustness depends strongly on the disturbance channel: it is notably stable under missing samples, competitive under current bias, but more exposed to derivative-amplified noise and voltage spikes.
+\end{itemize}
+
+\subsection{Accuracy--robustness trade-offs}
+\begin{itemize}[leftmargin=*]
+    \item The benchmark makes clear that low baseline MAE does not imply robust disturbed operation, because the best nominal model under clean measurements is not the best model under current bias or voltage noise.
+    \item The observed trade-off is therefore not only between accuracy and computational complexity, but also between calibration strength, explicit physical correction capability, and sensitivity to disturbance propagation through learned or derived features.
+    \item This result argues against single-metric leaderboard thinking and favors a scenario-aware interpretation in which estimator quality is tied to the disturbance classes that matter most in the target application.
+\end{itemize}
+
+\subsection{Implications for BMS deployment}
+\begin{itemize}[leftmargin=*]
+    \item If current-sensor bias and long-term drift are dominant concerns, the benchmark evidence favors the hybrid ECM class because voltage feedback provides a correction channel that integration-only estimators do not have.
+    \item If the deployment focus is nominal accuracy under controlled sensing and low-compute execution, the hybrid direct-measurement class remains attractive, but its vulnerability to biased current measurements must be considered explicitly.
+    \item If robustness against signal-integrity issues such as missing samples is important, the data-driven model offers a strong alternative, provided that the input feature pipeline and spike handling are engineered carefully.
+    \item For embedded BMS design, the practical selection criterion should therefore be the expected fault profile of the measurement chain and not only the nominal error ranking of the estimator.
+\end{itemize}
+
+\subsection{Limitations and future extensions}
+\begin{itemize}[leftmargin=*]
+    \item The current benchmark phase is based on one representative dataset trajectory and should later be expanded to additional cells, broader aging states, and cross-cell validation before stronger generalization claims are made.
+    \item The spike study currently uses isolated spike events; clustered disturbances, longer spike sequences, and hardware-level disturbance injection may reveal additional model differences.
+    \item The initialization test for the data-driven model remains an online-state proxy based on $Q_c$ perturbation rather than an explicit latent-state reset, which is methodologically justified but should still be interpreted as a class-specific approximation.
+    \item Future extensions should include the remaining extended scenarios, additional cells, pack-level settings, and eventually hardware-in-the-loop or true embedded runtime benchmarks under the same robustness philosophy.
+\end{itemize}
+
+\section{Conclusion}
+\begin{itemize}[leftmargin=*]
+    \item This work frames battery-state estimator evaluation as a robustness problem under realistic measurement corruption rather than as a clean-data accuracy comparison alone.
+    \item The central engineering message is that estimator selection depends on the expected disturbance profile of the BMS measurement chain and on the required recovery behavior after corrupted inputs.
+    \item The main findings are the strong nominal accuracy of HDM, the superior current-bias and voltage-noise robustness of HECM, and the good missing-sample stability of DD despite its sensitivity to some local spike and noise effects.
+    \item The benchmark is designed to be extensible, and the next steps are the extension to more cells and scenarios, the inclusion of remaining disturbance classes, and the transfer of the methodology toward broader embedded or hardware-in-the-loop validation.
+\end{itemize}
+
+\section*{Data and Code Availability}
+\begin{itemize}[leftmargin=*]
+    \item The underlying laboratory dataset is the MGFarm LFP 18650 cyclic-aging dataset described in \cite{LFP_DoE_Cycle_Aging_Dataset}.
+    \item The benchmark scripts and model runners are located in \code{DL\_Models/LFP\_SOC\_SOH\_Model/4\_simulation\_environment}.
+    \item The paper-facing figures and tables are collected under \code{DL\_Models/LFP\_SOC\_SOH\_Model/4\_simulation\_environment/results}.
+\end{itemize}
+
+\bibliographystyle{elsarticle-num}
+\bibliography{bib/paper3_robustness_test}
+\end{document}
