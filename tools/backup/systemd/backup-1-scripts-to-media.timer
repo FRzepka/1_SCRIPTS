@@ -1,0 +1,10 @@
+[Unit]
+Description=Run backup of MG_Farm 1_Scripts to media folder once per day
+
+[Timer]
+OnBootSec=10min
+OnCalendar=daily
+Persistent=true
+
+[Install]
+WantedBy=timers.target
