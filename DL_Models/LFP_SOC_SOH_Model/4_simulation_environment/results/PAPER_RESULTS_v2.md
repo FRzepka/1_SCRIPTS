@@ -31,9 +31,9 @@ This directory contains curated figures and tables for the robustness-benchmark 
 
 Current-bias global ranking:
 - `DM`: global MAE `0.3143`, global $\Delta$MAE `0.2833`
-- `HDM`: global MAE `0.3042`, global $\Delta$MAE `0.3000`
-- `HECM`: global MAE `0.0945`, global $\Delta$MAE `0.0858`
-- `DD`: global MAE `0.2822`, global $\Delta$MAE `0.2715`
+- `HDM`: global MAE `0.3068`, global $\Delta$MAE `0.3043`
+- `HECM`: global MAE `0.0932`, global $\Delta$MAE `0.0842`
+- `DD`: global MAE `0.2764`, global $\Delta$MAE `0.2649`
 
 ## Tables
 

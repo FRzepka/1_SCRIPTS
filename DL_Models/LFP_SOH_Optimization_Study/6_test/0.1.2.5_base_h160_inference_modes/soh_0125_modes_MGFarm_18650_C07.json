@@ -1,0 +1,73 @@
+{
+  "cell": "MGFarm_18650_C07",
+  "rows_hourly": 4024,
+  "chunk_size_hours": 192,
+  "sampling_interval_s": 3600,
+  "training_window_stride": 1,
+  "model_type": "LSTM_Hybrid_Seq2Seq",
+  "interpretation": {
+    "training": "window-based seq2seq training on overlapping hourly windows",
+    "inference_reference": "stateful chunked inference with hidden/cell carry across chunk boundaries"
+  },
+  "timing_stateful_stepwise_s": 91.04287583008409,
+  "timing_stateful_chunk_s": 0.6483580972999334,
+  "timing_stateless_chunk_s": 0.1997479349374771,
+  "timing_rolling_laststep_s": 3.4947404880076647,
+  "metrics": {
+    "stateful_stepwise_tail_aligned": {
+      "rmse": 0.002909441995696048,
+      "mae": 0.002310324925929308,
+      "r2": 0.9916578531265259,
+      "max_abs_error": 0.01034003496170044,
+      "bias": -0.002274990314617753
+    },
+    "stateful_chunk_tail_aligned": {
+      "rmse": 0.0029094398074876854,
+      "mae": 0.0023103244602680206,
+      "r2": 0.9916579127311707,
+      "max_abs_error": 0.010339975357055664,
+      "bias": -0.002274988917633891
+    },
+    "stateless_chunk_tail_aligned": {
+      "rmse": 0.01820829291259866,
+      "mae": 0.004658831283450127,
+      "r2": 0.6732648611068726,
+      "max_abs_error": 0.2714110016822815,
+      "bias": 0.00021840690169483423
+    },
+    "rolling_laststep": {
+      "rmse": 0.002909470129656966,
+      "mae": 0.0023096096701920033,
+      "r2": 0.9916577339172363,
+      "max_abs_error": 0.01036083698272705,
+      "bias": -0.0022776310797780752
+    }
+  },
+  "pairwise_prediction_difference": {
+    "stateful_stepwise_vs_stateful_chunk_tail": {
+      "mae_diff": 1.0113973303305102e-07,
+      "rmse_diff": 1.2945234573180642e-07,
+      "max_abs_diff": 4.76837158203125e-07
+    },
+    "stateful_stepwise_vs_stateless_chunk_tail": {
+      "mae_diff": 0.0028520121704787016,
+      "rmse_diff": 0.01817777194082737,
+      "max_abs_diff": 0.2709115147590637
+    },
+    "stateful_stepwise_vs_rolling_laststep": {
+      "mae_diff": 7.3428318501100875e-06,
+      "rmse_diff": 2.0535186195047572e-05,
+      "max_abs_diff": 0.0001856684684753418
+    },
+    "stateful_chunk_tail_vs_rolling_laststep": {
+      "mae_diff": 7.341338914557127e-06,
+      "rmse_diff": 2.0532534108497202e-05,
+      "max_abs_diff": 0.0001856088638305664
+    },
+    "stateless_chunk_tail_vs_rolling_laststep": {
+      "mae_diff": 0.0028493255376815796,
+      "rmse_diff": 0.018177155405282974,
+      "max_abs_diff": 0.2709362506866455
+    }
+  }
+}

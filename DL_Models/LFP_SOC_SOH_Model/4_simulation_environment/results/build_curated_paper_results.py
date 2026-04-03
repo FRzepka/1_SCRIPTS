@@ -102,7 +102,7 @@ def _setup_style() -> None:
     plt.rcParams.update(
         {
             "figure.facecolor": "white",
-            "axes.facecolor": "#f7f7f7",
+            "axes.facecolor": "white",
             "axes.edgecolor": "#444444",
             "axes.grid": True,
             "grid.color": "#d9d9d9",

@@ -1,0 +1,80 @@
+{
+  "cell": "MGFarm_18650_C07",
+  "start_row": 0,
+  "rows_used": 6000,
+  "hours_covered": 1.6651666666666765,
+  "chunk_size": 2024,
+  "features": [
+    "Voltage[V]",
+    "Current[A]",
+    "Temperature[\u00b0C]",
+    "SOH",
+    "Q_c",
+    "dU_dt[V/s]",
+    "dI_dt[A/s]",
+    "dt_s"
+  ],
+  "soh_source": "offline SOH column from dataframe; no separate SOH model used",
+  "timing_stateful_stream_s": 1.9235017225146294,
+  "timing_stateful_window_s": 60.431727699935436,
+  "timing_stateless_window_s": 19.031868189573288,
+  "metrics": {
+    "stateful_streaming_tail_aligned": {
+      "mae": 0.010677529498934746,
+      "rmse": 0.013310692273080349,
+      "max_abs_error": 0.028715074062347412,
+      "bias": 0.0025532927829772234
+    },
+    "stateful_window": {
+      "mae": 0.010695734061300755,
+      "rmse": 0.013324033468961716,
+      "max_abs_error": 0.028715074062347412,
+      "bias": 0.0025350889191031456
+    },
+    "stateless_window": {
+      "mae": 0.010695734061300755,
+      "rmse": 0.013324033468961716,
+      "max_abs_error": 0.028715074062347412,
+      "bias": 0.0025350889191031456
+    }
+  },
+  "pairwise_prediction_difference": {
+    "stateful_window_vs_stateless_window": {
+      "mae_diff": 0.0,
+      "rmse_diff": 0.0,
+      "max_abs_diff": 0.0
+    },
+    "stateful_streaming_vs_stateless_window": {
+      "mae_diff": 1.820958459575195e-05,
+      "rmse_diff": 3.675029074656777e-05,
+      "max_abs_diff": 0.00012576580047607422
+    },
+    "stateful_streaming_vs_stateful_window": {
+      "mae_diff": 1.820958459575195e-05,
+      "rmse_diff": 3.675029074656777e-05,
+      "max_abs_diff": 0.00012576580047607422
+    }
+  },
+  "memory_estimate": {
+    "shared_model": {
+      "parameter_count": 39937,
+      "parameter_bytes_float32": 159748,
+      "checkpoint_bytes": 491601
+    },
+    "stateful_streaming": {
+      "flash_onnx_bytes": 161613,
+      "ram_lower_bound_bytes": 2340,
+      "ram_lower_bound_kib": 2.28515625
+    },
+    "stateful_window_replay": {
+      "flash_onnx_bytes": 161613,
+      "ram_lower_bound_bytes": 67108,
+      "ram_lower_bound_kib": 65.53515625
+    },
+    "stateless_full_window": {
+      "flash_onnx_bytes": 162197,
+      "ram_lower_bound_bytes": 842756,
+      "ram_lower_bound_kib": 823.00390625
+    }
+  }
+}
