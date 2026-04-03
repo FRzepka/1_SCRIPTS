@@ -7,6 +7,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from matplotlib.colors import LinearSegmentedColormap, SymLogNorm
 
 
 ROOT = Path("/home/florianr/MG_Farm/1_Scripts")
@@ -201,7 +202,6 @@ def build_radar(meta_scores: pd.DataFrame) -> None:
         ax.fill(angles, values, color=color, alpha=0.12)
 
     ax.set_facecolor("white")
-    ax.set_title("Decision-oriented meta-scores", pad=24, fontsize=15, fontweight="bold")
     ax.legend(loc="upper right", bbox_to_anchor=(1.18, 1.12), frameon=False)
     fig.tight_layout()
     fig.savefig(OUT_DIR / "decision_radar_v4.png", dpi=220, bbox_inches="tight")
@@ -239,7 +239,6 @@ def build_profiles(meta_scores: pd.DataFrame) -> None:
     ax.set_xticklabels(list(PROFILE_WEIGHTS.keys()))
     ax.set_ylim(0, 1.02)
     ax.set_ylabel("Composite score")
-    ax.set_title("Illustrative deployment-priority profiles", fontsize=15, fontweight="bold")
     ax.grid(axis="y", alpha=0.25)
     ax.legend(frameon=False, ncol=4, loc="upper center", bbox_to_anchor=(0.5, 1.12))
     fig.tight_layout()
@@ -254,8 +253,6 @@ def build_heatmap(robustness_score_matrix: pd.DataFrame) -> None:
     ax.set_xticklabels(robustness_score_matrix.columns, rotation=30, ha="right")
     ax.set_yticks(np.arange(len(robustness_score_matrix.index)))
     ax.set_yticklabels(robustness_score_matrix.index)
-    ax.set_title("Scenario-wise Robustness Scores from v4", fontsize=14, fontweight="bold")
-
     for i in range(len(robustness_score_matrix.index)):
         for j in range(len(robustness_score_matrix.columns)):
             value = robustness_score_matrix.iloc[i, j]
@@ -271,19 +268,30 @@ def build_heatmap(robustness_score_matrix: pd.DataFrame) -> None:
 def build_delta_mae_heatmap(robustness_raw: pd.DataFrame) -> None:
     shown = robustness_raw.rename(index=CLASS_SHORT, columns=SCENARIO_SHORT)
     vmax = float(np.nanmax(np.abs(shown.to_numpy(dtype=float))))
+    cmap = LinearSegmentedColormap.from_list(
+        "paper_blue_purple",
+        [
+            (0.00, "#2563eb"),
+            (0.42, "#e8f1ff"),
+            (0.50, "#ffffff"),
+            (0.70, "#d8c3ff"),
+            (1.00, "#5b21b6"),
+        ],
+    )
+    norm = SymLogNorm(linthresh=0.005, linscale=1.0, vmin=-vmax, vmax=vmax, base=10)
     fig, ax = plt.subplots(figsize=(11.4, 4.8))
-    im = ax.imshow(shown.to_numpy(dtype=float), aspect="auto", cmap="RdBu_r", vmin=-vmax, vmax=vmax)
+    im = ax.imshow(shown.to_numpy(dtype=float), aspect="auto", cmap=cmap, norm=norm)
     ax.set_xticks(np.arange(len(shown.columns)))
     ax.set_xticklabels(shown.columns)
     ax.set_yticks(np.arange(len(shown.index)))
     ax.set_yticklabels(shown.index)
-    ax.set_title("Cross-scenario error increase relative to baseline", fontsize=15, fontweight="bold")
     for i in range(shown.shape[0]):
         for j in range(shown.shape[1]):
             val = shown.iloc[i, j]
             ax.text(j, i, f"{val:+.3f}", ha="center", va="center", fontsize=8.5, color="black")
     cbar = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
     cbar.set_label(r"$\Delta$MAE")
+    cbar.set_ticks([-0.30, -0.10, -0.03, -0.01, -0.003, 0.0, 0.003, 0.01, 0.03, 0.10, 0.30])
     fig.tight_layout()
     PAPER_FIG_DIR.mkdir(parents=True, exist_ok=True)
     fig.savefig(PAPER_FIG_DIR / "Figure_9_delta_mae_heatmap.png", dpi=240, bbox_inches="tight")
@@ -317,8 +325,6 @@ def build_combined_decision_figure(meta_scores: pd.DataFrame) -> None:
     ax_radar.set_yticklabels(["0.2", "0.4", "0.6", "0.8", "1.0"], fontsize=9)
     ax_radar.set_ylim(0, 1)
     ax_radar.set_facecolor("white")
-    ax_radar.set_title("(a) Decision dimensions", loc="left", fontsize=14, fontweight="bold", pad=16)
-
     for _, row in meta_scores.iterrows():
         short = row["Model"]
         values = row[labels].to_numpy(dtype=float)
@@ -344,12 +350,10 @@ def build_combined_decision_figure(meta_scores: pd.DataFrame) -> None:
     ax_bar.set_xticklabels(list(PROFILE_WEIGHTS.keys()))
     ax_bar.set_ylim(0, 1.02)
     ax_bar.set_ylabel("Composite score")
-    ax_bar.set_title("(b) Illustrative decision profiles", loc="left", fontsize=14, fontweight="bold")
     ax_bar.grid(axis="y", alpha=0.25)
     handles, labels_legend = ax_bar.get_legend_handles_labels()
-    fig.suptitle("Decision-oriented synthesis of the benchmark results", y=0.985, fontsize=16, fontweight="bold")
     fig.legend(handles, labels_legend, ncol=4, frameon=False, loc="upper center", bbox_to_anchor=(0.5, 0.95))
-    fig.subplots_adjust(top=0.86, left=0.04, right=0.98, bottom=0.11, wspace=0.24)
+    fig.subplots_adjust(top=0.88, left=0.04, right=0.98, bottom=0.11, wspace=0.24)
     PAPER_FIG_DIR.mkdir(parents=True, exist_ok=True)
     fig.savefig(PAPER_FIG_DIR / "Figure_10_decision_synthesis.png", dpi=240, bbox_inches="tight")
     plt.close(fig)

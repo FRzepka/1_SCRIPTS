@@ -15,6 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 RESULTS_DIR = Path(__file__).resolve().parent
 TABLES_OUT = RESULTS_DIR / "paper_tables_v4_adc_extension"
 FIGURES_OUT = RESULTS_DIR / "paper_figures_v4_adc_extension"
+PAPER_FIGURES_OUT = RESULTS_DIR / "paper_figures_v4"
 DATA_ROOT = Path("/home/florianr/MG_Farm/0_Data/MGFarm_18650_FE")
 CELL = "MGFarm_18650_C07"
 
@@ -143,16 +144,14 @@ def _plot_figure(df_table: pd.DataFrame) -> None:
     ax_bar = fig.add_subplot(gs[:, 1])
 
     ax_i.plot(rel_t, raw_seg["Current[A]"].to_numpy(dtype=float), color="#222222", lw=1.8, label="Raw")
-    ax_i.step(rel_t, quant_seg["Current[A]"].to_numpy(dtype=float), where="post", color="#d62728", lw=1.6, label="Quantized")
+    ax_i.step(rel_t, quant_seg["Current[A]"].to_numpy(dtype=float), where="post", color="#4589ff", lw=1.6, label="Quantized")
     ax_i.set_ylabel("Current [A]")
-    ax_i.set_title("(a) Current quantization", loc="left", fontweight="bold")
     ax_i.legend(frameon=True, loc="upper right")
 
     ax_u.plot(rel_t, raw_seg["Voltage[V]"].to_numpy(dtype=float), color="#222222", lw=1.8, label="Raw")
-    ax_u.step(rel_t, quant_seg["Voltage[V]"].to_numpy(dtype=float), where="post", color="#d62728", lw=1.6, label="Quantized")
+    ax_u.step(rel_t, quant_seg["Voltage[V]"].to_numpy(dtype=float), where="post", color="#4589ff", lw=1.6, label="Quantized")
     ax_u.set_ylabel("Voltage [V]")
     ax_u.set_xlabel("Seconds within representative local window")
-    ax_u.set_title("(b) Voltage quantization", loc="left", fontweight="bold")
     ax_u.legend(frameon=True, loc="upper right")
 
     x = np.arange(len(df_table))
@@ -162,7 +161,6 @@ def _plot_figure(df_table: pd.DataFrame) -> None:
     ax_bar.set_xticks(x)
     ax_bar.set_xticklabels(df_table["short"])
     ax_bar.set_ylabel(r"$\Delta$MAE vs baseline")
-    ax_bar.set_title("(c) Global ADC-quantization penalty", loc="left", fontweight="bold")
     for bar, (_, row) in zip(bars, df_table.iterrows()):
         y = float(row["delta_mae"])
         va = "bottom" if y >= 0 else "top"
@@ -176,15 +174,10 @@ def _plot_figure(df_table: pd.DataFrame) -> None:
             fontsize=9,
         )
     ax_bar.set_ylim(min(df_table["delta_mae"].min() - 0.0002, -0.0005), max(df_table["delta_mae"].max() + 0.00035, 0.0008))
-    fig.suptitle(
-        "ADC Quantization with v4 Models\n"
-        f"Current step = {meta['quantize_current_a']:.2f} A, Voltage step = {meta['quantize_voltage_v']:.3f} V, Temperature step = {meta['quantize_temp_c']:.1f} °C",
-        fontsize=15,
-        fontweight="bold",
-        y=0.98,
-    )
     FIGURES_OUT.mkdir(parents=True, exist_ok=True)
+    PAPER_FIGURES_OUT.mkdir(parents=True, exist_ok=True)
     fig.savefig(FIGURES_OUT / "Figure_ADC_quantization_v4.png")
+    fig.savefig(PAPER_FIGURES_OUT / "Figure_15_adc_quantization.png")
     plt.close(fig)
 
 
@@ -221,6 +214,7 @@ def main() -> None:
     _write_summary_note(df)
     print(f"Wrote {TABLES_OUT / 'table_adc_quantization_v4.csv'}")
     print(f"Wrote {FIGURES_OUT / 'Figure_ADC_quantization_v4.png'}")
+    print(f"Wrote {PAPER_FIGURES_OUT / 'Figure_15_adc_quantization.png'}")
 
 
 if __name__ == "__main__":
