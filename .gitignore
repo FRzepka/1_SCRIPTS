@@ -57,12 +57,10 @@ env/
 *.ldupdatedone
 
 # ── Bilder / Reports / Exporte ──
-*.png
 *.jpg
 *.jpeg
 *.gif
 *.bmp
-*.pdf
 *.svg
 *.ipynb
 
@@ -134,6 +132,10 @@ DL_Models/**/campaigns/
 DL_Models/**/cache/
 DL_Models/**/analysis_local_focus/
 DL_Models/**/results/*/
+!DL_Models/**/results/
+!DL_Models/**/results/*/
+!DL_Models/**/results/**/*.png
+!DL_Models/**/results/**/*.pdf
 DL_Models/**/archive/
 **/archive/
 **/_archive*/
