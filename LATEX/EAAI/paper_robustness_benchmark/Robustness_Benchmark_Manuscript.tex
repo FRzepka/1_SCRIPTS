@@ -108,7 +108,7 @@ Battery management system \sep State of charge \sep State of health \sep Perform
 
 \begin{figure*}[t]
     \centering
-    \benchfig{figures/Schematics/performance_requirements_overview.pdf}{Placeholder for an adapted conceptual overview of deployment-oriented BMS state-estimation requirements. The figure should group requirements into implementation, hardware, and performance, and should explicitly highlight that the present study focuses on the performance branch with baseline accuracy, convergence behavior, and robustness.}
+    \IfFileExists{figures/Schematics/BMS_Requirements.pdf}{\includegraphics[width=0.98\textwidth,trim=12 12 12 12,clip]{figures/Schematics/BMS_Requirements.pdf}}{\fbox{\parbox{0.9\textwidth}{Placeholder for an adapted conceptual overview of deployment-oriented BMS state-estimation requirements. The figure should group requirements into implementation, hardware, and performance, and should explicitly highlight that the present study focuses on the performance branch with baseline accuracy, convergence behavior, and robustness.\\\path{figures/Schematics/BMS_Requirements.pdf}}}}
     \caption{Conceptual overview of deployment-oriented requirements for embedded BMS state estimation. The broader requirement space includes implementation effort, hardware constraints, and estimator performance, whereas the present study focuses on the performance branch and evaluates baseline accuracy, convergence behavior, and robustness under measurement disturbances.}
     \label{fig:performance_requirements}
 \end{figure*}
