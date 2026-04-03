@@ -61,7 +61,6 @@ env/
 *.jpeg
 *.gif
 *.bmp
-*.svg
 *.ipynb
 
 # ── LaTeX Build-Artefakte ──
@@ -136,6 +135,7 @@ DL_Models/**/results/*/
 !DL_Models/**/results/*/
 !DL_Models/**/results/**/*.png
 !DL_Models/**/results/**/*.pdf
+!DL_Models/**/results/**/*.svg
 DL_Models/**/archive/
 **/archive/
 **/_archive*/
