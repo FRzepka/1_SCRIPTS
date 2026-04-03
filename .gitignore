@@ -62,6 +62,7 @@ env/
 *.gif
 *.bmp
 *.svg
+!LATEX/EAAI/paper_robustness_benchmark/figures/Schematics/BMS_Requirements.svg
 *.ipynb
 
 # ── LaTeX Build-Artefakte ──
