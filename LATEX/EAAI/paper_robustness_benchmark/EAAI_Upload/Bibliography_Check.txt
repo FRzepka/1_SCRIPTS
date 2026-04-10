@@ -1,0 +1,9 @@
+BIBLIOGRAPHY CHECK
+==================
+
+[x] Full manuscript compiled successfully.
+[x] Blind manuscript compiled successfully.
+[x] No undefined-citation warnings found in the latest manuscript logs.
+[x] Active bibliography source files:
+    - /home/florianr/MG_Farm/1_Scripts/LATEX/EAAI/paper_robustness_benchmark/bib/Paper 3- Robustness Test.bib
+    - /home/florianr/MG_Farm/1_Scripts/LATEX/EAAI/paper_robustness_benchmark/bib/Paper 3- Robustness Test.json

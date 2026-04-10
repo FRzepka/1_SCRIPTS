@@ -4,30 +4,35 @@
 \geometry{a4paper, margin=1in}
 \usepackage{hyperref}
 
-\address{[Name Placeholder]\\
-[Institution Placeholder]\\
-[Address Placeholder]\\
-\href{mailto:[mail placeholder]}{[mail placeholder]}}
+\address{Florian Rzepka\\
+Technical University of Berlin\\
+Chair of Electrical Energy Storage Technology\\
+Einsteinufer 11\\
+10587 Berlin, Germany\\
+\href{mailto:florian.rzepka@tu-berlin.de}{florian.rzepka@tu-berlin.de}}
 
 \date{\today}
 
 \begin{document}
-\begin{letter}{Editor-in-Chief\\Engineering Applications of Artificial Intelligence\\Elsevier}
+\begin{letter}{Editor-in-Chief\\
+Engineering Applications of Artificial Intelligence\\
+Elsevier}
+
 \opening{Dear Editor-in-Chief,}
 
-Please find enclosed our manuscript entitled \textbf{``Robustness Benchmarking of Embedded Battery State Estimation: A Measurement-Only Comparison of Coulomb Counting, Hybrid ECM, and Data-Driven SOC/SOH Models''}. This cover letter is a structured placeholder and should be replaced by polished prose before submission.
+Please find enclosed our manuscript entitled \textbf{``Performance Benchmarking of Embedded Battery State Estimation: A Measurement-Only Comparison of Direct-Measurement, Hybrid, and Data-Driven Estimators''}, which we submit for exclusive consideration in \textit{Engineering Applications of Artificial Intelligence}.
 
-\begin{itemize}
-    \item Bullet: introduce the paper as a robustness-focused comparison of battery state estimators for embedded BMS deployment.
-    \item Bullet: emphasize the comparison of CC, CC+SOH, ECM, and SOC+SOH under measurement-only perturbations.
-    \item Bullet: state the main novelty as the separation of estimator families under realistic sensor corruption and timing faults.
-    \item Bullet: mention the practical contribution: a decision-oriented benchmark rather than only a clean-data accuracy report.
-    \item Bullet: mention that the study is directly relevant to embedded AI and industrial energy-storage applications.
-\end{itemize}
+The manuscript addresses a practical gap in embedded battery management: estimator selection is often discussed through clean-data accuracy alone, whereas deployment quality depends equally on behavior under realistic measurement disturbances. To address this, the paper introduces a controlled measurement-only benchmark that compares four embedded-ready estimator classes under the same full-cell trajectory, the same disturbance definitions, and the same online execution assumptions. The study evaluates direct-measurement, hybrid direct-measurement, hybrid equivalent-circuit, and data-driven estimators under ADC quantization, current bias, additive noise, missing samples, irregular sampling, burst dropout, voltage spikes, and initialization mismatch.
 
-We confirm that the manuscript is not under consideration elsewhere. Author details and compliance statements should be inserted here before submission.
+The main contribution is a cross-class performance benchmark that separates baseline accuracy, disturbed-operation robustness, and recovery behavior under physically interpretable sensor-side faults. Rather than promoting a single universal winner, the results expose complementary strengths: the hybrid direct-measurement model leads under clean conditions, the hybrid equivalent-circuit model is the strongest overall robustness choice, and the data-driven model is particularly attractive for missing-sample resilience and strict-band recovery after initialization mismatch. This makes the paper directly relevant to the readership of \textit{EAAI}, because it connects data-driven and hybrid AI-enabled estimation with deployment-oriented evaluation and decision support for embedded energy systems.
+
+We confirm that this manuscript has not been published elsewhere and is not under consideration by another journal. All authors have approved the manuscript and agree with its submission.
+
+Thank you for your consideration.
 
 \closing{Sincerely,}
-[Signature Placeholder]
+
+Florian Rzepka\\
+Technical University of Berlin
 \end{letter}
 \end{document}

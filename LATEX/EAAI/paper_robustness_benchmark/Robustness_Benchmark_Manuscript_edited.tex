@@ -241,7 +241,7 @@ Battery management system \sep State of charge \sep State of health \sep Perform
 
 \begin{figure}[t]
     \centering
-    \benchfig{../../../DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/results/paper_figures/Figure_1_baseline_performance.png}{Baseline comparison figure missing.}
+    \benchfig{figures/Results/Figure_04_Baseline_Performance.png}{Baseline comparison figure missing.}
     \caption{Baseline performance on the selected full-cell benchmark trajectory. The hybrid direct-measurement model provides the lowest clean-condition error, whereas the direct-measurement model shows the largest baseline deviation.}
     \label{fig:baseline_mae}
 \end{figure}
@@ -256,7 +256,7 @@ Battery management system \sep State of charge \sep State of health \sep Perform
 
 \begin{figure*}[t]
     \centering
-    \benchfig{../../../DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/results/paper_figures/Figure_2_current_bias.png}{Current-bias sensitivity figure missing.}
+    \benchfig{figures/Results/Figure_05_Current_Bias.png}{Current-bias sensitivity figure missing.}
     \caption{Sensitivity to current measurement bias. (a) Example of the applied current bias ($+3\%$) in a representative 30~min window. (b) Global degradation of SOC estimation accuracy as a function of bias magnitude. (c) SOC trajectory divergence over the first 12~h for a $+3\%$ current bias.}
     \label{fig:offset_sensitivity}
 \end{figure*}
@@ -272,7 +272,7 @@ Battery management system \sep State of charge \sep State of health \sep Perform
 
 \begin{figure*}[t]
     \centering
-    \benchfig{../../../DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/results/paper_figures/Figure_3_noise_robustness.png}{Noise sensitivity figure missing.}
+    \benchfig{figures/Results/Figure_06_Noise_Robustness.png}{Noise sensitivity figure missing.}
     \caption{Noise sensitivity under additive current noise. The figure combines an applied current-noise example, a matched SOC comparison in the same 30~min window, the global MAE penalty, and the local output-jitter sensitivity across noise levels.}
     \label{fig:noise_sensitivity}
 \end{figure*}
@@ -287,7 +287,7 @@ Battery management system \sep State of charge \sep State of health \sep Perform
 
 \begin{figure*}[t]
     \centering
-    \benchfig{../../../DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/results/paper_figures/Figure_7_initial_state_recovery.png}{Initial-state recovery figure missing.}
+    \benchfig{figures/Results/Figure_07_Initial_State_Recovery.png}{Initial-state recovery figure missing.}
     \caption{Initial-state recovery in a reset-free evaluation window. The top panel shows SOC trajectories after the imposed state mismatch, and the lower panel shows the corresponding absolute SOC error over time.}
     \label{fig:init_recovery}
 \end{figure*}
@@ -302,21 +302,21 @@ Battery management system \sep State of charge \sep State of health \sep Perform
 
 \begin{figure*}[t]
     \centering
-    \benchfig{../../../DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/results/paper_figures/Figure_4_signal_integrity.png}{Signal-integrity summary figure missing.}
+    \benchfig{figures/Results/Figure_08_Signal_Integrity.png}{Signal-integrity summary figure missing.}
     \caption{Signal-integrity performance summary. The left panel compares the global MAE penalties for missing samples, irregular sampling, and burst dropout, whereas the right panel summarizes the burst-dropout recovery time.}
     \label{fig:signal_integrity}
 \end{figure*}
 
 \begin{figure*}[t]
     \centering
-    \benchfig{../../../DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/results/paper_figures/Figure_5_missing_gap_transition.png}{Missing-gap transition figure missing.}
+    \benchfig{figures/Results/Figure_09_Burst_Dropout_Transition.png}{Missing-gap transition figure missing.}
     \caption{Local transition into the burst-dropout window. The shaded region marks the missing-data interval, and the lower panel shows how the estimators behave while the measurements are frozen.}
     \label{fig:missing_gap_transition}
 \end{figure*}
 
 \begin{figure*}[t]
     \centering
-    \benchfig{../../../DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/results/paper_figures/Figure_6_missing_gap_recovery.png}{Missing-gap recovery figure missing.}
+    \benchfig{figures/Results/Figure_10_Burst_Dropout_Recovery.png}{Missing-gap recovery figure missing.}
     \caption{Post-gap recovery after the burst dropout. The upper panel shows the SOC trajectories after the gap, and the lower panel shows the corresponding absolute SOC error together with the recovery markers.}
     \label{fig:missing_gap_recovery}
 \end{figure*}
@@ -330,7 +330,7 @@ Battery management system \sep State of charge \sep State of health \sep Perform
 
 \begin{figure*}[t]
     \centering
-    \benchfig{../../../DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/results/paper_figures/Figure_8_spike_response.png}{Spike-response figure missing.}
+    \benchfig{figures/Results/Figure_11_Voltage_Spike_Response.png}{Spike-response figure missing.}
     \caption{Voltage-spike sensitivity. The figure combines a representative SOC window around a spike, a local spike-severity summary based on the $95$th percentile of the post-spike peak excess error, and the aligned local excess-error response across repeated spikes.}
     \label{fig:spike_recovery}
 \end{figure*}

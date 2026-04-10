@@ -47,6 +47,18 @@ ROBUSTNESS_SCENARIOS = [
     "Voltage noise",
 ]
 
+HEATMAP_SCENARIOS = [
+    "ADC quantization",
+    "Voltage spikes",
+    "Current noise (high)",
+    "Voltage noise",
+    "Temperature noise",
+    "Current bias",
+    "Missing samples",
+    "Irregular sampling",
+    "Burst dropout",
+]
+
 PROFILE_WEIGHTS = {
     "Accuracy-first": {"Accuracy": 0.60, "Robustness": 0.25, "Recovery": 0.15},
     "Robustness-first": {"Accuracy": 0.20, "Robustness": 0.65, "Recovery": 0.15},
@@ -54,6 +66,7 @@ PROFILE_WEIGHTS = {
 }
 
 SCENARIO_SHORT = {
+    "ADC quantization": "ADC\nquantization",
     "Current noise (high)": "Current\nnoise",
     "Current bias": "Current\nbias",
     "Irregular sampling": "Irregular\nsampling",
@@ -145,9 +158,8 @@ def save_markdown(
             "",
             "### Recovery",
             "",
-            "Average of penalized lower-is-better scores for:",
+            "Penalized lower-is-better score for:",
             "- `recovery_time_to_baseline_band_strict_h`",
-            "- `recovery_time_to_baseline_band_fair_h`",
             "",
             "Missing recovery times are treated as non-recovery and mapped to a zero score using a penalty larger than the slowest finite recovery time.",
             "",
@@ -359,6 +371,14 @@ def build_combined_decision_figure(meta_scores: pd.DataFrame) -> None:
     plt.close(fig)
 
 
+def load_adc_delta_mae() -> pd.Series:
+    adc_path = ROOT / "DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/results/paper_tables_v4_adc_extension/table_adc_quantization_v4.csv"
+    adc = pd.read_csv(adc_path)
+    adc = adc.set_index("class")["delta_mae"].reindex(CLASS_ORDER)
+    adc.name = "ADC quantization"
+    return adc
+
+
 def main() -> None:
     setup_style()
     baseline = pd.read_csv(TABLE_DIR / "table_baseline.csv")
@@ -374,7 +394,6 @@ def main() -> None:
         local["local_metric"].isin(
             [
                 "recovery_time_to_baseline_band_strict_h",
-                "recovery_time_to_baseline_band_fair_h",
             ]
         )
     ].copy()
@@ -393,7 +412,7 @@ def main() -> None:
 
     recovery_raw = local.pivot(index="class", columns="local_metric", values="value").reindex(CLASS_ORDER)
     recovery_score_matrix = recovery_raw.apply(penalized_lower_better_scores, axis=0)
-    recovery_scores = recovery_score_matrix.mean(axis=1).rename("Recovery")
+    recovery_scores = recovery_score_matrix["recovery_time_to_baseline_band_strict_h"].rename("Recovery")
 
     meta_scores = pd.concat([accuracy_scores, robustness_scores, recovery_scores], axis=1).reset_index()
     meta_scores = meta_scores.rename(columns={"class": "Class"})
@@ -404,7 +423,12 @@ def main() -> None:
     build_radar(meta_scores)
     build_profiles(meta_scores)
     build_heatmap(robustness_score_matrix.rename(index=CLASS_SHORT, columns=SCENARIO_SHORT))
-    build_delta_mae_heatmap(robustness_raw)
+
+    adc_delta = load_adc_delta_mae()
+    robustness_raw_heatmap = robustness_raw.copy()
+    robustness_raw_heatmap["ADC quantization"] = adc_delta
+    robustness_raw_heatmap = robustness_raw_heatmap[HEATMAP_SCENARIOS]
+    build_delta_mae_heatmap(robustness_raw_heatmap)
     build_combined_decision_figure(meta_scores)
     save_markdown(
         scores=meta_scores,
