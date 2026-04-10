@@ -54,10 +54,12 @@ class LSTMMLP(nn.Module):
                 nn.init.xavier_uniform_(m.weight)
                 nn.init.zeros_(m.bias)
 
-    def forward(self, x):
-        out, _ = self.lstm(x)
+    def forward(self, x, state=None, return_state: bool = False):
+        out, new_state = self.lstm(x, state)
         last = out[:, -1, :]
         pred = self.mlp(last).squeeze(-1)
+        if return_state:
+            return pred, new_state
         return pred
 
 
@@ -93,10 +95,12 @@ class GRUMLP(nn.Module):
                 nn.init.xavier_uniform_(m.weight)
                 nn.init.zeros_(m.bias)
 
-    def forward(self, x):
-        out, _ = self.gru(x)
+    def forward(self, x, state=None, return_state: bool = False):
+        out, new_state = self.gru(x, state)
         last = out[:, -1, :]
         pred = self.mlp(last).squeeze(-1)
+        if return_state:
+            return pred, new_state
         return pred
 
 # -------------------------
@@ -367,6 +371,20 @@ def rolling_predict_soc(Xs: np.ndarray, y_true: np.ndarray, chunk: int, model: L
     mae = np.mean(np.abs(y_ref - y_pred)) if len(y_pred) else float('nan')
     return y_pred, rmse, mae
 
+
+def stateful_stream_predict_soc(Xs: np.ndarray, y_true: np.ndarray, model: nn.Module, device: torch.device) -> Tuple[np.ndarray, float, float]:
+    preds = np.empty(len(Xs), dtype=np.float32)
+    state = None
+    model.eval()
+    with torch.no_grad():
+        for i in tqdm(range(len(Xs)), desc="SOC stateful", unit="step"):
+            xb = torch.from_numpy(Xs[i:i+1]).unsqueeze(1).to(device)
+            pred, state = model(xb, state=state, return_state=True)
+            preds[i] = float(pred.squeeze().detach().cpu().item())
+    rmse = math.sqrt(np.mean((y_true - preds) ** 2)) if len(preds) else float('nan')
+    mae = np.mean(np.abs(y_true - preds)) if len(preds) else float('nan')
+    return preds, rmse, mae
+
 # -------------------------
 # Scenario transforms
 # -------------------------
@@ -383,6 +401,7 @@ def main():
     ap.add_argument("--require_gpu", action="store_true",
                     help="Fail if CUDA is not available.")
     ap.add_argument("--soc_batch", type=int, default=64)
+    ap.add_argument("--soc_inference_mode", choices=["rolling", "stateful_streaming"], default="rolling")
     ap.add_argument("--soh_init", type=float, default=1.0)
     ap.add_argument("--warmup_seconds", type=float, default=600.0,
                     help="Ignore first N seconds for error plot/metrics")
@@ -538,23 +557,33 @@ def main():
     soc_state = torch.load(args.soc_ckpt, map_location=device)
     soc_model.load_state_dict(soc_state['model_state_dict'])
 
-    soc_pred, soc_rmse, soc_mae = rolling_predict_soc(
-        Xs=X_soc_scaled,
-        y_true=y_soc_true,
-        chunk=soc_chunk,
-        model=soc_model,
-        device=device,
-        batch_size=int(args.soc_batch),
-    )
+    if args.soc_inference_mode == "stateful_streaming":
+        soc_pred, soc_rmse, soc_mae = stateful_stream_predict_soc(
+            Xs=X_soc_scaled,
+            y_true=y_soc_true,
+            model=soc_model,
+            device=device,
+        )
+        soc_start_idx = 0
+    else:
+        soc_pred, soc_rmse, soc_mae = rolling_predict_soc(
+            Xs=X_soc_scaled,
+            y_true=y_soc_true,
+            chunk=soc_chunk,
+            model=soc_model,
+            device=device,
+            batch_size=int(args.soc_batch),
+        )
+        soc_start_idx = soc_chunk - 1
 
     if freeze_mask is not None and freeze_mask.any():
-        soc_gap_mask = freeze_mask[soc_chunk - 1:]
+        soc_gap_mask = freeze_mask[soc_start_idx:]
         if soc_gap_mask.any():
             for i in range(len(soc_pred)):
                 if soc_gap_mask[i]:
                     soc_pred[i] = soc_pred[i - 1] if i > 0 else soc_pred[i]
             # recompute metrics after freeze
-            diff = y_soc_true[soc_chunk - 1:] - soc_pred
+            diff = y_soc_true[soc_start_idx:] - soc_pred
             soc_rmse = math.sqrt(np.mean(diff ** 2))
             soc_mae = np.mean(np.abs(diff))
 
@@ -576,20 +605,20 @@ def main():
     soh_csv = os.path.join(args.out_dir, f"soh_hourly_{args.cell}.csv")
     soh_df.to_csv(soh_csv, index=False)
 
-    soc_idx = np.arange(soc_chunk - 1, len(df_soc))
-    soc_time_s = df_soc['Testtime[s]'].to_numpy(dtype=np.float64)[soc_chunk - 1:]
-    soc_abs_err = np.abs(y_soc_true[soc_chunk - 1:] - soc_pred)
+    soc_idx = np.arange(soc_start_idx, len(df_soc))
+    soc_time_s = df_soc['Testtime[s]'].to_numpy(dtype=np.float64)[soc_start_idx:]
+    soc_abs_err = np.abs(y_soc_true[soc_start_idx:] - soc_pred)
     metrics = compute_robustness_metrics(
         time_s=soc_time_s,
-        y_true=y_soc_true[soc_chunk - 1:],
+        y_true=y_soc_true[soc_start_idx:],
         y_pred=soc_pred,
         warmup_seconds=float(args.warmup_seconds),
-        disturbance_mask=np.asarray(scenario_info.get('disturbance_mask', freeze_mask), dtype=bool)[soc_chunk - 1:],
+        disturbance_mask=np.asarray(scenario_info.get('disturbance_mask', freeze_mask), dtype=bool)[soc_start_idx:],
     )
     soc_df = pd.DataFrame({
         'index': soc_idx,
         'time_s': soc_time_s,
-        'soc_true': y_soc_true[soc_chunk - 1:],
+        'soc_true': y_soc_true[soc_start_idx:],
         'soc_pred': soc_pred,
         'abs_err': soc_abs_err,
     })
@@ -607,6 +636,7 @@ def main():
         'soc_rmse': metrics['rmse'],
         'soc_mae': metrics['mae'],
         'soc_chunk': int(soc_chunk),
+        'soc_inference_mode': str(args.soc_inference_mode),
         'soc_model_type': soc_model_type,
         'soc_features': soc_features,
         'soh_interval_seconds': int(interval_seconds),
@@ -635,7 +665,7 @@ def main():
         'soc_init_error_proxy': {
             'enabled': args.scenario == 'initial_soc_error',
             'q_c_init_delta_soc': float(scenario_info.get('soc_init_delta', 0.0)),
-            'method': 'initial offset applied to online Q_c feature before rolling inference',
+            'method': 'initial offset applied to online Q_c feature before SOC inference',
         },
     }
     summary.update(metrics)

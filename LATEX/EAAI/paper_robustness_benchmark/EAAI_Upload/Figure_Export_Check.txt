@@ -1,0 +1,47 @@
+FIGURE EXPORT CHECK
+===================
+
+[x] Figure_01_Requirements_Overview.png
+    - Figure 1: conceptual requirements overview
+    - source: /home/florianr/MG_Farm/1_Scripts/LATEX/EAAI/paper_robustness_benchmark/figures/Schematics/BMS_Requirements.png
+[x] Figure_02_Methodology_Overview.png
+    - Figure 2: methodology overview
+    - source: /home/florianr/MG_Farm/1_Scripts/LATEX/EAAI/paper_robustness_benchmark/figures/Schematics/Methodology.png
+[x] Figure_03_Disturbance_Taxonomy.png
+    - Figure 3: disturbance taxonomy
+    - source: /home/florianr/MG_Farm/1_Scripts/LATEX/EAAI/paper_robustness_benchmark/figures/Schematics/Disturbance.png
+[x] Figure_04_Baseline_Performance.png
+    - Figure 4: baseline performance
+    - source: /home/florianr/MG_Farm/1_Scripts/DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/results/paper_figures_v4/Figure_1_baseline_performance.png
+[x] Figure_05_Current_Bias.png
+    - Figure 5: current bias
+    - source: /home/florianr/MG_Farm/1_Scripts/DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/results/paper_figures_v4/Figure_2_current_bias.png
+[x] Figure_06_Noise_Robustness.png
+    - Figure 6: noise robustness
+    - source: /home/florianr/MG_Farm/1_Scripts/DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/results/paper_figures_v4/Figure_3_noise_robustness.png
+[x] Figure_07_Initial_State_Recovery.png
+    - Figure 7: initial-state recovery
+    - source: /home/florianr/MG_Farm/1_Scripts/DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/results/paper_figures_v4/Figure_7_initial_state_recovery.png
+[x] Figure_08_Signal_Integrity.png
+    - Figure 8: signal integrity summary
+    - source: /home/florianr/MG_Farm/1_Scripts/DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/results/paper_figures_v4/Figure_4_signal_integrity.png
+[x] Figure_09_Burst_Dropout_Transition.png
+    - Figure 9: burst-dropout transition
+    - source: /home/florianr/MG_Farm/1_Scripts/DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/results/paper_figures_v4/Figure_5_missing_gap_transition.png
+[x] Figure_10_Burst_Dropout_Recovery.png
+    - Figure 10: burst-dropout recovery
+    - source: /home/florianr/MG_Farm/1_Scripts/DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/results/paper_figures_v4/Figure_6_missing_gap_recovery.png
+[x] Figure_11_Voltage_Spike_Response.png
+    - Figure 11: voltage-spike response
+    - source: /home/florianr/MG_Farm/1_Scripts/DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/results/paper_figures_v4/Figure_8_spike_response.png
+[x] Figure_12_Cross_Scenario_Heatmap.png
+    - Figure 12: cross-scenario heatmap
+    - source: /home/florianr/MG_Farm/1_Scripts/DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/results/paper_figures_v4/Figure_9_delta_mae_heatmap.png
+[x] Figure_13_Decision_Synthesis.png
+    - Figure 13: decision synthesis
+    - source: /home/florianr/MG_Farm/1_Scripts/DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/results/paper_figures_v4/Figure_10_decision_synthesis.png
+[x] Figure_14_ADC_Quantization.png
+    - Figure 14: appendix ADC quantization
+    - source: /home/florianr/MG_Farm/1_Scripts/DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/results/paper_figures_v4/Figure_15_adc_quantization.png
+
+Total figures copied: 14

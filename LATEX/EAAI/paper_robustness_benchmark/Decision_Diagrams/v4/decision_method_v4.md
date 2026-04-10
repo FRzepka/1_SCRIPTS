@@ -31,9 +31,8 @@ Average of min-max normalized disturbed-scenario `delta_MAE` over:
 
 ### Recovery
 
-Average of penalized lower-is-better scores for:
+Penalized lower-is-better score for:
 - `recovery_time_to_baseline_band_strict_h`
-- `recovery_time_to_baseline_band_fair_h`
 
 Missing recovery times are treated as non-recovery and mapped to a zero score using a penalty larger than the slowest finite recovery time.
 
@@ -48,10 +47,10 @@ These are not presented as a single universal truth. They are only alternative w
 
 | Model   | Class                     |   Accuracy |   Robustness |   Recovery |
 |:--------|:--------------------------|-----------:|-------------:|-----------:|
-| DM      | Direct measurement        |     0      |       0.654  |     0.9688 |
+| DM      | Direct measurement        |     0      |       0.654  |     0.9376 |
 | HDM     | Hybrid direct measurement |     1      |       0.2049 |     0      |
-| HECM    | Hybrid ECM                |     0.788  |       0.7303 |     0.2755 |
-| DD      | Data-driven               |     0.7155 |       0.3163 |     0.6857 |
+| HECM    | Hybrid ECM                |     0.788  |       0.7303 |     0.3093 |
+| DD      | Data-driven               |     0.7155 |       0.3163 |     1      |
 
 ## Robustness raw inputs (`delta_MAE`)
 
@@ -64,9 +63,9 @@ These are not presented as a single universal truth. They are only alternative w
 
 ## Recovery raw inputs
 
-| Class                     |   recovery_time_to_baseline_band_fair_h |   recovery_time_to_baseline_band_strict_h |
-|:--------------------------|----------------------------------------:|------------------------------------------:|
-| Direct measurement        |                                 0.25    |                                   1.16583 |
-| Hybrid direct measurement |                               nan       |                                 nan       |
-| Hybrid ECM                |                                 1.15639 |                                   2.36928 |
-| Data-driven               |                                 1.00139 |                                   1.04639 |
+| Class                     |   recovery_time_to_baseline_band_strict_h |
+|:--------------------------|------------------------------------------:|
+| Direct measurement        |                                   1.16583 |
+| Hybrid direct measurement |                                 nan       |
+| Hybrid ECM                |                                   2.36928 |
+| Data-driven               |                                   1.04639 |

@@ -877,17 +877,39 @@ def figure_initial_state(df: pd.DataFrame) -> None:
     fair = local[(local["focus_scenario"] == "initial_soc_error") & (local["local_metric"] == "recovery_time_to_baseline_band_fair_h")][["model", "value", "threshold"]]
     fair = fair.rename(columns={"value": "recovery_h", "threshold": "threshold"}).set_index("model")
 
+    alias = "initial_soc_error"
+    tag_candidates = []
+    for run_dir in df.loc[df["alias"] == alias, "run_dir"]:
+        name = Path(run_dir).name
+        suffix = f"_{alias}"
+        if name.endswith(suffix):
+            core = name[: -len(suffix)]
+            parts = core.split("_", 2)
+            if len(parts) == 3:
+                tag_candidates.append(parts[2])
+    campaign_tags = list(dict.fromkeys(tag_candidates))
+
     plotted_models = []
     start = None
     for model in MODEL_ORDER:
-        rows = df[(df["model"] == model) & (df["alias"] == "initial_soc_error")]
-        if rows.empty:
+        rows = df[(df["model"] == model) & (df["alias"] == alias)]
+        run_dir = None
+        if not rows.empty:
+            run_dir = Path(rows.iloc[0]["run_dir"])
+        else:
+            model_runs = ROOT / model / "runs" / alias
+            if model_runs.exists():
+                for tag in campaign_tags:
+                    matches = sorted(model_runs.glob(f"*_{tag}_{alias}"))
+                    if matches:
+                        run_dir = matches[-1]
+                        break
+        if run_dir is None:
             continue
-        row = rows.iloc[0]
-        series = _load_run_series(Path(row["run_dir"]), model)
+        series = _load_run_series(run_dir, model)
         if start is None:
             start = float(series["time_s"].iloc[0])
-        seg = series[(series["time_s"] >= start) & (series["time_s"] <= start + 6 * 3600)].copy()
+        seg = series[(series["time_s"] >= start) & (series["time_s"] <= start + 1.5 * 3600)].copy()
         t_h = (seg["time_s"] - start) / 3600.0
         seg = _thin(seg, max_points=2500)
         t_h = (seg["time_s"] - start) / 3600.0
@@ -896,8 +918,13 @@ def figure_initial_state(df: pd.DataFrame) -> None:
         plotted_models.append(model)
     if start is None or not plotted_models:
         raise ValueError("No initial_soc_error runs available for Figure 7")
-    truth = _load_run_series(Path(df[(df["model"] == plotted_models[0]) & (df["alias"] == "initial_soc_error")].iloc[0]["run_dir"]), plotted_models[0])
-    truth = truth[(truth["time_s"] >= start) & (truth["time_s"] <= start + 6 * 3600)].copy()
+    truth_rows = df[(df["model"] == plotted_models[0]) & (df["alias"] == alias)]
+    if not truth_rows.empty:
+        truth_run_dir = Path(truth_rows.iloc[0]["run_dir"])
+    else:
+        truth_run_dir = run_dir
+    truth = _load_run_series(truth_run_dir, plotted_models[0])
+    truth = truth[(truth["time_s"] >= start) & (truth["time_s"] <= start + 1.5 * 3600)].copy()
     truth = _thin(truth, max_points=2500)
     ax_soc.plot((truth["time_s"] - start) / 3600.0, truth["soc_true"], color="black", lw=2.0, ls="--", label="Ground truth")
 
