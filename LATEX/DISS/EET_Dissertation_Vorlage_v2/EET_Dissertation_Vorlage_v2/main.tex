@@ -1,0 +1,566 @@
+%#########################################
+% Templatevorschlag für die Prüfungsfassung der Dissertation
+%#########################################
+%#########################################
+%#########################################
+%#########################################
+% Elektrische Energietechnik an der TU Berlin
+%#########################################
+%#########################################
+%#########################################
+%#########################################
+% maßgeblich gestaltet: Pablo K. P. Ferraz
+% Ursprung: Abschlussarbeitenvorlage FG EET
+% sehr geringfügige Einflüsse/Ergänzungen: Vorlage Dissertation Christian Dinca (diese Vorlage weist erhebliche Mängel auf)
+%#########################################
+
+
+% Achtung bitte den Autorenvertrag berücksichten: Stand: ca. 2017.
+
+% keine Gewähr, nur zur Information und Orientierung 
+
+% WAHRSCHEINLICH VERALTET. BITTE JEWEILS AUF AKTUALITÄT PRÜFEN
+
+%#########################################
+%§ 1 Aufgaben des Autors
+%(1) Übermittlung der Metadaten einschließlich englischer und deutscher Schlagwörter sowie eines englischen und eines deutschen Abstracts an das institutionelle Repositorium der TU Berlin: https://depositonce.tu-berlin.de/ -> publish
+%(2) Fertigstellung des druckfertigen Manuskriptes, Einfügen der vom Universitätsverlag gelieferten Innentitelseiten inkl. des Impressums
+%(3) Übermittlung der Druckdatei im PDF/X-Format (für Druckvorlage) und im PDF/A-Format (für Online-Version) an den Verlag
+%(4) Übermittlung der Originaldateien an den Verlag (für Archivierungszwecke)
+%(5) Begleichung der Druckkosten für die Startauflage + Verlagspauschale von 30 Euro
+%(6) Werbung für den Titel in der Fachöffentlichkeit über möglichst vielfältige Kommunikationswege
+%(7) Der Autor versichert, dass er über die urheberrechtlichen Nutzungsrechte an allen Teilen des Werkes verfügt und Rechte Dritter, insbesondere Urheber- und Persönlichkeitsrechte Dritter, mit der Veröffentlichung nicht verletzt werden.
+%(8) Der Autor stellt den Universitätsverlag von etwaigen Ansprüchen Dritter frei.
+
+%#########################################
+%§ 2 Aufgaben des Universitätsverlages
+%#########################################
+%(1) Gestaltung des Umschlages, Erstellung der Innentitelseiten und des Impressums
+%(2) Ausstattung mit ISBN, ISSN sowie DOI
+%(3) Formallektorat (stichprobenartige Durchsicht des Manuskriptes auf formale Fehler)
+%(4) Betreuung der technischen Herstellung, Kontakt mit der Druckerei
+%(5) Vertrieb von 6 Pflichtexemplaren, Einarbeitung von mindestens 2 Exemplaren in den Bestand der Universitätsbibliothek
+%(6) Kalkulation des Buchhandelspreises (in Abstimmung mit dem Autor)
+%(7) Verzeichnung des Titels in den einschlägigen bibliothekarischen Datenbanken
+%(8) Verzeichnung des Titels in den einschlägigen buchhändlerischen Datenbanken
+%(9) Lagerung und Verwaltung der Verlagsexemplare
+%(10)Vertrieb an den Buchhandel und an Einzelkunden
+%(11)Auslösen von Nachdrucken auf Kosten des Universitätsverlages
+%(12)Einstellen des Volltextes in Google Bücher
+%(13)Archivierung und Veröffentlichung der Onlineversion auf dem Institutionellen Repositorium der TU Berlin
+
+%#########################################
+%§ 3 Rechteübertragung an den Universitätsverlag der TU Berlin
+%#########################################
+%Die Urheberrechte am Werk liegen beim Autor (Rechteinhaber). Der Rechteinhaber räumt der Technischen Universität Berlin (ausgeübt durch den Universitätsverlag) hiermit die folgenden Nutzungsrechte ein:
+%(1) das einfache*, zeitlich unbeschränkte Nutzungsrecht zur Vervielfältigung und Verbreitung in gedruckter Form als Buchausgabe;
+%(2) das einfache*, zeitlich unbeschränkte Recht, die die Publikation auf dem institutionellen Repositorium der TU Berlin zu speichern und im Internet öffentlich zugänglich zu machen. Das Recht wird zum Zweck der Langzeitarchivierung und öffentlichen Zugänglichmachung auch anderen Bibliotheken, Archiven und Aggregatoren eingeräumt (z. B. DNB, Google Books, Fachrepositories), es gilt für alle bekannten und noch nicht bekannten Nutzungsarten.
+%(3) das einfache*, zeitlich unbeschränkte Nutzungsrecht für die Metadaten zum Nachweis der Publikation in einschlägigen bibliographischen Datenbanken.
+%*Durch die Übertragung des einfachen, d. h. nicht ausschließlichen Nutzungsrechtes an die Technische Universität Berlin wird das Recht des Autors, das Werk auch anderweitig zu veröffentlichen, nicht berührt.
+
+%%#########################################
+%§ 4 Rechteübertragung an die Allgemeinheit
+%%#########################################
+%Der Inhaber der Urheberrechte ist einverstanden, dass die Publikation unter dem Creative Commons-Lizenzvertrag CC BY 4.0 veröffentlicht werden: Creative Commons Namensnennung 4.0 | http://creativecommons.org/licenses/by/4.0/
+%Die Rechte der Urheberinnen und Urheber bleiben durch die Pflicht zur Nennung der Verfassernamen gewahrt. Nähere Informationen: http://creativecommons.org/licenses/
+
+
+% Achtung: § 4 kann in manchen Fällen kritisch werden, da jedem das Recht eingeräumt wird Daten aus der Dissertation frei zu nutzen. Wird in der Dissertation selbst Fremdmaterial genutzt muss der Erstpublizist darüber entscheiden.
+
+%%#########################################
+%%#########################################
+%%#########################################
+% Ansprechpartner für das Institut Energie- und Automatisierungstechnik der TUB
+% Felix Klein
+% felix.klein@tu-berlin.de
+% Raum: EM 154
+%%#########################################
+%#########################################
+
+% KOMA-Skript, Dokumentenklasse: Report, A4, zweiseitig, Titelseite...
+\documentclass[
+a4paper,
+12pt,
+titlepage,
+bibliography=totoc,
+twoside=on,
+parskip = false,
+numbers=noenddot,
+cleardoublepage=empty,
+DIV=12,
+BCOR=12.0mm,
+headings = openright,
+]{scrreprt}
+
+\raggedbottom
+%%%%%%%%%%%%%
+% Seitenlayout und Encoding
+%%%%%%%%%%%%%
+\usepackage[utf8]{inputenc} %Unicode Schriftsatz
+\usepackage[T1]{fontenc} %Encoding der Schriftart
+\usepackage{lmodern} % Moderner Standard des Schriftsatzes
+%\usepackage[ngerman]{babel}	% Deutsche, nur meistens (!) richtige Silbentrennung
+% Alternativ:
+\usepackage[greek,english]{babel}	
+\usepackage[automark, headsepline]{scrlayer-scrpage}	% Kopf- und Fußzeile mit KOMA-Skript
+\usepackage{setspace} % Zeilenabstand
+\onehalfspacing % 1,5 Zeilen
+\KOMAoptions{DIV=last} % Seitenaufteilung neuberechnen
+%%%%%%%%%%%%%
+% Literaturverzeichnis, Zitate und Anhang
+%%%%%%%%%%%%%
+\usepackage{csquotes} % Für die einfache Kenntlichmachung/das einfache Absetzen von Zitaten
+% Verwendung von biber statt bibtex (bib-Dateien können unverändert bleiben) wegen full Unicode für äöü etc. und wegen exklusiver biblatex-Features, die bibtex nicht enthält
+\usepackage[sortcites,backend=biber,style = numeric, sorting = none, maxbibnames = 99]{biblatex}
+\setcounter{biburlnumpenalty}{100} %Linebreaks für DOI und url
+\setcounter{biburlucpenalty}{100}
+\setcounter{biburllcpenalty}{100}
+\addbibresource{diss_bib.bib} %  Einfügen der Bib-Datei in der Präambel.
+%\addbibresource{gliederung/literatur2.bib} % Es können auch weitere .bib-Dateien hinzugefügt werden
+\usepackage[toc]{appendix} % Anhang (im Inhaltsverzeichnis)
+%%%%%%%%%%%%%
+% Weitere Designentscheidungen, Grafiken, Tabellen, Floats im Allgemeinen, Listen
+%%%%%%%%%%%%%
+% Veränderung der Bildunterschriften etc.; notwendig für subcaption (Ersatz für subfig)
+\usepackage[labelfont=bf]{caption} % "Abbildung x.x/Tabelle y.y" fett gedruckt
+\usepackage{subcaption} % subfig und subfigure sind veraltet und machen Probleme mit hyperref, benötigt das Paket caption
+\usepackage{graphicx}	% Grafiken einbinden	
+\graphicspath{{bilder/}} % Die Grafiken sind im Unterordner Bilder
+\usepackage{color} % Einfärben, z. B. von Text
+\usepackage[section]{placeins} % Für "\FloatBarrier"
+\usepackage{scrhack} % Damit listings mit KOMA-Skript funktioniert
+\usepackage{listings} % Einfügen von Code			
+\usepackage{booktabs} % Tabellen in Schön		
+\usepackage{tabularx} % Tabellen einbinden	
+\usepackage{rotating} % Rotieren von floats (Tabellen o. ä.)
+\usepackage{multirow} % Mehrere Spalten zusammenfassen
+\usepackage[neveradjust]{paralist}	% Verbesserung von enumerate etc.
+%%%%%%%%%%%%%
+% Krickel-Krackel und andere Schmierereien
+%%%%%%%%%%%%%
+\usepackage{tikz} % Wird nur benötigt, wenn Grafiken mit tikz "programmiert" werden sollen
+\usetikzlibrary{arrows} % Ein paar Pfeile für tikz
+\usepgflibrary{fpu} % Verläufe aus Matlab o. ä. plotten
+\usepackage{pgfplots} % Diagramme in tikz
+\pgfplotsset{compat=1.11} %Einstellung von pgfplots
+\usepackage[european,RPvoltages]{circuitikz} % Für Schaltungen, benötigt tikz
+\usepackage{xstring} %Auslesen von Stringelementen. GGF. notwendig für Plotten mit tikz
+%%%%%%%%%%%%%
+% Weiteres
+%%%%%%%%%%%%%
+\usepackage{pdfpages} % Zum Einfügen von ganzen pdf-Seiten, z. B. Datenblätter
+%%%%%%%%%%%%%
+% Symbole
+%%%%%%%%%%%%%
+\usepackage{amsmath, amssymb} % Mathemodus
+\usepackage{textcomp} % Symbole im Text
+\usepackage[locale = DE]{siunitx} % SI-Einheiten und "schöne" Darstellung von Zahlen (u. a. durch richtige Abstände. Deutsche Darstellung, d. h. 1,0 statt 1.0 
+\usepackage[version = 4]{mhchem} % Für aktuelle Distros, d. h. neuer als 2014
+%\usepackage[version=3]{mhchem} % Chemische Formeln
+\usepackage{eurosym} % Erzeugt offizielles Eurozeichen; Nutzung von "€" (atl gr+e) auch möglich
+%%%%%%%%%%%%%%%%%%%%%%
+% Nomenklatur etc.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Wer eine Nomenklatur machen möchte, nutze:
+%\usepackage[noprefix,intoc]{nomencl}
+% Einfaches Abkürzungsverzeichnis mit self-made Symbolverzeichnis (siehe im Textkörper)
+\usepackage[nohyperlinks]{acronym}
+\usepackage[toc,acronym,nomain,indexonlyfirst]{glossaries}
+\usepackage{glossary-mcols}
+% add custom glossaries
+\newglossary[slg]{symbolslist}{syi}{syg}{Symbols}
+
+\loadglsentries{glossary}
+\makeglossaries
+
+
+% Fancy komplizierte Variante (acronym in dem Falle auskommentieren)
+%\usepackage[nonumberlist,acronym]{glossaries}
+%\usepackage{ifthen} %Notwendig, falls glossaries genutzt wird
+%%%%%%%%%%%%%%%
+% Richtiges Einbinden der Nomenklatur
+%%%%%%%%%%%%%%%
+% Beginn Einstellungen Glossary und Nomenklatur (viel zu kompliziert, oder? ;-) )
+%%%%%%%%%%%%%%%%
+%\RequirePackage{ifthen}
+%\newcommand{\nomgroupextra}[1]{\hspace*{\fill}#1%
+%	\vspace*{-2ex}\item[]\hspace*{-\leftmargin}%
+%	\rule[0.4pt]{\textwidth}{0.4pt}}
+%
+%\newcommand{\nomgroupentry}[3]{%
+%	\vspace*{#1}\item[\textbf{#2}]\nomgroupextra{\textbf{#3}}}
+%
+%\newcommand{\nomunit}[1]{%
+%	\renewcommand{\nomentryend}{\hspace*{\fill}$\mathrm{#1}$}}
+%
+%\setlength{\nomitemsep}{0ex}
+%\setlength{\nomlabelwidth}{10ex}
+%
+%\renewcommand{\nomgroup}[1]%
+%{\ifthenelse{\equal{#1}{A}}%
+%	{\nomgroupentry{4ex}{Abkrzungen}{}}%
+%	{\ifthenelse{\equal{#1}{G}}%
+%		{\nomgroupentry{3ex}{Greek}{}}%
+%		{\ifthenelse{\equal{#1}{R}}%
+%			{\nomgroupentry{3ex}{Latin}{}}%
+%			{\ifthenelse{\equal{#1}{I}}%
+%				{\nomgroupentry{3ex}{Indizes}{}}%
+%				{\ifthenelse{\equal{#1}{M}}%
+%					{\nomgroupentry{3ex}{Matrizen}{Einheit}}%
+%					{\ifthenelse{\equal{#1}{K}}%
+%						{\nomgroupentry{3ex}{Koordinatensysteme}{}}%          
+%					}%
+%					{}%
+%				}%
+%				{}%
+%			}%
+%			{}%
+%		}%
+%		{}%
+%	}%
+%	{}%
+%} 
+%
+%%#########################################
+%% Kommandos Fig. und Tab.
+%\addto\captionsenglish{\renewcommand{\figurename}{Fig. }}
+%\addto\captionsenglish{\renewcommand{\tablename}{Tab. }}
+%%#########################################
+%\makeindex
+%\makeglossaries
+%\makenomenclature
+%%%%%%%%%%%%%%%%
+% Ende Einstellungen Glossary und Nomenklatur
+%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%
+% Weitere Packages nach eigenem Ermessen, z. B. Verschlimmbesserungen und um absichtlich entfernte, veraltete Packages wieder einzubinden
+%%%%%%%%%%%%%%%%%
+
+%\renewcommand*{\chapterformat}{%
+%\enskip
+%  \textcolor{tugrau}{\rule[-\dp\strutbox]{2pt}{\baselineskip}}
+%}
+%\setkomafont{disposition}{\normalcolor\bfseries}
+
+
+\renewcommand\raggedchapter{\raggedleft}
+\setkomafont{chapter}{\Huge}
+\setkomafont{chapterprefix}{\large}
+\newkomafont{chapternumber}{\mdseries\fontsize{50pt}{60pt}\selectfont}
+
+\tikzset{
+    headings/base/.style = {
+      outer sep = 0pt,
+      inner sep = 5pt,
+    },
+    headings/chapterbackground/.style = {
+      headings/base,
+      shade,
+      left color = white,
+      right color = white,
+    },
+    headings/chapapp/.style = {
+      headings/base,
+      text = tugrau,
+      font = \usekomafont{chapterprefix}
+    },
+    headings/chapternumber/.style= {
+      headings/base,
+      text = tugrau,
+      font = \usekomafont{chapternumber}
+    },
+    headings/chapterline/.style = {
+      tugrau,
+      line width = 2pt
+    }
+}
+\makeatletter
+\renewcommand*\chapterlinesformat[3]{%
+  \Ifstr{#1}{chapter}{%
+    \begin{tikzpicture}[baseline=(title.base)]
+      \node[headings/chapterbackground](title){%
+        \parbox[t]
+          {\dimexpr\textwidth-2\pgfkeysvalueof{/pgf/inner xsep}\relax}
+          {\raggedchapter #3}%
+      };
+      \node[headings/chapapp,anchor=south east]
+        at (title.north east){\Ifstr{#2}{}{}{\chapapp}\strut};
+      \useasboundingbox
+        (current bounding box.north west)
+        rectangle
+        ([yshift=-10pt]current bounding box.south east);
+      \draw[headings/chapterline]
+        (current bounding box.south east)++(+.5\pgflinewidth,0)--+(0,\paperheight);
+      \node[anchor=base west,headings/chapternumber]
+        at([xshift=10pt]title.base-|current bounding box.east){#2};
+    \end{tikzpicture}
+    \par
+  }{%
+    \@hangfrom{#2}{#3}% other section levels using style=chapter
+  }%
+}
+\makeatother
+
+
+%
+%\definecolor{gray75}{gray}{0.75}
+%\newcommand{\hsp}{\hspace{20pt}}
+%\titleformat{\chapter}[hang]{\Huge\bfseries}{\thechapter\hsp\textcolor{gray75}{|}\hsp}{0pt}{\Huge\bfseries}
+
+
+%%%%%%%%
+% Hyperref Verlinkungen (sollte immer zum Schluss aufgeführt werden)
+%%%%%%%%
+\usepackage[bookmarksnumbered=true]{hyperref}
+%#########################################
+%% Definition der Linkfarben
+\hypersetup{colorlinks=true,  % aktiviert farbige Referenzen
+      urlcolor=black,
+%      citecolor=Sun2,
+      citecolor=black,
+     % pagecolor=black,
+      linkcolor=black,
+      %linkcolor=black,            pdfpagemode=None,  % PDF-Viewer startet ohne Inhaltsverzeichnis
+            pdfstartview=Fit}  % PDF-Viewer benutzt beim Start bestimmte Seitenbreite (fit horizontal width)
+%%%%%%%%%%%%%%%%%%%%
+% PDF Eigenschaften/Metadaten
+%%%%%%%%%%%%%%%%%%%%%
+\hypersetup{
+  pdftitle   ={Titel der Dissertation},
+  pdfauthor  ={Name, Technische Universit\"at Berlin},
+  pdfsubject ={Dissertation},
+  pdfkeywords={}
+}
+%%%%%%%%%%%%%%%%
+% TU-Farben
+%%%%%%%%%%%%%%%%
+\definecolor{turot}{RGB}{197,14,31}
+\definecolor{tublau}{RGB}{0,166,179}
+\definecolor{tugrau}{RGB}{113,113,113}
+\definecolor{tugelb}{RGB}{255,128,0}
+\definecolor{tugruen}{RGB}{34,161,92}
+%%%%%%%%%%%%%%%%%
+% Weitere Farben
+%%%%%%%%%%%%%%%%%
+\definecolor{kupfer}{RGB}{184,115,51}
+\definecolor{alu}{RGB}{165,165,165}
+%%%%%%%%%%%%%%%%
+% Definition Kopf- und Fußzeile 
+%%%%%%%%%%%%%%%%
+%(Oben außen (zweiseitig) wird die Section angezeigt. Trennlinie oben, keine unten)
+\pagestyle{scrheadings}
+\automark[section]{chapter}
+\ihead[]{}
+\chead[]{}
+\ohead[]{\headmark}
+\ifoot[]{}
+\cfoot[]{}
+\ofoot[\thepage]{\thepage}
+
+%\setlength{\parindent}{0pt}
+
+%change citavi bibtex urldate-format to biber format
+\DeclareSourcemap{
+    \maps{
+        \map[overwrite]{
+            \step[fieldsource=urldate,
+            match=\regexp{([0-9]{2})\.([0-9]{2})\.([0-9]{4})},
+            replace={$3-$2-$1},
+            final]
+        }
+    }
+}
+
+
+\begin{document}
+\pagenumbering{Roman}
+
+%
+%Titelseite
+%
+\begin{titlepage}
+
+\thispagestyle{empty}
+\begin{singlespace}
+%\vspace*{1.5cm}
+\begin{center}
+\vspace*{15pt}
+\begin{onehalfspace}
+\Huge{\textbf{Detection and Prevention of Lithium Plating}}\\
+\vspace*{10pt}
+\Large{\textbf{{}in Lithium-Ion-Batteries}}
+\end{onehalfspace}
+\vspace*{30pt}
+\large{vorgelegt von\\
+M. Sc.\\
+Julian Marscheider\\
+geb. in Berlin}\\
+\vspace*{40pt}
+
+\large{
+von der Fakultät IV -- Elektrotechnik und Informatik\\
+der Technischen Universität Berlin\\
+zur Erlangung des akademischen Grades\\}
+\vspace{17pt}
+
+\large{
+Doktor der Ingenieurswissenschaften\\
+-- Dr.-Ing. --\\
+}
+
+\vspace{12pt}
+
+\large{genehmigte Dissertation\\}
+\end{center}
+
+\vspace{36pt}
+\begin{flushleft}
+\large{Promotionsausschuss:\\}
+%\vspace{17pt}
+\large{Vorsitzende*r: Prof. Dr.-Ing. Stefan Steinhart\\
+Gutachter*in: Prof. Dr. rer. nat. Erna Eiskalt\\
+Gutachter*in: Prof. Dr.-Ing. Gundula Gnadenlos\\
+}
+\vspace{10pt}
+\large{Tag der wissenschaftlichen Aussprache: 4. Mai 2020\\}
+\end{flushleft}
+\vspace{10pt}
+\begin{center}
+\large{Berlin, 2020}
+\end{center}
+\end{singlespace}
+\end{titlepage}
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Ende Titelseite
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\cleardoublepage
+
+\thispagestyle{empty}
+
+%Zitat
+\begin{minipage}[c][\textheight][c]{0.97\textwidth} 
+\begin{minipage}[c]{0.4\textwidth}
+~
+\end{minipage}
+\begin{minipage}[c]{0.5\textwidth}
+%\begin{flushleft}
+''Die Brillianz des Zitierten färbt selten auf den Zitierenden ab.''\par\noindent
+(Heribert Herrlich)
+%\end{flushleft}
+\end{minipage}
+\begin{minipage}[c]{0.1\textwidth}
+\end{minipage}
+\end{minipage}
+
+\cleardoublepage
+
+
+\chapter*{Danksagung/Vorwort}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Abstract in Englisch
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter*{Abstract}
+Abstract in Englisch (if applicable)
+%\input{gliederung/abstract_eng.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Abstract Ende
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Abstract auf Deutsch (falls zutreffend)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter*{Kurzzusammenfassung (Abstract)}
+Kurzzusammenfassung auf Deutsch 
+%\input{gliederung/abstract_deu.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Abstract Ende
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Lists and glossaries
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\tableofcontents
+\cleardoublepage
+% Two column style Abbreviations
+%\printglossary[style=mcolindex,type=\acronymtype,title=Abbreviations]
+\printglossary[type=\acronymtype,title=Abbreviations]
+\cleardoublepage
+\printglossary[type=symbolslist,title=Symbols]
+\cleardoublepage
+%Abbildungsverzeichnis
+\listoffigures
+\addcontentsline{toc}{chapter}{List of Figures}  
+%Tabellenverzeichnis
+\listoftables
+\addcontentsline{toc}{chapter}{List of Tables}
+
+%Gliederungsvorschlag, in dieser Vorlage sind die Bestandteile des Dokuments im Unterordner "gliederung" gespeichert.
+
+%%%%%%%%%%%%%%%
+% Introduction and Motivation
+%%%%%%%%%%%%%%%
+\chapter{Introduction and Motivation}
+\pagenumbering{arabic}
+%\glsaddall
+\input{01_Introduction_and_Motivation.tex}
+
+%%%%%%%%%%%%%%%
+% State of the Art
+%%%%%%%%%%%%%%%
+\chapter{State of the Art}
+\label{sec:theorie}
+\input{02_State of the Art.tex}
+
+
+%%%%%%%%%%%%%%%
+% Experimental
+%%%%%%%%%%%%%%%
+\chapter{Experimental}
+\input{03_Experimental.tex}
+
+%%%%%%%%%%%%%%%
+% Analysis
+%%%%%%%%%%%%%%%
+\chapter{Analysis}
+%\input{gliederung/analysemethoden}
+
+
+%%%%%%%%%%%%%%%
+% Conclusion
+%%%%%%%%%%%%%%%
+\chapter{Conclusion}
+%\input{gliederung/sperrwandler}
+
+%%%%%%%%%%%%%%%
+% Outlook
+%%%%%%%%%%%%%%%
+\chapter{Outlook}
+%\input{gliederung/sperrwandler}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Literaturverzeichnis ausgeben (BiBLaTeX, muss selbst angelegt werden, z. B. mit dem Dateinamen "literatur.bib"
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\printbibliography
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Ende Literaturverzeichnis
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%
+% Anhang
+%%%%%%%%%%%%%%%
+\appendix
+%\input{gliederung/anhang.tex}
+%\input{gliederung/anhang.tex}
+
+
+
+\end{document}

@@ -1,0 +1,52 @@
+% -*- root: ../thesis.tex -*-
+% this file is called up by thesis.tex
+% content in this file will be fed into the main document
+
+% Glossary entries are defined with the command \nomenclature{1}{2}
+% 1 = Entry name, e.g. abbreviation; 2 = Explanation
+% You can place all explanations in this separate file or declare them in the middle of the text. Either way they will be collected in the glossary.
+
+% required to print nomenclature name to page header
+%\markboth{\MakeUppercase{\nomname}}{\MakeUppercase{\nomname}}
+
+
+% ----------------------- contents from here ------------------------
+% \newglossaryentry{uppercase}{
+%     name={Uppercase},
+%     text={uppercase},
+%     description={Appears uppercase in the glossary and lowercase in the text}
+% }
+
+% chemicals
+\newacronym[longplural={lithium-ion batteries}]{lib}{LIB}{lithium-ion battery} 
+\newacronym{ev}{EV}{electric vehicle}
+\newacronym{sei}{SEI}{surface electrolyte interface}
+\newacronym{xps}{XPS}{X-ray photoelectron spectroscopy}
+\newacronym{emc}{EMC}{ethyl methyl carbonate}
+\newacronym{ec}{EC}{ethylene carbonate}
+\newacronym{dmc}{DMC}{dimethyl carbonate}
+\newacronym{vc}{VC}{vinylene carbonate}
+\newacronym{sem}{SEM}{scanning electron microscopy}
+\newacronym{atr}{ATR}{attenuated total reflectance}
+\newacronym{ftir}{FTIR}{fourier transform infra-red spectroscopy}
+\newacronym{soc}{SOC}{state of charge}
+\newacronym[longplural={lithium-metal batteries}]{lmb}{LMB}{lithium-metal battery}
+\newacronym{li}{Li}{the element Lithium}
+\newacronym{nmc}{NMC}{nickel-manganese-cobalt}
+\newacronym{lipf6}{\ce{LiPF6}}{lithium hexafluorophosphate}
+\newacronym{pc}{PC}{propylene carbonate}
+\newacronym{pp}{PP}{polypropylene}
+\newacronym{pe}{PE}{polyethylene}
+\newacronym{ocv}{OCV}{open circuit voltage}
+\newacronym{cccv}{CCCV}{constan current constant voltage}
+\newacronym{pvdf}{PVDF}{polyvinylidenfluorid}
+\newacronym{afm}{AFM}{atomic force microscopy}
+\newacronym{gic}{GIC}{graphite intercalation compound}
+
+
+
+\newglossaryentry{x}{
+name=\ensuremath{\{x\}},
+description={Variable x.},
+sort=x, type=symbolslist
+}
