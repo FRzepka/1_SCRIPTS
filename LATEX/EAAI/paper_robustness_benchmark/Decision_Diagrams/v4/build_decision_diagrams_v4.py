@@ -60,9 +60,9 @@ HEATMAP_SCENARIOS = [
 ]
 
 PROFILE_WEIGHTS = {
-    "Accuracy-first": {"Accuracy": 0.60, "Robustness": 0.25, "Recovery": 0.15},
-    "Robustness-first": {"Accuracy": 0.20, "Robustness": 0.65, "Recovery": 0.15},
-    "Recovery-first": {"Accuracy": 0.20, "Robustness": 0.20, "Recovery": 0.60},
+    "Accuracy-weighted": {"Accuracy": 0.60, "Robustness": 0.20, "Recovery": 0.20},
+    "Robustness-weighted": {"Accuracy": 0.20, "Robustness": 0.60, "Recovery": 0.20},
+    "Recovery-weighted": {"Accuracy": 0.20, "Robustness": 0.20, "Recovery": 0.60},
 }
 
 SCENARIO_SHORT = {
@@ -323,18 +323,18 @@ def build_combined_decision_figure(meta_scores: pd.DataFrame) -> None:
             + meta_scores["Recovery"] * weights["Recovery"]
         )
 
-    fig = plt.figure(figsize=(13.8, 6.5))
-    gs = fig.add_gridspec(1, 2, width_ratios=[1.0, 1.18], wspace=0.24)
+    fig = plt.figure(figsize=(13.6, 5.2))
+    gs = fig.add_gridspec(1, 2, width_ratios=[1.0, 1.45], wspace=0.32)
     ax_radar = fig.add_subplot(gs[0, 0], projection="polar")
     ax_bar = fig.add_subplot(gs[0, 1])
 
     ax_radar.set_theta_offset(np.pi / 2)
     ax_radar.set_theta_direction(-1)
     ax_radar.set_xticks(angles[:-1])
-    ax_radar.set_xticklabels(labels, fontsize=12)
-    ax_radar.tick_params(axis="x", pad=2)
-    ax_radar.set_yticks([0.2, 0.4, 0.6, 0.8, 1.0])
-    ax_radar.set_yticklabels(["0.2", "0.4", "0.6", "0.8", "1.0"], fontsize=9)
+    ax_radar.set_xticklabels(labels)
+    ax_radar.tick_params(axis="x", pad=10)
+    ax_radar.set_yticks([0.25, 0.5, 0.75, 1.0])
+    ax_radar.set_yticklabels(["0.25", "0.50", "0.75", "1.00"], fontsize=8)
     ax_radar.set_ylim(0, 1)
     ax_radar.set_facecolor("white")
     for _, row in meta_scores.iterrows():
@@ -363,9 +363,12 @@ def build_combined_decision_figure(meta_scores: pd.DataFrame) -> None:
     ax_bar.set_ylim(0, 1.02)
     ax_bar.set_ylabel("Composite score")
     ax_bar.grid(axis="y", alpha=0.25)
+    ax_radar.set_title("(a) Relative decision dimensions", pad=26, fontsize=12, fontweight="bold")
+    ax_bar.set_title("(b) Priority-weighted composite scores", fontsize=12, fontweight="bold")
+    for spine in ["top", "right"]:
+        ax_bar.spines[spine].set_visible(False)
     handles, labels_legend = ax_bar.get_legend_handles_labels()
-    fig.legend(handles, labels_legend, ncol=4, frameon=False, loc="upper center", bbox_to_anchor=(0.5, 0.95))
-    fig.subplots_adjust(top=0.88, left=0.04, right=0.98, bottom=0.11, wspace=0.24)
+    ax_bar.legend(handles, labels_legend, ncol=4, frameon=False, loc="upper center", bbox_to_anchor=(0.5, 1.14))
     PAPER_FIG_DIR.mkdir(parents=True, exist_ok=True)
     fig.savefig(PAPER_FIG_DIR / "Figure_10_decision_synthesis.png", dpi=240, bbox_inches="tight")
     plt.close(fig)

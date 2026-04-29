@@ -420,8 +420,12 @@ def figure_baseline(df: pd.DataFrame) -> None:
         ax.invert_yaxis()
         ax.set_xlabel(metric.upper())
         ax.set_title(panel, loc="left", fontsize=14, fontweight="bold", pad=6)
+        max_val = max(vals)
         for yi, v in zip(y, vals):
-            ax.text(v + max(vals) * 0.02, yi, f"{v:.4f}", va="center", ha="left", fontsize=11)
+            if v > 0.75 * max_val:
+                ax.text(v - max_val * 0.025, yi, f"{v:.4f}", va="center", ha="right", fontsize=11, color="white")
+            else:
+                ax.text(v + max_val * 0.02, yi, f"{v:.4f}", va="center", ha="left", fontsize=11)
     _savefig(PAPER_FIGURES_DIR / "Figure_1_baseline_performance.png")
 
 
@@ -781,9 +785,11 @@ def figure_signal_integrity(df: pd.DataFrame) -> None:
     axes[1].set_xticklabels([MODEL_META[m]["short"] for m in gap["model"]])
     axes[1].set_ylabel("Recovery time [h]")
     axes[1].set_title("(b)", loc="left", fontsize=14, fontweight="bold", pad=6)
+    max_val = np.nanmax(vals)
     for xi, v in enumerate(vals):
         if np.isfinite(v):
-            axes[1].text(xi, v + max(vals) * 0.02, f"{v:.1f}", ha="center", va="bottom")
+            text_color = "black" if gap.iloc[xi]["model"] == "ECM_0.0.3" else "white"
+            axes[1].text(xi, v - max_val * 0.04, f"{v:.1f}", ha="center", va="top", color=text_color)
 
     _savefig(PAPER_FIGURES_DIR / "Figure_4_signal_integrity.png")
 

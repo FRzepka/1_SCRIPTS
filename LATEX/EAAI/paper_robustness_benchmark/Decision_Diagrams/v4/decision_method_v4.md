@@ -39,9 +39,9 @@ Missing recovery times are treated as non-recovery and mapped to a zero score us
 ## Decision profiles
 
 These are not presented as a single universal truth. They are only alternative weighting views:
-- `Accuracy-first`: Accuracy=0.60, Robustness=0.25, Recovery=0.15
-- `Robustness-first`: Accuracy=0.20, Robustness=0.65, Recovery=0.15
-- `Recovery-first`: Accuracy=0.20, Robustness=0.20, Recovery=0.60
+- `Accuracy-weighted`: Accuracy=0.60, Robustness=0.20, Recovery=0.20
+- `Robustness-weighted`: Accuracy=0.20, Robustness=0.60, Recovery=0.20
+- `Recovery-weighted`: Accuracy=0.20, Robustness=0.20, Recovery=0.60
 
 ## Final normalized scores
 
