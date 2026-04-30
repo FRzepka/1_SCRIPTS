@@ -1,0 +1,11 @@
+BIBLIOGRAPHY CHECK
+==================
+
+[x] Full manuscript compiled successfully.
+[x] Blind manuscript compiled successfully.
+[x] No undefined-citation warnings found in the latest manuscript logs.
+[x] Bibliography used for the current builds:
+    - C:\Users\Florian\SynologyDrive\TUB\1_Dissertation\1_Scripts\LATEX\JES\paper_robustness_benchmark\bib\paper3_robustness_test.bib
+
+[i] Additional archival duplicate present in the project:
+    - C:\Users\Florian\SynologyDrive\TUB\1_Dissertation\1_Scripts\LATEX\JES\paper_robustness_benchmark\bib\Paper 3- Robustness Test.bib

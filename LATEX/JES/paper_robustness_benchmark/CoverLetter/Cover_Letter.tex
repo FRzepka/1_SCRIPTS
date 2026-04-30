@@ -1,0 +1,38 @@
+\documentclass[11pt]{letter}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+\usepackage{hyperref}
+
+\address{Florian Rzepka\\
+Technical University of Berlin\\
+Chair of Electrical Energy Storage Technology\\
+Einsteinufer 11\\
+10587 Berlin, Germany\\
+\href{mailto:florian.rzepka@tu-berlin.de}{florian.rzepka@tu-berlin.de}}
+
+\date{\today}
+
+\begin{document}
+\begin{letter}{Editors\\
+Journal of Energy Storage\\
+Elsevier}
+
+\opening{Dear Editors,}
+
+Please find enclosed our manuscript entitled \textbf{``Performance Benchmarking of Embedded Battery State Estimation: A Measurement-Only Comparison of Direct-Measurement, Hybrid, and Data-Driven Estimators''}, which we submit for exclusive consideration in \textit{Journal of Energy Storage}.
+
+The manuscript addresses a practical gap in embedded battery management: estimator selection is often discussed through clean-data accuracy alone, whereas deployment quality depends equally on behavior under realistic measurement disturbances. To address this, the paper introduces a controlled measurement-only benchmark that compares four embedded-ready estimator classes under the same full-cell trajectory, the same disturbance definitions, and the same online execution assumptions. The study evaluates direct-measurement, hybrid direct-measurement, hybrid equivalent-circuit, and data-driven estimators under ADC quantization, current bias, additive noise, missing samples, irregular sampling, burst dropout, voltage spikes, and initialization mismatch.
+
+The main contribution is a cross-class performance benchmark that separates baseline accuracy, disturbed-operation robustness, and recovery behavior under physically interpretable sensor-side faults. Rather than promoting a single universal winner, the results expose complementary strengths: the hybrid direct-measurement model leads under clean conditions, the hybrid equivalent-circuit model is the strongest overall robustness choice, and the data-driven model is particularly attractive for missing-sample resilience and strict-band recovery after initialization mismatch. This makes the paper directly relevant to the readership of \textit{Journal of Energy Storage}, because it provides a deployment-oriented battery state-estimation benchmark and decision support for embedded energy-storage systems.
+
+We confirm that this manuscript has not been published elsewhere and is not under consideration by another journal. All authors have approved the manuscript and agree with its submission.
+
+Thank you for your consideration.
+
+\closing{Sincerely,}
+
+Florian Rzepka\\
+Technical University of Berlin
+\end{letter}
+\end{document}

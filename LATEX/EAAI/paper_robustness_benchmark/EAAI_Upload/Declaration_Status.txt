@@ -1,7 +1,0 @@
-DECLARATION STATUS
-==================
-
-[x] declarationStatement.docx copied into this upload package.
-    - Source: /home/florianr/MG_Farm/1_Scripts/LATEX/EAAI/elsarticle/elsarticle/EAAI_Upload/declarationStatement.docx
-
-Please confirm that Elsevier/EAAI still expects this exact form version at submission time.

@@ -1,0 +1,34 @@
+SUBMISSION CHECKLIST
+====================
+
+[x] Files prepared before submission:
+    - Manuscript_Blind.pdf
+    - Manuscript_Full.pdf
+    - Title_Page.pdf
+    - Cover_Letter.pdf
+    - Highlights.pdf
+    - declarationStatement.docx
+    - Figures\ (14 files)
+
+[x] Journal target switched to Journal of Energy Storage.
+    - Main manuscript metadata updated
+    - Blind manuscript metadata updated
+    - Title page updated
+    - Cover letter updated
+
+[x] Figure export check
+    - See Figure_Export_Check.txt
+
+[x] Bibliography check
+    - See Bibliography_Check.txt
+
+[x] Author metadata check
+    - See Author_Metadata_Check.txt
+
+[x] Declaration / journal-specific forms
+    - See Declaration_Status.txt
+
+[ ] Optional manual items before upload
+    - Confirm whether Journal of Energy Storage expects a graphical abstract for this submission.
+    - Confirm that the copied declarationStatement.docx is still the current JES / Elsevier form.
+    - Recheck author metadata once entered in the submission portal.

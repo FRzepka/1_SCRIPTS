@@ -1,0 +1,11 @@
+DECLARATION STATUS
+==================
+
+[x] declarationStatement.docx copied into this JES upload package.
+    - Package copy:
+      C:\Users\Florian\SynologyDrive\TUB\1_Dissertation\1_Scripts\LATEX\JES\paper_robustness_benchmark\JES_Upload\declarationStatement.docx
+    - Source:
+      copied from the local Elsevier submission-template archive
+
+[ ] Manual check before submission
+    - Confirm that this is still the current Elsevier / Journal of Energy Storage declaration form version.

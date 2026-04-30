@@ -1,0 +1,53 @@
+\documentclass[review,nopreprintline]{elsarticle}
+\usepackage{hyperref}
+\journal{Journal of Energy Storage}
+
+\begin{document}
+\begin{frontmatter}
+
+\title{Performance Benchmarking of Embedded Battery State Estimation: A Measurement-Only Comparison of Direct-Measurement, Hybrid, and Data-Driven Estimators}
+
+\author[1]{Florian Rzepka\corref{cor1}}
+\ead{florian.rzepka@tu-berlin.de}
+
+\author[1]{Julia Kowal}
+\ead{julia.kowal@tu-berlin.de}
+
+\cortext[cor1]{Corresponding author.}
+
+\affiliation[1]{organization={Technical University of Berlin, Chair of Electrical Energy Storage Technology},
+            addressline={Einsteinufer 11},
+            city={Berlin},
+            postcode={10587},
+            country={Germany}}
+
+\begin{abstract}
+This paper presents a measurement-only performance benchmark for embedded battery state estimation under realistic Battery Management System (BMS) constraints. The study isolates estimator performance rather than hardware-resource or implementation-effort evaluation and compares four embedded-ready estimators on the same Lithium Iron Phosphate (LFP) full-cell trajectory under a shared embedded constraint: a direct-measurement model (DM), a hybrid direct-measurement model with learned State-of-Health support (HDM), a hybrid equivalent-circuit model with voltage feedback (HECM), and a data-driven neural model with GRU-based SOC estimation and LSTM-based online SOH context (DD). The benchmark perturbs only measurable inputs and timing information, including ADC quantization, current bias, additive current, voltage, and temperature noise, missing samples, irregular sampling, burst dropout, voltage spikes, and initial-state mismatch, so that all disturbances remain physically interpretable and reproducible. The comparison reveals no universal winner across deployment-relevant dimensions. Under clean conditions, HDM provides the lowest baseline error with an MAE of $0.0024$, followed by HECM with $0.0090$, DD with $0.0100$, and DM with $0.0311$. Under disturbed measurements, HECM is the strongest overall robustness choice, especially in the most discriminative current-bias and voltage-noise scenarios. DD is the most stable estimator under missing samples and recovers fastest after initialization mismatch, while DM shows the expected drift sensitivity and HDM trades nominal accuracy against reduced disturbance tolerance. The benchmark therefore exposes complementary failure modes of direct-measurement, hybrid physics-based, and data-driven estimators and supports decision-oriented model selection for embedded BMS deployment.
+\end{abstract}
+
+\begin{keyword}
+Battery management system \sep State of charge \sep State of health \sep Performance benchmark \sep Direct measurement \sep Equivalent circuit model \sep Data-driven estimation \sep Embedded artificial intelligence
+\end{keyword}
+
+\end{frontmatter}
+
+\section*{Funding}
+This research was funded by the German Federal Ministry of Education and Research (BMBF), grant number 03SF0684A (MG FARM). The authors are responsible for the content. The work was further supported by the German Research Foundation and the Open Access Publication Fund of the Technical University of Berlin.
+
+\section*{Acknowledgements}
+The authors acknowledge the High Performance Computing Service of the Technical University of Berlin for providing the computational resources used for training, benchmarking, and figure generation.
+
+\section*{CRediT authorship contribution statement}
+\textbf{Florian Rzepka}: Conceptualization, methodology, software, validation, formal analysis, investigation, data curation, writing--original draft preparation, writing--review and editing, visualization.\\
+\textbf{Julia Kowal}: Resources, supervision, project administration, funding acquisition, writing--review and editing.
+
+\section*{Declaration of competing interest}
+The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
+
+\section*{Declaration of generative AI and AI-assisted technologies in the manuscript preparation process}
+During the preparation of this work the author(s) used ChatGPT, DeepL, and Grammarly in order to improve the linguistic quality and style of the manuscript. After using these tools, the author(s) reviewed and edited the content as needed and take(s) full responsibility for the content of the published article.
+
+\section*{Data availability}
+The underlying laboratory dataset, benchmark scripts, model runners, and paper-facing result exports will be made available on reasonable request.
+
+\end{document}

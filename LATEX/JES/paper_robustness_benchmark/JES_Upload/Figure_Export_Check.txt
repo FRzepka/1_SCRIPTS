@@ -1,0 +1,47 @@
+FIGURE EXPORT CHECK
+===================
+
+[x] Figure_01_Requirements_Overview.png
+    - Figure 1: conceptual requirements overview
+    - source: C:\Users\Florian\SynologyDrive\TUB\1_Dissertation\1_Scripts\LATEX\JES\paper_robustness_benchmark\figures\Schematics\BMS_Requirements.png
+[x] Figure_02_Methodology_Overview.png
+    - Figure 2: methodology overview
+    - source: C:\Users\Florian\SynologyDrive\TUB\1_Dissertation\1_Scripts\LATEX\JES\paper_robustness_benchmark\figures\Schematics\Methodology.png
+[x] Figure_03_Disturbance_Taxonomy.png
+    - Figure 3: disturbance taxonomy
+    - source: C:\Users\Florian\SynologyDrive\TUB\1_Dissertation\1_Scripts\LATEX\JES\paper_robustness_benchmark\figures\Schematics\Disturbance.png
+[x] Figure_04_Baseline_Performance.png
+    - Figure 4: baseline performance
+    - source: C:\Users\Florian\SynologyDrive\TUB\1_Dissertation\1_Scripts\LATEX\JES\paper_robustness_benchmark\figures\Results\Figure_04_Baseline_Performance.png
+[x] Figure_05_Current_Bias.png
+    - Figure 5: current bias
+    - source: C:\Users\Florian\SynologyDrive\TUB\1_Dissertation\1_Scripts\LATEX\JES\paper_robustness_benchmark\figures\Results\Figure_05_Current_Bias.png
+[x] Figure_06_Noise_Robustness.png
+    - Figure 6: noise robustness
+    - source: C:\Users\Florian\SynologyDrive\TUB\1_Dissertation\1_Scripts\LATEX\JES\paper_robustness_benchmark\figures\Results\Figure_06_Noise_Robustness.png
+[x] Figure_07_Initial_State_Recovery.png
+    - Figure 7: initial-state recovery
+    - source: C:\Users\Florian\SynologyDrive\TUB\1_Dissertation\1_Scripts\LATEX\JES\paper_robustness_benchmark\figures\Results\Figure_07_Initial_State_Recovery.png
+[x] Figure_08_Signal_Integrity.png
+    - Figure 8: signal integrity summary
+    - source: C:\Users\Florian\SynologyDrive\TUB\1_Dissertation\1_Scripts\LATEX\JES\paper_robustness_benchmark\figures\Results\Figure_08_Signal_Integrity.png
+[x] Figure_09_Burst_Dropout_Transition.png
+    - Figure 9: burst-dropout transition
+    - source: C:\Users\Florian\SynologyDrive\TUB\1_Dissertation\1_Scripts\LATEX\JES\paper_robustness_benchmark\figures\Results\Figure_09_Burst_Dropout_Transition.png
+[x] Figure_10_Burst_Dropout_Recovery.png
+    - Figure 10: burst-dropout recovery
+    - source: C:\Users\Florian\SynologyDrive\TUB\1_Dissertation\1_Scripts\LATEX\JES\paper_robustness_benchmark\figures\Results\Figure_10_Burst_Dropout_Recovery.png
+[x] Figure_11_Voltage_Spike_Response.png
+    - Figure 11: voltage-spike response
+    - source: C:\Users\Florian\SynologyDrive\TUB\1_Dissertation\1_Scripts\LATEX\JES\paper_robustness_benchmark\figures\Results\Figure_11_Voltage_Spike_Response.png
+[x] Figure_12_Cross_Scenario_Heatmap.png
+    - Figure 12: cross-scenario heatmap
+    - source: C:\Users\Florian\SynologyDrive\TUB\1_Dissertation\1_Scripts\LATEX\JES\paper_robustness_benchmark\figures\Results\Figure_12_Cross_Scenario_Heatmap.png
+[x] Figure_13_Decision_Synthesis.png
+    - Figure 13: decision synthesis
+    - source: C:\Users\Florian\SynologyDrive\TUB\1_Dissertation\1_Scripts\LATEX\JES\paper_robustness_benchmark\figures\Results\Figure_13_Decision_Synthesis.png
+[x] Figure_14_ADC_Quantization.png
+    - Figure 14: appendix ADC quantization
+    - source: C:\Users\Florian\SynologyDrive\TUB\1_Dissertation\1_Scripts\LATEX\JES\paper_robustness_benchmark\figures\Results\Figure_14_ADC_Quantization.png
+
+Total figures copied: 14
