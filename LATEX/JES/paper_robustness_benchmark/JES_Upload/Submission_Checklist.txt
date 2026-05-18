@@ -31,4 +31,5 @@ SUBMISSION CHECKLIST
 [ ] Optional manual items before upload
     - Confirm whether Journal of Energy Storage expects a graphical abstract for this submission.
     - Confirm that the copied declarationStatement.docx is still the current JES / Elsevier form.
+    - Confirm that the declarationStatement.docx wording is consistent with the manuscript declaration of competing interest.
     - Recheck author metadata once entered in the submission portal.

@@ -9,3 +9,4 @@ DECLARATION STATUS
 
 [ ] Manual check before submission
     - Confirm that this is still the current Elsevier / Journal of Energy Storage declaration form version.
+    - Confirm that the DOCX declaration wording is intended: it reports financial support for Julia Kowal, while the manuscript states no known competing interests.

@@ -2,13 +2,14 @@ AUTHOR METADATA CHECK
 =====================
 
 [x] Full manuscript frontmatter updated for Journal of Energy Storage.
-    - Authors: Florian Rzepka; Julia Kowal
+    - Authors: Florian Rzepka; Qinnan Chen; Julia Kowal
     - Corresponding author: Florian Rzepka
-    - Emails: florian.rzepka@tu-berlin.de; julia.kowal@tu-berlin.de
+    - Emails: florian.rzepka@tu-berlin.de; qinnan.chen@campus.tu-berlin.de; julia.kowal@tu-berlin.de
     - Affiliation: Technical University of Berlin, Chair of Electrical Energy Storage Technology
 
 [x] Blind manuscript metadata updated for Journal of Energy Storage.
     - Anonymous author / affiliation kept in place
+    - Funding, acknowledgements, and CRediT details anonymized for double-blind review
     - Line numbering enabled in the manuscript body
 
 [x] Title page updated with the same author metadata and Journal of Energy Storage journal field.
