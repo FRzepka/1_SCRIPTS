@@ -112,22 +112,22 @@ def main():
                 [r"$\{U, I, T, \mathrm{EFC}, Q_c\}$",
                  r"$\times$ {mean, std, min, max}",
                  "20 channels, 1/h"], title_size=11, line_size=9.3)
-    rounded_box(ax, 0.222, by, 0.16, bh, LAVENDER_FILL, "Embedding block",
+    rounded_box(ax, 0.222, by, 0.16, bh, LAVENDER_FILL, "Projection block",
                 [r"Linear 20$\,\rightarrow\,$128 + GELU",
                  r"Linear 128$\,\rightarrow\,$128 + GELU",
                  "LayerNorm"], title_size=11, line_size=9.3)
     rounded_box(ax, 0.427, by, 0.155, bh, TEAL_FILL, "LSTM core",
-                ["3 layers, hidden 192",
+                ["2 layers, hidden 160",
                  r"stateful: $(h_t, c_t)$",
                  "carried hour-to-hour"], title_size=11, line_size=9.3)
-    rounded_box(ax, 0.627, by, 0.16, bh, PURPLE_FILL, "2 residual blocks",
-                [r"Linear 192$\,\rightarrow\,$160 + GELU",
-                 r"Linear 160$\,\rightarrow\,$192",
+    rounded_box(ax, 0.627, by, 0.16, bh, PURPLE_FILL, "3 residual blocks",
+                [r"width 160 + GELU",
+                 "residual correction",
                  "skip + LayerNorm"], title_size=11, line_size=9.3)
     rounded_box(ax, 0.832, by + 0.30, 0.155, 0.26, PURPLE_FILL, "Prediction head",
-                [r"192$\,\rightarrow\,$160$\,\rightarrow\,$160 + GELU",
+                [r"width 160",
                  r"Linear 160$\,\rightarrow\,$1"], title_size=10.5, line_size=9.0)
-    rounded_box(ax, 0.842, by - 0.06, 0.135, 0.24, "#FFFFFF", "Output",
+    rounded_box(ax, 0.842, by - 0.075, 0.135, 0.32, "#FFFFFF", "Output",
                 [r"$\widehat{\mathrm{SOH}}_k$ hourly,",
                  "held between updates"], title_size=10.5, line_size=8.8)
 
@@ -135,11 +135,11 @@ def main():
     arrow(ax, 0.382, by + bh / 2, 0.425, by + bh / 2)
     arrow(ax, 0.582, by + bh / 2, 0.625, by + bh / 2)
     arrow(ax, 0.787, by + bh / 2, 0.830, by + bh / 2 + 0.05)
-    arrow(ax, 0.909, by + 0.295, 0.909, by + 0.19)
+    arrow(ax, 0.909, by + 0.295, 0.909, by + 0.245)
     state_loop(ax, 0.5045, by + bh + 0.012, r"$(h_{t-1},\,c_{t-1})$")
 
     ax.text(0.5045, by - 0.115,
-            "deployed in base form (pruning not viable) + INT8 weight quantization",
+            "deployment-prepared variant: width reduction to hidden 112 + INT8 weights",
             ha="center", va="center", fontsize=9.5, style="italic", color=NOTE_PURPLE)
     ax.text(0.0, 1.0, "(b)  Shared SOH estimator: hourly LSTM sequence-to-sequence model",
             ha="left", va="top", fontsize=12.5, fontweight="bold", fontdict=FONT)

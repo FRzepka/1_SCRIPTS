@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-Live-Plot: Real SOC vs. Predicted SOC from STM32
-Shows a rolling window of the last 120 samples
+Live-Plot: Real SOC vs. Predicted SOC from STM32.
+Shows a rolling window of recent samples.
 """
 import argparse
 import time
-from typing import List
+from typing import List, Optional
 from collections import deque
 
 import pandas as pd
@@ -46,7 +46,7 @@ def _parse_cols_arg(df: pd.DataFrame, cols_arg: str, need: int) -> List[str]:
     return cols
 
 
-def _try_yaml_features(yaml_path: str | None) -> List[str] | None:
+def _try_yaml_features(yaml_path: Optional[str]) -> Optional[List[str]]:
     if not yaml_path:
         return None
     try:
@@ -61,7 +61,7 @@ def _try_yaml_features(yaml_path: str | None) -> List[str] | None:
         return None
 
 
-def pick_columns(df: pd.DataFrame, need: int, cols_arg: str | None, yaml_path: str | None) -> List[str]:
+def pick_columns(df: pd.DataFrame, need: int, cols_arg: Optional[str], yaml_path: Optional[str]) -> List[str]:
     feats = _try_yaml_features(yaml_path)
     if feats:
         missing = [c for c in feats if c not in df.columns]
@@ -92,7 +92,17 @@ def main():
     ap.add_argument("--delay", type=float, default=0.0, help="Delay after write (seconds, 0=no delay)")
     ap.add_argument("--timeout", type=float, default=0.5, help="Serial read timeout (seconds)")
     ap.add_argument("--window", type=int, default=120, help="Rolling window size for plot")
+    ap.add_argument("--window-seconds", type=float, help="Rolling window duration in seconds, converted to samples using --delay")
+    ap.add_argument("--fixed-soc-axis", action="store_true", help="Fix SOC y-axis instead of auto-scaling")
+    ap.add_argument("--soc-ymin", type=float, default=0.0, help="Minimum SOC y-axis value when --fixed-soc-axis is used")
+    ap.add_argument("--soc-ymax", type=float, default=1.0, help="Maximum SOC y-axis value when --fixed-soc-axis is used")
     args = ap.parse_args()
+
+    window_size = max(args.window, 1)
+    if args.window_seconds is not None:
+        if args.delay <= 0:
+            raise ValueError("--window-seconds needs --delay > 0 so seconds can be converted to samples")
+        window_size = max(1, int(round(args.window_seconds / args.delay)))
 
     df = pd.read_parquet(args.parquet)
     try:
@@ -129,13 +139,14 @@ def main():
     print(f"Real SOC column: '{soc_col}'")
     print(f"Total rows in file: {len(df)}")
     print(f"Streaming rows: {args.start} .. {end-1} (total {end-args.start} samples)")
+    print(f"Rolling window: {window_size} samples")
     print("Starting live plot... (Press Ctrl+C to stop)")
 
     # Data buffers
-    indices = deque(maxlen=args.window)
-    real_socs = deque(maxlen=args.window)
-    pred_socs = deque(maxlen=args.window)
-    errors = deque(maxlen=args.window)
+    indices = deque(maxlen=window_size)
+    real_socs = deque(maxlen=window_size)
+    pred_socs = deque(maxlen=window_size)
+    errors = deque(maxlen=window_size)
 
     # Serial connection
     ser = serial.Serial(args.port, args.baud, timeout=args.timeout)
@@ -157,6 +168,8 @@ def main():
     ax1.set_title('State of Charge Comparison')
     ax1.legend(loc='upper right')
     ax1.grid(True, alpha=0.3)
+    if args.fixed_soc_axis:
+        ax1.set_ylim(args.soc_ymin, args.soc_ymax)
     
     line_error, = ax2.plot([], [], 'g-', linewidth=1.5, label='Error (Real - Pred)')
     ax2.axhline(y=0, color='k', linestyle='--', alpha=0.3)
@@ -215,21 +228,24 @@ def main():
                 # Sliding window: always show the last 'window' samples
                 if len(indices) > 0:
                     # X-axis: scroll with the data (show last window_size samples)
-                    if len(indices) < args.window:
+                    if len(indices) < window_size:
                         # Still filling up - show from start
-                        ax1.set_xlim(args.start, args.start + args.window)
-                        ax2.set_xlim(args.start, args.start + args.window)
+                        ax1.set_xlim(args.start, args.start + window_size)
+                        ax2.set_xlim(args.start, args.start + window_size)
                     else:
                         # Sliding window - show last window samples
-                        ax1.set_xlim(max(indices) - args.window + 1, max(indices) + 1)
-                        ax2.set_xlim(max(indices) - args.window + 1, max(indices) + 1)
+                        ax1.set_xlim(max(indices) - window_size + 1, max(indices) + 1)
+                        ax2.set_xlim(max(indices) - window_size + 1, max(indices) + 1)
                     
-                    # Y-axis: auto-scale based on visible data
-                    all_socs = list(real_socs) + list(pred_socs)
-                    if all_socs:
-                        soc_min, soc_max = min(all_socs), max(all_socs)
-                        margin = (soc_max - soc_min) * 0.1 or 0.01
-                        ax1.set_ylim(soc_min - margin, soc_max + margin)
+                    if args.fixed_soc_axis:
+                        ax1.set_ylim(args.soc_ymin, args.soc_ymax)
+                    else:
+                        # Y-axis: auto-scale based on visible data
+                        all_socs = list(real_socs) + list(pred_socs)
+                        if all_socs:
+                            soc_min, soc_max = min(all_socs), max(all_socs)
+                            margin = (soc_max - soc_min) * 0.1 or 0.01
+                            ax1.set_ylim(soc_min - margin, soc_max + margin)
                     
                     if errors:
                         err_min, err_max = min(errors), max(errors)

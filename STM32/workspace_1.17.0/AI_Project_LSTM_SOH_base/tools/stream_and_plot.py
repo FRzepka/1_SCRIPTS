@@ -1,28 +1,63 @@
 #!/usr/bin/env python3
 """
-Live-Plot: Real SOC/SOH vs. Predicted SOC/SOH from STM32
-Shows a rolling window of the last 120 samples
+Live plot: real SOH vs. predicted SOH from STM32.
+Shows a rolling window of recent samples.
 """
 import argparse
+import re
 import time
-from typing import List
+import unicodedata
 from collections import deque
+from typing import List, Optional
 
-import pandas as pd
-from pandas.api.types import is_numeric_dtype
-import serial
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
+import pandas as pd
+import serial
+from pandas.api.types import is_numeric_dtype
 
-# Default features from train_soc.yaml (1.5.0.0)
+
+# Default features from train_soh.yaml (2.1.0.0).
 DEFAULT_FEATURES = [
+    "Testtime[s]",
     "Voltage[V]",
     "Current[A]",
-    "Temperature[°C]",
+    "Temperature[C]",
+    "EFC",
     "Q_c",
-    "dU_dt[V/s]",
-    "dI_dt[A/s]",
 ]
+
+
+def _column_key(name: str) -> str:
+    text = unicodedata.normalize("NFKD", str(name))
+    text = text.encode("ascii", "ignore").decode("ascii").lower()
+    key = re.sub(r"[^a-z0-9]+", "", text)
+    if key.startswith("temperature"):
+        return "temperature"
+    return key
+
+
+def _resolve_column_name(df: pd.DataFrame, requested: str) -> str:
+    if requested in df.columns:
+        return requested
+
+    req_key = _column_key(requested)
+    matches = [str(c) for c in df.columns if _column_key(str(c)) == req_key]
+    if len(matches) == 1:
+        return matches[0]
+    if not matches:
+        raise ValueError(f"Column '{requested}' not found in parquet columns")
+    raise ValueError(f"Column '{requested}' is ambiguous after normalization: {matches}")
+
+
+def _resolve_requested_columns(df: pd.DataFrame, requested: List[str], need: int) -> List[str]:
+    if len(requested) != need:
+        raise ValueError(f"Please provide exactly {need} columns (got {len(requested)})")
+
+    cols = [_resolve_column_name(df, c) for c in requested]
+    bad = [c for c in cols if not is_numeric_dtype(df[c])]
+    if bad:
+        raise ValueError(f"Selected non-numeric columns: {bad}")
+    return cols
 
 
 def _parse_cols_arg(df: pd.DataFrame, cols_arg: str, need: int) -> List[str]:
@@ -33,24 +68,18 @@ def _parse_cols_arg(df: pd.DataFrame, cols_arg: str, need: int) -> List[str]:
             idx = int(p)
             if idx < 0 or idx >= len(df.columns):
                 raise ValueError(f"Column index {idx} out of range (0..{len(df.columns)-1})")
-            cols.append(df.columns[idx])
+            cols.append(str(df.columns[idx]))
         else:
-            if p not in df.columns:
-                raise ValueError(f"Column '{p}' not found in parquet columns")
-            cols.append(p)
-    if len(cols) != need:
-        raise ValueError(f"Please provide exactly {need} columns (got {len(cols)})")
-    bad = [c for c in cols if not is_numeric_dtype(df[c])]
-    if bad:
-        raise ValueError(f"Selected non-numeric columns: {bad}")
-    return cols
+            cols.append(_resolve_column_name(df, p))
+    return _resolve_requested_columns(df, cols, need)
 
 
-def _try_yaml_features(yaml_path: str | None) -> List[str] | None:
+def _try_yaml_features(yaml_path: Optional[str]) -> Optional[List[str]]:
     if not yaml_path:
         return None
     try:
         import yaml
+
         with open(yaml_path, "r", encoding="utf-8") as f:
             data = yaml.safe_load(f)
         feats = data.get("model", {}).get("features")
@@ -61,16 +90,22 @@ def _try_yaml_features(yaml_path: str | None) -> List[str] | None:
         return None
 
 
-def pick_columns(df: pd.DataFrame, need: int, cols_arg: str | None, yaml_path: str | None) -> List[str]:
+def pick_columns(df: pd.DataFrame, need: int, cols_arg: Optional[str], yaml_path: Optional[str]) -> List[str]:
     feats = _try_yaml_features(yaml_path)
     if feats:
-        missing = [c for c in feats if c not in df.columns]
-        if not missing:
-            return feats
+        try:
+            return _resolve_requested_columns(df, feats, need)
+        except ValueError:
+            pass
+
     if cols_arg:
         return _parse_cols_arg(df, cols_arg, need)
-    if all(c in df.columns for c in DEFAULT_FEATURES):
-        return DEFAULT_FEATURES
+
+    try:
+        return _resolve_requested_columns(df, DEFAULT_FEATURES, need)
+    except ValueError:
+        pass
+
     num_cols = [c for c in df.columns if is_numeric_dtype(df[c])]
     if len(num_cols) >= need:
         return num_cols[:need]
@@ -80,10 +115,20 @@ def pick_columns(df: pd.DataFrame, need: int, cols_arg: str | None, yaml_path: s
     )
 
 
-def main():
-    ap = argparse.ArgumentParser(description="Live-Plot: Real vs. Predicted SOC/SOH from STM32")
+def pick_target_column(df: pd.DataFrame) -> Optional[str]:
+    for candidate in ["SOH", "SOH[%]", "soh", "StateOfHealth", "state_of_health"]:
+        if candidate in df.columns:
+            return candidate
+    for candidate in ["SOC", "soc", "SOC[%]", "SoC"]:
+        if candidate in df.columns:
+            return candidate
+    return None
+
+
+def main() -> None:
+    ap = argparse.ArgumentParser(description="Live plot: real vs. predicted SOH from STM32")
     ap.add_argument("parquet", help="Path to parquet file")
-    ap.add_argument("--port", required=True, help="Serial port e.g. COM9")
+    ap.add_argument("--port", required=True, help="Serial port e.g. COM8")
     ap.add_argument("--baud", type=int, default=115200)
     ap.add_argument("--cols", help="Comma-separated column names or indices (exactly 6)")
     ap.add_argument("--yaml", help="Path to YAML config (reads model.features if present)")
@@ -92,161 +137,159 @@ def main():
     ap.add_argument("--delay", type=float, default=0.0, help="Delay after write (seconds, 0=no delay)")
     ap.add_argument("--timeout", type=float, default=0.5, help="Serial read timeout (seconds)")
     ap.add_argument("--window", type=int, default=120, help="Rolling window size for plot")
+    ap.add_argument("--window-seconds", type=float, help="Rolling window duration in seconds, converted with --delay")
+    ap.add_argument("--fixed-soh-axis", action="store_true", help="Fix SOH y-axis instead of auto-scaling")
+    ap.add_argument("--soh-ymin", type=float, default=0.0, help="Minimum SOH y-axis value")
+    ap.add_argument("--soh-ymax", type=float, default=1.0, help="Maximum SOH y-axis value")
     args = ap.parse_args()
+
+    window_size = max(args.window, 1)
+    if args.window_seconds is not None:
+        if args.delay <= 0:
+            raise ValueError("--window-seconds needs --delay > 0 so seconds can be converted to samples")
+        window_size = max(1, int(round(args.window_seconds / args.delay)))
 
     df = pd.read_parquet(args.parquet)
     try:
         cols = pick_columns(df, need=6, cols_arg=args.cols, yaml_path=args.yaml)
     except Exception as e:
         print(str(e))
-        print("Hint: Use --yaml to point to your train_soc.yaml or --cols to specify columns explicitly.")
+        print("Hint: Use --yaml to point to train_soh.yaml or --cols to specify columns explicitly.")
         return
-    
-    # If --n not specified, go to end of file
+
     if args.n is None:
         end = len(df)
     else:
         end = min(len(df), args.start + max(args.n, 0))
-    
+
     if args.start >= len(df):
         raise ValueError(f"Start index {args.start} is beyond end of file (max: {len(df)-1})")
     if args.start >= end:
         raise ValueError("Empty selection: check --start/--n")
 
-    # Check if SOC column exists in parquet
-    soc_col = None
-    for candidate in ["SOC", "soc", "SOC[%]", "SoC"]:
-        if candidate in df.columns:
-            soc_col = candidate
-            break
-
-    if not soc_col:
-        print("ERROR: No SOC column found in parquet (tried: SOC, soc, SOC[%], SoC)")
+    target_col = pick_target_column(df)
+    if not target_col:
+        print("ERROR: No SOH/SOC target column found in parquet")
         print(f"Available columns: {list(df.columns)}")
         return
+    target_label = "SOH" if "soh" in target_col.lower() else "SOC"
 
     print(f"Using columns: {cols}")
-    print(f"Real SOC column: '{soc_col}'")
+    print(f"Real {target_label} column: '{target_col}'")
     print(f"Total rows in file: {len(df)}")
     print(f"Streaming rows: {args.start} .. {end-1} (total {end-args.start} samples)")
+    print(f"Rolling window: {window_size} samples")
     print("Starting live plot... (Press Ctrl+C to stop)")
 
-    # Data buffers
-    indices = deque(maxlen=args.window)
-    real_socs = deque(maxlen=args.window)
-    pred_socs = deque(maxlen=args.window)
-    errors = deque(maxlen=args.window)
+    indices = deque(maxlen=window_size)
+    real_values = deque(maxlen=window_size)
+    pred_values = deque(maxlen=window_size)
+    errors = deque(maxlen=window_size)
 
-    # Serial connection
     ser = serial.Serial(args.port, args.baud, timeout=args.timeout)
     ser.reset_input_buffer()
     ser.reset_output_buffer()
     time.sleep(0.2)
-    # Drain boot messages
-    boot = ser.read(ser.in_waiting or 1).decode(errors="ignore")
+    ser.read(ser.in_waiting or 1).decode(errors="ignore")
 
-    # Setup plot
     plt.ion()
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 8))
-    fig.suptitle('STM32 SOC/SOH Estimation - Real vs. Predicted', fontsize=14, fontweight='bold')
-    
-    line_real, = ax1.plot([], [], 'b-', linewidth=2, label='Real')
-    line_pred, = ax1.plot([], [], 'r--', linewidth=2, label='Predicted')
-    ax1.set_xlabel('Sample Index')
-    ax1.set_ylabel('SOC')
-    ax1.set_title('State of Charge Comparison')
-    ax1.legend(loc='upper right')
+    fig.suptitle(f"STM32 {target_label} Estimation - Real vs. Predicted", fontsize=14, fontweight="bold")
+
+    line_real, = ax1.plot([], [], "b-", linewidth=2, label=f"Real {target_label}")
+    line_pred, = ax1.plot([], [], "r--", linewidth=2, label=f"Predicted {target_label}")
+    ax1.set_xlabel("Sample Index")
+    ax1.set_ylabel(target_label)
+    ax1.set_title(f"{target_label} Comparison")
+    ax1.legend(loc="upper right")
     ax1.grid(True, alpha=0.3)
-    
-    line_error, = ax2.plot([], [], 'g-', linewidth=1.5, label='Error (Real - Pred)')
-    ax2.axhline(y=0, color='k', linestyle='--', alpha=0.3)
-    ax2.set_xlabel('Sample Index')
-    ax2.set_ylabel('Error')
-    ax2.set_title('Prediction Error')
-    ax2.legend(loc='upper right')
+    if args.fixed_soh_axis:
+        ax1.set_ylim(args.soh_ymin, args.soh_ymax)
+
+    line_error, = ax2.plot([], [], "g-", linewidth=1.5, label="Error (Real - Pred)")
+    ax2.axhline(y=0, color="k", linestyle="--", alpha=0.3)
+    ax2.set_xlabel("Sample Index")
+    ax2.set_ylabel("Error")
+    ax2.set_title("Prediction Error")
+    ax2.legend(loc="upper right")
     ax2.grid(True, alpha=0.3)
-    
+
     plt.tight_layout()
 
-    # Streaming loop
     current_idx = args.start
     try:
         while current_idx < end:
             idx = current_idx
             row_vals = df.loc[idx, cols].astype("float32").values.tolist()
-            real_soc = float(df.loc[idx, soc_col])
+            real_value = float(df.loc[idx, target_col])
             line = " ".join(f"{v:.6f}" for v in row_vals) + "\n"
 
-            # Send to STM32
-            ser.write(line.encode())
+            ser.write(line.encode("ascii"))
             ser.flush()
             if args.delay > 0:
                 time.sleep(args.delay)
 
-            # Read response
             deadline = time.time() + args.timeout
-            predicted_soc = None
+            predicted_value = None
             while time.time() < deadline:
                 raw = ser.readline()
                 if not raw:
                     continue
                 text = raw.decode(errors="ignore").strip()
                 tag = None
-                if "SOC:" in text:
-                    tag = "SOC:"
-                elif "SOH:" in text:
+                if "SOH:" in text:
                     tag = "SOH:"
+                elif "SOC:" in text:
+                    tag = "SOC:"
                 if tag:
-                    idx0 = text.find(tag)
-                    resp = text[idx0:]
+                    tag_idx = text.find(tag)
+                    resp = text[tag_idx:]
                     try:
-                        predicted_soc = float(resp.split()[1])
+                        predicted_value = float(resp.split()[1])
                         break
                     except (IndexError, ValueError):
                         pass
 
-            if predicted_soc is not None:
-                # Add to buffers
+            if predicted_value is not None:
                 indices.append(idx)
-                real_socs.append(real_soc)
-                pred_socs.append(predicted_soc)
-                errors.append(real_soc - predicted_soc)
+                real_values.append(real_value)
+                pred_values.append(predicted_value)
+                errors.append(real_value - predicted_value)
 
-                # Update plot
-                line_real.set_data(list(indices), list(real_socs))
-                line_pred.set_data(list(indices), list(pred_socs))
+                line_real.set_data(list(indices), list(real_values))
+                line_pred.set_data(list(indices), list(pred_values))
                 line_error.set_data(list(indices), list(errors))
-                
-                # Sliding window: always show the last 'window' samples
+
                 if len(indices) > 0:
-                    # X-axis: scroll with the data (show last window_size samples)
-                    if len(indices) < args.window:
-                        # Still filling up - show from start
-                        ax1.set_xlim(args.start, args.start + args.window)
-                        ax2.set_xlim(args.start, args.start + args.window)
+                    if len(indices) < window_size:
+                        ax1.set_xlim(args.start, args.start + window_size)
+                        ax2.set_xlim(args.start, args.start + window_size)
                     else:
-                        # Sliding window - show last window samples
-                        ax1.set_xlim(max(indices) - args.window + 1, max(indices) + 1)
-                        ax2.set_xlim(max(indices) - args.window + 1, max(indices) + 1)
-                    
-                    # Y-axis: auto-scale based on visible data
-                    all_socs = list(real_socs) + list(pred_socs)
-                    if all_socs:
-                        soc_min, soc_max = min(all_socs), max(all_socs)
-                        margin = (soc_max - soc_min) * 0.1 or 0.01
-                        ax1.set_ylim(soc_min - margin, soc_max + margin)
-                    
+                        ax1.set_xlim(max(indices) - window_size + 1, max(indices) + 1)
+                        ax2.set_xlim(max(indices) - window_size + 1, max(indices) + 1)
+
+                    if args.fixed_soh_axis:
+                        ax1.set_ylim(args.soh_ymin, args.soh_ymax)
+                    else:
+                        all_values = list(real_values) + list(pred_values)
+                        if all_values:
+                            val_min, val_max = min(all_values), max(all_values)
+                            margin = (val_max - val_min) * 0.1 or 0.01
+                            ax1.set_ylim(val_min - margin, val_max + margin)
+
                     if errors:
                         err_min, err_max = min(errors), max(errors)
                         err_margin = max(abs(err_min), abs(err_max)) * 0.1 or 0.01
                         ax2.set_ylim(err_min - err_margin, err_max + err_margin)
 
-                # Only update plot every 10 samples for speed
                 if idx % 10 == 0:
                     plt.pause(0.001)
-                
-                # Console output
-                print(f"[{idx}] Real={real_soc:.3f} | Pred={predicted_soc:.3f} | Error={real_soc - predicted_soc:+.3f}")
+
+                print(
+                    f"[{idx}] Real={real_value:.3f} | "
+                    f"Pred={predicted_value:.3f} | "
+                    f"Error={real_value - predicted_value:+.3f}"
+                )
             else:
                 print(f"[{idx}] TIMEOUT - no response")
 
@@ -260,9 +303,9 @@ def main():
         plt.show()
         print("\nStream complete. Close plot window to exit.")
 
-    # Show final statistics
-    if len(errors) > 0:
+    if errors:
         import numpy as np
+
         mae = np.mean(np.abs(errors))
         rmse = np.sqrt(np.mean(np.square(errors)))
         print(f"\n=== Statistics (last {len(errors)} samples) ===")
