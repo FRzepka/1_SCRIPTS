@@ -20,7 +20,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
-\usepackage[english,ngerman]{babel}
+\usepackage[main=english,ngerman]{babel}
 \usepackage[automark,headsepline]{scrlayer-scrpage}
 \usepackage{setspace}
 \onehalfspacing
@@ -175,8 +175,7 @@
 \vspace*{30pt}
 \large{submitted by\\
 M. Sc.\\
-Florian Rzepka\\
-born in Berlin}\\
+Florian Rzepka}\\
 \vspace*{40pt}
 
 \large{
@@ -214,12 +213,14 @@ Reviewer: tbd\\
 
 \cleardoublepage
 \chapter*{Preface}
+\markboth{Preface}{Preface}
 \addcontentsline{toc}{chapter}{Preface}
-This dissertation took shape during my time at the Chair of Electrical Energy Storage Technology at Technische Universit\"at Berlin. Its questions emerged gradually from the research environment there and from my own interest in how artificial intelligence can be made useful under real operating conditions rather than in idealized settings. This direction was reinforced by my involvement in the MG-FARM project, an international research collaboration on smart, stand-alone micro-grids for the electrification of remote agricultural regions. Working alongside university and industry partners in Morocco, France, and Algeria, I was able to see at first hand how decentralized energy systems and their battery storage are deployed and operated in places where grid access, connectivity, and maintenance are limited. Taken together, these influences shaped the central question of this thesis: how battery-state estimation can be made not only accurate, but also robust against imperfect measurements and executable on the modest embedded hardware that such systems actually rely on.
+This dissertation took shape during my time at the Chair of Electrical Energy Storage Technology at Technische Universit\"at Berlin. Its questions emerged gradually from the research environment there and from my own interest in how artificial intelligence can support battery-state estimation and battery management under real operating conditions rather than in idealized settings. This direction was reinforced by my involvement in the MG-FARM project, an international research collaboration on smart, stand-alone micro-grids for the electrification of remote agricultural regions. Working alongside university and industry partners in Morocco, France, and Algeria, I was able to see at first hand how decentralized energy systems and their battery storage are deployed and operated in places where grid access, connectivity, and maintenance are limited. Taken together, these influences shaped the central question of this thesis: how battery-state estimation can be made not only accurate, but also robust against imperfect measurements and executable on the modest embedded hardware that such systems actually rely on.
 
 I am grateful for the support I received in many forms throughout this work. My sincere thanks go above all to my supervisor, Prof. Dr.-Ing. Julia Kowal, and to the Chair of Electrical Energy Storage Technology at Technische Universit\"at Berlin, for the guidance and the freedom to pursue this topic in my own way. I thank my colleagues at the chair for countless discussions and for a productive working atmosphere, and the partners of the MG-FARM consortium across Morocco, France, and Algeria for their experience and a genuinely international perspective on decentralized energy. I also thank my family and friends for their steady support throughout this time. I am especially grateful to my partner Hannah, whose positive spirit and steady encouragement helped me regain confidence and continue through the difficult phases of this work.
 
 \chapter*{Abstract}
+\markboth{Abstract}{Abstract}
 \addcontentsline{toc}{chapter}{Abstract}
 Reliable estimates of state of charge (SOC) and state of health (SOH) are central to the safe and efficient operation of lithium-ion battery systems. At the same time, many neural battery estimators are still evaluated mainly as offline models under clean laboratory signals, whereas practical battery management systems (BMS) impose additional requirements through disturbed measurements, limited embedded resources, firmware constraints, and the physical measurement chain. This dissertation therefore develops a deployment-oriented perspective on artificial intelligence for BMS applications. Predictive accuracy is treated as one requirement among others, and is assessed together with robustness, embedded feasibility, and hardware integration.
 
@@ -231,34 +232,152 @@ The central conclusion is that AI-enabled battery-state estimation should not be
 \cleardoublepage
 
 \chapter*{Abbreviations}
+\markboth{Abbreviations}{Abbreviations}
 \addcontentsline{toc}{chapter}{Abbreviations}
-\begin{description}[style=nextline,leftmargin=3cm]
+\begin{description}[style=nextline,leftmargin=3.2cm]
+\item[2RC] Two-resistor-capacitor equivalent circuit model
+\item[ADC] Analog-to-digital converter
+\item[AFE] Analog front end
 \item[AI] Artificial Intelligence
 \item[BMS] Battery Management System
+\item[CC-CV] Constant-current constant-voltage charging
+\item[CV] Constant voltage
+\item[DD] Data-driven estimator
+\item[DM] Direct-measurement estimator
+\item[DoD] Depth of discharge
+\item[DWT] Data Watchpoint and Trace
 \item[ECM] Equivalent Circuit Model
 \item[EFC] Equivalent Full Cycles
+\item[EMI] Electromagnetic interference
+\item[FP16] 16-bit floating-point format
+\item[FP32] 32-bit floating-point format
+\item[GELU] Gaussian error linear unit
+\item[GPU] Graphics processing unit
+\item[GRU] Gated recurrent unit
+\item[HDM] Hybrid direct-measurement model
+\item[HECM] Hybrid equivalent-circuit model
+\item[HPPC] Hybrid pulse-power characterization
+\item[IC] Integrated circuit
+\item[INT8] 8-bit signed integer representation
+\item[KPI] Key performance indicator
+\item[LFP] Lithium iron phosphate
 \item[LSTM] Long Short-Term Memory
+\item[MAE] Mean absolute error
 \item[MCU] Microcontroller Unit
+\item[MG-FARM] Smart micro-grid research project for remote agricultural regions
 \item[MLP] Multilayer Perceptron
+\item[MSE] Mean squared error
+\item[NMC] Lithium nickel manganese cobalt oxide
+\item[NPU] Neural processing unit
+\item[NTC] Negative temperature coefficient thermistor
+\item[OCV] Open-circuit voltage
+\item[ONNX] Open Neural Network Exchange
+\item[P95] 95th percentile
+\item[PV] Photovoltaic
+\item[RAM] Random-access memory
+\item[RC] Resistor-capacitor
+\item[ReLU] Rectified linear unit
+\item[RGB] Red-green-blue color representation
+\item[RMSE] Root mean squared error
+\item[SRAM] Static random-access memory
+\item[STM32] STMicroelectronics 32-bit microcontroller family
+\item[STM32H7] STM32 high-performance microcontroller family based on Arm Cortex-M7
+\item[STM32H753ZI] STM32H7 microcontroller target used for the embedded benchmark
+\item[STM32N6] STM32 microcontroller family with integrated neural accelerator
 \item[SOC] State of Charge
+\item[SOC-GRU] SOC estimator based on a GRU recurrent core
 \item[SOH] State of Health
+\item[SOH-LSTM] SOH estimator based on an LSTM recurrent core
+\item[TU] Technische Universit\"at
+\item[UART] Universal asynchronous receiver-transmitter
+\item[\texttt{.bss}] Linker section for zero-initialized or uninitialized static and global data
+\item[\texttt{.data}] Linker section for initialized static and global data copied from flash to RAM
 \end{description}
 
 \chapter*{Symbols}
+\markboth{Symbols}{Symbols}
 \addcontentsline{toc}{chapter}{Symbols}
-\begin{description}[style=nextline,leftmargin=3cm]
-\item[$SOC$] State of charge
-\item[$SOH$] State of health
+\begin{description}[style=nextline,leftmargin=3.2cm]
+\item[$\alpha$] Smoothing factor of the causal SOH post-filter
+\item[$\Delta I$] Current quantization step
+\item[$\Delta\mathrm{MAE}$] Difference in mean absolute error relative to the baseline case
+\item[$\Delta t$] Sampling interval
+\item[$\Delta T$] Temperature quantization step
+\item[$\Delta U$] Voltage quantization step
+\item[$\varepsilon$] Small numerical constant used in normalization
+\item[$\eta$] Coulombic efficiency factor in the equivalent-circuit observer
+\item[$\sigma_I$] Standard deviation of injected current noise
+\item[$\sigma_T$] Standard deviation of injected temperature noise
+\item[$\sigma_U$] Standard deviation of injected voltage noise
+\item[$\tau_1,\tau_2$] Time constants of the two RC branches
+\item[$\mathbf{A}$] State-transition matrix of the equivalent-circuit observer
+\item[$\mathbf{b}$] Input vector of the equivalent-circuit observer
+\item[$\mathbf{c}_t$] LSTM cell state at sample $t$
+\item[$\mathbf{f}_t$] LSTM forget-gate activation
+\item[$\mathbf{g}_t$] LSTM candidate-state activation
+\item[$\mathbf{h}_t$] LSTM hidden state at sample $t$
+\item[$\mathbf{i}_t$] LSTM input-gate activation
+\item[$\mathbf{o}_t$] LSTM output-gate activation
+\item[$\mathbf{x}$] State vector or model input vector, depending on context
+\item[$\mathbf{z}_t$] Concatenated LSTM input vector including current features and previous hidden state
+\item[$b$] Neural-network bias vector
+\item[$C(t)$] Capacity measured at time $t$
+\item[$C_b$] SOH-scaled capacity used by the equivalent-circuit observer
+\item[$C_\mathrm{app}$] Apparent capacity used in SOC reference reconstruction
+\item[$C_\mathrm{chg}$] Charge C-rate in the LFP ageing design
+\item[$C_\mathrm{dis}$] Discharge C-rate in the LFP ageing design
+\item[$C_\mathrm{eff}$] Effective capacity obtained from nominal capacity and estimated SOH
+\item[$C_k$] Measured discharge capacity during check-up $k$
+\item[$C_\mathrm{N}$] Nominal capacity of the NMC cell
+\item[$C_\mathrm{nom}$] Nominal cell capacity
+\item[$E$] Energy per inference used in the embedded utility score
+\item[$F$] Flash-memory footprint used in the embedded utility score
+\item[$H$] Recurrent hidden-state size
+\item[$I$] Current
+\item[$I_k$] Current sample at discrete time index $k$
+\item[$|I|_{\max}$] Maximum absolute current magnitude used to scale current-bias scenarios
+\item[$k$] Discrete time index
+\item[$L_\mathrm{SOC}$] SOC training sequence length
+\item[$m_k$] Median of feature channel $k$ used for robust normalization
+\item[$n$] Number of evaluated samples
+\item[$P$] Covariance matrix of the observer correction step
+\item[$q$] INT8 quantized weight code
 \item[$Q$] Cumulative charge or charge throughput
 \item[$Q_c$] Online cumulative charge state
+\item[$r_k$] Interquartile range of feature channel $k$ used for robust normalization
+\item[$R$] Total RAM usage in the embedded utility score
+\item[$R_0,R_1,R_2$] Ohmic and polarization resistances of the equivalent-circuit model
+\item[$R^2$] Coefficient of determination
+\item[$s$] Quantization scale factor
+\item[$s_h$] Structured-pruning importance score of hidden channel $h$
+\item[$SOC$] State of charge
+\item[$SOH$] State of health
 \item[$t$] Time
-\item[$U$] Voltage
-\item[$I$] Current
+\item[$T$] Temperature
+\item[$U$] Voltage or composite utility score, depending on context
+\item[$U_1,U_2$] Polarization voltages of the two RC branches
+\item[$W$] Neural-network weight matrix
+\item[$w$] Individual neural-network weight
+\item[$\hat{w}$] Reconstructed floating-point weight after INT8 quantization
+\item[$x_{t,k}$] Feature value of channel $k$ at sample $t$
+\item[$y_i$] Measured target value of sample $i$
+\item[$\hat{y}_i$] Predicted target value of sample $i$
+\item[$\mathrm{d}I/\mathrm{d}t$] Current derivative
+\item[$\mathrm{d}U/\mathrm{d}t$] Voltage derivative
+\item[$\mathrm{DoD}$] Depth of discharge
+\item[$\mathrm{EFC}$] Equivalent full cycles
+\item[$\mathrm{MAE}$] Mean absolute error
+\item[$\mathrm{MSE}$] Mean squared error
+\item[$\mathrm{OCV}$] Open-circuit voltage
+\item[$\mathrm{P95}$] 95th percentile of the absolute error
+\item[$\mathrm{RMSE}$] Root mean squared error
 \end{description}
 
 \listoffigures
+\markboth{List of Figures}{List of Figures}
 \addcontentsline{toc}{chapter}{List of Figures}
 \listoftables
+\markboth{List of Tables}{List of Tables}
 \addcontentsline{toc}{chapter}{List of Tables}
 
 \cleardoublepage
@@ -377,7 +496,7 @@ The literature has moved from demonstrating that neural models can fit battery d
 \section{Embedded AI, Compression, and Model-Hardware Co-Design}
 Embedded AI in battery applications adds another constraint layer. A model that performs well on a workstation must still fit the flash and RAM budget of the target controller, meet latency requirements, preserve numerical stability, and reproduce the intended online state handling in firmware.\autocite{cordova-cardenasEdgeAIPractice2025,linTinyMachineLearning2023,naguibMicroprocessorExecutionTime2022} Existing studies show that neural-network-based SOC and SOH estimators can run on microcontroller-class hardware and even on dedicated BMS-oriented edge devices.\autocite{giazitzisCaseStudyTiny2024,crocioniLiIonBatteriesParameter2020,Embedded_AI_only_SOC_mobile,shiueDesignImplementationDecentralized2026} However, many demonstrations still report resource use or accuracy only at a high level and do not document the full transfer chain from preprocessing and scaling to stateful streaming execution on the controller.
 
-The hardware trend also points in this direction. Whereas many classical BMS implementations run estimation software on general-purpose Arm Cortex-M microcontrollers, newer MCU families increasingly integrate dedicated AI accelerators or neural-processing units. Examples include STMicroelectronics' STM32N6 with the Neural-ART accelerator, NXP's MCX~N series with the eIQ Neutron NPU, Renesas' RA8P1 with Arm Ethos-U55, Alif Semiconductor's Ensemble E1/E3/E5/E7 family with Ethos-U55 acceleration, and Silicon Labs' EFR32xG26/PG26 devices with AI/ML hardware acceleration.\autocite{STM32N6,MCXNSeriesMicrocontrollers,RenesasRA8P1,AlifSemiconductorEnsemble,EFR32xG26PG26} This does not mean that every BMS estimator requires a dedicated NPU, especially for compact recurrent models. It does show, however, that embedded AI is becoming a hardware-supported design direction rather than only a software optimization problem.
+The hardware trend also points in this direction. Whereas many classical BMS implementations run estimation software on general-purpose Arm Cortex-M microcontrollers, newer MCU families increasingly integrate dedicated AI accelerators or neural-processing units. Examples include STMicroelectronics' STM32N6 with the Neural-ART accelerator, NXP's MCX~N series with the eIQ Neutron NPU, Renesas' RA8P1 with Arm Ethos-U55, Alif Semiconductor's Ensemble E1/E3/E5/E7 family with Ethos-U55 acceleration, and Silicon Labs' EFR32xG26/PG26 devices with AI/ML hardware acceleration.\autocite{zotero-item-518,zotero-item-519,zotero-item-520,zotero-item-522,zotero-item-523} This does not mean that every BMS estimator requires a dedicated NPU, especially for compact recurrent models. It does show, however, that embedded AI is becoming a hardware-supported design direction rather than only a software optimization problem.
 
 Compression is one route to this transfer. Quantization reduces numerical precision and can strongly reduce weight storage. Pruning removes weights, units, or channels and can reduce both memory and computation when the sparsity pattern matches the hardware implementation.\autocite{hanLearningBothWeights2015,blalockWhatStateNeural2020,jacobQuantizationTrainingNeural2017,krishnamoorthiQuantizingDeepConvolutional2018} For recurrent models, structured sparsity is particularly relevant because hidden-state dimensions and gate matrices directly determine runtime cost.\autocite{wenLearningStructuredSparsity2016,wenLearningIntrinsicSparse2017,narangExploringSparsityRecurrent2017,lobachevaStructuredSparsificationGated2020} The current state of the art therefore supports embedded neural-network estimation in principle, but it also shows that pruning and quantization have to be evaluated together with architecture and firmware, not as architecture-independent guarantees.\autocite{schulzePQBenchBenchmarking2025,abushahlaNeuralNetworkQuantization2026}
 
