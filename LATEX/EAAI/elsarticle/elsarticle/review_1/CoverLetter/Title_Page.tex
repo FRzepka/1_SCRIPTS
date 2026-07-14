@@ -1,0 +1,53 @@
+\documentclass[review]{elsarticle}
+\usepackage{lineno}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\journal{Engineering Applications of Artificial Intelligence}
+
+\begin{document}
+
+\begin{frontmatter}
+
+\title{Embedded Artificial Intelligence in Battery Management Systems: Pruning and Quantization for Efficient State-of-Charge and State-of-Health Estimation}
+
+\author[1]{Florian Rzepka\corref{cor1}}
+\ead{florian.rzepka@tu-berlin.de}
+
+\author[1]{Julia Kowal}
+\ead{julia.kowal@tu-berlin.de}
+
+\cortext[cor1]{Corresponding author.}
+
+\affiliation[1]{organization={Technical University of Berlin, Chair of Electrical Energy Storage Technology},
+            addressline={Einsteinufer 11}, 
+            city={Berlin},
+            postcode={10587}, 
+            country={Germany}}
+
+\begin{abstract}
+State-of-charge (SOC) and state-of-health (SOH) estimators based on recurrent neural networks can achieve high accuracy, but their computational and memory cost on embedded hardware is often insufficiently characterised. This work quantifies the accuracy, timing, and resource trade-offs of Long Short-Term Memory (LSTM) and Multi-Layer Perceptron (MLP) based SOC/SOH estimators deployed on an STM32H753ZI microcontroller. Using the open \emph{LFP DoE Cycle Ageing Dataset}, we train full-precision baseline models and obtain compressed variants via pruning and weight quantization. In long-horizon streaming replay on the test set the SOC estimators attain mean-absolute errors (MAE) between $2.3$~\% and $2.8$~\% of full scale, while the SOH estimators reach MAE values between $0.9$~\% and $1.5$~\%. Hardware-in-the-loop benchmarks on the STM32 show that pruning reduces both the flash footprint and the energy per inference by roughly $40$~\% for SOC and about $45$~\% for SOH, while slightly improving SOC MAE and keeping SOH MAE within a few tenths of a percent of the dense baseline. Quantization further shrinks the flash footprint to around half of the baseline size for both tasks and keeps the MAE within a few tenths of a percent of the corresponding full-precision models, at the expense of increased inference energy, especially for SOC. The presented methodology and measurements provide a reproducible reference for implementing and comparing data-driven battery state estimators on resource-constrained Battery Management System (BMS) hardware.
+\end{abstract}
+
+\begin{keyword}
+State of charge \sep State of health \sep LSTM \sep Pruning \sep Quantization \sep STM32 \sep Battery diagnostics \sep Embedded AI
+\end{keyword}
+
+\end{frontmatter}
+
+\section*{Acknowledgements}
+This research was funded by the German Federal Ministry for Education and Research (BMBF), grant number 03SF0684A (MG FARM). The authors are responsible for the content. The work was further supported by the German Research Foundation and the Open Access Publication Fund of the Technical University of Berlin.
+The first author provided the initial authorship and conceptual design of this manuscript, with subsequent refinements and enhancements implemented using AI-based tools such as ChatGPT, DeepL, and Grammarly. It is emphasised that all presented ideas and arguments are the authors’ own, and that the AI tools were solely employed for linguistic and stylistic improvements. We acknowledge support from the German Research Foundation and the Open Access Publication Fund of the Technical University of Berlin, as well as the High Performance Computing Service of the Technical University of Berlin for providing the computational resources used in the pruning and quantization experiments. The authors thank Nils Strassenburg (Hasso-Plattner-Institut, Potsdam) for helpful discussions on pruning and quantization, Mano Schmitz for the collaboration on the dataset creation, and Max Mönikes and Pavel Aleinikau (Technical University of Berlin) for their collaboration on the BMS hardware.
+
+\section*{CRediT authorship contribution statement}
+\textbf{Florian Rzepka}: Conceptualization, methodology, software, validation, formal analysis, investigation, data curation, writing--original draft preparation, writing--review and editing, visualization.
+\textbf{Julia Kowal}: Resources, supervision, project administration, funding acquisition, writing--review and editing.
+
+\section*{Declaration of competing interest}
+The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
+
+\end{document}

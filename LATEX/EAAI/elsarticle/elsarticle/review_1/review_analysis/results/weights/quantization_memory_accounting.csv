@@ -1,0 +1,5 @@
+﻿"Task","Variant","Int8RecurrentWeightsBytes","FP32RecurrentWeightsBytes","FP32ScalesAndBiasBytes","FP32MLPBytes","PersistentStateBytes","TotalModelBytes"
+"SOC","Base","0","71680","1024","16900","512","89604"
+"SOC","Quantized","17920","0","3072","16900","512","37892"
+"SOH","Base","0","274432","2048","66564","1024","343044"
+"SOH","Quantized","68608","0","6144","66564","1024","141316"

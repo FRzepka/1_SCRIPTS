@@ -1,0 +1,8 @@
+{
+  "samples_compared": 14496990,
+  "calibration_factor": 1.0023638010025024,
+  "target_mae": 4.9420454190848946e-12,
+  "target_max_abs": 5.960464477539063e-08,
+  "filtered_output_mae": 0.01902468764337061,
+  "filtered_output_max_abs": 0.062211036682128906
+}

@@ -1,0 +1,46 @@
+\documentclass[11pt]{letter}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+\usepackage{hyperref}
+
+\address{Florian Rzepka\\
+Technische Universität Berlin\\
+Chair of Electrical Energy Storage Technology\\
+Einsteinufer 11\\
+10587 Berlin, Germany\\
+\href{mailto:florian.rzepka@tu-berlin.de}{florian.rzepka@tu-berlin.de}}
+
+\date{\today}
+
+\begin{document}
+
+\begin{letter}{Editor-in-Chief\\
+Engineering Applications of Artificial Intelligence\\
+Elsevier}
+
+\opening{Dear Editor-in-Chief,}
+
+Please find enclosed our manuscript entitled \textbf{``Embedded Artificial Intelligence in Battery Management Systems: Pruning and Quantization for Efficient State-of-Charge and State-of-Health Estimation''}, which we are submitting for exclusive consideration for publication in \textit{Engineering Applications of Artificial Intelligence}.
+
+This work addresses the critical gap between the theoretical performance of neural network-based battery state estimators and their practical deployment on resource-constrained hardware. While many studies propose complex architectures for State-of-Charge (SOC) and State-of-Health (SOH) estimation, few rigorously quantify the computational and memory costs on actual microcontrollers.
+
+In this study, we present a complete, reproducible pipeline that transforms Long Short-Term Memory (LSTM) models trained on the open \textit{LFP DoE Cycle Ageing Dataset} into energy- and resource-efficient AI for an STM32H7 microcontroller. We demonstrate that:
+\begin{itemize}
+    \item Pruning and quantization enable energy- and resource-efficient AI, reducing the Flash footprint and energy consumption by approximately 40\% with negligible loss in accuracy.
+    \item Complex SOC and SOH models run autonomously on-device, as INT8 quantization halves the memory requirement to fit standard BMS hardware.
+    \item The proposed estimators meet strict real-time constraints, validated through extensive hardware-in-the-loop benchmarking.
+\end{itemize}
+
+We believe this paper is highly relevant to the readership of \textit{EAAI} as it provides a concrete engineering framework for embedding AI in industrial control systems, bridging the fields of machine learning, embedded systems, and energy storage.
+
+We confirm that this manuscript has not been published elsewhere and is not under consideration by another journal. All authors have approved the manuscript and agree with its submission.
+
+Thank you for your consideration.
+
+Sincerely,
+
+Florian Rzepka\\
+Technische Universität Berlin
+\end{letter}
+\end{document}
