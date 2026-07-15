@@ -251,4 +251,359 @@ Do not silently replace them with stronger claims unless new evidence is found.
   not request a figure, and the diagram gives disproportionate visual weight to two
   derivative features while its untested deployment branch could be mistaken for an
   implemented method.
-- Answer Reviewer 3.2 in tÛ¿4¶‰žËkºwµçA­•É¹•°ÍÑÉÕÑÕÉ”É•µ…¥¸@ÌÈèM=É•Ñ…¥¹Ì€ÔÐ¸ä”½˜Ñ¡”½Õ¹Ñ•5Ì…¹€ÔÜ¸È”(€½˜Ñ¡”µ•…ÍÕÉ•Ñ¥µ”ìM= É•Ñ…¥¹Ì€ÔÐ¸Ì”…¹€ÔØ¸À”°É•ÍÁ•Ñ¥Ù•±ä¸Q¡¥ÌÍÕÁÁ½ÉÑÌÑ¡”(€5µ‰…Í•Í¥é”…¹…±åÍ¥ÌÝ¥Ñ¡¥¸Ñ¡”Í…µ”¥µÁ±•µ•¹Ñ…Ñ¥½¸™…µ¥±ä¸(´Q¡”Í…µ”ÁÉ½Á½ÉÑ¥½¹…±¥ÑäµÕÍÐ¹½Ð‰”•áÁ•Ñ•™½ÈEÕ…¹Ñ¥é•‰•…ÕÍ”¥Ð¡…¹•ÌÑ¡”(€½Á•É…Ñ¥½¸ÑåÁ•Ì…¹µ•µ½Éä™½½ÑÁÉ¥¹Ð¸½Õ¹Ñ¥¹œ„5…¹„Í•Á…É…Ñ”@ÌÈµÕ±Ñ¥Á±ä(€…Ì½¹”½Á•É…Ñ¥½¸•… ½µ¥ÑÌÑ¡”%9PàµÑ¼µ@ÌÈ½¹Ù•ÉÍ¥½¸°±½½À½¥¹‘•à½Ù•É¡•…°(€±½…‘Ì°ÍÑ½É•Ì°¹½¹±¥¹•…É¥Ñ¥•Ì°…¹…¡”½±…Í ‰•¡…Ù¥½ÕÈ¸MÑ…Ñ¥Œ½Á•É…Ñ¥½¸É…Ñ¥½Ì(€ÁÉ•‘¥Ð…‰½ÕÐ€Ä¸àÄÑ¥µ•Ì	…Í”™½È‰½Ñ Ñ…Í­Ì°Ý¡•É•…ÌÑ¡”µ•…ÍÕÉ•É…Ñ¥½Ì…É”…‰½ÕÐ(€€Ð¸ää™½ÈM=…¹€Ä¸Èä™½ÈM= ¸(´Á±…ÕÍ¥‰±”•áÁ±…¹…Ñ¥½¸™½ÈÑ¡”Íµ…±±•ÈÉ•±…Ñ¥Ù”M= Á•¹…±Ñä¥ÌÑ¡…ÐÑ¡”µÕ (€±…É•ÈM= µ½‘•°¥Ìµ½É”ÍÑÉ½¹±ä…™™•Ñ•‰ä@ÌÈÝ•¥¡ÐÑÉ…™™¥ŒìÑ¡”Íµ…±±•È%9Pà(€É•ÕÉÉ•¹Ðµ…ÑÉ¥•Ì…¸½™™Í•ÐÁ…ÉÐ½˜Ñ¡”½¹Ù•ÉÍ¥½¸…¹Í…±¥¹œ½ÍÐ¸½ÈÑ¡”(€Íµ…±±•ÈM=µ½‘•°°Ñ¡”…‘‘¥Ñ¥½¹…°…ÍÐ½Í…±”…¹Õ¹½ÁÑ¥µ¥é•¥¹¹•Èµ±½½À½Ù•É¡•…(€‘½µ¥¹…Ñ”µ½É”Ù¥Í¥‰±ä¸Q¡”EÕ…¹Ñ¥é•Ù…É¥…¹ÑÌ…±Í¼ÕÍ”µÕ ±…É•ÈÑÉ…¹Í¥•¹ÐÍÑ…¬(€…ÉÉ…åÌÑ¡…¸	…Í”¸Q¡•Í”…É”½‘”´…¹™½½ÑÁÉ¥¹Ðµ‰…Í•¡åÁ½Ñ¡•Í•Ì°¹½Ðµ•…ÍÕÉ•(€å±”…ÑÑÉ¥‰ÕÑ¥½¸½Èµ•µ½Éäµ‰…¹‘Ý¥‘Ñ •Ù¥‘•¹”¸(´Q¡”™¥ÕÉ”…¸ÍÕÁÁ½ÉÐÑ¡”±¥µ¥Ñ•½¹±ÕÍ¥½¸Ñ¡…ÐÑ¡”Ý•¥¡Ðµ½¹±äµ¥á•µÁÉ•¥Í¥½¸(€­•É¹•°Í…Ù•Ì±…Í ‰ÕÐ‘½•Ì¹½ÐÁÉ½Ù¥‘”„¹…Ñ¥Ù”¥¹Ñ••È½µÁÕÑ”Á…Ñ è%9PàÝ•¥¡ÑÌ(€…É”½¹Ù•ÉÑ•¥¹Ñ¼@ÌÈ…É¥Ñ¡µ•Ñ¥Œ…¹É•Á•…Ñ•‘±ä½µ‰¥¹•Ý¥Ñ @ÌÈÍ…±•Ì¸Q¡¥Ì(€½‘”ÍÑÉÕÑÕÉ”¥Ì½¹Í¥ÍÑ•¹ÐÝ¥Ñ …‘‘¥Ñ¥½¹…°ÉÕ¹Ñ¥µ”½Ù•É¡•…¸(´É•Ù|ÄÁ€‘½•Ì¹½Ðµ•…ÍÕÉ”å±•Ì™½È¥¹‘¥Ù¥‘Õ…°½Á•É…Ñ¥½¹Ì°…ÍÐ½ÍÑÌ°±…Í ½…¡”(€ÑÉ…™™¥Œ°µ•µ½Éä‰…¹‘Ý¥‘Ñ °½È½µÁ¥±•È•™™•ÑÌ¸¼¹½Ð‘•ÍÉ¥‰”¥Ð…Ì¡…É‘Ý…É”(€ÁÉ½™¥±¥¹œ…¹‘¼¹½Ð…ÑÑÉ¥‰ÕÑ”„µ•…ÍÕÉ•Á•É•¹Ñ…”½˜Ñ¡”‘•±…äÑ¼…¹ä½¹”…ÕÍ”¸(´A½Ñ•¹Ñ¥…°½ÁÑ¥µ¥é…Ñ¥½¹Ì‰•±½¹œ¥¸Ñ¡”‘¥ÍÕÍÍ¥½¸èµ½Ù”•… É½ÜÍ…±”½ÕÑÍ¥‘”Ñ¡”(€¥¹¹•Éµ½ÍÐ…ÕµÕ±…Ñ¥½¸Ý¡•É”µ…Ñ¡•µ…Ñ¥…±±äÙ…±¥°ÕÍ”½ÁÑ¥µ¥é•‘½ÐµÁÉ½‘ÕÐ½È(€¥¹Ñ••È­•É¹•±Ì°™ÕÍ”Í…±”½‰¥…ÌÝ½É¬°…¹•Ù…±Õ…Ñ”„½µÁ±•Ñ”…Ñ¥Ù…Ñ¥½¸µÅÕ…¹Ñ¥é•(€Á…Ñ ¸Q¡•Í”Ý•É”¹½Ð•Ù…±Õ…Ñ•…¹µÕÍÐ‰”ÁÉ•Í•¹Ñ•…Ì™ÕÑÕÉ”Ý½É¬¸(´ÕÉÉ•¹ÐÉ•½µµ•¹‘…Ñ¥½¸èÉ•Ù|ÄÁ€¥Ì½ÁÑ¥½¹…°É…Ñ¡•ÈÑ¡…¸•ÍÍ•¹Ñ¥…°¸Q¡”µ•…ÍÕÉ•(€Ñ¥µ•Ì…±É•…‘ä…ÁÁ•…È¥¸Ñ¡”µ…¥¸É•ÍÕ±ÑÌ°Ý¡¥±”Ñ¡”¹•Ü½¹ÑÉ¥‰ÕÑ¥½¸¥ÌÑ¡”ÍÑ…Ñ¥Œ(€Í½ÕÉ”µ±•Ù•°…½Õ¹Ñ¥¹œ¸½µÁ…Ð…ÁÁ•¹‘¥àÑ…‰±”Á±ÕÌÁÉ•¥Í”µ…¹ÕÍÉ¥ÁÐÑ•áÐµ…ä(€…¹ÍÝ•ÈÑ¡”Á½¥¹Ðµ½É”±•…É±äÑ¡…¸„™½ÕÈµÁ…¹•°™¥ÕÉ”¸-••ÀÑ¡”™¥ÕÉ”½¹±ä¥˜¥ÑÌ(€…ÁÑ¥½¸ÍÑ…Ñ•ÌÑ¡”ÍÑ…Ñ¥Œ½µ•…ÍÕÉ•‘¥ÍÑ¥¹Ñ¥½¸…¹Ñ¡”…‰Í•¹”½˜å±”µ±•Ù•°…¹(€µ•µ½Éäµ‰…¹‘Ý¥‘Ñ ÁÉ½™¥±¥¹œ¸((ŒŒŒI•Ù¥•Ý•È€È½µÁ±•Ñ¥½¸ÍÑ…ÑÕÌ€ ÄÔ)Õ±ä€ÈÀÈØ¤((´mát9¼¹•Ü…±Õ±…Ñ¥½¸°µ½‘•°ÉÕ¸°¡…É‘Ý…É”µ•…ÍÕÉ•µ•¹Ð°½È™¥ÕÉ”¥ÌÉ•ÅÕ¥É•(€™½ÈÑ¡”™¥Ù”I•Ù¥•Ý•È€È½µµ•¹ÑÌìÑ¡•ä½¹•É¸Á½Í¥Ñ¥½¹¥¹œ°½‰©•Ñ¥Ù”°±¥Ñ•É…ÑÕÉ”(€Íå¹Ñ¡•Í¥Ì°½¹±ÕÍ¥½¸°…¹±…¹Õ…”¸(´mát9¼¹•Üi½Ñ•É¼•¹ÑÉä¥ÌÉ•ÅÕ¥É•¸Q¡”É•Ù¥Í•Á½Í¥Ñ¥½¹¥¹œÕÍ•ÌÑ¡”…±É•…‘ä(€Ù•É¥™¥•É••¹ÐÉ•™•É•¹•Ì¥¸Ñ¡”‰¥‰±¥½É…Á¡ä°¥¹±Õ‘¥¹œ€ÈÀÈÐ…¹€ÈÀÈÔÉ•Ù¥•ÝÌ°(€•µ‰•‘‘•M=½M= ÍÑÕ‘¥•Ì°…¹„ÕÉÉ•¹ÐÁÉÕ¹¥¹œ½ÅÕ…¹Ñ¥é…Ñ¥½¸‰•¹¡µ…É¬¸(´mátQ¡”%¹ÑÉ½‘ÕÑ¥½¸Ý…ÌÉ•ÝÉ¥ÑÑ•¸™É½´Ñ¡”ÕÉÉ•¹ÐM=½M= ½¹Ñ•áÐÑ¡É½Õ Ñ¡”(€•µ‰•‘‘•É•Í½ÕÉ”ÁÉ½‰±•´Ñ¼½¹”•áÁ±¥¥ÐÉ•Í•…É …À¸(´mát=¹”½¹¥Í”½‰©•Ñ¥Ù”…¹Ñ¡É•”½¹ÑÉ¥‰ÕÑ¥½¹Ì¹½Ü±½Í”Ñ¡”%¹ÑÉ½‘ÕÑ¥½¸¸(´mátI•±…Ñ•]½É¬¹½Ü½µÁ…É•ÌÑ¡”ÍÑÕ‘ä‘¥É•Ñ±äÝ¥Ñ ÁÉ¥½È•µ‰•‘‘•M=½M= …¹(€½µÁÉ•ÍÍ¥½¸ÍÑÕ‘¥•Ì…¹ÍÑ…Ñ•ÌÑ¡…ÐÑ¡”¹½Ù•±Ñä¥ÌÑ¡”Á…¥É•°…Õ‘¥Ñ…‰±”MQ4ÌÈ(€‰•¹¡µ…É¬°¹½Ð„¹•ÜÉ•ÕÉÉ•¹Ð•±°½È½µÁÉ•ÍÍ¥½¸…±½É¥Ñ¡´¸(´mátQ¡”½¹±ÕÍ¥½¸…¹=ÕÑ±½½¬¹½ÜÅÕ…¹Ñ¥™¥•Ì±…Í °I4°¥¹™•É•¹”µÑ¥µ”°…¹5(€¡…¹•Ì™½ÈM=…¹M= °‘¥ÍÑ¥¹Õ¥Í¡•Ì•ÍÑ¥µ…Ñ••¹•Éä™É½´‘¥É•ÐÁ½Ý•È(€µ•…ÍÕÉ•µ•¹Ð°¥¹Ñ•ÉÁÉ•ÑÌÑ¡”½Á•É…Ñ¥¹œÁ½¥¹ÑÌ°…¹ÁÉ¥½É¥Ñ¥Í•Ì™ÕÑÕÉ”Ý½É¬¸(´mátµ…¹ÕÍÉ¥ÁÐµÝ¥‘”±…¹Õ…”…¹±½¥ŒÁ…ÍÌ½ÉÉ•Ñ•Ñ¡”‰ÍÑÉ…Ð°(€%¹ÑÉ½‘ÕÑ¥½¸°I•±…Ñ•]½É¬°5•Ñ¡½‘ÌÝ½É‘¥¹œ°I•ÍÕ±ÑÌ¥¹Ñ•ÉÁÉ•Ñ…Ñ¥½¸°¥ÍÕÍÍ¥½¸°(€…¹½¹±ÕÍ¥½¸¸(´mátIMA=9M}Q=}IY%]I|È¹µ‘€‘½Õµ•¹ÑÌ•Ù•ÉäÉ•ÍÁ½¹Í”Ý¥Ñ É•™•É•¹•ÌÑ¼Ñ¡”(€™¥¹…°€ÔÜµÁ…”±¥¹”µ¹Õµ‰•É•…¹½¹åµ½ÕÌÉ•Ù¥Í¥½¸¸(´mátQ¡”Á…”…¹±¥¹”É•™•É•¹•Ì¥¸IMA=9M}Q=}IY%]I|Ä¹µ‘€…¹(€IMA=9M}Q=}IY%]I|Ì¹µ‘€Ý•É”É•™É•Í¡•…™Ñ•ÈÑ¡”I•Ù¥•Ý•È€È¥¹Ñ•É…Ñ¥½¸¸((ŒŒŒI•Ù¥•Ý•È€ÌÍÑ…ÑÕÌ…™Ñ•ÈÑ¡”½µÁ±•Ñ•Ñ•¡¹¥…°‘¥ÍÕÍÍ¥½¸€ ÄÔ)Õ±ä€ÈÀÈØ¤((´mát±°Í¥àI•Ù¥•Ý•È€Ì½µµ•¹ÑÌ¡…Ù”¹½Ü‰••¸‘¥ÍÕÍÍ•…¹¡•­•……¥¹ÍÐÑ¡”(€…Ù…¥±…‰±”µ½‘•°½‘”°MQ4ÌÈÁÉ½©•ÑÌ°‰•¹¡µ…É¬É•ÍÕ±ÑÌ°…¹•¹•É…Ñ•…¹…±åÍ•Ì¸(´mát9¼…‘‘¥Ñ¥½¹…°•áÁ•É¥µ•¹ÐÉ•ÅÕ¥É¥¹œÑ¡”!A½È„¹•ÜMQ4ÌÈÉÕ¸¥ÌÕÉÉ•¹Ñ±ä(€Á±…¹¹•™½ÈI•Ù¥•Ý•È€Ì¸(´mát5…¹ÕÍÉ¥ÁÐ¥¹Ñ•É…Ñ¥½¸°…ÁÁ•¹‘¥àÁ±…•µ•¹Ð°…¹Ñ¡”Á½¥¹Ðµ‰äµÁ½¥¹ÐÉ•ÍÁ½¹Í”(€…É”½µÁ±•Ñ”¸IMA=9M}Q=}IY%]I|Ì¹µ‘€É•™•ÉÌÑ¼Ñ¡”€ÔÜµÁ…”±¥¹”µ¹Õµ‰•É•(€…¹½¹åµ½ÕÌÉ•Ù¥Í¥½¸½µÁ¥±•½¸€ÄÔ)Õ±ä€ÈÀÈØ¸((¨¨Ì¸Ä5½‘•°½µÁ±•á¥Ñä…¹¡…É‘Ý…É”ÑÉ…¹Í™•É…‰¥±¥Ñä¨¨((´mátÉ•Ù|Ù}µ½‘•±}½µÁ±•á¥Ñå}Í…±¥¹œ¹Á¹€…¹¥ÑÌ¥¹Ñ•ÉÁÉ•Ñ…Ñ¥½¸…É”…•ÁÑ•¸(´mát‘Ñ•áÐ•áÁ±…¥¹¥¹œÑ¡”…¹…±åÑ¥…°¡¥‘‘•¸µÍ¥é”Í…±¥¹œ°¥µÁ±•µ•¹Ñ•€ØÐ€´ø€ÐÕ€(€…¹€ÄÈà€´ø€äÁ€Á½¥¹ÑÌ°…¹Ñ¡”€ÔÄ”…ÍåµÁÑ½Ñ¥Œ5µÉ•‘ÕÑ¥½¸±¥µ¥Ð™½È„¹½µ¥¹…°(€€ÌÀ”¡¥‘‘•¸µÍ¥é”É•‘ÕÑ¥½¸¸(´mátMÑ…Ñ”Ñ¡…ÐÑ¡”…ÁÁÉ½á¥µ…Ñ•±ä€ÐÀ”µ•…ÍÕÉ•±…Í ½Ñ¥µ”½•¹•ÉäµÁÉ½áä™¥¹‘¥¹Ì…É”(€ÍÁ•¥™¥ŒÑ¼Ñ¡”Ñ•ÍÑ•¡•­Á½¥¹ÑÌ°MQ4ÌÉ ÜÔÍi$°™¥ÉµÝ…É”°…¹‰Õ¥±¸¼¹½Ð±…¥´(€ÑÉ…¹Í™•ÈÑ¼MQ4ÌÉÐ½È…¹½Ñ¡•È½¹ÑÉ½±±•È™…µ¥±äì½¹±äÑ¡”…É¡¥Ñ•ÑÕÉ”µ±•Ù•°5(€ÑÉ•¹ÑÉ…¹Í™•ÉÌÝ¥Ñ¡½ÕÐ„¹•Ü¡…É‘Ý…É”‰•¹¡µ…É¬¸((¨¨Ì¸È•É¥Ù…Ñ¥Ù”¥µÁ±•µ•¹Ñ…Ñ¥½¸…¹¹½¸µ¥‘•…°Í…µÁ±¥¹œ¨¨((´mát¥¹…°‘•¥Í¥½¸¥ÌÑ•áÐ½¹±äìÉ•Ù|Ý€É•µ…¥¹Ì¥¹Ñ•É¹…°…¹¥Ì¹½Ð¥¹Í•ÉÑ•¸(´mát½ÉÉ•ÐÑ¡”½É¥¥¹…°ÍÑ…Ñ•µ•¹Ð•¹ÑÉ•™¥¹¥Ñ”‘¥™™•É•¹•Í€¸Q¡”…Õ‘¥Ñ•(€¥µÁ±•µ•¹Ñ…Ñ¥½¸ÕÍ•ÌÑ¥µ•ÍÑ…µÀµ…Ý…É”‰…­Ý…É‘¥™™•É•¹•Ì¸(´mát‘Ñ¡”…ÕÍ…°•ÅÕ…Ñ¥½¸°ÍÑ…Ñ”Ñ¡…ÐÑ¡”Í¥àÁÉ•Á…É•™•…ÑÕÉ•ÌÝ•É”½µÁÕÑ•(€¡½ÍÐµÍ¥‘”…¹É•Á±…å•½Ù•ÈUIP°…¹±…É¥™äÑ¡…ÐÉ•Á½ÉÑ•­•É¹•°Ñ¥µ¥¹œ¥Í½±…Ñ•Ì(€1MQ4½51@¥¹™•É•¹”…¹•á±Õ‘•Ì…ÅÕ¥Í¥Ñ¥½¸…¹™•…ÑÕÉ”•áÑÉ…Ñ¥½¸¸(´mát‘„‰½Õ¹‘•±¥µ¥Ñ…Ñ¥½¸èÙ…É¥…‰±”Í…µÁ±¥¹œ°µ¥ÍÍ¥¹œÍ…µÁ±•Ì°‘•É¥Ù…Ñ¥Ù”¹½¥Í”°(€…¹…ÕÍ…°™¥±Ñ•É¥¹œ½±¥µ¥Ñ¥¹œÝ•É”¹½Ð•Ù…±Õ…Ñ•¥¸Ñ¡¥Ì½µÁÉ•ÍÍ¥½¸‰•¹¡µ…É¬¸(€I•™•ÈÑ¼Ñ¡”Í•Á…É…Ñ”É½‰ÕÍÑ¹•ÍÌÝ½É¬½¹±ä¥˜¥Ð¥Ì¥Ñ…‰±”…ÐÍÕ‰µ¥ÍÍ¥½¸Ñ¥µ”¸((¨¨Ì¸Ì0ÈÁÉÕ¹¥¹œÉ¥Ñ•É¥½¸¨¨((´mátÉ•Ù|á}ÁÉÕ¹¥¹}É¥Ñ•É¥½¹}Í½Á”¹Á¹€…¹Ñ¡”Ù•É¥™¥•Í…±¥•¹ä‘•™¥¹¥Ñ¥½¸…É”(€…•ÁÑ•¸(´mátQ¡”ÕÉÉ•¹Ðµ•Ñ¡½…±É•…‘ä•áÁ±…¥¹ÌÑ¡”ÍÑÉÕÑÕÉ•0ÈÉ¥Ñ•É¥½¸°‰ÕÐ…‘…¸(€•áÁ±¥¥ÐÍ•¹Ñ•¹”½¹ÑÉ…ÍÑ¥¹œ¥ÐÝ¥Ñ É…‘¥•¹Ð´…¹…Ñ¥Ù…Ñ¥½¸µ‰…Í•Í•¹Í¥Ñ¥Ù¥Ñäè(€Ñ¡½Í”…±Ñ•É¹…Ñ¥Ù•ÌÉ•ÅÕ¥É”‰…­Ý…ÉµÁ…ÍÌ½ÈÉ•ÁÉ•Í•¹Ñ…Ñ¥Ù”µ…Ñ¥Ù…Ñ¥½¸ÍÑ…Ñ¥ÍÑ¥Ì°(€Ý¡•É•…ÌÑ¡”Í•±•Ñ•…Ñ”µÉ½ÕÀ0ÈÍ½É”¥Ì‘…Ñ„¥¹‘•Á•¹‘•¹Ð…¹‘¥É•Ñ±äµ…ÁÌÑ¼(€É•µ½Ù…°½˜½µÁ±•Ñ”‘•¹Í”¡¥‘‘•¸¡…¹¹•±Ì¸(´mátMÑ…Ñ”•áÁ±¥¥Ñ±äÑ¡…Ð¹¼•áÁ•É¥µ•¹Ñ…°½µÁ…É¥Í½¸½˜ÁÉÕ¹¥¹œÉ¥Ñ•É¥„Ý…ÌÉÕ¸ì(€Ñ¡”É…Ñ¥½¹…±”¥Ìµ•Ñ¡½‘½±½¥…°…¹¥µÁ±•µ•¹Ñ…Ñ¥½¸‰…Í•°¹½Ð•Ù¥‘•¹”Ñ¡…Ð0È¥Ì(€Õ¹¥Ù•ÉÍ…±±äÍÕÁ•É¥½È¸((¨¨Ì¸Ð]•¥¡Ðµ½¹±äµ¥á•µÁÉ•¥Í¥½¸ÅÕ…¹Ñ¥é…Ñ¥½¸¨¨((´mátÉ•Ù|å}µ¥á•‘}ÁÉ•¥Í¥½¹}ÅÕ…¹Ñ¥é…Ñ¥½¸¹Á¹€Ý…Ì½ÉÉ•Ñ•……¥¹ÍÐÑ¡”…±±•M=(€…¹M= ­•É¹•±Ì°•áÁ½ÉÑ•¡•…‘•ÉÌ°…¹±¥¹­•Èµ…ÁÌ¸%ÑÌÁ…¹•°€¡„¤½¹Ñ…¥¹Ì½¹±äÑ¡”(€ÁÉ•¥Í¥½¸Á…Ñ ¸(´mát-••ÀÑ¡”Ù•É¥™¥•Í½Á”¥¸Ñ¡”µ•Ñ¡½è½¹±äÉ•ÕÉÉ•¹Ð]}¥¡€…¹]}¡¡€…É”(€%9PàìÉ½ÜÍ…±•Ì°‰¥…Ì°ÍÑ…Ñ•Ì°…Ñ¥Ù…Ñ¥½¹Ì°51@°…¹½ÕÑÁÕÐÉ•µ…¥¸@ÌÈ¸(´mát‘Ñ¡”µ¥ÍÍ¥¹œ•áÁ±¥¥Ð½¹Í•ÅÕ•¹”èÉ•Ñ…¥¹¥¹œ@ÌÈ…Ñ¥Ù…Ñ¥½¹Ì½ÍÑ…Ñ•Ì…Ù½¥‘Ì(€¥¹ÑÉ½‘Õ¥¹œ…¹½Ñ¡•ÈÅÕ…¹Ñ¥é…Ñ¥½¸Í½ÕÉ”‰ÕÐÁÉ•Í•ÉÙ•Ì@ÌÈI4…¹…É¥Ñ¡µ•Ñ¥Œ½ÍÐ°(€Í¼Ñ¡”¥µÁ±•µ•¹Ñ…Ñ¥½¸…¹¹½Ð½‰Ñ…¥¸Ñ¡”±…Ñ•¹ä…¹I4‰•¹•™¥ÑÌ½˜„™Õ±°µ¥¹Ñ••È(€Á…Ñ ¸Q¡”…ÕÉ…ä‰•¹•™¥Ð½˜Ñ¡¥Ì¡½¥”Ý…Ì¹½Ð¥Í½±…Ñ••áÁ•É¥µ•¹Ñ…±±ä¸(´mátMÑ…Ñ”‘¥É•Ñ±äÑ¡…Ð…Ñ¥Ù…Ñ¥½¸ÅÕ…¹Ñ¥é…Ñ¥½¸…¹™Õ±±ä¥¹Ñ••È‘•Á±½åµ•¹ÐÝ•É”(€¹½Ð•Ù…±Õ…Ñ•¸áÁ±…¥¸É•ÕÉÉ•¹ÐµÝ•¥¡Ðµ½¹±äÍ½Á”Ù¥„Ñ¡”…ÁÁÉ½á¥µ…Ñ•±ä€àÀ”Í¡…É”(€½˜É•ÕÉÉ•¹Ðµ…ÑÉ¥•Ì¥¸Ñ¡”	…Í”µ½‘•°½¹ÍÑ…¹ÑÌ°Ý¥Ñ¡½ÕÐ±…¥µ¥¹œÑ¡…ÐÉ•Ñ…¥¹¥¹œ(€Ñ¡”@ÌÈ51@Ý…Ì•áÁ•É¥µ•¹Ñ…±±äÍÕÁ•É¥½È¸((¨¨Ì¸Ô1½Ý•ÈM=AÉÕ¹•5¨¨((´mátQ¡¥ÌÁ½¥¹Ð¥Ì…±É•…‘ä¡…¹‘±•½ÉÉ•Ñ±ä¥¸Ñ¡”ÕÉÉ•¹Ðµ…¹ÕÍÉ¥ÁÐèÑ¡”…ÕÍ…°(€É•Õ±…É¥Í…Ñ¥½¸±…¥´¡…Ì‰••¸É•µ½Ù•°Ñ¡”€À¸ÌÔµÁ•É•¹Ñ…”µÁ½¥¹Ð‘¥™™•É•¹”¥Ì(€¡•­Á½¥¹Ð´…¹ÍÁ±¥ÐµÍÁ•¥™¥Œ°…¹Ñ¡”…‰Í•¹”½˜É•Á•…Ñ•Í••‘Ì°É½ÍÌµÙ…±¥‘…Ñ¥½¸°(€…¹µ…Ñ¡•Õ¹ÁÉÕ¹•™¥¹”µÑÕ¹¥¹œ¥ÌÍÑ…Ñ•¸(´mát9¼¹•Ü‘¥…É…´½È•áÁ•É¥µ•¹Ð¥ÌÉ•ÅÕ¥É•¸-••ÀÑ¡”•á¥ÍÑ¥¹œÍ…±¥•¹ä½Ý•¥¡Ð(€‘¥…¹½ÍÑ¥Ì‘•ÍÉ¥ÁÑ¥Ù”…¹‘¼¹½ÐÕÍ”Ñ¡•´…ÌÁÉ½½˜½˜¥µÁÉ½Ù••¹•É…±¥Í…Ñ¥½¸¸((¨¨Ì¸ØEÕ…¹Ñ¥é•ÉÕ¹Ñ¥µ”¥¹É•…Í”¨¨((´mátÉ•Ù|ÄÁ}ÅÕ…¹Ñ¥é•‘}ÉÕ¹Ñ¥µ•}…½Õ¹Ñ¥¹œ¹Á¹€°¥ÑÌ5™½ÉµÕ±„°…‘‘¥Ñ¥½¹…°Í…±”(€½Õ¹ÑÌ°µ•…ÍÕÉ•]PÑ¥µ•Ì°…¹Ñ¡”ÍÑ…Ñ¥ŒµÙ•ÉÍÕÌµµ•…ÍÕÉ•¥¹Ñ•ÉÁÉ•Ñ…Ñ¥½¸¡…Ù”‰••¸(€‘¥ÍÕÍÍ•…¹…•ÁÑ•…ÌÕÍ•™Õ°•Ù¥‘•¹”¸(´mátáÁ…¹Ñ¡”ÕÉÉ•¹Ð‘¥ÍÕÍÍ¥½¸‰•å½¹½¹Í¥ÍÑ•¹ÐÝ¥Ñ Ñ¡”½‰Í•ÉÙ•Ñ¥µ¥¹œ(€Á•¹…±Ñå€èÉ•Á½ÉÐÑ¡…ÐÍÑ…Ñ¥ŒÉ…Ñ¥½Ì…É”…‰½ÕÐ€Ä¸àÄ™½È‰½Ñ Ñ…Í­Ì°Ý¡•É•…Ìµ•…ÍÕÉ•(€EÕ…¹Ñ¥é•½	…Í”É…Ñ¥½Ì…É”€Ð¸ää™½ÈM=…¹€Ä¸Èä™½ÈM= ¸áÁ±…¥¸Ý¡äÍÑ…Ñ¥Œ½Õ¹ÑÌ(€…É”ÁÉ•‘¥Ñ¥Ù”Ý¥Ñ¡¥¸Ñ¡”@ÌÈÁÉÕ¹¥¹œ™…µ¥±ä‰ÕÐ¹½Ð…É½ÍÌ„¡…¹•­•É¹•°¸(´mátI•½ÉÑ¡…ÐÑ¡”¥¹ÍÁ•Ñ•™¥ÉµÝ…É”ÕÍ•€µ<Á€°¡…Éµ™±½…Ð@ÌÈ°Á•ÈµÝ•¥¡Ð(€%9PàµÑ¼µ@ÌÈ…ÍÑÌ°…¹Á•ÈµÝ•¥¡ÐÉ½ÜÍ…±¥¹œÝ¥Ñ¡½ÕÐ…¸½ÁÑ¥µ¥é•¥¹Ñ••È(€‘½ÐµÁÉ½‘ÕÐÁ…Ñ ¸AÉ•Í•¹ÐÉ•‘Õ•M= Ý•¥¡ÐÑÉ…™™¥Œ…Ì„Á±…ÕÍ¥‰±”½™™Í•ÑÑ¥¹œ(€™…Ñ½È°¹½Ð…Ìµ•…ÍÕÉ•µ•µ½Éäµ‰…¹‘Ý¥‘Ñ …ÑÑÉ¥‰ÕÑ¥½¸¸(´mát‘™ÕÑÕÉ”½ÁÑ¥µ¥é…Ñ¥½¸½ÁÑ¥½¹ÌÉ•ÅÕ•ÍÑ•‰äÑ¡”É•Ù¥•Ý•Èè¡½¥ÍÐÉ½ÜÍ…±•Ì(€½ÕÑÍ¥‘”¥¹¹•È…ÕµÕ±…Ñ¥½¹ÌÝ¡•É”Ù…±¥°™ÕÍ”Í…±”½‰¥…ÌÝ½É¬°ÕÍ”½ÁÑ¥µ¥é•M@½È(€¥¹Ñ••È‘½ÐµÁÉ½‘ÕÐ­•É¹•±Ì°…¹•Ù…±Õ…Ñ”…Ñ¥Ù…Ñ¥½¸ÅÕ…¹Ñ¥é…Ñ¥½¸½™Õ±°µ¥¹Ñ••È(€•á•ÕÑ¥½¸¸Q¡•Í”…É”ÁÉ½Á½Í…±Ì°¹½Ð•Ù…±Õ…Ñ•É•ÍÕ±ÑÌ¸(´mátMÑ…Ñ”•áÁ±¥¥Ñ±äÑ¡…Ð¹¼½Á•É…Ñ¥½¸µ±•Ù•°å±”‰É•…­‘½Ý¸½Èµ•µ½Éäµ‰…¹‘Ý¥‘Ñ (€ÁÉ½™¥±”Ý…Ì…Ù…¥±…‰±”¸Q¡”•á¥ÍÑ¥¹œ]Pµ•…ÍÕÉ•µ•¹ÑÌ…É”Ñ½Ñ…°­•É¹•°Ñ¥µ•Ì…Ù•É…•(€½Ù•È€ÄÀ°ÀÀÀ¥¹™•É•¹•Ì¸((ŒŒŒI•Ù¥•Ý•È€Ð½µÁ±•Ñ¥½¸ÍÑ…ÑÕÌ€ ÄÔ)Õ±ä€ÈÀÈØ¤((´mátQ¡”‰ÍÑÉ…ÐÝ…ÌÉ•‘Õ•Ñ¼…ÁÁÉ½á¥µ…Ñ•±ä€ÄØäÝ½É‘Ì…¹¹½Ü‘¥É•Ñ±ä¥‘•¹Ñ¥™¥•Ì(€Ñ¡”•¹¥¹••É¥¹œ…ÁÁ±¥…Ñ¥½¸½˜…ÉÑ¥™¥¥…°¥¹Ñ•±±¥•¹”°Ñ¡”¥µÁ±•µ•¹Ñ•…ÉÑ¥™¥¥…°(€¥¹Ñ•±±¥•¹”°Ñ¡”Á…¥É•½µÁÉ•ÍÍ¥½¸‰•¹¡µ…É¬°Ñ¡”ÁÉ¥¹¥Á…°¹Õµ•É¥…°É•ÍÕ±ÑÌ°(€…¹Ñ¡”•Ù¥‘•¹”‰½Õ¹‘…Éä¸±°…‰ÍÑÉ…Ð…É½¹åµÌ…É”‘•™¥¹•½¸™¥ÉÍÐÕÍ”¸(´mátQ¡”­•åÝ½É±¥ÍÐÝ…ÌÉ•‘Õ•Ñ¼Í¥àÝÉ¥ÑÑ•¸µ½ÕÐÑ•ÉµÌ¸Q¡”Ñ¥Ñ±”…¹­•åÝ½É‘Ì(€½¹Ñ…¥¸¹¼Õ¹•áÁ±…¥¹•…É½¹å´¸(´mátQ¡”ÑÝ¼É•Ù¥•Ý•ÈµÍÕ•ÍÑ•Á…Á•ÉÌÝ•É”¥µÁ½ÉÑ•™É½´Ñ¡”…ÕÑ¡½ÈÌi½Ñ•É¼•áÁ½ÉÐ(€‰¥ˆ½Á…Á•ÈÉ}Í½Í½¡}É•™}™È¹‰¥‰€¥¹Ñ¼Ñ¡”¥Í½±…Ñ•É•Ù¥•Ü‰¥‰±¥½É…Á¡ä…Ì(€Ý…¹}¥µÁÉ½Ù•‘|ÈÀÈÑ€€¡=$€ÄÀ¸ÄÀÄØ½¨¹•ÍÐ¸ÈÀÈÌ¸ÄÄÀÈÈÉ€¤…¹(€Ý…¹}¥µÁÉ½Ù•‘|ÈÀÈÍ€€¡=$€ÄÀ¸ÄÀÄØ½¨¹•¹•Éä¸ÈÀÈÌ¸ÄÈàØÜÝ€¤¸9¼‰¥‰±¥½É…Á¡¥Œ‘…Ñ„(€Ý•É”¥¹Ù•¹Ñ•½È¥¹™•ÉÉ•¸(´mátI•±…Ñ•]½É¬¹½Ü•áÁ±…¥¹ÌÝ¡…ÐÑ¡”ÑÝ¼¡å‰É¥•ÍÑ¥µ…Ñ½ÉÌ½¹ÑÉ¥‰ÕÑ”…¹Ý¡ä(€Ñ¡•¥È…ÕÉ…ä•Ù¥‘•¹”½µÁ±•µ•¹ÑÌ°‰ÕÐ‘½•Ì¹½ÐÉ•Á±…”°Ñ¡”Á…¥É••µ‰•‘‘•(€ÁÉÕ¹¥¹œ½ÅÕ…¹Ñ¥é…Ñ¥½¸‰•¹¡µ…É¬¸(´mátQ¡”µ•Ñ¡½±½¥Œ¹½Ü•áÁ±¥¥Ñ±äÍ•Á…É…Ñ•ÌÑ¡”½µµ½¸	…Í”•ÅÕ…Ñ¥½¹Ì°ÍÑÉÕÑÕÉ•(€‘¥µ•¹Í¥½¸É•‘ÕÑ¥½¸°…¹É•ÁÉ•Í•¹Ñ…Ñ¥½¸µ½¹±äÅÕ…¹Ñ¥é…Ñ¥½¸¸(´mát5…Ñ¡•µ…Ñ¥…°‘•Ñ…¥°Ý…Ì…‘‘•™½È‘•¹Í”ÁÉÕ¹¥¹œÍÕ‰µ…ÑÉ¥à½¹ÍÑÉÕÑ¥½¸°(€½‘”µ•á…ÐÍåµµ•ÑÉ¥ŒÁ•ÈµÉ½ÜÅÕ…¹Ñ¥é…Ñ¥½¸½Ù•È€´ÄÈÜ¸¸¸ÄÈÝ€°Ñ¡”É•½¹ÍÑÉÕÑ¥½¸(€•ÉÉ½È‰½Õ¹°Ñ¡”µ¥á•µÁÉ•¥Í¥½¸…Ñ”…±Õ±…Ñ¥½¸°…¹5½I5M½@äÔ‘•™¥¹¥Ñ¥½¹Ì¸(´mátQ¡”ÅÕ…¹Ñ¥é…Ñ¥½¸‘•ÍÉ¥ÁÑ¥½¸Ý…Ì¡•­•……¥¹ÍÐÑ¡”M=…¹M= •áÁ½ÉÐ½‘”¸(€Q¡”ÁÉ•Ù¥½ÕÌÍ¡•µ…Ñ¥Œ½…ÁÑ¥½¸É…¹”€´ÄÈà¸¸¸ÄÈÝ€Ý…Ì½ÉÉ•Ñ•Ñ¼Ñ¡”¥µÁ±•µ•¹Ñ•(€Íåµµ•ÑÉ¥ŒÍ•Ð€´ÄÈÜ¸¸¸ÄÈÝ€Ý¥Ñ €´ÄÈá€‘•±¥‰•É…Ñ•±äÕ¹ÕÍ•¸(´mát1½¹œ…Ñ…Í•Ð°QÉ…¥¹¥¹œ°	•¹¡µ…É¬°I•ÍÕ±ÑÌ°¥ÍÕÍÍ¥½¸°…¹1¥µ¥Ñ…Ñ¥½¹ÌÁ…ÍÍ…•Ì(€Ý•É”ÍÁ±¥Ð½ÈÑ¥¡Ñ•¹•°…¹„µ…¹ÕÍÉ¥ÁÐµÝ¥‘”É…µµ…È…¹±½¥ŒÁ…ÍÌÝ…ÌÁ•É™½Éµ•¸(´mát¥ÕÉ•Ì€È°€Ø°…¹€ÜÝ•É”É••¹•É…Ñ•…Ð¡¥ É•Í½±ÕÑ¥½¸Ý¥Ñ ±…É•ÈÑ•áÐ…¹(€½‘”µ½¹Í¥ÍÑ•¹Ð½¹Ñ•¹Ð¸¥ÕÉ”€ÈÍ¡½ÝÌÑ¡”É•…°½™…Ñ½È±•Ù•±Ì°¥ÕÉ”€ØÍ¡½ÝÌ(€‘•¹Í”¡¥‘‘•¸µ¡…¹¹•°É•µ½Ù…°…¹Ñ¡”€ØÐ€´ø€ÐÕ€€¼€ÄÈà€´ø€äÁ€‘¥µ•¹Í¥½¹Ì°…¹(€¥ÕÉ”€ÜÍ¡½ÝÌÑ¡”Ù•É¥™¥•µ¥á•µÁÉ•¥Í¥½¸Á…Ñ ¸(´mátQ¡”É•ÁÉ½‘Õ¥‰±”•¹•É…Ñ½È¥Ì(€É•Ù¥•Ý}…¹…±åÍ¥Ì½Ñ½½±Ì½•¹•É…Ñ•}É•Ù¥•Ý•ÈÑ}™¥ÕÉ•Ì¹ÁÌÅ€¸(´mátÕÑ¡½È…¹…¹½¹åµ½ÕÌÉ•Ù¥•Üµ…¹ÕÍÉ¥ÁÑÌ½µÁ¥±”Ý¥Ñ¡½ÕÐÕ¹‘•™¥¹•¥Ñ…Ñ¥½¹Ì°(€Õ¹‘•™¥¹•É•™•É•¹•Ì°½È1…Q•`•ÉÉ½ÉÌ¸Q¡”™¥¹…°AÌ½¹Ñ…¥¸€ÌØ…¹€ÔÜÁ…•Ì°(€É•ÍÁ•Ñ¥Ù•±ä¸(´mátIMA=9M}Q=}IY%]I|Ð¹µ‘€É•½É‘ÌÑ¡”Á½¥¹Ðµ‰äµÁ½¥¹ÐÉ•ÍÁ½¹Í”ÕÍ¥¹œÑ¡”™¥¹…°(€€ÔÜµÁ…”±¥¹”µ¹Õµ‰•É•…¹½¹åµ½ÕÌA¸I•ÍÁ½¹Í•Ì€Ä´´ÌÝ•É”É•™É•Í¡•…™Ñ•ÈÑ¡¥Ì(€¥¹Ñ•É…Ñ¥½¸¸((ŒŒŒ¸Y•É¥™¥•ÁÉÕ¹¥¹œ¥µÁ±•µ•¹Ñ…Ñ¥½¸((¨©5•Ñ¡½¨¨((´Q¡”™¥¹…°µ½‘•±ÌÕÍ”½¹”µÍ¡½Ð°µ…¹¥ÑÕ‘”µ‰…Í•ÍÑÉÕÑÕÉ•ÁÉÕ¹¥¹œ½˜½µÁ±•Ñ”1MQ4(€¡¥‘‘•¸Õ¹¥ÑÌ°¹½Ð¥Ñ•É…Ñ¥Ù”ÁÉÕ¹¥¹œ…¹¹½ÐÁÉÕ¹¥¹œµ…Ý…É”ÑÉ…¥¹¥¹œ¸(´U¹¥ÐÍ…±¥•¹ä¥ÌÑ¡”ÍÕ´½˜0È¹½ÉµÌ½˜¥¹ÁÕÐ…¹É•ÕÉÉ•¹ÐÝ•¥¡ÐÉ½ÝÌ½Ù•È…±°(€™½ÕÈ1MQ4…Ñ•Ì¸(´Q¡”±½Ý•ÍÐµÍ…±¥•¹äÕ¹¥ÑÌ…É”É•µ½Ù•©½¥¹Ñ±ä™É½´…±°…Ñ”µ…ÑÉ¥•Ì¸ÍÍ½¥…Ñ•(€É•ÕÉÉ•¹Ð½±Õµ¹Ì…¹Ñ¡”¥¹ÁÕÐ½±Õµ¹Ì½˜Ñ¡”‘½Ý¹ÍÑÉ•…´51@…É”Í±¥•Ñ¼™½É´(€„Á¡åÍ¥…±±äÍµ…±±•È‘•¹Í”¹•ÑÝ½É¬¸(´M=¡…¹•Ì™É½´€ØÐÑ¼€ÐÔ¡¥‘‘•¸Õ¹¥ÑÌìM= ¡…¹•Ì™É½´€ÄÈàÑ¼€äÀ¡¥‘‘•¸Õ¹¥ÑÌ°(€½ÉÉ•ÍÁ½¹‘¥¹œÑ¼…ÁÁÉ½á¥µ…Ñ•±ä€ÌÀ”É•µ½Ù…°¸(´Q¡”É•‘Õ•µ½‘•°¥ÌÑ¡•¸‰É¥•™±ä™¥¹”µÑÕ¹•Ý¥Ñ ‘…µ\…¹5M±½ÍÌ¸((¨©A…É…µ•Ñ•ÉÌÑ¡…Ð…É”…ÑÕ…±±ä•Ù¥‘•¹•¨¨((´M= ¥Ì™Õ±±ä‘½Õµ•¹Ñ•‰ä…É¡¥Ù”½ÉÕ¹}ÁÉÕ¹¥¹œ¹Í¡€…¹Ñ¡”Ù…±¥™¥¹…°µ…¹¥™•ÍÐè(€€ÌÀ”ÁÉÕ¹¥¹œ°€Ì™¥¹”µÑÕ¹¥¹œ•Á½¡Ì°±•…É¹¥¹œÉ…Ñ”€Å”´Ù€°ÑÉ…¥¹¥¹œ‰…Ñ Í¥é”€ÔÄÈ°(€…¹Í…Ù•Ù…±¥‘…Ñ¥½¸µ•ÑÉ¥Ì…™Ñ•È™¥¹”µÑÕ¹¥¹œ¸(´Q¡”™¥¹…°M=™½±‘•È…¹€ØÐµÑ¼´ÐÔ¡•­Á½¥¹Ðµ…Ñ Ñ¡”Í¥µÁ±”½¹”µÍ¡½ÐÁÉÕ¹¥¹œ(€ÍÉ¥ÁÐ…¹Ñ¡”ÁÉ½©•ÐI5ÍÑ…Ñ•ÌÑ¡…ÐÑ¡”•á¥ÍÑ¥¹œµ½‘•°É••¥Ù•Í¡½ÉÐ(€™¥¹”µÑÕ¹¥¹œ¸(´Q¡”™¥¹…°M=µ…¹¥™•ÍÐ¹©Í½¹€¥ÌÑÉÕ¹…Ñ•Ñ¼€ÄÀà‰åÑ•Ì¸Q¡”•á…ÐM=•Á½ ½Õ¹Ð(€…¹±•…É¹¥¹œÉ…Ñ”…É”Ñ¡•É•™½É”¹½ÐÉ•½Ù•É…‰±”™É½´Ñ¡…Ð™¥±”¸MÉ¥ÁÐ‘•™…Õ±ÑÌ(€…É”€Ô•Á½¡Ì…¹€Õ”´Õ€°Ý¡¥±”…¹½Ñ¡•È…É¡¥Ù•ÕÍ…”•á…µÁ±”Í¡½ÝÌ€Ì•Á½¡Ì¸(´U¹Ñ¥°…¸½É¥¥¹…°M=½µµ…¹½È±½œ¥Ì™½Õ¹°‘¼¹½ÐÍÑ…Ñ”…¸•á…ÐM=•Á½ (€½Õ¹Ð½È±•…É¹¥¹œÉ…Ñ”…Ì™…Ð¸]É¥Ñ”‰É¥•˜Á½ÍÐµÁÉÕ¹¥¹œ™¥¹”µÑÕ¹¥¹€…¹‘¥Í±½Í”(€Ñ¡”É•ÁÉ½‘Õ¥‰¥±¥Ñä±¥µ¥Ñ…Ñ¥½¸¥˜¹••ÍÍ…Éä¸((¨©I•ÅÕ¥É•½ÉÉ•Ñ¥½¹Ì…¹±…¥µÌ¨¨((´I•Á±…”Ñ¡”ÕÉÉ•¹ÐÍ•¹Ñ•¹”™Ñ•È•… ÁÉÕ¹¥¹œÍÑ•À€¸¸¸‰•™½É”Ñ¡”¹•áÐÁÉÕ¹¥¹œ(€É½Õ¹‘€‰•…ÕÍ”Ñ¡•É”Ý…Ì½¹”ÁÉÕ¹¥¹œÍÑ•À…¹¹¼¹•áÐÉ½Õ¹¸(´]•¥¡Ðµ‘¥ÍÑÉ¥‰ÕÑ¥½¸…¹0ÈµÍ…±¥•¹ä‘¥…É…µÌÁÉ½Ù¥‘”‘•ÍÉ¥ÁÑ¥Ù”ÍÕÁÁ½ÉÐ™½ÈÑ¡”(€ÁÉÕ¹¥¹œÉ¥Ñ•É¥½¸°‰ÕÐÑ¡•ä‘¼¹½ÐÁÉ½Ù”Ñ¡…ÐÁÉÕ¹¥¹œ…ÕÍ•É•Õ±…É¥é…Ñ¥½¸¸(´•ÍÉ¥‰”Ñ¡”±½Ý•ÈM=5…Ì…¸½‰Í•ÉÙ•É•ÍÕ±Ð™½ÈÑ¡”•Ù…±Õ…Ñ•¡•­Á½¥¹Ð…¹(€ÍÁ±¥Ð¸9¼¹•ÜÉ…¹‘½´µÍ••°É½ÍÌµÙ…±¥‘…Ñ¥½¸°ÁÉÕ¹¥¹œµ…Ý…É”°½ÈEP•áÁ•É¥µ•¹ÑÌ…É”(€Á±…¹¹•¸((ŒŒŒ¸I•Ù¥Í¥½¸‰½Õ¹‘…Éä((´9¼¹•Ü!AÑÉ…¥¹¥¹œ½È…É¡¥Ñ•ÑÕÉ”ÍÝ••À¸(´9¼¹•ÜMQ4ÌÈ½ÈMQ4ÌÉÐ‘•Á±½åµ•¹Ð¸(´9¼¹•ÜÁ½Ý•Èµ•…ÍÕÉ•µ•¹Ð½È½Á•É…Ñ¥½¸µ±•Ù•°¡…É‘Ý…É”ÁÉ½™¥±¥¹œ¸(´9¼ÅÕ…¹Ñ¥é…Ñ¥½¸µ…Ý…É”½ÈÁÉÕ¹¥¹œµ…Ý…É”ÑÉ…¥¹¥¹œ¸(´9¼¹•Ü‘•É¥Ù…Ñ¥Ù”µÉ½‰ÕÍÑ¹•ÍÌ…µÁ…¥¸¥¸Ñ¡¥Ì½ÁÑ¥µ¥Í…Ñ¥½¸Á…Á•È¸(´9¼¹•Ü95½1<µ•…ÍÕÉ•µ•¹ÑÌ¸(´Q¡”É•Ù¥Í¥½¸Ý¥±°É•±ä½¸Ù•É¥™¥•…ÉÑ•™…ÑÌ°…‘‘¥Ñ¥½¹…°½™™±¥¹”…¹…±åÍ•Ì°±•…É•È(€µ…Ñ¡•µ…Ñ¥…°‘•ÍÉ¥ÁÑ¥½¹Ì°…ÁÁ•¹‘¥•Ì°…É•™Õ±±ä‰½Õ¹‘•±…¥µÌ°…¹•áÁ±¥¥Ð(€±¥µ¥Ñ…Ñ¥½¹Ì¸(
+- Answer Reviewer 3.2 in text: correct `centred` to timestamp-aware backward
+  differences, show the equation, state that features were prepared host-side, and
+  explain that the benchmark deliberately isolates LSTM/MLP inference. Reported
+  kernel timing therefore excludes sensor acquisition and feature extraction.
+- Add a short implementation note that a causal version stores only the previous
+  accepted voltage/current samples and timestamp and has constant work per sample.
+  Add a limitation that jitter, missing samples, derivative noise, filtering, and
+  derivative limiting were not evaluated in this compression benchmark.
+- The internal process diagram was initially generated because the reviewer asks
+  both how derivatives were formed in the evaluated benchmark and how non-ideal
+  sampling could be handled in an embedded implementation.
+- Panel (a) is the audited path: timestamp-aware backward differences and robust
+  scaling were calculated before the prepared six-feature vectors were replayed by
+  UART. Derivative computation itself was neither timed nor stress-tested on the MCU.
+- Panel (b) is only a proposed causal deployment path: validate timestamps/samples,
+  skip and flag invalid derivatives, resynchronise state, and optionally apply causal
+  filtering or derivative limiting. None of these safeguards was evaluated in the
+  current compression benchmark.
+- Current colour intent is visual rather than quantitative: blue marks the main data
+  path and data/state objects, green marks validation, preprocessing, or mitigation
+  operations, and red highlights the derivative issue, invalid-sample branch, and
+  scope warnings. The colours do not encode measured quality or implementation
+  status. No colour key is needed while the figure remains internal; add one or
+  simplify the palette only if the figure is reused elsewhere.
+- The phrase `resynchronise state` in the invalid-sample branch is ambiguous. It is
+  intended to mean resynchronising the accepted-sample/timestamp buffer used for the
+  derivative, not resetting or correcting the LSTM hidden or cell state. Rename this
+  box before any future reuse of the diagram.
+- Do not add a new derivative-robustness experiment to this compression paper. The
+  author's separate robustness work covers that broader topic; the response should
+  correct the factual method description and define the scope honestly.
+
+**Remaining Reviewer 3 boundaries**
+
+- `rev_8` may justify why gate-group L2 ranking is simple, structured, and directly
+  compatible with dense dimension reduction, but it must not be described as an
+  experimental comparison with gradient- or activation-based criteria.
+- `rev_9` must call the implementation weight-only mixed precision: recurrent weights
+  are INT8 with FP32 scales, while biases, states, activations, and MLP computation
+  remain FP32. Activation quantisation was not evaluated.
+- `rev_10` may connect the quantised runtime increase to explicit per-weight FP32
+  scale multiplications and dequantisation work. It cannot provide cycle attribution,
+  memory-bandwidth use, or operator-level hardware profiling that was not measured.
+- For Reviewer 3.5, report the lower SOC Pruned MAE only as a checkpoint- and split-
+  specific observation. Do not retain the unsupported causal `regularisation effect`
+  explanation and do not imply repeated-seed or cross-validation evidence.
+
+**Reviewer 3.4 and `rev_9` verification**
+
+- The evaluated quantized deployment is now verified from the final model packages,
+  STM32 source selected by `main.c`, and the linked map sections for both tasks.
+- SOC calls `lstm_model_predict_int8()` from `lstm_model_int8.c`. That source uses
+  `model_weights_lstm_int8_manual.h` and `mlp_weights_fp32.h`.
+- SOH calls `lstm_model_soh_int8_forward()` from `lstm_model_soh_int8.c`. That source
+  uses `model_weights_lstm_int8_manual_soh.h` and `mlp_weights_fp32_soh.h`.
+- In both final deployments only `W_ih` and `W_hh` are stored as INT8. The per-row
+  scales, fused LSTM bias, input and recurrent states, gate activations, MLP weights
+  and activations, and estimator output remain FP32.
+- The MLP declarations are `static const float` in both exported headers. The linker
+  maps independently confirm FP32 sizes for `MLP0_WEIGHT` and `MLP1_WEIGHT`.
+- The quantization scripts explicitly implement recurrent-weight-only quantization
+  and export the MLP unchanged. They do not document a separate empirical comparison
+  that proves why MLP quantization was rejected. The defensible rationale is scope:
+  the experiment targets the recurrent matrices, which account for about 80% of the
+  raw Base model constants, while retaining a simple, directly validated FP32 MLP
+  path. Do not present this rationale as a measured superiority of FP32 MLP weights.
+- Activation quantization and a fully integer kernel were not evaluated. State this
+  directly. Retaining FP32 activations avoids introducing another quantization source,
+  but its accuracy benefit was not isolated experimentally.
+- The STM32 quantized-project README files are stale and describe an older opposite
+  hybrid variant (FP32 LSTM and INT8 MLP). Several unused alternative headers also
+  remain in the project folders. Do not infer the evaluated method from those files;
+  use the called kernel and linked map sections.
+- The analytical stored-model-constant totals are 87.5/37.0 KiB for SOC Base/Quantized
+  and 335.0/138.0 KiB for SOH Base/Quantized. These values are computed from recurrent
+  weights, LSTM bias/scales, and MLP parameters only.
+- Hidden/cell states and transient activations are runtime RAM and must not be stacked
+  into those model-constant bars. This was corrected in `rev_9`.
+- The analytical totals are not the complete linked-firmware Flash values. The measured
+  map-derived firmware values remain 105.32/52.48 KiB for SOC and 335.00/138.00 KiB
+  for SOH. The matching SOH pairs are coincidental at the displayed precision.
+- `rev_9` now uses `model constants` rather than `persistent storage`. Panel (a)
+  contains only the verified precision path; the complete explanatory block below
+  that path was removed at the author's request. Limitations and interpretation
+  belong in the future caption or manuscript text, not inside the graphic.
+
+**Reviewer 3.6 and `rev_10` assessment**
+
+- Reviewer 3.6 asks why the quantized implementation is slower despite its smaller
+  weight storage. In particular, the reviewer suggests operation-level cycle counts,
+  memory-bandwidth analysis, and a discussion of implementation optimizations.
+- `rev_10` combines two different evidence types that must remain explicitly
+  distinguished: static operation counts derived from the architecture and C source,
+  and already available total STM32 kernel-time measurements.
+- The Base and Quantized models have the same topology and therefore the same model
+  MAC counts: 22,080 for SOC and 85,120 for SOH. Pruning reduces these counts to
+  12,124 for SOC and 46,208 for SOH by reducing the hidden dimension.
+- The current quantized C kernels execute the per-row FP32 scale multiplication inside
+  the inner recurrent-weight loops. The static accounting therefore contains one
+  additional FP32 scale multiplication for each recurrent weight term: 17,920 for
+  SOC and 68,608 for SOH. These are source-level counts, not measured instruction or
+  processor-cycle counts.
+- The measured total kernel times are 1.40/0.80/6.99 ms for SOC and
+  22.73/12.72/29.21 ms for SOH (Base/Pruned/Quantized). Relative to Base, the
+  Quantized kernel is approximately 5.0 times as slow for SOC and 1.29 times as slow
+  for SOH. The different penalties already show that static multiplication counts
+  alone do not establish a complete causal explanation.
+- The timing values are averages over 10,000 streaming inferences on the STM32H753ZI;
+  the on-device inference interval was measured with the DWT cycle counter. They are
+  not host-side UART latency values.
+- All inspected Base and Quantized STM32 projects were compiled as Debug builds with
+  `-O0`, hard-float ABI, and the Cortex-M7 FPv5 FPU. Consequently, the written
+  per-weight cast and scale expression remains a particularly expensive code path,
+  while no optimized integer dot-product kernel is used.
+- For pruning, static and measured ratios agree closely because the arithmetic type
+  and kernel structure remain FP32: SOC retains 54.9% of the counted MACs and 57.2%
+  of the measured time; SOH retains 54.3% and 56.0%, respectively. This supports the
+  MAC-based size analysis within the same implementation family.
+- The same proportionality must not be expected for Quantized because it changes the
+  operation types and memory footprint. Counting a MAC and a separate FP32 multiply
+  as one operation each omits the INT8-to-FP32 conversion, loop/index overhead,
+  loads, stores, nonlinearities, and cache/Flash behaviour. Static operation ratios
+  predict about 1.81 times Base for both tasks, whereas the measured ratios are about
+  4.99 for SOC and 1.29 for SOH.
+- A plausible explanation for the smaller relative SOH penalty is that the much
+  larger SOH model is more strongly affected by FP32 weight traffic; the smaller INT8
+  recurrent matrices can offset part of the conversion and scaling cost. For the
+  smaller SOC model, the additional cast/scale and unoptimized inner-loop overhead
+  dominate more visibly. The Quantized variants also use much larger transient stack
+  arrays than Base. These are code- and footprint-based hypotheses, not measured
+  cycle attribution or memory-bandwidth evidence.
+- The figure can support the limited conclusion that the weight-only mixed-precision
+  kernel saves Flash but does not provide a native integer compute path: INT8 weights
+  are converted into FP32 arithmetic and repeatedly combined with FP32 scales. This
+  code structure is consistent with additional runtime overhead.
+- `rev_10` does not measure cycles for individual operations, cast costs, Flash/cache
+  traffic, memory bandwidth, or compiler effects. Do not describe it as hardware
+  profiling and do not attribute a measured percentage of the delay to any one cause.
+- Potential optimizations belong in the discussion: move each row scale outside the
+  innermost accumulation where mathematically valid, use optimized dot-product or
+  integer kernels, fuse scale/bias work, and evaluate a complete activation-quantized
+  path. These were not evaluated and must be presented as future work.
+- Current recommendation: `rev_10` is optional rather than essential. The measured
+  times already appear in the main results, while the new contribution is the static
+  source-level accounting. A compact appendix table plus precise manuscript text may
+  answer the point more clearly than a four-panel figure. Keep the figure only if its
+  caption states the static/measured distinction and the absence of cycle-level and
+  memory-bandwidth profiling.
+
+### Reviewer 2 completion status (15 July 2026)
+
+- [x] No new calculation, model run, hardware measurement, or figure is required
+  for the five Reviewer 2 comments; they concern positioning, objective, literature
+  synthesis, conclusion, and language.
+- [x] No new Zotero entry is required. The revised positioning uses the already
+  verified recent references in the bibliography, including 2024 and 2025 reviews,
+  embedded SOC/SOH studies, and a current pruning/quantization benchmark.
+- [x] The Introduction was rewritten from the current SOC/SOH context through the
+  embedded resource problem to one explicit research gap.
+- [x] One concise objective and three contributions now close the Introduction.
+- [x] Related Work now compares the study directly with prior embedded SOC/SOH and
+  compression studies and states that the novelty is the paired, auditable STM32
+  benchmark, not a new recurrent cell or compression algorithm.
+- [x] The Conclusion and Outlook now quantifies Flash, RAM, inference-time, and MAE
+  changes for SOC and SOH, distinguishes estimated energy from direct power
+  measurement, interprets the operating points, and prioritises future work.
+- [x] A manuscript-wide language and logic pass corrected the Abstract,
+  Introduction, Related Work, Methods wording, Results interpretation, Discussion,
+  and Conclusion.
+- [x] `RESPONSE_TO_REVIEWER_2.md` documents every response with references to the
+  final 57-page line-numbered anonymous revision.
+- [x] The page and line references in `RESPONSE_TO_REVIEWER_1.md` and
+  `RESPONSE_TO_REVIEWER_3.md` were refreshed after the Reviewer 2 integration.
+
+### Reviewer 3 status after the completed technical discussion (15 July 2026)
+
+- [x] All six Reviewer 3 comments have now been discussed and checked against the
+  available model code, STM32 projects, benchmark results, and generated analyses.
+- [x] No additional experiment requiring the HPC or a new STM32 run is currently
+  planned for Reviewer 3.
+- [x] Manuscript integration, appendix placement, and the point-by-point response
+  are complete. `RESPONSE_TO_REVIEWER_3.md` refers to the 57-page line-numbered
+  anonymous revision compiled on 15 July 2026.
+
+**3.1 Model complexity and hardware transferability**
+
+- [x] `rev_6_model_complexity_scaling.png` and its interpretation are accepted.
+- [x] Add text explaining the analytical hidden-size scaling, implemented `64 -> 45`
+  and `128 -> 90` points, and the 51% asymptotic MAC-reduction limit for a nominal
+  30% hidden-size reduction.
+- [x] State that the approximately 40% measured Flash/time/energy-proxy findings are
+  specific to the tested checkpoints, STM32H753ZI, firmware, and build. Do not claim
+  transfer to STM32F4 or another controller family; only the architecture-level MAC
+  trend transfers without a new hardware benchmark.
+
+**3.2 Derivative implementation and non-ideal sampling**
+
+- [x] Final decision is text only; `rev_7` remains internal and is not inserted.
+- [x] Correct the original statement `centred finite differences`. The audited
+  implementation uses timestamp-aware backward differences.
+- [x] Add the causal equation, state that the six prepared features were computed
+  host-side and replayed over UART, and clarify that reported kernel timing isolates
+  LSTM/MLP inference and excludes acquisition and feature extraction.
+- [x] Add a bounded limitation: variable sampling, missing samples, derivative noise,
+  and causal filtering/limiting were not evaluated in this compression benchmark.
+  Refer to the separate robustness work only if it is citable at submission time.
+
+**3.3 L2 pruning criterion**
+
+- [x] `rev_8_pruning_criterion_scope.png` and the verified saliency definition are
+  accepted.
+- [x] The current method already explains the structured L2 criterion, but add an
+  explicit sentence contrasting it with gradient- and activation-based sensitivity:
+  those alternatives require backward-pass or representative-activation statistics,
+  whereas the selected gate-group L2 score is data independent and directly maps to
+  removal of complete dense hidden channels.
+- [x] State explicitly that no experimental comparison of pruning criteria was run;
+  the rationale is methodological and implementation based, not evidence that L2 is
+  universally superior.
+
+**3.4 Weight-only mixed-precision quantization**
+
+- [x] `rev_9_mixed_precision_quantization.png` was corrected against the called SOC
+  and SOH kernels, exported headers, and linker maps. Its panel (a) contains only the
+  precision path.
+- [x] Keep the verified scope in the method: only recurrent `W_ih` and `W_hh` are
+  INT8; row scales, bias, states, activations, MLP, and output remain FP32.
+- [x] Add the missing explicit consequence: retaining FP32 activations/states avoids
+  introducing another quantization source but preserves FP32 RAM and arithmetic cost,
+  so the implementation cannot obtain the latency and RAM benefits of a full-integer
+  path. The accuracy benefit of this choice was not isolated experimentally.
+- [x] State directly that activation quantization and fully integer deployment were
+  not evaluated. Explain recurrent-weight-only scope via the approximately 80% share
+  of recurrent matrices in the Base model constants, without claiming that retaining
+  the FP32 MLP was experimentally superior.
+
+**3.5 Lower SOC Pruned MAE**
+
+- [x] This point is already handled correctly in the current manuscript: the causal
+  regularisation claim has been removed, the 0.35-percentage-point difference is
+  checkpoint- and split-specific, and the absence of repeated seeds, cross-validation,
+  and matched unpruned fine-tuning is stated.
+- [x] No new diagram or experiment is required. Keep the existing saliency/weight
+  diagnostics descriptive and do not use them as proof of improved generalisation.
+
+**3.6 Quantized runtime increase**
+
+- [x] `rev_10_quantized_runtime_accounting.png`, its MAC formula, additional scale
+  counts, measured DWT times, and the static-versus-measured interpretation have been
+  discussed and accepted as useful evidence.
+- [x] Expand the current discussion beyond `consistent with the observed timing
+  penalty`: report that static ratios are about 1.81 for both tasks, whereas measured
+  Quantized/Base ratios are 4.99 for SOC and 1.29 for SOH. Explain why static counts
+  are predictive within the FP32 pruning family but not across a changed kernel.
+- [x] Record that the inspected firmware used `-O0`, hard-float FP32, per-weight
+  INT8-to-FP32 casts, and per-weight row scaling without an optimized integer
+  dot-product path. Present reduced SOH weight traffic as a plausible offsetting
+  factor, not as measured memory-bandwidth attribution.
+- [x] Add future optimization options requested by the reviewer: hoist row scales
+  outside inner accumulations where valid, fuse scale/bias work, use optimized DSP or
+  integer dot-product kernels, and evaluate activation quantization/full-integer
+  execution. These are proposals, not evaluated results.
+- [x] State explicitly that no operation-level cycle breakdown or memory-bandwidth
+  profile was available. The existing DWT measurements are total kernel times averaged
+  over 10,000 inferences.
+
+### Reviewer 4 completion status (15 July 2026)
+
+- [x] The Abstract was reduced to approximately 169 words and now directly identifies
+  the engineering application of artificial intelligence, the implemented artificial
+  intelligence, the paired compression benchmark, the principal numerical results,
+  and the evidence boundary. All abstract acronyms are defined on first use.
+- [x] The keyword list was reduced to six written-out terms. The title and keywords
+  contain no unexplained acronym.
+- [x] The two reviewer-suggested papers were imported from the author's Zotero export
+  `bib/paper2_socsoh_ref_fr.bib` into the isolated review bibliography as
+  `wang_improved_2024` (DOI `10.1016/j.est.2023.110222`) and
+  `wang_improved_2023` (DOI `10.1016/j.energy.2023.128677`). No bibliographic data
+  were invented or inferred.
+- [x] Related Work now explains what the two hybrid estimators contribute and why
+  their accuracy evidence complements, but does not replace, the paired embedded
+  pruning/quantization benchmark.
+- [x] The method logic now explicitly separates the common Base equations, structured
+  dimension reduction, and representation-only quantization.
+- [x] Mathematical detail was added for dense pruning submatrix construction,
+  code-exact symmetric per-row quantization over `-127...127`, the reconstruction
+  error bound, the mixed-precision gate calculation, and MAE/RMSE/P95 definitions.
+- [x] The quantization description was checked against the SOC and SOH export code.
+  The previous schematic/caption range `-128...127` was corrected to the implemented
+  symmetric set `-127...127` with `-128` deliberately unused.
+- [x] Long Dataset, Training, Benchmark, Results, Discussion, and Limitations passages
+  were split or tightened, and a manuscript-wide grammar and logic pass was performed.
+- [x] Figures 2, 6, and 7 were regenerated at high resolution with larger text and
+  code-consistent content. Figure 2 shows the real DoE factor levels, Figure 6 shows
+  dense hidden-channel removal and the `64 -> 45` / `128 -> 90` dimensions, and
+  Figure 7 shows the verified mixed-precision path.
+- [x] The reproducible generator is
+  `review_analysis/tools/generate_reviewer4_figures.ps1`.
+- [x] Author and anonymous review manuscripts compile without undefined citations,
+  undefined references, or LaTeX errors. The final PDFs contain 36 and 57 pages,
+  respectively.
+- [x] `RESPONSE_TO_REVIEWER_4.md` records the point-by-point response using the final
+  57-page line-numbered anonymous PDF. Responses 1--3 were refreshed after this
+  integration.
+
+### D. Verified pruning implementation
+
+**Method**
+
+- The final models use one-shot, magnitude-based structured pruning of complete LSTM
+  hidden units, not iterative pruning and not pruning-aware training.
+- Unit saliency is the sum of L2 norms of input and recurrent weight rows over all
+  four LSTM gates.
+- The lowest-saliency units are removed jointly from all gate matrices. Associated
+  recurrent columns and the input columns of the downstream MLP are sliced to form
+  a physically smaller dense network.
+- SOC changes from 64 to 45 hidden units; SOH changes from 128 to 90 hidden units,
+  corresponding to approximately 30% removal.
+- The reduced model is then briefly fine-tuned with AdamW and MSE loss.
+
+**Parameters that are actually evidenced**
+
+- SOH is fully documented by `archive/run_pruning.sh` and the valid final manifest:
+  30% pruning, 3 fine-tuning epochs, learning rate `1e-6`, training batch size 512,
+  and saved validation metrics after fine-tuning.
+- The final SOC folder and 64-to-45 checkpoint match the simple one-shot pruning
+  script and the project README states that the existing model received short
+  fine-tuning.
+- The final SOC `manifest.json` is truncated to 108 bytes. The exact SOC epoch count
+  and learning rate are therefore not recoverable from that file. Script defaults
+  are 5 epochs and `5e-5`, while another archived usage example shows 3 epochs.
+- Until an original SOC command or log is found, do not state an exact SOC epoch
+  count or learning rate as fact. Write `brief post-pruning fine-tuning` and disclose
+  the reproducibility limitation if necessary.
+
+**Required corrections and claims**
+
+- Replace the current sentence `After each pruning step ... before the next pruning
+  round` because there was one pruning step and no next round.
+- Weight-distribution and L2-saliency diagrams provide descriptive support for the
+  pruning criterion, but they do not prove that pruning caused regularization.
+- Describe the lower SOC MAE as an observed result for the evaluated checkpoint and
+  split. No new random-seed, cross-validation, pruning-aware, or QAT experiments are
+  planned.
+
+### E. Revision boundary
+
+- No new HPC training or architecture sweep.
+- No new STM32 or STM32F4 deployment.
+- No new power measurement or operation-level hardware profiling.
+- No quantization-aware or pruning-aware training.
+- No new derivative-robustness campaign in this optimisation paper.
+- No new NMC/LCO measurements.
+- The revision will rely on verified artefacts, additional offline analyses, clearer
+  mathematical descriptions, appendices, carefully bounded claims, and explicit
+  limitations.
