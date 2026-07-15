@@ -6,9 +6,9 @@ Revision working copy: `review_1/Embedded_Ai_Manuscript.tex`
 
 Compiled revision: `review_1/review_build/Embedded_Ai_Manuscript.pdf`
 
-Line-numbered anonymous revision: `review_1/Embedded_Ai_Manuscript_Anonymized.pdf`
+Line-numbered anonymous revision: `review_1/review_build/Embedded_Ai_Manuscript_Anonymized.pdf`
 
-The page and line references below refer to the 49-page line-numbered anonymous revision compiled on 14 July 2026. Figure captions and other float contents are identified by figure number and page because the `lineno` package does not assign reliable line numbers inside floats. No new STM32 measurements, battery experiments, HPC training runs, random-seed study, or validation on another chemistry were performed. Added analyses use archived model artefacts and saved output trajectories, and the revised manuscript states this boundary explicitly.
+The page and line references below refer to the final 57-page line-numbered anonymous revision compiled on 15 July 2026. Figure captions and other float contents are identified by figure number and page because the `lineno` package does not assign reliable line numbers inside floats. No new STM32 measurements, battery experiments, HPC training runs, random-seed study, or validation on another chemistry were performed. Added analyses use archived model artefacts and saved output trajectories, and the revised manuscript states this boundary explicitly. All references below were refreshed after integration of the Reviewer 2, Reviewer 3, and Reviewer 4 revisions.
 
 ## General response
 
@@ -20,7 +20,7 @@ We thank the reviewer for the detailed comments. We revised the method descripti
 
 **Response:** We agree that the original manuscript did not delimit chemistry transferability clearly enough. The revised Discussion now separates architecture-level storage effects from model accuracy. For a fixed architecture, removing the same number of hidden channels or storing the same recurrent matrices as INT8 produces comparable parameter-count changes independent of chemistry. However, the accuracy-compression trade-off depends on chemistry, operating range, degradation trajectory, and training data. Our numerical MAE and preferred compression level are therefore demonstrated only for the evaluated JGC LFP cells at 25 degrees Celsius and cannot be transferred to NMC or LCO without retraining and validation. We added relevant NMC SOC/SOH literature to show feasibility of compact data-driven models while explicitly stating that those studies do not validate our numerical trade-off.
 
-**Changes in the manuscript:** scope statement in the Abstract (page 1, lines 24--27); chemistry-transferability discussion (pages 34--35, lines 715--725); expanded limitations (page 35, lines 734--740); Conclusion and Outlook (page 36, lines 758--768).
+**Changes in the manuscript:** scope statement in the Abstract (page 1, lines 22--24); chemistry-transferability discussion (pages 37--38, lines 793--803); expanded limitations (page 38, lines 812--825); Conclusion and Outlook (pages 39--40, lines 845--864).
 
 ## Comment 2: Quantization-aware and pruning-aware training
 
@@ -28,7 +28,7 @@ We thank the reviewer for the detailed comments. We revised the method descripti
 
 **Response:** We clarified that the present study evaluates two deployable transformations of trained FP32 checkpoints: one-shot structured pruning followed by brief post-pruning fine-tuning, and post-training recurrent-weight quantization. Quantization-aware training, pruning-aware training, and an iterative pruning schedule were not performed because they require a new training campaign. The revised paper no longer suggests that the tested variants represent the best attainable jointly trained compression result. It explains why training-aware compression may recover accuracy and identifies this comparison as future work.
 
-**Changes in the manuscript:** structured magnitude pruning and the explicit post-pruning fine-tuning boundary (page 16, lines 348--360); post-training mixed-precision quantization details (page 17, lines 367--379); Discussion of the compression boundary and missing training-aware comparison (page 35, lines 726--740); future work (page 36, lines 762--769).
+**Changes in the manuscript:** structured magnitude pruning and the explicit post-pruning fine-tuning boundary (pages 17--19, lines 384--425); post-training mixed-precision quantization details (pages 20--21, lines 432--462); Discussion of the compression boundary and missing training-aware comparison (page 38, lines 804--811); future work (pages 39--40, lines 855--864).
 
 ## Comment 3: Evidence for the claimed pruning regularisation effect
 
@@ -36,7 +36,7 @@ We thank the reviewer for the detailed comments. We revised the method descripti
 
 **Response:** We agree that the original causal interpretation was too strong. We removed the claim that pruning acted as a regulariser. The revised text reports the lower SOC MAE as an observation for one checkpoint and test split. We added a post-hoc L2 unit-saliency ranking and recurrent-weight distribution comparison. The 19 removed SOC units occupy the lowest saliency ranks by construction, which verifies implementation of the stated criterion. The figure is explicitly described as diagnostic evidence, not proof of improved generalisation. We also state that repeated seeds, cross-validation, and a matched fine-tuning ablation were not available.
 
-**Changes in the manuscript:** pruning criterion and diagnostic scope (page 16, lines 337--360); Error Distribution Analysis and removal of the causal regularisation claim (page 27, lines 565--574); Discussion (page 33, lines 671--679); Appendix A.1 and Fig. A.16 (page 37).
+**Changes in the manuscript:** pruning criterion and diagnostic scope (pages 17--19, lines 384--425); Error Distribution Analysis and removal of the causal regularisation claim (pages 29--30, lines 620--637); Discussion (pages 35--36, lines 727--735); Appendix A.1 (page 40, line 869) and Fig. A.16 (page 41).
 
 ## Comment 4: Scope of the inference-energy values
 
@@ -44,7 +44,7 @@ We thank the reviewer for the detailed comments. We revised the method descripti
 
 **Response:** We corrected the terminology throughout. On-device kernel time was measured with the STM32 DWT cycle counter. Energy was not measured independently for each model. The reported value is now defined as the proxy `E_est = 0.5 W * measured inference time`, where 0.5 W is an assumed representative average power for the complete development board. The timed kernel interval includes the instructions and memory accesses executed by the LSTM and MLP, but the constant-power calculation cannot separate CPU computation, flash access, SRAM access, UART, regulator losses, or other board consumers. It therefore cannot establish whether flash access dominates actual consumption. Tables, abstract, utility score, Discussion, and Conclusion now consistently call this value an estimate or timing-derived proxy.
 
-**Changes in the manuscript:** Abstract (page 1, lines 18--22); measured kernel interval (pages 21--22, lines 470--476); energy-proxy definition and limitations (page 22, lines 477--494); utility definition (pages 31--32, lines 638--645); Discussion (page 34, lines 698--706); Conclusion (pages 35--36, lines 746--755). The revised KPI table captions and headings appear on pages 21--22.
+**Changes in the manuscript:** Abstract (page 1, lines 17--21); measured kernel interval and build settings (pages 23--24, lines 515--535); energy-proxy definition and limitations (pages 24--25, lines 536--566); utility definition (pages 33--34, lines 688--709); Discussion (page 37, lines 776--784); Conclusion (page 39, lines 826--844). The revised KPI table captions and headings appear in Tables 1 and 2 on page 25.
 
 ## Comment 5: Temporal dependence and very long sequences
 
@@ -52,7 +52,7 @@ We thank the reviewer for the detailed comments. We revised the method descripti
 
 **Response:** We added a temporal analysis of the saved full-stream predictions. The naturally ordered replay is divided into ten consecutive equal-count segments without resetting recurrent states. We report target MAE and P95 error in each segment and the mean absolute deviation of each compressed output from Base. Quantized-to-Base SOC deviation changes from 0.332 percentage points in the first tenth to 0.271 percentage points in the final tenth, so the evaluated output does not exhibit quantization-specific monotonic drift. SOH deviations fluctuate with ageing phase and likewise show no monotonic quantization accumulation. We limit this conclusion to the recorded replay and do not claim stability for arbitrary sequence lengths.
 
-**Changes in the manuscript:** host-side temporal-analysis method (page 20, lines 431--442); Temporal Stability and Filter Interaction results (pages 25--26, lines 536--549); bounded conclusion (page 36, lines 755--757); Appendix A.2 and Fig. A.17 (page 38).
+**Changes in the manuscript:** host-side temporal-analysis method (pages 22--23, lines 482--493); Temporal Stability and Filter Interaction results (pages 27--29, lines 595--608); bounded conclusion (page 39, lines 845--854); Appendix A.2 and Fig. A.17 (page 42).
 
 ## Comment 6: SOH filter design, cutoff frequency, delay, and compression
 
@@ -62,7 +62,7 @@ We thank the reviewer for the detailed comments. We revised the method descripti
 
 We also added a controlled local C-model re-execution for Base, Pruned, and Quantized, showing raw, stage-1, and final sequential outputs and MAE. The results demonstrate that filtering changes both absolute error and model ranking, while the strong final stage introduces substantial delay. Because the local Windows trajectory is not numerically identical to the archived Linux output over the complete recurrent sequence, it is used only for the filter-interaction analysis and does not replace the main benchmark values.
 
-**Changes in the manuscript:** new SOH prediction post-processing subsection (pages 12--13, lines 269--288); revised SOH Results text (page 25, lines 527--535); compression/filter comparison (pages 26--27, lines 550--560); Discussion (page 33, lines 680--686); bounded conclusion (page 36, lines 755--757); Appendix A.3 and Fig. A.18 (page 39). The revised SOH dashboard caption appears on page 26.
+**Changes in the manuscript:** new SOH prediction post-processing subsection (pages 14--15, lines 300--327); revised SOH Results text (pages 26--27, lines 585--594); compression/filter comparison (page 29, lines 606--619); Discussion (page 36, lines 736--742); bounded conclusion (page 39, lines 845--854); Appendix A.3 and Fig. A.18 (page 43). The revised SOH dashboard caption appears in Fig. 11 on page 29.
 
 ## Comment 7: Utility weights and ranking sensitivity
 
@@ -70,7 +70,7 @@ We also added a controlled local C-model re-execution for Base, Pruned, and Quan
 
 **Response:** We generalised the utility equation to four explicit non-negative weights for accuracy, flash, RAM, and estimated energy, constrained to sum to one. The originally reported score uses equal weights of 0.25. We evaluated all 1,771 combinations on a 0.05 grid and added focused sweeps in which one objective receives 25--85% weight and the remainder is divided equally. Pruned is top-ranked for 94.64% of SOC combinations and 53.36% of SOH combinations; Base wins 0% and 28.85%, and Quantized wins 5.36% and 17.79%, respectively. Thus, SOC Pruned is robust across most tested priorities, while the SOH ranking changes when accuracy or flash dominates. We also clarify that the energy objective is a timing-derived proxy and is not statistically independent of inference time under the fixed-power assumption.
 
-**Changes in the manuscript:** revised utility equation, explicit equal weights, and sensitivity results (pages 31--32, lines 632--655); interpretation in the Discussion (page 34, lines 707--714); Appendix A.4 and Fig. A.19 (page 40).
+**Changes in the manuscript:** revised utility equation, explicit equal weights, and sensitivity results (pages 33--34, lines 688--711); interpretation in the Discussion (page 37, lines 785--792); Appendix A.4 and Fig. A.19 (page 44).
 
 ## Comment 8: Robustness to embedded-system faults
 
@@ -80,14 +80,14 @@ We also added a controlled local C-model re-execution for Base, Pruned, and Quan
 
 The revised manuscript explicitly states that this is not internal embedded fault injection. It does not corrupt weights, activations, recurrent states, inputs, communication packets, or MCU memory and does not support a hardware-safety claim. Those tests remain future work.
 
-**Changes in the manuscript:** Limited Software-Level Fault Sensitivity method (page 21, lines 450--463); Limited Output-Fault Sensitivity results (pages 32--33, lines 656--669); expanded limitations (page 35, lines 734--740); future-work boundary (page 36, lines 765--768); Appendix A.5 and Fig. A.20 (page 41).
+**Changes in the manuscript:** Limited Software-Level Fault Sensitivity method (page 23, lines 501--514); Limited Output-Fault Sensitivity results (page 35, lines 712--725); expanded limitations (page 38, lines 812--825); future-work boundary (pages 39--40, lines 855--864); Appendix A.5 and Fig. A.20 (page 45).
 
 ## Files added or updated
 
 - Updated manuscript: `review_1/Embedded_Ai_Manuscript.tex`
 - Compiled manuscript: `review_1/review_build/Embedded_Ai_Manuscript.pdf`
 - Updated line-numbered anonymous manuscript: `review_1/Embedded_Ai_Manuscript_Anonymized.tex`
-- Compiled line-numbered anonymous manuscript: `review_1/Embedded_Ai_Manuscript_Anonymized.pdf`
+- Compiled line-numbered anonymous manuscript: `review_1/review_build/Embedded_Ai_Manuscript_Anonymized.pdf`
 - Figure generator: `review_1/review_analysis/tools/generate_reviewer1_figures.ps1`
 - Added appendix figures: `review_1/figures/Review_1_Additional/rev_1_*.png` through `rev_5_*.png`
 - Analysis data and provenance: `review_1/review_analysis/results/` and `review_1/review_analysis/results/analysis_provenance.json`

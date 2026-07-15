@@ -254,8 +254,7 @@ function Draw-StackedStorageBars($g, [float]$x, [float]$y, [float]$w, [float]$h,
         @('FP32RecurrentWeightsBytes',$PaleGreen,$Green),
         @('Int8RecurrentWeightsBytes',$PaleBlue,$Blue),
         @('FP32MLPBytes',$PalePurple,$Purple),
-        @('FP32ScalesAndBiasBytes',$PaleRed,$Red),
-        @('PersistentStateBytes',$PaleGray,$Gray)
+        @('FP32ScalesAndBiasBytes',$PaleRed,$Red)
     )
     $barWidth = [math]::Min(150,$plotWidth/4)
     $centers = @(($plotLeft + $plotWidth*0.30),($plotLeft + $plotWidth*0.70))
@@ -396,7 +395,7 @@ Save-Canvas $canvas 'rev_7_derivative_deployment_boundary.png'
 $saliency = Import-Csv (Join-Path $ResultsRoot 'weights\lstm_unit_saliency.csv')
 $canvas = New-Canvas 2400 1400
 $g = $canvas.Graphics
-Draw-Text $g '(a) Gate-group L2 ranking for complete hidden units' 80 55 1100 70 30 $true
+Draw-Text $g '(a) L2 saliency ranking of hidden units' 80 55 1100 70 30 $true
 Draw-Text $g '(b) Criterion scope and deployment implications' 1280 55 1040 70 30 $true
 
 $plotX=135; $plotY=185; $plotW=980; $plotH=900
@@ -415,7 +414,7 @@ for ($i=0;$i -le 5;$i++) {
 $g.DrawLine($axisPen,$plotX,$plotY,$plotX,$plotY+$plotH)
 $g.DrawLine($axisPen,$plotX,$plotY+$plotH,$plotX+$plotW,$plotY+$plotH)
 Draw-Text $g 'Unit rank [% of task units]' ($plotX+250) ($plotY+$plotH+55) 500 45 22 $false $Dark 'Center' 'Center'
-Draw-Text $g 'Normalized L2 score' $plotX 132 300 36 19 $false $Gray 'Near' 'Center'
+Draw-Text $g 'Normalized L2 saliency score' $plotX 132 360 36 19 $false $Gray 'Near' 'Center'
 Draw-Text $g 'Lowest 30% removed' ($plotX+15) ($plotY+18) ($plotW*0.30-30) 40 20 $true $Red 'Center' 'Center'
 
 foreach ($task in @('SOC','SOH')) {
@@ -435,23 +434,32 @@ foreach ($task in @('SOC','SOH')) {
     }
     $pen.Dispose()
 }
-Draw-Text $g 'SOC' ($plotX+700) ($plotY+90) 90 35 22 $true $Red 'Near' 'Center'
-Draw-Text $g 'SOH' ($plotX+830) ($plotY+90) 90 35 22 $true $Blue 'Near' 'Center'
+$legendY=$plotY+$plotH+135
+$socLegendPen=New-Object System.Drawing.Pen((C $Red),5)
+$sohLegendPen=New-Object System.Drawing.Pen((C $Blue),5)
+$g.DrawLine($socLegendPen,410,$legendY+22,475,$legendY+22)
+Draw-Text $g 'SOC' 490 $legendY 90 44 22 $false $Dark 'Near' 'Center'
+$g.DrawLine($sohLegendPen,650,$legendY+22,715,$legendY+22)
+Draw-Text $g 'SOH' 730 $legendY 90 44 22 $false $Dark 'Near' 'Center'
+$socLegendPen.Dispose(); $sohLegendPen.Dispose()
 $gridPen.Dispose(); $axisPen.Dispose()
 
-Draw-Box $g 1300 170 300 115 $VeryPaleBlue $Blue 'Four gate rows per hidden unit' 21 $true
-Draw-Arrow $g 1600 228 1680 228
-Draw-Box $g 1685 170 280 115 $VeryPaleRed $Red 'Aggregate row L2 norms' 21 $true
-Draw-Arrow $g 1965 228 2045 228
-Draw-Box $g 2050 170 270 115 $VeryPaleGreen $Green 'Remove one complete unit' 21 $true
-Draw-Arrow $g 2185 285 2185 355
-Draw-Box $g 1690 360 495 105 $VeryPaleGreen $Green 'Slice recurrent columns and MLP input' 21 $false
+Draw-Box $g 1280 170 225 115 $VeryPaleBlue $Blue 'Four gate rows per hidden unit' 19 $true
+Draw-Arrow $g 1505 228 1540 228 $Red 4
+Draw-Box $g 1545 170 225 115 $VeryPaleRed $Red 'Compute row-wise L2 norms' 19 $true
+Draw-Arrow $g 1770 228 1805 228 $Red 4
+$subscriptH = [char]0x2095
+Draw-Box $g 1810 170 240 115 $VeryPaleRed $Red "L2 saliency s$subscriptH`naggregated over gates" 18 $true
+Draw-Arrow $g 2050 228 2085 228 $Red 4
+Draw-Box $g 2090 170 230 115 $VeryPaleGreen $Green 'Rank and remove lowest 30%' 19 $true
+Draw-Arrow $g 2205 285 2205 355
+Draw-Box $g 1690 360 515 105 $VeryPaleGreen $Green 'Remove complete unit; slice recurrent columns and MLP input' 19 $false
 
 $tableX=1280; $tableY=540; $tableW=1040; $rowH=125
 $colWidths=@(270,245,245,280)
 $headers=@('Criterion','Required evidence','Unit grouping','Dense-kernel effect')
 $rows=@(
-    @('Gate-group L2`n(used)','Saved weights only','All four gates`ncombined','Direct dimension`nreduction'),
+    @('L2 saliency score`n(used)','Saved weights only','All four gates`ncombined','Direct dimension`nreduction'),
     @('Gradient sensitivity','Training data and`nbackpropagation','Must be designed`nas structured','Only if complete`nunits are removed'),
     @('Activation statistics','Calibration stream','Must aggregate`nunit activations','Only if complete`nunits are removed')
 )
@@ -467,11 +475,13 @@ for($r=0;$r -lt $rows.Count;$r++) {
         $xx += $colWidths[$c]
     }
 }
-Draw-Box $g 1325 1075 950 125 '#FFF7E8' $Red "Method-property rationale only. Gradient- and activation-based`ncriteria were not experimentally compared in this study." 22 $true
+$usedRowBorder = New-Object System.Drawing.Pen((C $Red),4)
+$g.DrawLine($usedRowBorder,$tableX,($tableY+85+$rowH),($tableX+$tableW),($tableY+85+$rowH))
+$usedRowBorder.Dispose()
 Save-Canvas $canvas 'rev_8_pruning_criterion_scope.png'
 
 # -----------------------------------------------------------------------------
-# rev_9: exact mixed-precision boundary and persistent storage composition.
+# rev_9: exact mixed-precision boundary and analytical model-constant storage.
 # -----------------------------------------------------------------------------
 $memory = Import-Csv (Join-Path $ResultsRoot 'weights\quantization_memory_accounting.csv')
 $canvas = New-Canvas 2500 1450
@@ -487,25 +497,23 @@ Draw-Arrow $g 735 580 735 675
 Draw-Box $g 505 680 460 135 $VeryPaleGreen $Green "MLP weights and`nactivations remain FP32" 23 $true
 Draw-Arrow $g 735 815 735 910
 Draw-Box $g 505 915 460 120 $VeryPaleGreen $Green "Estimator output`nFP32" 24 $true
-Draw-Box $g 110 1090 1030 145 '#FFF7E8' $Red "The export is weight-only mixed precision, not a fully integer path.`nTransient activation buffers were not separately profiled." 23 $true
 
 $socRows = @($memory | Where-Object Task -eq 'SOC' | Sort-Object { if($_.Variant -eq 'Base'){0}else{1} })
 $sohRows = @($memory | Where-Object Task -eq 'SOH' | Sort-Object { if($_.Variant -eq 'Base'){0}else{1} })
-Draw-StackedStorageBars $g 1240 160 560 980 $socRows 100 '(b) SOC persistent storage'
-Draw-StackedStorageBars $g 1870 160 560 980 $sohRows 360 '(c) SOH persistent storage'
+Draw-StackedStorageBars $g 1240 160 560 980 $socRows 100 '(b) SOC model constants'
+Draw-StackedStorageBars $g 1870 160 560 980 $sohRows 360 '(c) SOH model constants'
 
 $legendItems=@(
     @('FP32 recurrent weights',$PaleGreen,$Green),
     @('INT8 recurrent weights',$PaleBlue,$Blue),
-    @('FP32 MLP',$PalePurple,$Purple),
-    @('FP32 scales and bias',$PaleRed,$Red),
-    @('FP32 persistent h+c state',$PaleGray,$Gray)
+    @('FP32 MLP parameters',$PalePurple,$Purple),
+    @('FP32 row scales and LSTM bias',$PaleRed,$Red)
 )
 $lx=1240; $ly=1210
 for($i=0;$i -lt $legendItems.Count;$i++) {
-    $row=[math]::Floor($i/3); $col=$i%3; $xx=$lx+$col*390; $yy=$ly+$row*72
+    $row=[math]::Floor($i/2); $col=$i%2; $xx=$lx+$col*590; $yy=$ly+$row*72
     Draw-Box $g $xx $yy 48 34 $legendItems[$i][1] $legendItems[$i][2]
-    Draw-Text $g $legendItems[$i][0] ($xx+60) ($yy-5) 315 46 18 $false $Dark 'Near' 'Center'
+    Draw-Text $g $legendItems[$i][0] ($xx+60) ($yy-5) 500 46 18 $false $Dark 'Near' 'Center'
 }
 Save-Canvas $canvas 'rev_9_mixed_precision_quantization.png'
 
