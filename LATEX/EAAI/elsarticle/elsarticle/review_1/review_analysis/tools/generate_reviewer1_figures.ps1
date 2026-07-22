@@ -356,37 +356,13 @@ $legend = Add-Legend $chart
 foreach ($model in @('Base','Pruned','Quantized')) { Add-CustomLegendItem $legend $model $FillColors[$model] $ModelColors[$model] }
 Save-Figure $chart 'rev_4_utility_sensitivity.png'
 
-# rev_5: limited stored-output fault sensitivity
-$faultRows = @()
-foreach ($task in @('SOC','SOH')) {
-    $path = Join-Path $ResultsRoot "faults\$($task.ToLowerInvariant())_output_bitflip_robustness.csv"
-    $faultRows += Import-Csv $path | Where-Object BitClass -eq 'AnyBit'
-}
-$chart = New-Figure 'Limited software-level output fault sensitivity' 2200 1400 'Random single-bit corruption of the FP32 estimator output; 20,000 trials per model (not internal MCU, weight, activation, or recurrent-state injection)'
-$catArea = Add-Area $chart 'Catastrophic' 5 5 43 82 '' 'Large-error outcomes (>10 percentage points) [% of trials]'
-$mitArea = Add-Area $chart 'Mitigation' 53 5 43 82 '' '95th-percentile absolute error [percentage points]'
-Add-PanelTitle $chart 'Catastrophic' '(a) Unmitigated corruption of stored FP32 outputs'
-Add-PanelTitle $chart 'Mitigation' '(b) Effect of range check and hold-last'
-$catRows = @($faultRows | ForEach-Object {
-    [pscustomobject]@{Task=$_.Task;Model=$_.Model;Value=100*(D $_.CatastrophicRate_gt10pp)}
-})
-Add-GroupedBars $chart 'Catastrophic' $catRows 'Task' 'Model' 'Value' $ModelColors $FillColors $true $false
-$catArea.AxisX.Interval = 1; $catArea.AxisY.Minimum = 0; $catArea.AxisY.Maximum = 40; $catArea.AxisY.Interval = 10
-$mitRows = @()
-foreach ($row in $faultRows) {
-    $category = "$($row.Task) $($row.Model)"
-    $mitRows += [pscustomobject]@{Category=$category;Condition='Corrupted';Value=$row.P95CorruptedError_pct}
-    $mitRows += [pscustomobject]@{Category=$category;Condition='Mitigated';Value=$row.P95MitigatedError_pct}
-}
-$conditionOutline = @{Corrupted=$PrunedColor;Mitigated=$BaseColor}
-$conditionFill = @{Corrupted=$FillColors.Corrupted;Mitigated=$FillColors.Mitigated}
-Add-GroupedBars $chart 'Mitigation' $mitRows 'Category' 'Condition' 'Value' $conditionOutline $conditionFill $true $false
-$mitArea.AxisX.Interval = 1; $mitArea.AxisX.LabelStyle.Angle = -25; $mitArea.AxisY.Minimum = 0; $mitArea.AxisY.Maximum = 200; $mitArea.AxisY.Interval = 50
-$modelLegend = Add-AreaBottomLegend $chart 'ModelLegend' 'Catastrophic'
-foreach ($model in @('Base','Pruned','Quantized')) { Add-CustomLegendItem $modelLegend $model $FillColors[$model] $ModelColors[$model] }
-$mitigationLegend = Add-AreaBottomLegend $chart 'MitigationLegend' 'Mitigation'
-Add-CustomLegendItem $mitigationLegend 'Corrupted output' $FillColors.Corrupted $PrunedColor
-Add-CustomLegendItem $mitigationLegend 'Range check + hold-last' $FillColors.Mitigated $BaseColor
-Save-Figure $chart 'rev_5_limited_fault_sensitivity.png'
+# rev_5: transient input-buffer bitflip and recurrent recovery
+$Workspace = (Resolve-Path (Join-Path $ReviewRoot '..\..\..\..\..')).Path
+$FaultFigureScript = Join-Path $Workspace (
+    'DL_Models\LFP_LSTM_MLP\5_benchmark\PC\input_bitflip_recovery\' +
+    'generate_review_figure.ps1'
+)
+$FaultFigureOutput = Join-Path $FiguresRoot 'rev_5_limited_fault_sensitivity.png'
+& $FaultFigureScript -OutputPath $FaultFigureOutput
 
 Write-Host 'Reviewer 1 figures completed.'

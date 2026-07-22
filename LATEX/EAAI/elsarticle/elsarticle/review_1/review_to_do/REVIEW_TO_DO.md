@@ -42,7 +42,8 @@ statement.
 - Recurrent-weight distributions and L2 unit-saliency plots.
 - INT8 reconstruction error and explicit FP32/INT8 storage accounting.
 - Static kernel operation counts related to the saved inference times.
-- Limited missing-output and output-register bit-flip simulations.
+- Limited missing-output analysis and a stateful transient input-buffer bit-flip
+  test using the six exported C models.
 
 The existing filter comparison under `review_analysis/results/filter` treats
 `alpha=0.02` and `alpha=1e-6` primarily as alternatives applied to locally generated
@@ -70,7 +71,8 @@ The 39 candidate figures are in `figures/Review_1_Additional`. Raw values are un
 - [x] Add utility-weight definitions and the new sensitivity result.
 - [x] Add a precise FP32 activation/state and INT8 recurrent-weight implementation note.
 - [x] Add limitations for one chemistry, one split/seed, one STM32 family, estimated
-  energy, no QAT, no internal fault injection, and no operation-level profiling.
+  energy, no QAT, no broad hardware fault-injection campaign, and no operation-level
+  profiling.
 - [x] Quantify the main results in the conclusion and add concrete future work.
 - [x] Break up long paragraphs, proofread the whole manuscript, and improve unclear
   figures. Submit the revision in single-column format with all source files.
@@ -82,11 +84,13 @@ The 39 candidate figures are in `figures/Review_1_Additional`. Raw values are un
 - New STM32/F4 runs, power-rail measurements, cycle-level profiling, or memory-bus
   instrumentation.
 - Validation on NMC/LCO cells.
-- Internal model-state, activation, weight-memory, sensor, or MCU fault injection.
+- Broad hardware fault injection into model-state, activation, weight memory, physical
+  sensors, communication links, or MCU memory. The completed input-buffer test covers
+  only a transient software upset before inference.
 
 These omissions are possible to disclose and discuss, but the strongest reviewer
 requests may not be fully satisfied by discussion alone. In particular, QAT, seed
-robustness, energy-component profiling, and broad internal fault injection remain
+robustness, energy-component profiling, and broad hardware fault injection remain
 acceptance risks and should be answered transparently rather than implied as done.
 
 ## Binding decisions from author discussion (14 July 2026)
@@ -226,23 +230,35 @@ Do not silently replace them with stronger claims unless new evidence is found.
 
 **Reviewer 3.1 and final `rev_6` interpretation**
 
-- The final `rev_6_model_complexity_scaling.png` layout uses two wide panels stacked
-  vertically. This version has been reviewed and accepted for later manuscript use.
+- The final `rev_6_model_complexity_scaling.png` layout uses three wide panels stacked
+  vertically. Panels (a) and (b) retain the accepted model-size and evaluated 30%
+  operating-point views. Panel (c) adds the general pruning-fraction limit.
 - Panel (a) reports architecture-level MAC counts only. For input size `D=6`, hidden
   size `H`, and MLP width `M`, the count is
   `N(H) = 4H(D+H) + HM + M`. The plotted SOC and SOH differences arise from their
   MLP widths (`M=64` and `M=128`), not from measured hardware behaviour.
-- Panel (b) applies an analytical 30% hidden-size reduction (`H' = 0.70H`). As the
-  quadratic recurrent term dominates for large `H`, its retained share approaches
-  `0.70^2 = 0.49`; the corresponding MAC reduction therefore approaches 51%.
+- For a general pruning fraction `p`, the retained hidden size is `H_p = (1-p)H` and
+  the analytical MAC reduction is
+  `[4(2p-p^2)H^2 + p(4D+M)H] / [4H^2 + (4D+M)H + M]`. Its large-`H` limit is
+  `2p-p^2` because the quadratic recurrent term dominates.
+- Panel (b) applies the evaluated `p=0.30` operating point. Its retained quadratic
+  share approaches `(1-p)^2 = 0.49`, so the MAC reduction approaches 51%.
+- Panel (c) shows the general asymptotic curve and highlights `p=0.30`. The reference
+  values are 19%, 36%, 51%, 64%, and 75% maximum analytical reduction for pruning
+  fractions of 10%, 20%, 30%, 40%, and 50%, respectively.
 - The implemented architecture points are shown separately: SOC `64 -> 45` gives
   an analytical 45.1% MAC reduction and SOH `128 -> 90` gives 45.7%.
 - The 51% dashed line is an asymptotic architecture-level limit for this calculation,
   not a measured flash, latency, or energy reduction and not a guaranteed saving on
   every MCU. The earlier mixed flash/runtime/energy points and 40% reference line
   were removed because they combined quantities with different meanings.
-- Later manuscript text must explain the linear and fixed terms that keep smaller
-  models below the 51% limit. It must also state that transfer to another STM32
+- The manuscript explains the linear and fixed terms that keep finite models below
+  the limit for the selected `p`. It also states that `p=0.30` is a pragmatic moderate
+  operating point rather than the optimum of an exhaustive pruning-rate sweep.
+- A rate sweep would require a separately pruned and fine-tuned model at every
+  candidate fraction. This remains a pruning-focused follow-up and must not be implied
+  by the analytical curve, which predicts architecture-level MAC scaling but not MAE.
+- The manuscript must also state that transfer to another STM32
   family was not measured; only the operation-count trend is architecture based.
 
 **Reviewer 3.2 and `rev_7` scope**
@@ -421,7 +437,7 @@ Do not silently replace them with stronger claims unless new evidence is found.
   Introduction, Related Work, Methods wording, Results interpretation, Discussion,
   and Conclusion.
 - [x] `RESPONSE_TO_REVIEWER_2.md` documents every response with references to the
-  final 57-page line-numbered anonymous revision.
+  final 61-page line-numbered anonymous revision.
 - [x] The page and line references in `RESPONSE_TO_REVIEWER_1.md` and
   `RESPONSE_TO_REVIEWER_3.md` were refreshed after the Reviewer 2 integration.
 
@@ -432,15 +448,19 @@ Do not silently replace them with stronger claims unless new evidence is found.
 - [x] No additional experiment requiring the HPC or a new STM32 run is currently
   planned for Reviewer 3.
 - [x] Manuscript integration, appendix placement, and the point-by-point response
-  are complete. `RESPONSE_TO_REVIEWER_3.md` refers to the 57-page line-numbered
-  anonymous revision compiled on 15 July 2026.
+  are complete. `RESPONSE_TO_REVIEWER_3.md` refers to the 61-page line-numbered
+  anonymous revision compiled on 20 July 2026.
 
 **3.1 Model complexity and hardware transferability**
 
-- [x] `rev_6_model_complexity_scaling.png` and its interpretation are accepted.
-- [x] Add text explaining the analytical hidden-size scaling, implemented `64 -> 45`
-  and `128 -> 90` points, and the 51% asymptotic MAC-reduction limit for a nominal
-  30% hidden-size reduction.
+- [x] `rev_6_model_complexity_scaling.png` now includes the general pruning-fraction
+  limit `2p-p^2`, example limits from 10% to 50%, and the highlighted evaluated
+  `p=0.30` point.
+- [x] Add text deriving the general analytical hidden-size scaling, the implemented
+  `64 -> 45` and `128 -> 90` points, and the 51% asymptotic MAC-reduction limit for
+  the evaluated 30% fraction.
+- [x] State that 30% is a single moderate operating point and is not claimed to be
+  the optimum of an exhaustive pruning-rate sweep.
 - [x] State that the approximately 40% measured Flash/time/energy-proxy findings are
   specific to the tested checkpoints, STM32H753ZI, firmware, and build. Do not claim
   transfer to STM32F4 or another controller family; only the architecture-level MAC
@@ -550,10 +570,10 @@ Do not silently replace them with stronger claims unless new evidence is found.
 - [x] The reproducible generator is
   `review_analysis/tools/generate_reviewer4_figures.ps1`.
 - [x] Author and anonymous review manuscripts compile without undefined citations,
-  undefined references, or LaTeX errors. The final PDFs contain 36 and 57 pages,
+  undefined references, or LaTeX errors. The final PDFs contain 37 and 61 pages,
   respectively.
 - [x] `RESPONSE_TO_REVIEWER_4.md` records the point-by-point response using the final
-  57-page line-numbered anonymous PDF. Responses 1--3 were refreshed after this
+  61-page line-numbered anonymous PDF. Responses 1--3 were refreshed after this
   integration.
 
 ### D. Verified pruning implementation
@@ -604,6 +624,79 @@ Do not silently replace them with stronger claims unless new evidence is found.
 - No quantization-aware or pruning-aware training.
 - No new derivative-robustness campaign in this optimisation paper.
 - No new NMC/LCO measurements.
+- No broad hardware fault-injection campaign. The software input-buffer test below is
+  the only newly evaluated fault class.
 - The revision will rely on verified artefacts, additional offline analyses, clearer
   mathematical descriptions, appendices, carefully bounded claims, and explicit
   limitations.
+
+### F. Reviewer 1.8 transient input-buffer fault test (20 July 2026)
+
+**Final decision**
+
+- [x] The earlier post-inference output-register bit-flip analysis was rejected because
+  independent corruption of reported scalar outputs does not exercise LSTM state or
+  reveal recovery behaviour. It must not appear in the manuscript or reviewer response.
+- [x] Replace it with the minimal stateful test in
+  `DL_Models/LFP_LSTM_MLP/5_benchmark/PC/input_bitflip_recovery/`.
+- [x] Keep the separate missing-output and hold-last results in concise prose because
+  they cover a second common failure mode without another figure.
+
+**Verified protocol**
+
+- The actual exported SOC and SOH Base, Pruned, and Quantized C implementations process
+  8000 finite C07 samples in their natural 1-Hz order.
+- Thirty independent events per task and model are distributed after a minimum of 2048
+  preceding clean samples. Ten events affect voltage, ten current, and ten temperature.
+- Every event starts from the corresponding clean recurrent state. Bit 22, the most
+  significant FP32 mantissa bit, is flipped in one input-buffer value before inference
+  for exactly one sample. The following 60 inputs are clean and the LSTM state is not
+  reset.
+- The events are independent of one another so that overlapping faults do not obscure
+  the response to one transient upset. Within each event, propagation through the
+  recurrent state is retained for the full 60-s recovery horizon.
+- Recovery is the first time after the peak at which disturbed-clean absolute deviation
+  remains below `max(10% of peak, 0.0001 pp)` for five consecutive samples.
+
+**Metrics and interpretation**
+
+- `d(t) = 100 * |fault output - clean output|` measures only the effect of the injected
+  fault. Peak, P95 peak, residual, and recovery time characterise transient magnitude
+  and persistence.
+- Target accuracy is reported with a 61-s window MAE for the clean and disturbed paths.
+  `Delta MAE_61 = MAE_fault - MAE_clean` isolates the change caused by the fault.
+  Normalised errors are multiplied by 100 and reported in percentage points.
+- MAE does not replace disturbed-clean deviation. A fault can accidentally move an
+  imperfect prediction closer to the target, and averaging over 61 samples can hide one
+  short peak. The paper therefore reports both target-MAE change and transient response.
+- Negative `Delta MAE_61` values mean accidental movement toward the target and must not
+  be interpreted as improved fault robustness.
+
+**Results used in the manuscript**
+
+- SOC median peak deviations are 3.29--3.82 pp and P95 peaks are 16.18--23.81 pp. Every
+  SOC event recovers within 60 s, with median recovery times of 10.0--12.5 s.
+- SOC median `Delta MAE_61` is 0.046--0.079 pp and P95 is 1.42--1.59 pp. Quantized is
+  close to Base, while Pruned has the largest upper-tail peak and P95 MAE increase.
+- SOH median peak deviations are 0.83--1.59 pp and P95 peaks are 3.37--5.85 pp. Recovery
+  within 60 s is 93.3% for Base, 90.0% for Pruned, and 86.7% for Quantized.
+- SOH median `Delta MAE_61` is approximately zero and P95 is 0.053--0.122 pp. Quantized
+  has the largest P95 peak and the largest share without confirmed 60-s recovery.
+- No non-finite output occurs in the 180 evaluated task/model events. The result is not
+  a hardware-safety claim and does not cover physical sensors, communication, weight or
+  recurrent-state memory, activations, or MCU memory.
+
+**Files and manuscript integration**
+
+- [x] Reproducible runner, wrapper, README, and figure generator are stored in the new
+  benchmark folder. Progress, elapsed time, and ETA are printed during execution.
+- [x] Final numerical run:
+  `results/BITFLIP_INPUT_20260720_124813/`.
+- [x] Figure A.20 is replaced by `rev_5_limited_fault_sensitivity.png`. Panels (a) and
+  (b) show representative SOC and SOH propagation, panel (c) shows median and P95 peak,
+  and panel (d) shows recovery within 60 s.
+- [x] The manuscript now defines the stateful protocol, disturbed-clean response,
+  `Delta MAE_61`, and recovery criterion. Model-specific MAE changes are placed in an
+  Appendix A.5 table.
+- [x] Reviewer 1 response 8 is rewritten around the input-buffer experiment and the
+  remaining hardware fault-injection boundary.

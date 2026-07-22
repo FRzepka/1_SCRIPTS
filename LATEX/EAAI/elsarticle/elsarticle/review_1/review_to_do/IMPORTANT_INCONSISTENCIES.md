@@ -77,7 +77,16 @@ because no repeated seeds or matched ablation are available.
 
 ## Fault and robustness scope
 
-The new fault CSVs cover held outputs and one-bit corruption of an FP32 output value.
-They do not exercise the LSTM after corrupting recurrent state, weights, activations,
-input sensors, sampling intervals, or communication packets. Label them as limited
-software sensitivity checks, not embedded fault-injection validation.
+The former post-inference output-register bit-flip analysis has been removed from the
+manuscript because it did not exercise recurrent propagation. The replacement test in
+`DL_Models/LFP_LSTM_MLP/5_benchmark/PC/input_bitflip_recovery` runs the exported C
+models statefully. It flips the most significant FP32 mantissa bit in one voltage,
+current, or temperature input for one sample and then follows 60 clean samples without
+resetting the LSTM state.
+
+Report disturbed-clean peak and recovery together with the change in 61-sample target
+MAE. MAE alone is insufficient because a fault can accidentally move an imperfect
+prediction closer to the target and because a short peak is diluted by window
+averaging. The test is a bounded software input-buffer sensitivity analysis. It does
+not cover physical sensors, communication, recurrent-state or weight memory,
+activations, or MCU memory and must not be described as hardware-safety validation.

@@ -285,50 +285,80 @@ function Draw-StackedStorageBars($g, [float]$x, [float]$y, [float]$w, [float]$h,
 # or energy to another MCU family.
 # -----------------------------------------------------------------------------
 $scalingRows = @()
+$evaluatedPruningFraction = 0.30
 foreach ($taskSpec in @(
     [pscustomobject]@{Task='SOC'; MlpWidth=64; BaseH=64; PrunedH=45},
     [pscustomobject]@{Task='SOH'; MlpWidth=128; BaseH=128; PrunedH=90}
 )) {
     for ($h=30; $h -le 1000; $h+=10) {
-        $hp = [int][math]::Round(0.7*$h,[System.MidpointRounding]::AwayFromZero)
+        $hp = [int][math]::Round((1.0-$evaluatedPruningFraction)*$h,[System.MidpointRounding]::AwayFromZero)
         $baseMac = 4*$h*(6+$h) + $h*$taskSpec.MlpWidth + $taskSpec.MlpWidth
         $prunedMac = 4*$hp*(6+$hp) + $hp*$taskSpec.MlpWidth + $taskSpec.MlpWidth
         $scalingRows += [pscustomobject]@{
-            Task=$taskSpec.Task; HiddenSize=$h; PrunedHiddenSize=$hp; TotalMACs=$baseMac
+            Task=$taskSpec.Task; PruningFraction=$evaluatedPruningFraction
+            HiddenSize=$h; PrunedHiddenSize=$hp; TotalMACs=$baseMac
             MACReductionPct=100.0*(1.0-$prunedMac/$baseMac)
         }
     }
 }
 $scalingRows | Export-Csv -LiteralPath (Join-Path $Reviewer3Results 'model_complexity_scaling.csv') -NoTypeInformation -Encoding UTF8
 
-$chart = New-Chart 2500 2050
-$left = Add-Area $chart 'Complexity' 6 3 89 42 'LSTM hidden size H' 'Analytical MACs per inference'
-$right = Add-Area $chart 'Reduction' 6 52 89 42 'Original LSTM hidden size H' 'MAC reduction after 30% hidden-unit pruning [%]'
-Add-PanelTitle $chart 'Complexity' '(a) Architecture-level operation scaling' 21
-Add-PanelTitle $chart 'Reduction' '(b) Why 30% hidden-unit pruning approaches a 51% MAC reduction' 21
-$left.AxisX.TitleFont=Font 18; $left.AxisY.TitleFont=Font 18
-$left.AxisX.LabelStyle.Font=Font 17; $left.AxisY.LabelStyle.Font=Font 17
-$right.AxisX.TitleFont=Font 18; $right.AxisY.TitleFont=Font 18
-$right.AxisX.LabelStyle.Font=Font 17; $right.AxisY.LabelStyle.Font=Font 17
+$limitCurveRows = @()
+for ($pruningPct=0; $pruningPct -le 60; $pruningPct++) {
+    $p = $pruningPct / 100.0
+    $limitCurveRows += [pscustomobject]@{
+        PruningPct=$pruningPct
+        AsymptoticReductionPct=100.0*(2.0*$p-$p*$p)
+    }
+}
+$limitCurveRows | Export-Csv -LiteralPath (Join-Path $Reviewer3Results 'pruning_fraction_limit.csv') -NoTypeInformation -Encoding UTF8
+
+$chart = New-Chart 2500 2800
+$left = Add-Area $chart 'Complexity' 6 2 89 27 'LSTM hidden size H' 'Analytical MACs per inference'
+$right = Add-Area $chart 'Reduction' 6 35 89 27 'Original LSTM hidden size H' 'MAC reduction for p = 30% [%]'
+$limit = Add-Area $chart 'PruningLimit' 6 68 89 27 'Hidden-unit pruning fraction p [%]' 'Asymptotic MAC reduction [%]'
+Add-PanelTitle $chart 'Complexity' '(a) Architecture-level operation scaling' 30
+Add-PanelTitle $chart 'Reduction' '(b) Finite-model reduction at the evaluated pruning fraction' 30
+Add-PanelTitle $chart 'PruningLimit' '(c) General reduction limit set by the pruning fraction' 30
+$left.AxisX.TitleFont=Font 27; $left.AxisY.TitleFont=Font 27
+$left.AxisX.LabelStyle.Font=Font 24; $left.AxisY.LabelStyle.Font=Font 24
+$right.AxisX.TitleFont=Font 27; $right.AxisY.TitleFont=Font 27
+$right.AxisX.LabelStyle.Font=Font 24; $right.AxisY.LabelStyle.Font=Font 24
+$limit.AxisX.TitleFont=Font 27; $limit.AxisY.TitleFont=Font 27
+$limit.AxisX.LabelStyle.Font=Font 24; $limit.AxisY.LabelStyle.Font=Font 24
 $left.AxisX.Minimum=30; $left.AxisX.Maximum=160; $left.AxisX.Interval=20
 $left.AxisY.Minimum=0; $left.AxisY.Maximum=180000; $left.AxisY.Interval=30000
 $left.AxisY.LabelStyle.Format='N0'
 $right.AxisX.Minimum=30; $right.AxisX.Maximum=1000; $right.AxisX.Interval=100
 $right.AxisY.Minimum=38; $right.AxisY.Maximum=52; $right.AxisY.Interval=2
+$limit.AxisX.Minimum=0; $limit.AxisX.Maximum=60; $limit.AxisX.Interval=10
+$limit.AxisY.Minimum=0; $limit.AxisY.Maximum=90; $limit.AxisY.Interval=10
 
 foreach ($task in @('SOC','SOH')) {
     $color = if ($task -eq 'SOC') { $Red } else { $Blue }
     $rows = @($scalingRows | Where-Object Task -eq $task)
     $complexityRows = @($rows | Where-Object { [int]$_.HiddenSize -le 160 })
-    Add-LineSeries $chart 'Complexity' $task $color $complexityRows 'HiddenSize' 'TotalMACs' 'Solid' $false 5
-    Add-LineSeries $chart 'Reduction' $task $color $rows 'HiddenSize' 'MACReductionPct' 'Solid' $false 5
+    Add-LineSeries $chart 'Complexity' $task $color $complexityRows 'HiddenSize' 'TotalMACs' 'Solid' $false 6
+    Add-LineSeries $chart 'Reduction' $task $color $rows 'HiddenSize' 'MACReductionPct' 'Solid' $false 6
 }
 
 $limitRows = @(
     [pscustomobject]@{HiddenSize=30; MACReductionPct=51},
     [pscustomobject]@{HiddenSize=1000; MACReductionPct=51}
 )
-Add-LineSeries $chart 'Reduction' 'Quadratic limit' $Gray $limitRows 'HiddenSize' 'MACReductionPct' 'Dash' $false 4
+Add-LineSeries $chart 'Reduction' 'Quadratic limit' $Gray $limitRows 'HiddenSize' 'MACReductionPct' 'Dash' $false 5
+
+Add-LineSeries $chart 'PruningLimit' 'General quadratic limit' $Purple $limitCurveRows 'PruningPct' 'AsymptoticReductionPct' 'Solid' $false 6
+$usedHorizontal = @(
+    [pscustomobject]@{PruningPct=0; AsymptoticReductionPct=51},
+    [pscustomobject]@{PruningPct=30; AsymptoticReductionPct=51}
+)
+$usedVertical = @(
+    [pscustomobject]@{PruningPct=30; AsymptoticReductionPct=0},
+    [pscustomobject]@{PruningPct=30; AsymptoticReductionPct=51}
+)
+Add-LineSeries $chart 'PruningLimit' 'Used horizontal guide' $PaleRed $usedHorizontal 'PruningPct' 'AsymptoticReductionPct' 'Dash' $false 3
+Add-LineSeries $chart 'PruningLimit' 'Used vertical guide' $PaleRed $usedVertical 'PruningPct' 'AsymptoticReductionPct' 'Dash' $false 3
 
 $socBaseMac = 4*64*(6+64)+64*64+64
 $socPrunedMac = 4*45*(6+45)+45*64+64
@@ -336,20 +366,30 @@ $sohBaseMac = 4*128*(6+128)+128*128+128
 $sohPrunedMac = 4*90*(6+90)+90*128+128
 $socActualReduction = 100.0*(1.0-$socPrunedMac/$socBaseMac)
 $sohActualReduction = 100.0*(1.0-$sohPrunedMac/$sohBaseMac)
-Add-PointSeries $chart 'Complexity' 'SOC base' $Red 64 $socBaseMac 'SOC Base' 'Circle' 14
-Add-PointSeries $chart 'Complexity' 'SOC pruned' $Red 45 $socPrunedMac 'SOC Pruned' 'Diamond' 14
-Add-PointSeries $chart 'Complexity' 'SOH base' $Blue 128 $sohBaseMac 'SOH Base' 'Circle' 14
-Add-PointSeries $chart 'Complexity' 'SOH pruned' $Blue 90 $sohPrunedMac 'SOH Pruned' 'Diamond' 14
-Add-PointSeries $chart 'Reduction' 'SOC implemented architecture' $Red 64 $socActualReduction 'SOC 64 -> 45: 45.1%' 'Circle' 15 'Right'
-Add-PointSeries $chart 'Reduction' 'SOH implemented architecture' $Blue 128 $sohActualReduction 'SOH 128 -> 90: 45.7%' 'Circle' 15 'Right'
+Add-PointSeries $chart 'Complexity' 'SOC base' $Red 64 $socBaseMac 'SOC Base' 'Circle' 20
+Add-PointSeries $chart 'Complexity' 'SOC pruned' $Red 45 $socPrunedMac 'SOC Pruned' 'Diamond' 20
+Add-PointSeries $chart 'Complexity' 'SOH base' $Blue 128 $sohBaseMac 'SOH Base' 'Circle' 20
+Add-PointSeries $chart 'Complexity' 'SOH pruned' $Blue 90 $sohPrunedMac 'SOH Pruned' 'Diamond' 20
+Add-PointSeries $chart 'Reduction' 'SOC implemented architecture' $Red 64 $socActualReduction 'SOC 64 -> 45: 45.1%' 'Circle' 20 'BottomRight'
+Add-PointSeries $chart 'Reduction' 'SOH implemented architecture' $Blue 128 $sohActualReduction 'SOH 128 -> 90: 45.7%' 'Circle' 20 'TopRight'
 
-$legendLeft = Add-AreaLegend $chart 'ComplexityLegend' 'Complexity' 'Near' 15
+foreach ($pruningPct in @(10,20,40,50)) {
+    $p = $pruningPct / 100.0
+    $reductionPct = 100.0*(2.0*$p-$p*$p)
+    Add-PointSeries $chart 'PruningLimit' "Limit at $pruningPct percent" $Purple $pruningPct $reductionPct ("{0:0}%" -f $reductionPct) 'Circle' 20 'Top'
+}
+Add-PointSeries $chart 'PruningLimit' 'Evaluated pruning fraction' $Red 30 51 '51% limit at evaluated p = 30%' 'Diamond' 20 'Right'
+
+$legendLeft = Add-AreaLegend $chart 'ComplexityLegend' 'Complexity' 'Near' 20
 Add-CustomLineLegendItem $legendLeft 'SOC analytical MACs' $Red
 Add-CustomLineLegendItem $legendLeft 'SOH analytical MACs' $Blue
-$legendRight = Add-AreaLegend $chart 'ReductionLegend' 'Reduction' 'Near' 15
+$legendRight = Add-AreaLegend $chart 'ReductionLegend' 'Reduction' 'Near' 20
 Add-CustomLineLegendItem $legendRight 'SOC analytical MAC reduction' $Red
 Add-CustomLineLegendItem $legendRight 'SOH analytical MAC reduction' $Blue
-Add-CustomLineLegendItem $legendRight 'H^2 limit: 1 - 0.70^2 = 51%' $Gray 'Dash'
+Add-CustomLineLegendItem $legendRight 'Large-H limit for p = 30%: 51%' $Gray 'Dash'
+$legendLimit = Add-AreaLegend $chart 'PruningLimitLegend' 'PruningLimit' 'Near' 20
+Add-CustomLineLegendItem $legendLimit 'General limit: 2p - p^2' $Purple
+Add-CustomLineLegendItem $legendLimit 'Evaluated pruning fraction: p = 30%' $Red 'Dash'
 Save-Chart $chart 'rev_6_model_complexity_scaling.png'
 
 # -----------------------------------------------------------------------------

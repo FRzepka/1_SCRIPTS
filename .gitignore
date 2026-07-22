@@ -144,6 +144,9 @@ STM32/**/.metadata/
 Arduino/**/Arduino_CLI/
 archive/
 
+# Local runtime bundles used by the EAAI reviewer analyses
+LATEX/EAAI/elsarticle/elsarticle/review_1/review_analysis/runtime/
+
 # ── Embedded / IDE Build Folders ──
 **/Debug/
 **/Release/
