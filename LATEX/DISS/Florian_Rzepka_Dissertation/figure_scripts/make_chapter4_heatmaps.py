@@ -33,26 +33,88 @@ RED = np.array(mcolors.to_rgb("#d62728"))
 BLUE = np.array(mcolors.to_rgb("#1f77b4"))
 
 
-def direct_blue_red_colormap() -> mcolors.LinearSegmentedColormap:
-    """Interpolate directly between the EAAI blue and red in sRGB."""
+def _srgb_to_oklab(rgb: np.ndarray) -> np.ndarray:
+    rgb = np.asarray(rgb, dtype=float)
+    linear = np.where(
+        rgb <= 0.04045,
+        rgb / 12.92,
+        ((rgb + 0.055) / 1.055) ** 2.4,
+    )
+    r, g, b = np.moveaxis(linear, -1, 0)
+    l_root = np.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b)
+    m_root = np.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b)
+    s_root = np.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b)
+    return np.stack(
+        [
+            0.2104542553 * l_root + 0.7936177850 * m_root - 0.0040720468 * s_root,
+            1.9779984951 * l_root - 2.4285922050 * m_root + 0.4505937099 * s_root,
+            0.0259040371 * l_root + 0.7827717662 * m_root - 0.8086757660 * s_root,
+        ],
+        axis=-1,
+    )
 
+
+def _oklab_to_srgb(lab: np.ndarray) -> np.ndarray:
+    lab = np.asarray(lab, dtype=float)
+    lightness, axis_a, axis_b = np.moveaxis(lab, -1, 0)
+    l_root = lightness + 0.3963377774 * axis_a + 0.2158037573 * axis_b
+    m_root = lightness - 0.1055613458 * axis_a - 0.0638541728 * axis_b
+    s_root = lightness - 0.0894841775 * axis_a - 1.2914855480 * axis_b
+    l_value = l_root**3
+    m_value = m_root**3
+    s_value = s_root**3
+    linear = np.stack(
+        [
+            4.0767416621 * l_value - 3.3077115913 * m_value + 0.2309699292 * s_value,
+            -1.2684380046 * l_value + 2.6097574011 * m_value - 0.3413193965 * s_value,
+            -0.0041960863 * l_value - 0.7034186147 * m_value + 1.7076147010 * s_value,
+        ],
+        axis=-1,
+    )
+    srgb = np.where(
+        linear <= 0.0031308,
+        12.92 * linear,
+        1.055 * np.maximum(linear, 0.0) ** (1.0 / 2.4) - 0.055,
+    )
+    return np.clip(srgb, 0.0, 1.0)
+
+
+def _oklab_blue_red_colors(values: np.ndarray) -> np.ndarray:
+    values = np.clip(np.asarray(values, dtype=float), 0.0, 1.0)
+    blue_lab = _srgb_to_oklab(BLUE)
+    red_lab = _srgb_to_oklab(RED)
+    lab = blue_lab + (red_lab - blue_lab) * values[..., None]
+    return _oklab_to_srgb(lab)
+
+
+def direct_blue_red_colormap() -> mcolors.LinearSegmentedColormap:
+    """Interpolate perceptually between the EAAI blue and red in OKLAB."""
+
+    samples = _oklab_blue_red_colors(np.linspace(0.0, 1.0, 257))
     return mcolors.LinearSegmentedColormap.from_list(
-        "direct_srgb_blue_red",
-        ["#1f77b4", "#d62728"],
+        "direct_oklab_blue_red",
+        samples,
+        N=256,
     )
 
 
 def red_blue_colors(values: np.ndarray) -> np.ndarray:
-    """Map normalized values directly from blue to red in sRGB."""
+    """Map normalized values perceptually from blue to red in OKLAB."""
 
-    values = np.clip(np.asarray(values, dtype=float), 0.0, 1.0)
-    return direct_blue_red_colormap()(values)[..., :3]
+    return _oklab_blue_red_colors(values)
 
 
 def correlation_colormap() -> mcolors.LinearSegmentedColormap:
-    """Map negative correlations to blue and positive correlations to red."""
+    """Map zero to blue and both correlation extrema to the same red."""
 
-    return direct_blue_red_colormap()
+    positions = np.linspace(0.0, 1.0, 257)
+    magnitude = np.abs(2.0 * positions - 1.0)
+    samples = _oklab_blue_red_colors(magnitude)
+    return mcolors.LinearSegmentedColormap.from_list(
+        "symmetric_oklab_blue_red",
+        samples,
+        N=256,
+    )
 
 
 def make_correlation_heatmap() -> None:
