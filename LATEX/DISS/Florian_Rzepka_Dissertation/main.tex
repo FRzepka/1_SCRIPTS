@@ -52,6 +52,7 @@
 \usepackage{longtable}
 \usepackage{etoolbox}
 \usepackage{enumitem}
+\usepackage{needspace}
 \usepackage{amsmath,amssymb}
 \usepackage[locale=DE]{siunitx}
 \usepackage{tikz}
@@ -301,6 +302,35 @@ The central conclusion is that AI-enabled battery-state estimation should not be
 \item[\texttt{.data}] Linker section for initialized static and global data copied from flash to RAM
 \end{description}
 
+\chapter*{Glossary}
+\markboth{Glossary}{Glossary}
+\addcontentsline{toc}{chapter}{Glossary}
+\begin{description}[style=nextline,leftmargin=4.0cm]
+\item[Accuracy] Agreement between an estimated battery state and its reference value. The required accuracy depends on the state variable, reference uncertainty, and the decision for which the estimate is used.
+\item[Baseline condition] Evaluation condition with the nominal, undisturbed measurement stream. It provides the reference against which disturbance-induced changes are quantified.
+\item[Causal processing] Processing that uses only information available at the current and previous samples. Future samples are unavailable during online execution.
+\item[Cell chemistry] Combination of electrode and electrolyte materials that determines characteristic voltage behaviour, energy density, ageing, and safety properties. This work considers NMC and LFP cells.
+\item[Coulomb counting] SOC estimation by integrating measured current over time and relating the accumulated charge to an assumed usable capacity.
+\item[Data-driven estimator] Estimator whose input-output relationship is learned from representative measurements and reference labels rather than being prescribed completely by physical equations.
+\Needspace{6\baselineskip}
+\item[Deployment] Transfer of an estimation method from model development into an executable target implementation, including numerical conversion, memory layout, timing, firmware integration, and validation.
+\item[Disturbance] Deliberate or naturally occurring deviation from the nominal measurement stream, such as bias, noise, missing samples, irregular timing, dropout, or a transient spike.
+\item[Embedded inference] Execution of a trained model on a resource-constrained controller as part of the operational signal-processing chain.
+\item[Feature] Input quantity supplied to an estimator. A feature can be measured directly or derived causally from measurements, for example cumulative charge or a signal derivative.
+\item[Flash memory] Non-volatile memory used for firmware, model parameters, and persistent lookup data. Its contents remain available when power is removed.
+\item[Label] Reference target assigned to a training or evaluation sample. SOC and SOH labels are derived from measured quantities and a specified reference construction.
+\item[Model-based estimator] Estimator that propagates battery states through an explicit physical or equivalent-circuit model and can correct them using measurement residuals.
+\item[Online estimation] Sequential state estimation during operation, where each output is produced from information available up to the current sample.
+\item[Pruning] Reduction of a trained neural network by removing weights or complete structures judged to be less important for the learned mapping.
+\item[Quantization] Representation of model quantities with a restricted numerical grid, typically using fewer bits than the original floating-point representation.
+\item[Random-access memory] Volatile runtime memory used for recurrent states, intermediate activations, buffers, stack, and other working data.
+\item[Recurrent state] Internal memory propagated between consecutive samples of a recurrent neural network. It carries temporal information that is not contained in the current input alone.
+\item[Robustness] Ability of an estimator to limit performance degradation under disturbances and non-ideal operating conditions.
+\item[State estimator] Algorithm that reconstructs a battery state that cannot be measured directly from available measurements and prior information.
+\item[Structured pruning] Pruning of complete channels, neurons, rows, columns, or other coherent groups so that the resulting tensors and runtime operations can be physically reduced.
+\item[Utility score] Normalized combination of several evaluation dimensions used to compare deployment alternatives under an explicitly defined set of priorities.
+\end{description}
+
 \chapter*{Symbols}
 \markboth{Symbols}{Symbols}
 \addcontentsline{toc}{chapter}{Symbols}
@@ -398,7 +428,7 @@ The central conclusion is that AI-enabled battery-state estimation should not be
 
 Lithium-ion batteries are increasingly used in systems that must operate reliably for long periods with limited maintenance access. This includes stationary storage in decentralized energy systems, for example remote microgrids in regions where grid connection can be limited or unavailable. The same requirement appears in mobile and autonomous applications that have to continue operating when communication, remote control, or service access is restricted. In all of these cases, the battery-management system (BMS) needs reliable information about internal battery states that cannot be measured directly. The state of charge (SOC) affects usable energy and power limits, while the state of health (SOH) affects lifetime assessment, maintenance planning, and safe operating margins.
 
-Artificial-intelligence-based estimation methods are attractive because battery behaviour is nonlinear and depends on ageing, load history, temperature, and operating point. The problem is not simply to obtain a low error on a clean laboratory test set. A method that is useful in a BMS must also handle imperfect measurements, causal online execution, memory and timing limits, and the practical route from a trained model to firmware. This research therefore examines battery-state estimation as a connected development and deployment problem rather than only as an offline modelling task.
+Artificial-intelligence-based estimation methods are attractive because battery behaviour is nonlinear and depends on ageing, load history, temperature, and operating point. A small error on a clean laboratory test set alone does not establish practical suitability. What constitutes a sufficiently small error depends on the estimated state, the uncertainty of its reference, and the operating decision supported by the estimate. A method that is useful in a BMS must additionally handle imperfect measurements, causal online execution, memory and timing limits, and the practical route from a trained model to firmware. The methodological novelty of this research lies in connecting these stages: battery-state estimation is examined from data representation and nominal accuracy through disturbed-operation behaviour to measured embedded execution, rather than as an isolated offline modelling task.
 
 \section{Research Aim and Questions}
 The aim of this work is to develop and evaluate AI-based battery-state estimation methods along the path from data representation to embedded execution. The work is guided by three research questions:
@@ -418,6 +448,24 @@ The ageing-estimation contribution presented in Chapter~\ref{chap:ageing} is bas
 
 These contributions are supported by an experimental basis consisting of two ageing datasets and a custom BMS platform. The hardware platform is not treated as a separate algorithmic contribution in the same sense as the three estimator studies. It provides the measurement, firmware, and validation environment required to connect the methodological results to practical BMS implementation.
 
+\begin{table}[htbp]
+    \centering
+    \small
+    \setlength{\tabcolsep}{3.5pt}
+    \caption[Research components and publication basis.]{Experimental basis, technical contributions, and associated publication basis of the research.}
+    \label{tab:publication_map}
+    \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{3.0cm}>{\raggedright\arraybackslash}p{4.3cm}>{\raggedright\arraybackslash}p{3.2cm}>{\raggedright\arraybackslash}X}
+        \toprule
+        Research component & Role & Primary dimension & Publication basis \\
+        \midrule
+        Experimental and hardware basis & Data, labels, embedded targets, and validation context & Shared experimental basis & Supports all three contribution studies \\
+        Ageing estimation in Chapter~\ref{chap:ageing} & Temporal representation for compact SOH estimation & Representation design and SOH estimation & Published journal article\autocite{rzepkaNeuralNetworkArchitecture2023a} \\
+        Robustness benchmark in Chapter~\ref{chap:robustness} & Matched comparison under measurement disturbances & Disturbed-operation performance & Manuscript submitted to the \emph{Journal of Energy Storage}\autocite{rzepkaPerformanceBenchmarkSubmitted2026} \\
+        Embedded AI in Chapter~\ref{chap:embedded} & Compression and measured microcontroller execution & Deployment and compression & SSRN preprint\autocite{rzepkaEmbeddedArtificialIntelligence2026} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
 \section{Battery-Management Requirement Framework}
 A BMS supervises a lithium-ion cell or pack and keeps it within safe and efficient operating limits by monitoring voltage, current, and temperature and by controlling charging, balancing, protection, and communication. SOC and SOH are central internal quantities in this control chain. They influence usable energy, power limitation, lifetime-aware operation, and maintenance decisions, but they cannot be obtained directly from one sensor channel. They must be inferred from the measurement stream and from knowledge about the cell or pack.\autocite{plettBatteryManagementSystems2015,zhouStateEstimationModels2023a,jiangAdvancesBatteryState2024}
 
@@ -434,57 +482,12 @@ For a BMS, state estimation is therefore not only an algorithmic accuracy proble
 Performance requirements describe whether the estimated SOC or SOH signal is suitable for BMS decisions during operation. In this work, performance is not reduced to average error under clean measurements. It also includes robustness against disturbed input signals and convergence or recovery after an inconsistent initial state. This distinction is important because bias, noise, missing samples, timing irregularities, and communication interruptions can change the estimator ranking even when the clean-data error is low.\autocite{liRobustnessSOCEstimation2015,naseriReliableWirelessBMS2025,bergerBenchmarkingBatteryManagement2024}
 
 \subsection{Hardware requirements}
-Hardware requirements define the resource envelope in which state estimation can run on the BMS controller. Flash memory limits the amount of code, parameters, and lookup data that can be stored. RAM usage limits the size of recurrent states, intermediate buffers, and runtime data. Inference time determines whether the estimator can meet the required update rate with sufficient timing margin. Energy per inference becomes relevant when the controller has to operate under strict power budgets.\autocite{linTinyMachineLearning2023,naguibMicroprocessorExecutionTime2022} The measurement chain belongs to the same requirement area because sensor resolution, noise, sampling timing, and communication behaviour define the input information available to the estimator.
+Hardware requirements define the resource envelope in which state estimation can run on the BMS controller. Flash memory limits the amount of code, parameters, and lookup data that can be stored. RAM usage limits the size of recurrent states, intermediate buffers, stack, and runtime data. Inference time determines whether the estimator can meet the required update rate with sufficient timing margin. Energy per inference becomes relevant when the controller has to operate under strict power budgets.\autocite{linTinyMachineLearning2023,naguibMicroprocessorExecutionTime2022}
+
+Selecting a controller with more internal RAM is possible in principle, but it is not a neutral remedy. A larger device can increase component cost, power consumption, package size, and qualification effort, and it can require changes to the board and firmware platform. External RAM introduces an additional memory interface, access latency, bus traffic, board area, and further power and electromagnetic-compatibility considerations. It can also weaken timing predictability compared with tightly coupled internal memory. A deployable estimator should therefore use the available memory efficiently instead of assuming that the hardware can always be enlarged around the model. The measurement chain belongs to the same requirement area because sensor resolution, noise, sampling timing, and communication behaviour define the input information available to the estimator.
 
 \subsection{Deployment requirements}
 Deployment requirements describe the engineering path from a trained or identified method to a reusable BMS implementation. Relevant aspects are model complexity, firmware transfer, calibration effort, adaptability to changed cells or operating conditions, and scalability to related estimation tasks or target platforms. A method is therefore not deployment-ready only because it runs once on a controller. It must also be reproducible, maintainable, and modifiable without rebuilding the full BMS software around it. Compression methods such as pruning and quantization can support deployment, but their effect depends on the architecture and must be verified on the target implementation.\autocite{hanLearningBothWeights2015,jacobQuantizationTrainingNeural2017}
-
-\section{Structure of the Research and Development Path}
-Chapter~\ref{chap:foundations} introduces the battery, BMS, state-estimation, machine-learning, and embedded-AI foundations required by the later studies. Chapter~\ref{chap:experimental} describes the two datasets, the construction of the reference quantities, the embedded targets, and the Custom BMS Platform. Chapters~\ref{chap:ageing} to~\ref{chap:embedded} contain the three technical contributions. Chapter~\ref{chap:synthesis} combines the general discussion, overall conclusion, remaining gaps, and outlook. The requirement framework in Figure~\ref{fig:bms_requirements} is revisited in this final synthesis rather than repeated as a separate introductory chapter.
-
-\begin{table}[H]
-    \centering
-    \small
-    \setlength{\tabcolsep}{3.5pt}
-    \caption[Research structure and publication basis.]{Structure of the research, function of the contribution chapters, and associated publication basis.}
-    \label{tab:publication_map}
-    \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{1.35cm}>{\raggedright\arraybackslash}p{4.2cm}>{\raggedright\arraybackslash}p{3.3cm}>{\raggedright\arraybackslash}X}
-        \toprule
-        Chapter & Role & Primary dimension & Publication basis \\
-        \midrule
-        \ref{chap:experimental} & Experimental and hardware basis & Data, labels, and validation context & Shared basis for all three contribution studies \\
-        \ref{chap:ageing} & Ageing estimation for stationary storage & Representation design and SOH estimation & Published journal article\autocite{rzepkaNeuralNetworkArchitecture2023a} \\
-        \ref{chap:robustness} & Robustness benchmark for battery-state estimation & Disturbed-operation performance & Manuscript submitted to the \emph{Journal of Energy Storage}\autocite{rzepkaPerformanceBenchmarkSubmitted2026} \\
-        \ref{chap:embedded} & Embedded AI for SOC and SOH estimation & Deployment and compression & SSRN preprint\autocite{rzepkaEmbeddedArtificialIntelligence2026} \\
-        \bottomrule
-    \end{tabularx}
-\end{table}
-
-\begin{figure}[htbp]
-    \centering
-    \resizebox{\textwidth}{!}{%
-    \begin{tikzpicture}[
-        >=Latex,
-        topic/.style={draw=tublau, rounded corners=4pt, fill=tublau!10, text width=4.1cm, align=left, inner sep=8pt},
-        base/.style={draw=tugrau, rounded corners=4pt, fill=tugrau!12, text width=14.0cm, align=left, inner sep=8pt},
-        synth/.style={draw=tugruen, rounded corners=4pt, fill=tugruen!12, text width=14.0cm, align=left, inner sep=8pt}
-    ]
-        \node[base] (foundation) at (0,0) {\textbf{Technical and experimental basis:} battery and BMS foundations, datasets, reference quantities, embedded targets, and the Custom BMS Platform.};
-        \node[topic] (p1) at (-4.8,2.8) {\textbf{Chapter \ref{chap:ageing}}\\Ageing estimation\\published study};
-        \node[topic] (p3) at (0,2.8) {\textbf{Chapter \ref{chap:robustness}}\\Robustness benchmark\\submitted manuscript};
-        \node[topic] (p2) at (4.8,2.8) {\textbf{Chapter \ref{chap:embedded}}\\Embedded AI\\SSRN preprint};
-        \node[synth] (synthesis) at (0,5.6) {\textbf{Chapter \ref{chap:synthesis}:} integrated discussion, deployment-oriented design lessons, conclusion, and outlook.};
-        \draw[->,thick] (foundation.north) ++(-4.8,0) -- (p1.south);
-        \draw[->,thick] (foundation.north) -- (p3.south);
-        \draw[->,thick] (foundation.north) ++(4.8,0) -- (p2.south);
-        \draw[->,thick] (p1.north) -- (synthesis.south west);
-        \draw[->,thick] (p3.north) -- (synthesis.south);
-        \draw[->,thick] (p2.north) -- (synthesis.south east);
-    \end{tikzpicture}
-    }
-    \caption[Overall work roadmap.]{Roadmap from the shared basis to the three contribution studies and their integrated synthesis. Chapters~\ref{chap:ageing} to~\ref{chap:embedded} correspond to a published study, a submitted manuscript, and an SSRN preprint.\autocite{rzepkaNeuralNetworkArchitecture2023a,rzepkaPerformanceBenchmarkSubmitted2026,rzepkaEmbeddedArtificialIntelligence2026}}
-    \label{fig:diss_roadmap}
-\end{figure}
 
 \chapter{State of the Art and Technical Foundations}
 \label{chap:foundations}
