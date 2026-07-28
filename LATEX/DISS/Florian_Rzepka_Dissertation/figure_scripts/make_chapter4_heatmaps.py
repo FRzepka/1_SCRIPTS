@@ -29,8 +29,8 @@ MDPI_FIGURES = (
     / "Figures"
 )
 
-RED = np.array(mcolors.to_rgb("#d62728"))
-BLUE = np.array(mcolors.to_rgb("#1f77b4"))
+RED = np.array(mcolors.to_rgb("#eea4a5"))
+BLUE = np.array(mcolors.to_rgb("#a1c6e0"))
 
 
 def _srgb_to_oklab(rgb: np.ndarray) -> np.ndarray:
@@ -171,7 +171,7 @@ def make_correlation_heatmap() -> None:
                     ha="center",
                     va="center",
                     fontsize=12,
-                    color="white",
+                    color="#202020",
                 )
 
     ax.set_xticks(np.arange(-0.5, 4, 1), minor=True)
@@ -313,7 +313,7 @@ def make_cross_scenario_heatmap() -> None:
         vmax=vmax,
         base=10,
     )
-    colormap = direct_blue_red_colormap()
+    colormap = correlation_colormap()
 
     plt.rcParams.update(
         {
