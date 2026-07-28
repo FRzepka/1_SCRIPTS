@@ -1,5 +1,5 @@
 param(
-    [string]$ImagePath = (Join-Path (Resolve-Path (Join-Path $PSScriptRoot '..')).Path 'pictures\eaai_palette\bms_requirements.png')
+    [string]$ImagePath = (Join-Path (Resolve-Path (Join-Path $PSScriptRoot '..')).Path 'pictures\eaai_palette\bms_requirements_icon_white.png')
 )
 
 $ErrorActionPreference = 'Stop'
@@ -28,7 +28,7 @@ try {
 
     $centerX = [int][Math]::Round($bitmap.Width * 0.5033)
     $centerY = [int][Math]::Round($bitmap.Height * 0.7811)
-    $radius = [int][Math]::Round([Math]::Min($bitmap.Width, $bitmap.Height) * 0.048)
+    $radius = [int][Math]::Round([Math]::Min($bitmap.Width, $bitmap.Height) * 0.056)
 
     $baseR = 0xC5
     $baseG = 0x59
