@@ -206,12 +206,32 @@ def _nearest_blues_r_position(rgb: np.ndarray) -> np.ndarray:
     return mapped[inverse].reshape(rgb.shape[:2])
 
 
-def _recolor_region(array: np.ndarray, box: tuple[int, int, int, int]) -> None:
+def _source_positions(
+    array: np.ndarray,
+    box: tuple[int, int, int, int],
+) -> tuple[np.ndarray, np.ndarray]:
     x0, y0, x1, y1 = box
     region = array[y0:y1, x0:x1]
     rgb = region[..., :3].astype(float) / 255.0
     dark = np.max(rgb, axis=2) < 0.22
-    normalized = _nearest_blues_r_position(rgb)
+    return _nearest_blues_r_position(rgb), dark
+
+
+def _recolor_region(
+    array: np.ndarray,
+    box: tuple[int, int, int, int],
+    source_min: float,
+    source_max: float,
+) -> None:
+    x0, y0, x1, y1 = box
+    region = array[y0:y1, x0:x1]
+    rgb = region[..., :3].astype(float) / 255.0
+    normalized, dark = _source_positions(array, box)
+    normalized = np.clip(
+        (normalized - source_min) / (source_max - source_min),
+        0.0,
+        1.0,
+    )
     converted = red_blue_colors(normalized)
     rgb[~dark] = converted[~dark]
     region[..., :3] = np.rint(rgb * 255.0).astype(np.uint8)
@@ -222,16 +242,17 @@ def make_mae_matrix() -> None:
     array = np.asarray(Image.open(source).convert("RGBA")).copy()
 
     # Plot and color-bar interiors in the 4500 x 1500 source image.
-    regions = [
-        (223, 280, 1165, 1221),
-        (1702, 280, 2644, 1221),
-        (3181, 280, 4123, 1221),
-        (1227, 64, 1293, 1437),
-        (2706, 64, 2772, 1437),
-        (4185, 64, 4251, 1437),
+    panel_regions = [
+        ((223, 280, 1165, 1221), (1227, 64, 1293, 1437)),
+        ((1702, 280, 2644, 1221), (2706, 64, 2772, 1437)),
+        ((3181, 280, 4123, 1221), (4185, 64, 4251, 1437)),
     ]
-    for region in regions:
-        _recolor_region(array, region)
+    for plot_region, colorbar_region in panel_regions:
+        colorbar_positions, colorbar_dark = _source_positions(array, colorbar_region)
+        valid_positions = colorbar_positions[~colorbar_dark]
+        source_min, source_max = np.quantile(valid_positions, [0.01, 0.99])
+        _recolor_region(array, plot_region, source_min, source_max)
+        _recolor_region(array, colorbar_region, source_min, source_max)
 
     Image.fromarray(array, mode="RGBA").save(
         OUTPUT_DIR / "paper1_mae_matrix.png",
