@@ -754,7 +754,62 @@ FUNCTION {format.edition}
 { edition empty$
     { "" }
     { output.state mid.sentence =
-        { convert.edition "l" change.case$ " " * ﬂnm¢Gß≤⁄Óù∆≠y‘ION {format.vol.num.pages}
+        { convert.edition "l" change.case$ " " * bbl.edition * }
+        { convert.edition "t" change.case$ " " * bbl.edition * }
+      if$
+    }
+  if$
+}
+
+INTEGERS { multiresult }
+
+FUNCTION {multi.page.check}
+{ 't :=
+  #0 'multiresult :=
+    { multiresult not
+      t empty$ not
+      and
+    }
+    { t #1 #1 substring$
+      duplicate$ "-" =
+      swap$ duplicate$ "," =
+      swap$ "+" =
+      or or
+        { #1 'multiresult := }
+        { t #2 global.max$ substring$ 't := }
+      if$
+    }
+  while$
+  multiresult
+}
+
+FUNCTION {format.pages}
+{ pages empty$
+    { "" }
+    { pages multi.page.check
+        { bbl.pages pages n.dashify tie.or.space.connect }
+        { bbl.page pages tie.or.space.connect }
+      if$
+    }
+  if$
+}
+
+FUNCTION {format.journal.pages}
+{ pages empty$
+    'skip$
+    { duplicate$ empty$
+        { pop$ format.pages }
+        {
+          " " *
+          format.year * " " *
+          pages n.dashify *
+        }
+      if$
+    }
+  if$
+}
+
+FUNCTION {format.vol.num.pages}
 {
   % volume field.or.null
   " "

@@ -53,7 +53,7 @@
   \fi
 }
 
-% Avoid writing long caption strings into `soc_outline.aux` (not needed; the
+% Avoid writing long caption strings into `soc_outline.aux` (not needed because the
 % paper does not use `\nameref`). This significantly reduces aux file size.
 \let\orig@caption\@caption
 \long\def\@caption#1[#2]#3{%
@@ -75,10 +75,10 @@
             state={Berlin},
             country={Germany}}
 \begin{abstract}
-State-of-charge (SOC) and state-of-health (SOH) estimators based on recurrent neural networks can achieve high accuracy, but their computational and memory cost on embedded hardware is often insufficiently characterised. This work quantifies the accuracy, timing, and resource trade-offs of Long Short-Term Memory (LSTM) and Multi-Layer Perceptron (MLP) based SOC/SOH estimators deployed on an STM32H753ZI microcontroller. Using the open \emph{Lithium Iron Phosphate (LFP) Cycle Ageing Dataset}, we train full-precision baseline models and obtain compressed variants via structured pruning and recurrent-weight quantization. In long-horizon streaming replay on the test set the SOC estimators attain mean-absolute errors (MAE) between $2.3$~\% and $2.8$~\% of full scale, while the SOH estimators reach MAE values between $0.9$~\% and $1.5$~\%. Hardware-in-the-loop benchmarks show that pruning reduces the flash footprint by roughly $40$~\% for SOC and $45$~\% for SOH. Multiplying measured kernel time by an assumed constant board power of \SI{0.5}{\watt} gives estimated energy-per-inference reductions of similar magnitude; this value is a timing-derived proxy rather than a separate power measurement. Weight quantization further reduces flash to approximately half of the baseline footprint, but the mixed-precision software kernel increases inference time. The results establish the observed trade-offs for the evaluated LFP data, model checkpoints, and STM32H753ZI implementation; transfer to other chemistries or controller families requires separate validation.
+Online battery management requires accurate state-of-charge (SOC) and state-of-health (SOH) estimates within strict memory and timing budgets. This study investigates an engineering application of artificial intelligence (AI): continuous battery-state estimation on an STM32H753ZI microcontroller. The implemented AI consists of stateful long short-term memory (LSTM) networks with multi-layer perceptron (MLP) output heads. Using an open lithium iron phosphate (LFP) ageing dataset, we compare full-precision Base models with structured-pruned and recurrent-weight-quantized variants under identical long-horizon replay and hardware measurements. This paired, auditable compression benchmark is the AI contribution of the work. SOC mean absolute error (MAE) ranges from $2.3$ to $2.8$ percentage points, while SOH MAE ranges from $0.9$ to $1.5$ percentage points. Pruning reduces flash by $40.9$~\% for SOC and $45.5$~\% for SOH and reduces inference time by $42.9$~\% and $44.0$~\%, respectively. Quantization reduces flash by $50.2$~\% and $58.8$~\%, but the mixed-precision kernel increases inference time. Estimated energy is a constant-power timing proxy, not a separate power measurement. The quantitative conclusions apply to the evaluated LFP data, model configurations, firmware, and build settings. Additional cell chemistries and embedded platforms require separate validation.
 \end{abstract}
 \begin{keyword}
-State of charge \sep State of health \sep Long short-term memory \sep Pruning \sep Quantization \sep Microcontroller \sep Battery diagnostics \sep Embedded artificial intelligence
+Embedded artificial intelligence \sep Battery state estimation \sep Long short-term memory network \sep Structured pruning \sep Weight quantization \sep Microcontroller deployment
 \end{keyword}
 \end{frontmatter}
 \section*{Nomenclature}
@@ -95,6 +95,7 @@ State of charge \sep State of health \sep Long short-term memory \sep Pruning \s
 \item[STM32] 32-bit ARM Cortex-M microcontroller family
 \item[MAE] Mean absolute error
 \item[RMSE] Root-mean-square error
+\item[MAC] Multiply--accumulate operation
 \item[INT8] Signed 8-bit integer representation (quantized weights)
 \item[FP32] 32-bit floating-point representation
 \end{description}
@@ -125,22 +126,588 @@ State of charge \sep State of health \sep Long short-term memory \sep Pruning \s
 \item[$q$] Quantized weight (INT8 code)
 \item[$s$] Per-row quantization scale (FP32)
 \item[$\hat{w}$] Reconstructed floating-point weight after dequantization
-\item[$\mathcal{Q}_s(\cdot)$] Uniform mid-tread quantizer with scale $s$
+\item[$\varepsilon_q$] Positive lower bound for the quantization scale
+\item[$\mathcal{R}$] Index set of retained LSTM hidden units
+\item[$e_n$] Signed prediction error of sample $n$ in percentage points
+\item[$Q_p(\cdot)$] Empirical quantile operator at probability $p$
 \item[$W_{\mathrm{ih}}^{\mathrm{int8}}$] Quantized input-to-gate weight matrix
 \item[$W_{\mathrm{hh}}^{\mathrm{int8}}$] Quantized hidden-to-gate weight matrix
 \item[$s_{\mathrm{ih}}, s_{\mathrm{hh}}$] Per-row quantization scale vectors for $W_{\mathrm{ih}}^{\mathrm{int8}}$ and $W_{\mathrm{hh}}^{\mathrm{int8}}$
 \item[$b_{\mathrm{fp32}}$] Floating-point bias of a given gate
 \item[$g$] Gate pre-activation used in the quantized LSTM kernel
+\item[$D,H,M$] Input dimension, LSTM hidden size, and MLP width
+\item[$N_{\mathrm{MAC}}$] Analytical multiply--accumulate count per inference
 \end{description}
 \normalsize
 \section{Introduction}
-Accurate online estimation of the state of charge (SOC) and the state of health (SOH) remains a central challenge for battery powered systems~\cite{yaoSmarterBatteryManagement2025a,a.m.s.m.h.s.attanayakaEstimationStateCharge2019,berecibarCriticalReviewState2016,shrivastavaReviewTechnologicalAdvancement2023}. Classical model-based estimation schemes often struggle to track long-term degradation under highly dynamic current and temperature conditions. Neural networks can capture such effects and have recently been surveyed comprehensively for SOC estimation in~\cite{yaoSmarterBatteryManagement2025a}, yet the majority of published solutions remain purely theoretical: they report accuracy on offline datasets but rarely demonstrate how the models behave once deployed on embedded targets with tight memory and energy budgets. This work closes this gap by optimising SOC and SOH Long Short-Term Memory (LSTM) models for microcontroller deployment using pruning and quantization.
-The methodology is motivated by modular stationary storage systems in remote microgrids. Within the MG Farm programme~\cite{leap-reMGFARMSmart,microenergyMGFARMPoweringSustainable,aqachtoulMGFARMIoTEdgeDriven2026,technischeuniversitatberlinMGFarmSmart}, partners from France, Algeria, Morocco, and Germany develop smart-grid demonstrators for North African sites, with the Technical University of Berlin contributing the battery ageing experiments for the LFP DoE Cycle Ageing Dataset, a battery management system prototype for the demonstrator, and the SOC/SOH state-estimation algorithms that are later deployed on the embedded controller. Each storage module must operate autonomously without reliable infrastructure, so the battery management system must compute SOC and SOH within the flash, RAM, and energy limits of an STM32H753ZI-class microcontroller. Similar demands arise in mobile applications where devices must run for long periods without cloud support. Translating high-fidelity neural estimators into this environment is therefore an enabling step for future resource-aware Battery Management System (BMS) platforms.
-While many machine-learning models for state estimation have been proposed~\cite{yaoSmarterBatteryManagement2025a,rzepkaNeuralNetworkArchitecture2023a}, accompanying artefacts such as scaling statistics, hidden-state handling, and quantization parameters are rarely documented in sufficient detail to enable faithful reproduction on microcontrollers. Even fewer works report resource usage, energy consumption, or long-horizon streaming behaviour of the deployed models, with only a handful of studies analysing Tiny Machine Learning (TinyML)-style SOC or SOH estimators on microcontrollers~\cite{crocioniLiIonBatteriesParameter2020,Embedded_AI_only_SOC_mobile,Embedded_AI_SOH_badData}. Against this backdrop, we focus on closing the gap between theoretical validation and embedded deployment, with a particular emphasis on optimisation for memory, runtime, and energy.
-In the remainder of this work we rely on the resulting Lithium Iron Phosphate (LFP) DoE Cycle Ageing Dataset~\cite{LFP_DoE_Cycle_Aging_Dataset}. The data capture long-term cyclic ageing of numerous LFP cells under full and fractional factorial conditions with controlled temperature, charge and discharge rates, depth-of-discharge variations, and interleaved check-ups containing capacity tests, OCV sweeps, and hybrid pulse-power characterisation. This breadth provides a realistic basis for training and evaluating SOC and SOH estimators across a wide range of ageing patterns.
+Accurate online estimation of the state of charge (SOC) and the state of health (SOH) remains a central challenge for battery-powered systems~\cite{yaoSmarterBatteryManagement2025a,a.m.s.m.h.s.attanayakaEstimationStateCharge2019,berecibarCriticalReviewState2016,shrivastavaReviewTechnologicalAdvancement2023}. Recent reviews show sustained progress in model-based and data-driven estimators, but they also emphasise that accuracy depends strongly on cell chemistry, operating conditions, reference construction, and evaluation protocol~\cite{guoSystematicReviewElectrochemical2024,yaoSmarterBatteryManagement2025a}. For an embedded battery management system, predictive accuracy alone is therefore insufficient: the estimator must also fit the available flash and RAM, meet the update deadline, and preserve its state consistently over long input streams.
+
+The study is motivated by modular stationary storage systems in remote microgrids. Within the MG Farm programme~\cite{leap-reMGFARMSmart,microenergyMGFARMPoweringSustainable,aqachtoulMGFARMIoTEdgeDriven2026,technischeuniversitatberlinMGFarmSmart}, partners from France, Algeria, Morocco, and Germany develop smart-grid demonstrators for North African sites. The Technical University of Berlin contributes the battery ageing experiments, the LFP DoE Cycle Ageing Dataset, a battery management system prototype, and the SOC/SOH estimators deployed on its controller. Each storage module must operate autonomously within the flash, RAM, and timing limits of an STM32H753ZI-class microcontroller. Similar constraints arise in mobile systems that cannot rely on continuous cloud access.
+
+Existing embedded studies demonstrate that compact neural SOC or SOH estimators are feasible on microcontrollers and that quantization can reduce their storage requirements~\cite{crocioniLiIonBatteriesParameter2020,giazitzisCaseStudyTiny2024,Embedded_AI_only_SOC_mobile,Embedded_AI_SOH_badData,naguibMicroprocessorExecutionTime2022}. However, these studies generally examine one battery state, one model family, or one deployment platform. They do not provide a common, auditable comparison of structured hidden-unit pruning and recurrent-weight quantization for both stateful SOC and SOH estimators under identical long-horizon replay and hardware measurement conditions. Reproduction is further hindered when scaling parameters, recurrent-state handling, and the exact mixed-precision boundary are not reported.
+
+This work uses the Lithium Iron Phosphate (LFP) DoE Cycle Ageing Dataset~\cite{LFP_DoE_Cycle_Aging_Dataset}. It contains long-term cyclic ageing measurements from multiple LFP cells under full and fractional factorial conditions, with controlled temperature, charge and discharge rates, depth-of-discharge variations, and interleaved capacity, open-circuit-voltage, and pulse-power check-ups. These data support a paired assessment of rapid SOC dynamics and slowly evolving SOH trajectories.
+
+The objective of this study is to quantify, under identical data and deployment conditions, how structured hidden-unit pruning and recurrent-weight post-training quantization change the accuracy, memory footprint, and inference cost of stateful LSTM\,+\,MLP SOC and SOH estimators on an STM32H753ZI. The study makes three contributions:
+\begin{enumerate}[label=(\roman*),leftmargin=*,nosep]
+    \item an auditable path from trained PyTorch models to stateful C inference, including explicit feature scaling, recurrent-state handling, pruning, and mixed-precision quantization.
+    \item a controlled Base--Pruned--Quantized comparison for both SOC and SOH using continuous replay, linked-firmware flash and RAM, host latency, and cycle-counter-measured kernel time.
+    \item an evidence-bounded trade-off analysis that connects architecture-level operation counts and implementation details to long-horizon accuracy, filtering, and application-dependent utility.
+\end{enumerate}
+The novelty lies in this paired, transparent deployment and compression benchmark rather than in proposing a new recurrent cell or compression algorithm.
 \section{Related Work and Motivation}
 \subsection{SOC/SOH Estimation}
 Existing SOC/SOH estimation methods can be grouped into three families~\cite{a.m.s.m.h.s.attanayakaEstimationStateCharge2019,berecibarCriticalReviewState2016,shrivastavaReviewTechnologicalAdvancement2023,guoSystematicReviewElectrochemical2024}. First, \emph{measurement-derived} techniques use Coulomb counting and open-circuit-voltage (OCV) look-up tables during rest periods. They provide inexpensive proxies but suffer from drift, offset accumulation, and a strong dependence on initialisation and periodic recalibration. Second, \emph{model-based} observers combine equivalent-circuit or electrochemical models with Kalman filtering and its variants. These approaches can offer physical interpretability but require careful parameter identification and are sensitive to model mismatch and ageing-induced parameter drift. Third, \emph{data-driven} methods employ machine-learning regressors, including LSTM networks, Transformers, and hybrid structures, to map sequences of current, voltage, and temperature to SOC and SOH estimates. Key challenges for such models are robustness when operated under conditions that differ from the training data and the careful treatment of normalisation and state handling on embedded targets.
-Across these families the reported accuracy spans a wide range. Electrochemical or Equivalent Circuit Model (ECM)-based observers with carefully tuned filters often achieve SOC root-mean-square errors (RMSE) well below $1\,\%$ of full scale and sub-percent SOH capacity errors on laboratory test cycles~\cite{gaoCoEstimationStateofChargeStateof2022,gaoEnhancedStateofchargeEstimation2022,shenAlternativeCombinedCoestimation2022,wangFusionEstimationLithiumion2022}. Recent sequence-model approaches based on N-BEATS and Bidirectional LSTMs (BiLSTMs) for sodium-ion cells report SOC Mean Absolute Error (MAE) between roughly $0.1$ and $0.4\,\%$~\cite{sunStateChargeEstimation2023,sunStateofchargeEstimationSodiumion2024}, whereas TinyML-style SOC estimators deployed on microcontrollers typically operate in the 1--3~\% error regime~\cite{crocioniLiIonBatteriesParameter2020,giazitzisCaseStudyTiny2024,Embedded_AI_only_SOC_mobile}. These results provide a useful reference band for the SOC/SOH errors obtained in this work.
+
+Recent hybrid estimators combine physical or statistical preprocessing with learned correction models. Wang et al.~\cite{wang_improved_2024} couple online parameter identification with an adaptive radial-basis correction and differential support-vector machine for SOC estimation under dynamic vehicle-oriented tests. For whole-life capacity estimation, Wang et al.~\cite{wang_improved_2023} combine singular filtering, Gaussian-process regression, and an LSTM to address fast ageing and varying currents. These studies broaden the operating conditions and model structures considered for battery-state estimation. Their primary evidence concerns estimation accuracy, however. Neither reports a paired post-training pruning and quantization study with linked-firmware memory and recurrent microcontroller timing. They are therefore complementary to, rather than substitutes for, the deployment benchmark developed here.
+Across these families the reported accuracy spans a wide range. Electrochemical or Equivalent Circuit Model (ECM)-based observers with carefully tuned filters often achieve SOC root-mean-square errors (RMSE) well below $1\,\%$ of full scale and sub-percent SOH capacity errors on laboratory test cycles~\cite{gaoCoEstimationStateofChargeStateof2022,gaoEnhancedStateofchargeEstimation2022,shenAlternativeCombinedCoestimation2022,wangFusionEstimationLithiumion2022}. Recent sequence-model approaches based on N-BEATS and Bidirectional LSTMs (BiLSTMs) for sodium-ion cells report SOC Mean Absolute Error (MAE) between roughly $0.1$ and $0.4\,\%$~\cite{sunStateChargeEstimation2023,sunStateofchargeEstimationSodiumion2024}, whereas TinyML-style SOC estimators deployed on microcontrollers often operate in the 1--3~\% error regime~\cite{crocioniLiIonBatteriesParameter2020,giazitzisCaseStudyTiny2024,Embedded_AI_only_SOC_mobile}. These values provide context rather than a direct ranking because chemistry, data splits, target construction, drive cycles, and error definitions differ between studies.
 Kalman filters, particle filters, and equivalent-circuit-model observers therefore dominate the classical literature, yet their accuracy can degrade over long operating periods with pronounced current and temperature gradients~\cite{gaoEnhancedStateofchargeEstimation2022,wangFusionEstimationLithiumion2022}. Recurrent neural networks, and in particular LSTM-based regressors, address these limitations by integrating long temporal context and absorbing residual modelling errors~\cite{liOnlineCapacityEstimation2021,wangFusionEstimationLithiumion2022}. In this work we deliberately restrict the architecture search to a single-layer LSTM with a fully connected Multi-Layer Perceptron (MLP) output layer. LSTMs retain explicit cell states with separate input, forget, and output gates, which made it straightforward to hand-code a numerically stable, stateful kernel in C and to reuse the same backbone for both SOC and SOH. Gated recurrent units (GRUs) or Transformer variants could offer alternative trade-offs between accuracy and cost, but exploring multiple architectures would dilute the focus on the embedded tool flow and is left as future work.
-Most publications on LSTM-based estimators maximise accuracy with complex architectures and rarely examine how the resulting models behave once deployed on constrained controllers. Even within the LSTM family, sliding-window inference is commonly employed because it delivers high accuracy, but it also requires substantial RAM to buffer multiple past samples. A stateful LSTM that hands over its hidden and cell vectors step by step retains the temporal information without maintaining large windows and therefore forms the first optimisation step in our architecture. The associated handling of hidden states, feature scaling, and numerical stability is rarely described in the literature, wh×½»ÒÚ$z{-®éÜj×&ÆR–æfÇVVæ6RöâF†R6Æ÷vÇ’f'––ær6fVB4ô‚÷WGWBâF†W6R&W7VÇG2FVÖöç7G&FRF†RfÇVRæBF†R6ÆV"–ç7Vff–6–Væ7’öb&ævR6†V6³²F†W’&Ræ÷B–çFW&æÂÔ5R÷"&V7W'&VçB×7FFRfVÇBÖ–æ¦V7F–öâ&W7VÇG2à Ð¥Ç6V7F–öç´F—67W76–öçÐÐ¥F†RW‡W&–ÖVçG26†÷rF†B'Væ–æræBVçF—¦F–öâffV7BF†R4ô2æB4ô‚W7F–ÖF÷'2F–ffW&VçFÇ’âf÷"4ô2ÂF†RWfÇVFVB'VæVB6†V6·ö–çBö'F–ç2ã3R×W&6VçFvR×ö–çBÆ÷vW"ÔRF†â&6RÂv†–ÆRVçF—¦VB&VÖ–ç2ãW&6VçFvRö–çG2&÷fR&6RâF†RÃ"6Æ–Væ7’æBvV–v‡BÖF—7G&–'WF–öâF–væ÷7F–726öæf—&Òv†–6‚6†ææVÇ2vW&R6VÆV7FVBÂ'WBF†W’Fòæ÷B6†÷rF†B'Væ–ær6W6VB&VwVÆ&—6F–öâ÷"–×&÷fVBvVæW&Æ—6F–öââæò&WVFVB×6VVBÂ7&÷72×fÆ–FF–öâÂ÷"ÖF6†VBVç'VæVBf–æR×GVæ–ærW‡W&–ÖVçBv2f–Æ&ÆS²F†RÆ÷vW"'VæVBÔR—2F†W&Vf÷&R&W÷'FVB26†V6·ö–çBÒæB7Æ—B×7V6–f–2ö'6W'fF–öâà Ð¤f÷"4ô‚F†R–7GW&R—2Ö÷&RçVæ6VBâF&vWG2WföÇfR6Æ÷vÇ’æB&Ræ6†÷&VB'’W&–öF–266—G’6†V6²×W2Âv†–ÆRF†RF—7Æ–VBöæÆ–æRW7F–ÖFW2VæFW&vòGvò7G&öærf–ÇFW&–ær7FvW2âF†RÆö6Âf–ÇFW"6ö×&—6öâ6†÷w2F†B÷7B×&ö6W76–ær6âÇFW"æ÷BöæÇ’'6öÇWFRÔR'WBÇ6òF†R&æ¶–ær&WGvVVâ&6RÂ'VæVBÂæBVçF—¦VBâ6ö×&W76–öâVÆ—G’6†÷VÆBF†W&Vf÷&R&R76W76VBöâ&÷F‚&ræBf–ÇFW&VB÷WGWG2ÂæBf–ÇFW"6VÆV7F–öâ6†÷VÆB6öç6–FW"&W7öç6RFVÆ’&F†W"F†âÔRÆöæRà Ð¤g&öÒâVæv–æVW&–ærW'7V7F—fRF†RF‡&VRFWÆ÷–ÖVçBf&–çG2&W&W6VçBF—7F–æ7B÷W&F–ærö–çG2â&6Re3"öffW'2F†R6–×ÆW7BFööÂfÆ÷r'WB&WV—&W2F†RÆ&vW7BfÆ6‚fö÷G&–çBâ'Væ–ær&VGV6W2F†R&V7W'&VçB7FFRF–ÖVç6–öâæB76ö6–FVBÔÅ&÷w2Â6‡&–æ¶–ær4ô2fÆ6‚g&öÒRã3"Fòc"ã#wæ´"æB–æfW&Væ6RF–ÖRg&öÒãCFòãƒæ×2âf÷"4ô‚F†R6÷'&W7öæF–ær6†ævW2&R33RãFòƒ"ãCæ´"æB#"ãs2Fò"ãs'æ×2âvV–v‡BÖöæÇ’VçF—¦F–öâv—fW2F†R6ÖÆÆW7BfÆ6‚fö÷G&–çG2ÂS"ãC‡æ´"f÷"4ô2æB3‚ãæ´"f÷"4ô‚Â'WBæ÷BgVÆÇ’–çFVvW"W†V7WF–öâF‚â7FF–2¶W&æVÂ66÷VçF–ær–FVçF–f–W2rÃ“#FF—F–öæÂW"×vV–v‡Be3"66ÆR×VÇF—Æ–6F–öç2f÷"4ô2æBc‚Ãc‚f÷"4ô‚Â6öç6—7FVçBv—F‚F†Rö'6W'fVBF–Ö–ærVæÇG’âF†—266÷VçF–ærFöW2æ÷B&WÆ6R7–6ÆRÖÆWfVÂ&öf–Æ–ær÷"ÖVÖ÷'’Ö&æGv–GF‚ÖV7W&VÖVçG2à Ð¥F†RF—7F–æ7F–öâ&WGvVVâ7—7FVÒÆFVæ7’Â–æfW&Væ6RF–ÖRÂæBW7F–ÖFVBVæW&w’—2'F–7VÆ&Ç’&VÆWfçBf÷"&W6÷W&6RÖ6öç7G&–æVB$Õ2âF†RT%BÖG&—fVâFW7G2&W÷'BVæB×FòÖVæBÆFVæ7’Âv†–ÆRöâÖFWf–6R–æfW&Væ6R7ç2ãƒÒÓbã“—æ×2f÷"4ô2æB"ãs"ÒÓ#’ã#æ×2f÷"4ô‚âF†R&W÷'FVBDU÷µÆÖF‡&×¶W7G×ÒBfÇVW2&Rö'F–æVB'’×VÇF—Ç––ærF†W6RF–ÖW2'’â77VÖVB6öç7FçBÅ4—³ãW×µÇvGGÓ²F†W’Fòæ÷B—6öÆFR5RÂfÆ6‚Â5$ÒÂT%BÂ÷"&VwVÆF÷"6öçG&–'WF–öç2â6öç6WVVçFÇ’ÂF†R&W7VÇG2W7F&Æ—6‚F–Ö–æræBÖVÖ÷'’G&FRÖöfg2öâF†R5DÓ3$ƒsS5¤’Â'WBæ÷B6ö×öæVçBÖÆWfVÂVæW&w’'VFvWB÷"6öæ6ÇW6–öâF†BfÆ6‚66W72FöÖ–æFW26öç7V×F–öâà Ð¤Ö÷&RvVæW&ÆÇ’ÂF†R&W÷'FVBÖV7W&VÖVçG2FW67&–&R×VÇF’Öö&¦V7F—fRG&FRÖöfb76R&F†W"F†â6–ævÆR&W7Brr6öÇWF–öââF†RWVÂ×vV–v‡B66÷&Rv—fW2ESÓãsBf÷"4ô2'VæVBæBESÓãƒ2Bf÷"4ô2VçF—¦VBÂv†W&V2&÷F‚6ö×&W76VB4ô‚f&–çG2&VÖ–âæV"öæRâF†RgVÆÂvV–v‡BÖw&–BæÇ—6—26†÷w2v‡’F†W6R66Æ"fÇVW2×W7Bæ÷B&R–çFW'&WFVB2Væ—fW'6Â&æ¶–æw3¢4ô2'VæVB—27F&ÆR7&÷72Ö÷7B&–÷&—F–W2Â'WBF†R&VfW'&VB4ô‚ÖöFVÂ6†ævW2v†Vâ67W&7’÷"fÆ6‚FöÖ–æFW2â–â&7F–6RÂ†&B67W&7’æBÖVÖ÷'’6öç7G&–çG26†÷VÆB&RÆ–VB&Vf÷&R66Æ"WF–Æ—G’66÷&R—2W6VBà ¥F†R–×ÆVÖVçFF–öâÖÆWfVÂ7F÷&vR&VGV7F–öâ—2æ÷B–çG&–ç6–6ÆÇ’F–VBFòÄe6†VÖ—7G'“¢&VÖ÷f–ærF†R6ÖRçVÖ&W"öb†–FFVâ6†ææVÇ2÷"7F÷&–ærF†R6ÖR&V7W'&VçBÖG&–6W22”åC‚&öGV6W26–Ö–Æ"&ÖWFW"Ö6÷VçB6†ævW2f÷"f—†VB&6†—FV7GW&RâF†R67W&7’ÒÖ6ö×&W76–öâG&FRÖöfb—26†VÖ—7G'’ÒæBFFÖFWVæFVçBÂ†÷vWfW"âF†—27GVG’G&–ç2æBWfÇVFW2öæÇ’¤t2Äe6VÆÇ2BÅ4—³#W×µÆFVw&VT6VÇ6—W7Ó²—BFöW2æ÷BfÆ–FFRäÔ2÷"Ä4òföÇFvR6†&7FW&—7F–72ÂFVw&FF–öâG&¦V7F÷&–W2Â÷"÷W&F–ær&ævW2âW†—7F–ærVÖ&VFFVBäÔ24ô27GVF–W2æBäÔ24ô‚W7F–ÖF÷'2FVÖöç7G&FRF†B6ö×7BFFÖG&—fVâÖöFVÇ2&RfV6–&ÆRöâF†÷6R6†VÖ—7G&–W7åÆ6—FW¶v–¦—G¦—466U7GVG•F–ç“##BÆÆ”öæÆ–æT66—G”W7F–ÖF–öã##Ç'¦W¶æWW&ÄæWGv÷&´&6†—FV7GW&S##6ÒÂ'WBF†W’Fòæ÷BG&ç6fW"F†RçVÖW&–6ÂÔR÷"÷F–ÖÂ'Væ–ær÷VçF—¦F–öâÆWfVÂ&W÷'FVB†W&Râ6†VÖ—7G'’×7V6–f–2&WG&–æ–æræBfÆ–FF–öâ&R&WV—&VB&Vf÷&RF†÷6RfÇVW26â&RvVæW&Æ—6VBà ¥F†R&W6VçBf&–çG2Ç6ò6W&FRF†RGvò6ö×&W76–öâ&÷WFW3¢öæR×6†÷B7G'V7GW&VB'Væ–ærv—F‚6†÷'Bf–æR×GVæ–ærÂæB÷7B×G&–æ–ær&V7W'&VçB×vV–v‡BVçF—¦F–öâöbF†R÷&–v–æÂe3"6†V6·ö–çBâVçF—¦F–öâÖv&RG&–æ–æræB'Væ–ærÖv&R÷"—FW&F—fRG&–æ–ær6â–â&–æ6—ÆR&V6÷fW"67W&7’'’FF–ær&ÖWFW'2FòF†R–×÷6VB&W&W6VçFF–öçåÆ6—FW¶·&—6†æÖö÷'F†•VçF—¦–ætFVW6öçföÇWF–öæÃ#‚ÇvVäÆV&æ–æt–çG&–ç6–57'6S#wÒÂ'WBvW&Ræ÷B'Vâf÷"F†—2&Wf—6–öâ&V6W6RF†W’&WV—&RæWrG&–æ–ær6×–vââF†R7W'&VçB6ö×&—6öâF†W&Vf÷&RFG&W76W2FWÆ÷–&ÆR÷7B×G&–æ–ærG&ç6f÷&ÖF–öç2Âæ÷BF†R&W7B6†–Wf&ÆR&W7VÇBöb¦ö–çFÇ’G&–æVB6ö×&W76–öâà Ð¤7W'&VçBÆ–Ö—FF–öç2&RöæRÄe6†VÖ—7G'’ÂöæR&–æ6—ÂFW7B7Æ—BæBG&–æVB6†V6·ö–çBW"F6²ÂöæR5DÓ3"fÖ–Ç’ÂæòVçF—¦F–öâÖv&R÷"'Væ–ærÖv&RG&–æ–ærÂæBæòF—&V7BW"ÖÖöFVÂ÷vW"ÖV7W&VÖVçBâF†RÆöærÖ†÷&—¦öâæB÷WGWBÖfVÇBæÇ—6W2W6R6fVB6ögGv&RG&¦V7F÷&–W2âF†W’Fòæ÷B6÷fW"&V7W'&VçB×7FFRÂ7F—fF–öâÂvV–v‡BÖÖVÖ÷'’Â6Vç6÷"Â6öÖ×Væ–6F–öâÂ÷"Ô5RfVÇG2ÂæBF†R&ævRÖ6†V6²W‡W&–ÖVçB&VÖ–ç2&6–26Vç6—F—f—G’6†V6²&F†W"F†âVÖ&VFFVB6fWG’fÆ–FF–öâà¥Ç6V7F–öç´6öæ6ÇW6–öâæB÷WFÆöö·ÐÐ¥F†—2v÷&²&W6VçG2&W&öGV6–&ÆRF‚g&öÒFFÖG&—fVâ4ô2æB4ô‚W7F–ÖF÷'2Fòâ5DÓ3"Ö&6VB&GFW'’ÖævVÖVçB6öçG&öÆÆW"â7F'F–ærg&öÒÅ5DÕÂÂµÂÄÔÅÖöFVÇ2G&–æVBöâF†RÄeFôR7–6ÆRvV–ærFF6WBÂvRFW&—fR'VæVBæB&V7W'&VçB×vV–v‡B×VçF—¦VBf&–çG2æB&Væ6†Ö&²67W&7’ÂF–Ö–ærÂæBÖVÖ÷'’W6vRöââ5DÓ3$ƒsS5¤’Ö–7&ö6öçG&öÆÆW"âW7F–ÖFVBVæW&w’W"–æfW&Væ6R—2&W÷'FVBöæÇ’26öç7FçB×÷vW"F–Ö–ær&÷‡’à Ð¤f÷"4ô2Â'VæVB&VGV6W2fÆ6‚'’Cã—åÂRæB–æfW&Væ6RF–ÖR'’C"ã—åÂRÂv†–ÆR—G2ÔR—2ã3RW&6VçFvRö–çG2Æ÷vW"F†â&6Rf÷"F†RWfÇVFVB6†V6·ö–çBæB7Æ—BâVçF—¦VB&VGV6W2fÆ6‚'’Sã'åÂR'WB–æ7&V6W2–æfW&Væ6RF–ÖR'’3“—åÂR–âF†RÖ—†VB×&V6—6–öâ6ögGv&R¶W&æVÂâf÷"4ô‚Â'VæVB&VGV6W2fÆ6‚'’CRãWåÂRæB–æfW&Væ6RF–ÖR'’CBãåÂS²VçF—¦VB&VGV6W2fÆ6‚'’S‚ã‡åÂRv†–ÆR–æ7&V6–ær–æfW&Væ6RF–ÖR'’#‚ãWåÂRâF†R6öç7FçB×÷vW"VæW&w’&÷‡’6†ævW2'’F†R6ÖRW&6VçFvW22–æfW&Væ6RF–ÖRæB×W7Bæ÷B&R&VB2â–æFWVæFVçB÷vW"ÖV7W&VÖVçBâFVâ6öç6V7WF—fR&WÆ’6VvÖVçG26†÷ræòVçF—¦F–öâ×7V6–f–2Ööæ÷Föæ–2FWf–F–öâg&öÒ&6RÂv†–ÆRF†Rf–ÇFW"6ö×&—6öâFVÖöç7G&FW2F†B4ô‚67W&7’æB&W7öç6RFVÆ’×W7B&R6öç6–FW&VB¦ö–çFÇ’à Ð¥F†RÖV7W&VÖVçG2W7F&Æ—6‚FWÆ÷–ÖVçBfV6–&–Æ—G’f÷"F†RFW7FVBÄeG&¦V7F÷&–W2Â6†V6·ö–çG2ÂæB6öçG&öÆÆW"–×ÆVÖVçFF–öââF†W’Fòæ÷BW7F&Æ—6‚F†R6ÖR67W&7’ÒÖ6ö×&W76–öâG&FRÖöfbf÷"äÔ2÷"Ä4ò6VÆÇ2Â÷F†W"5DÓ3"fÖ–Æ–W2Â&WVFVBÖöFVÂ–æ—F–Æ—6F–öç2Â÷"–çFW&æÂVÖ&VFFVBfVÇG2à Ð¤gWGW&Rv÷&²v–ÆÂW‡FVæBfÆ–FF–öâFòFF—F–öæÂ6†VÖ—7G&–W2ÂFV×W&GW&W2Â&æFöÒ6VVG2ÂæB6öçG&öÆÆW"fÖ–Æ–W3²6ö×&R÷7B×G&–æ–ær6ö×&W76–öâv—F‚VçF—¦F–öâÖv&RæB'Væ–ærÖv&RG&–æ–æs²æBÖV7W&RW"ÖÖöFVÂ&ö&B÷vW"v—F‚W‡FW&æÂ–ç7G'VÖVçFF–öââ–çFW&æÂvV–v‡BÂ7F—fF–öâÂ&V7W'&VçB×7FFRÂ6Vç6÷"Â6öÖ×Væ–6F–öâÂæBÔ5RfVÇB–æ¦V7F–öâ—2Ç6ò&WV—&VB&Vf÷&R6fWG’6Æ–×26â&RÖFRâ¦ö–çFÇ’'Væ–æræBVçF—¦–æröæRÖöFVÂ&VÖ–ç2&öÖ—6–ær&÷WFRFò6öÖ&–æR&VGV6VB7FFRF–ÖVç6–öâv—F‚6ö×7B&V7W'&VçB7F÷&vRà¥Æ6ÆV'vP¥ÆVæF—€¥Ç6V7F–öçµ7WÆVÖVçF'’6ö×&W76–öâæB&ö'W7FæW72æÇ—6W7ÕÆÆ&VÇ¶§7WÆVÖVçF'—Ð¥F†—2VæF—‚Fö7VÖVçG2÷7BÖ†ö2æÇ—6W2öbF†R&6†—fVBÖöFVÂ'FVf7G2æB6fVB7G&VÖ–ær÷WGWG2âVæÆW727FFVB÷F†W'v—6RÂæòæWr5DÓ3"ÖV7W&VÖVçB÷"æWW&ÂÖæWGv÷&²G&–æ–ærv2W&f÷&ÖVBà ¥Ç7V'6V7F–öçµ7G'V7GW&VB×'Væ–ærF–væ÷7F–77ÕÆÆ&VÇ¶§'Væ–æuöF–væ÷7F–77Ð¥Æ&Vv–ç¶f–wW&R§Õ²‡EÐ¢Æ6VçFW&–æp¢Æ–æ6ÇVFVw&†–75·v–GFƒÕÇFW‡Gv–GF…×¶f–wW&W2õ&Wf–WuóôFF—F–öæÂ÷&Weó÷'Væ–æuöWf–FVæ6RçæwÐ¢Æ6F–öçµ÷7BÖ†ö2F–væ÷7F–72f÷"F†RöæR×6†÷B4ô2'Væ–ær÷W&F–öââ†’Ã"6Æ–Væ7’g&öÒWçåÇ&Vg¶W§'Væ–æu÷6Æ–Væ7—ÒÂ6÷'FVB–â66VæF–ær÷&FW#²F†R’Æ÷vW7B×&æ¶VBVæ—G2&R&VÖ÷fVBæBCRVæ—G2&R&WF–æVBâ†"’FVç6—G’öbF†R6VçG&Â&V7W'&VçB×vV–v‡B&ævRf÷"F†R&6RæB'VæVB6†V6·ö–çG2âF†RÆ÷B6öæf—&×2Æ–6F–öâöbF†R7V6–f–VB6†ææVÂ×&æ¶–ær7&—FW&–öâæBFW67&–&W2F†R&W7VÇF–ærvV–v‡BF—7G&–'WF–öââ—BFöW2æ÷B&÷fRF†B'Væ–ær6W6VBF†RÆ÷vW"4ô2ÔR÷"F†BF†RVffV7BW'6—7G27&÷72&æFöÒ6VVG2çÐ¢ÆÆ&VÇ¶f–s¦÷'Væ–æuöF–væ÷7F–77Ð¥ÆVæG¶f–wW&R§Ð¥Æ6ÆV'vP ¥Ç7V'6V7F–öç´ÆöærÖ†÷&—¦öâFV×÷&Â7F&–Æ—G—ÕÆÆ&VÇ¶¦Æöæuö†÷&—¦öçÐ¥Æ&Vv–ç¶f–wW&R§Õ²‡EÐ¢Æ6VçFW&–æp¢Æ–æ6ÇVFVw&†–75·v–GFƒÕÇFW‡Gv–GF…×¶f–wW&W2õ&Wf–WuóôFF—F–öæÂ÷&Weó%öÆöæuö†÷&—¦öå÷7F&–Æ—G’çæwÐ¢Æ6F–öçµFV×÷&ÂW'&÷"æBÖöFVÂ×FòÔ&6RFWf–F–öâ÷fW"FVâ6öç6V7WF—fRÂWVÂÖ6÷VçB6VvÖVçG2öbF†R6fVBgVÆÂ×7G&VÒ&WÆ’â&V7W'&VçB7FFW2&Ræ÷B&W6WBB6VvÖVçB&÷VæF&–W2âæVÇ2†’æB†2’6†÷rF&vWBÔRf÷"4ô2æB4ôƒ²æVÇ2†"’æB†B’6†÷rF†RÖVâ'6öÇWFRFWf–F–öâöb'VæVBæBVçF—¦VBg&öÒ&6RâVçF—¦VBFöW2æ÷BW††–&—BÖöæ÷Föæ–2ÆFR×6WVVæ6RFWf–F–öâg&öÒ&6R–âV—F†W"F6²ÂÇF†÷Vv‚F&vWBW'&÷"f&–W2v—F‚6WVVæ6R†6RâF†R&W7VÇB—27V6–f–2FòF†R&V6÷&FVB&WÆ’æB—2æ÷B&ööböb7F&–Æ—G’f÷"&&—G&'’6WVVæ6RÆVæwF‡2çÐ¢ÆÆ&VÇ¶f–s¦öÆöæuö†÷&—¦öçÐ¥ÆVæG¶f–wW&R§Ð¥Æ6ÆV'vP ¥Ç7V'6V7F–öçµ4ô‚f–ÇFW&–æræB6ö×&W76–öâ–çFW&7F–öçÕÆÆ&VÇ¶§6ö…öf–ÇFW'Ð¥Æ&Vv–ç¶f–wW&R§Õ²‡EÐ¢Æ6VçFW&–æp¢Æ–æ6ÇVFVw&†–75·v–GFƒÕÇFW‡Gv–GF…×¶f–wW&W2õ&Wf–WuóôFF—F–öæÂ÷&Weó5÷6ö…öf–ÇFW%÷—VÆ–æRçæwÐ¢Æ6F–öç´6öçG&öÆÆVB6ö×&—6öâöb4ô‚6ö×&W76–öâæBf–ÇFW&–ærf÷"Æö6ÆÇ’&RÖW†V7WFVB&6RÂ'VæVBÂæBVçF—¦VB2ÖöFVÇ2â†’÷WGWG2gFW"f—'7B×ö–çBÆ–væÖVçB'WB&Vf÷&RFV×÷&Âf–ÇFW&–ærâ†"’7FvWãv—F‚EÆÇ†óÓã"BæBF†R7–ÖÖWG&–2Æ–Ö—FW"â†2’f–æÂ6WVVçF–Â÷WGWBgFW"Ç––ær7FvWã"v—F‚EÆÇ†ó#Óç²ÓgÒBæBF†RF÷vçv&BÆ–Ö—FW"Fò7FvWãâ†B’ÔRgFW"V6‚&ö6W76–ær7FvRâBÅ4—³×µÆ†W'G§ÒÂF†RTÔÖöæÇ’“åÂR&W7öç6RF–ÖW2&R&÷†–ÖFVÇ’Å4—³G×µÇ6V6öæGÒæB#bãcWæF—2Â&W7V7F—fVÇ“²F†RæöæÆ–æV"Æ–Ö—FW'2†fRæò6–ævÆR7WFöfbg&WVVæ7’âF†RÆö6Âv–æF÷w2&RÖW†V7WF–öâ—2–çFW&æÆÇ’6öç6—7FVçB7&÷72F†RF‡&VRf&–çG2'WB—2æ÷BçVÖW&–6ÆÇ’–FVçF–6ÂFòF†R&6†—fVBÆ–çW‚G&¦V7F÷'’÷fW"F†R6ö×ÆWFR&V7W'&VçB6WVVæ6RÂ6òF†W6RfÇVW2æÇ—6Rf–ÇFW"–çFW&7F–öâæBFòæ÷B&WÆ6RF†RÖ–â&Væ6†Ö&²ÖWG&–72çÐ¢ÆÆ&VÇ¶f–s¦÷6ö…öf–ÇFW'Ð¥ÆVæG¶f–wW&R§Ð¥Æ6ÆV'vP ¥Ç7V'6V7F–öçµWF–Æ—G’×vV–v‡B6Vç6—F—f—G—ÕÆÆ&VÇ¶§WF–Æ—G•÷6Vç6—F—f—G—Ð¥Æ&Vv–ç¶f–wW&R§Õ²‡EÐ¢Æ6VçFW&–æp¢Æ–æ6ÇVFVw&†–75·v–GFƒÕÇFW‡Gv–GF…×¶f–wW&W2õ&Wf–WuóôFF—F–öæÂ÷&WeóE÷WF–Æ—G•÷6Vç6—F—f—G’çæwÐ¢Æ6F–öçµ6Vç6—F—f—G’öbF†RWF–Æ—G’&æ¶–ærFòÆ–6F–öâ&–÷&—F–W2âæVÇ2†’æB†"’f'’F†R†–v†Æ–v‡FVBö&¦V7F—fRg&öÒ#RFòƒWåÂRæBF—f–FRF†R&VÖ–æ–ærvV–v‡BWVÆÇ’ÖöærF†R÷F†W"F‡&VRö&¦V7F—fW3²V6‚7V&R–FVçF–f–W2F†RÆ÷vW7B×WF–Æ—G’ÖöFVÂâB#WåÂRÂÆÂf÷W"ö&¦V7F—fW2†fRWVÂvV–v‡BâæVÂ†2’v—fW2F†Rv–ææ–ær6†&R7&÷72ÆÂÃssæöâÖæVvF—fRãR×76VBvV–v‡B6öÖ&–æF–öç2F†B7VÒFòöæRâF†RVæW&w’ö&¦V7F—fRW6W2F†RF–Ö–ærÖFW&—fVBDU÷µÆÖF‡&×¶W7G×ÒB&÷‡’æB—2F†W&Vf÷&Ræ÷Bâ–æFWVæFVçB÷vW"ÖV7W&VÖVçBçÐ¢ÆÆ&VÇ¶f–s¦÷WF–Æ—G•÷6Vç6—F—f—G—Ð¥ÆVæG¶f–wW&R§Ð¥Æ6ÆV'vP ¥Ç7V'6V7F–öç´Æ–Ö—FVB÷WGWBÖfVÇB6Vç6—F—f—G—ÕÆÆ&VÇ¶¦fVÇE÷6Vç6—F—f—G—Ð¥Æ&Vv–ç¶f–wW&R§Õ²‡EÐ¢Æ6VçFW&–æp¢Æ–æ6ÇVFVw&†–75·v–GFƒÕÇFW‡Gv–GF…×¶f–wW&W2õ&Wf–WuóôFF—F–öæÂ÷&WeóUöÆ–Ö—FVEöfVÇE÷6Vç6—F—f—G’çæwÐ¢Æ6F–öçµ6ögGv&RÖÆWfVÂ6Vç6—F—f—G’Fò&æFöÒ6–ævÆRÖ&—B6÷''WF–öâöb6fVBe3"W7F–ÖF÷"÷WGWBÂ&6VBöâ#ÃG&–Ç2W"F6²æBÖöFVÂâ†’g&7F–öâöb&&—G&'’Ö&—B6÷''WF–öç2&öGV6–ærâ'6öÇWFRW'&÷"&÷fRW&6VçFvRö–çG2â†"’“R'6öÇWFRW'&÷"&Vf÷&RæBgFW"&V¦V7F–æræöâÖf–æ—FR÷"÷WBÖöb×&ævRfÇVW2æB†öÆF–ærF†R&V6VF–ær&VF–7F–öââF†RwV&B&VGV6W2W‡G&VÖRW‡öæVçBæB6–vâfVÇG2'WB6ææ÷BFWFV7BÆW6–&ÆR–â×&ævR6÷''WF–öââF†—2W‡W&–ÖVçBFöW2æ÷B–æ¦V7BfVÇG2–çFòÔ5RÖVÖ÷'’Â&V7W'&VçB7FFW2ÂvV–v‡G2Â7F—fF–öç2Â–çWG2Â÷"6öÖ×Væ–6F–öâæB—2æ÷BâVÖ&VFFVBfVÇB×fÆ–FF–öâ6Æ–ÒçÐ¢ÆÆ&VÇ¶f–s¦öfVÇE÷6Vç6—F—f—G—Ð¥ÆVæG¶f–wW&R§Ð¥Æ6ÆV'vP¥Ç6V7F–öâ§´gVæF–æwÐ¥F†—2&W6V&6‚v2gVæFVB'’F†RvW&ÖâfVFW&ÂÖ–æ—7G'’f÷"VGV6F–öâæB&W6V&6‚„$Ô$b’Âw&çBçVÖ&W"54ccƒD„Ôrd$Ò’âF†RWF†÷'2&R&W7öç6–&ÆRf÷"F†R6öçFVçBâF†Rv÷&²v2gW'F†W"7W÷'FVB'’F†RvW&Öâ&W6V&6‚f÷VæFF–öâæBF†R÷Vâ66W72V&Æ–6F–öâgVæBöbF†RFV6†æ–6ÂVæ—fW'6—G’öb&W&Æ–âàÐ¥Ç6V7F–öâ§´6¶æ÷vÆVFvVÖVçG7ÐÐ¥F†—2&W6V&6‚v2gVæFVB'’F†RvW&ÖâfVFW&ÂÖ–æ—7G'’f÷"VGV6F–öâæB&W6V&6‚„$Ô$b’Âw&çBçVÖ&W"54ccƒD„Ôrd$Ò’âF†RWF†÷'2&R&W7öç6–&ÆRf÷"F†R6öçFVçBâF†Rv÷&²v2gW'F†W"7W÷'FVB'’F†RvW&Öâ&W6V&6‚f÷VæFF–öâæBF†R÷Vâ66W72V&Æ–6F–öâgVæBöbF†RFV6†æ–6ÂVæ—fW'6—G’öb&W&Æ–âàÐ¥vR6¶æ÷vÆVFvR7W÷'Bg&öÒF†RvW&Öâ&W6V&6‚f÷VæFF–öâæBF†R÷Vâ66W72V&Æ–6F–öâgVæBöbF†RFV6†æ–6ÂVæ—fW'6—G’öb&W&Æ–âÂ2vVÆÂ2F†R†–v‚W&f÷&Öæ6R6ö×WF–ær6W'f–6RöbF†RFV6†æ–6ÂVæ—fW'6—G’öb&W&Æ–âf÷"&÷f–F–ærF†R6ö×WFF–öæÂ&W6÷W&6W2W6VB–âF†R'Væ–æræBVçF—¦F–öâW‡W&–ÖVçG2âF†RWF†÷'2F†æ²æ–Ç27G&76Væ'W&r„†76òÕÆGFæW"Ô–ç7F—GWBÂ÷G6FÒ’f÷"†VÇgVÂF—67W76–öç2öâ'Væ–æræBVçF—¦F–öâÂÖæò66†Ö—G¢f÷"F†R6öÆÆ&÷&F–öâöâF†RFF6WB7&VF–öâÂæBÖ‚Ü;fæ–¶W2æBfVÂÆV–æ–¶R…FV6†æ–6ÂVæ—fW'6—G’öb&W&Æ–â’f÷"F†V—"6öÆÆ&÷&F–öâöâF†R$Õ2†&Gv&RàÐ¥Ç6V7F–öâ§´5&VF•BWF†÷'6†—6öçG&–'WF–öâ7FFVÖVçGÐÐ¤fÆ÷&–â'¦W¶¢6öæ6WGVÆ—¦F–öâÂÖWF†öFöÆöw’Â6ögGv&RÂfÆ–FF–öâÂf÷&ÖÂæÇ—6—2Â–çfW7F–vF–öâÂFF7W&F–öâÂw&—F–ærÒÖ÷&–v–æÂG&gB&W&F–öâÂw&—F–ærÒ×&Wf–WræBVF—F–ærÂf—7VÆ—¦F–öâàÐ Ð¤§VÆ–¶÷vÃ¢&W6÷W&6W2Â7WW'f—6–öâÂ&ö¦V7BFÖ–æ—7G&F–öâÂgVæF–ær7V—6—F–öâÂw&—F–ærÒ×&Wf–WræBVF—F–æràÐ Ð¥Ç6V7F–öâ§´FV6Æ&F–öâöb6ö×WF–ær–çFW&W7GÐÐ¥F†RWF†÷'2FV6Æ&RF†BF†W’†fRæò¶æ÷vâ6ö×WF–ærf–ææ6–Â–çFW&W7G2÷"W'6öæÂ&VÆF–öç6†—2F†B6÷VÆB†fRV&VBFò–æfÇVVæ6RF†Rv÷&²&W÷'FVB–âF†—2W"àÐ¥Ç6V7F–öâ§´FV6Æ&F–öâöbvVæW&F—fR’æB’Ö76—7FVBFV6†æöÆöv–W2–âF†RÖçW67&—B&W&F–öâ&ö6W77ÐÐ¤GW&–ærF†R&W&F–öâöbF†—2v÷&²F†RWF†÷"‡2’W6VB6†DuBÂFVWÂÂæBw&ÖÖ&Ç’–â÷&FW"Fò–×&÷fRF†RÆ–æwV—7F–2VÆ—G’æB7G–ÆRöbF†RÖçW67&—BâgFW"W6–ærF†W6RFööÇ2ÂF†RWF†÷"‡2’&Wf–WvVBæBVF—FVBF†R6öçFVçB2æVVFVBæBF¶R‡2’gVÆÂ&W7öç6–&–Æ—G’f÷"F†R6öçFVçBöbF†RV&Æ—6†VB'F–6ÆRàÐ Ð¥Ç6V7F–öâ§´FFf–Æ&–Æ—G—ÐÐ¥F†RÄeFôR7–6ÆRvV–ærFF6WBW6VB–âF†—2v÷&²6â&Rö'F–æVBg&öÒF†RDô’&W÷6—F÷'’–çåÆ6—FW´ÄeôFôUô7–6ÆUôv–æuôFF6WGÒâF†RÆæF–ærvR&÷f–FW2Æ–6Vç6–ær–æf÷&ÖF–öâæBF÷væÆöB–ç7G'V7F–öç2àÐ Ð¥Æ&–&Æ–öw&‡—7G–ÆW¶VÇ6'F–6ÆRÖçV×ÐÐ¥Æ&–&Æ–öw&‡—¶&–"÷W#%÷6ö76ö…ög'ÐÐ¥ÆVæG¶Fö7VÖVçGÐ
+Most publications on LSTM-based estimators maximise accuracy with complex architectures and rarely examine how the resulting models behave once deployed on constrained controllers. Even within the LSTM family, sliding-window inference is commonly employed because it delivers high accuracy, but it also requires substantial RAM to buffer multiple past samples. A stateful LSTM that hands over its hidden and cell vectors step by step retains the temporal information without maintaining large windows and therefore forms the first optimisation step in our architecture. The associated handling of hidden states, feature scaling, and numerical stability is rarely described in the literature, which is why this work explicitly targets embedded SOC/SOH deployment.
+\begin{figure*}[t!]
+    \centering
+    \includegraphics[width=\textwidth]{figures/Schematics/Figure_1_LSTM_MLP_Schematic.png}
+    \caption[Stateful LSTM+MLP estimator]{Schematic of the deployed SOC/SOH estimator. Preprocessed feature streams are fed into a single-layer LSTM whose hidden state is propagated across time. At each step a lightweight MLP head maps the hidden representation either to SOC or SOH, enabling stateful streaming inference on the STM32.}
+    \label{fig:lstm_mlp_schematic}
+\end{figure*}
+\subsection{Embedded Deployment Strategies}
+Commercial toolchains such as ONNX Runtime, TensorRT, and STM32Cube.AI support many neural-network deployment workflows~\cite{ONNXRuntimeHighperformance,NVIDIATensorRTHighPerformance,XCUBEAISTM32CubeExpansion}. For continuously stateful estimators, however, a generated binary does not always expose recurrent-state handling or the precise placement of mixed-precision scaling operations needed for an implementation audit. Naguib et al.~\cite{naguibMicroprocessorExecutionTime2022} compare accuracy, execution time, flash, and RAM for classical and neural SOC estimators on two NXP microcontrollers. Crocioni et al.~\cite{crocioniLiIonBatteriesParameter2020} deploy compact recurrent capacity estimators on STM32 targets and study 8-bit quantization. More recent TinyML studies evaluate quantized or hardware-accelerated SOC estimators on embedded platforms~\cite{giazitzisCaseStudyTiny2024,Embedded_AI_only_SOC_mobile}, while Kamali et al.~\cite{Embedded_AI_SOH_badData} target computationally compact SOH estimation. These studies establish embedded feasibility, but each addresses a narrower combination of task, architecture, compression method, and target hardware.
+
+At the compression-method level, PQ Bench~\cite{schulzePQBenchBenchmarking2025} systematically compares pruning and quantization across general deep-learning workloads and confirms that their accuracy--storage trade-offs are model dependent. It does not address the continuous recurrent state, SOH post-processing, or microcontroller timing behaviour of battery estimators. The resulting research gap is therefore not the absence of compact neural estimators, but the absence of a controlled, task-paired benchmark that traces two transparent compression routes from trained SOC and SOH models to measured stateful firmware behaviour. Our study addresses this gap with the same input dimension, streaming protocol, performance-indicator definitions, and STM32 measurement procedure for Base, Pruned, and Quantized variants of both tasks.
+
+To retain control over the implementation boundary, we extract the PyTorch tensors, remove complete recurrent channels according to the documented saliency score, apply per-row symmetric quantization to the recurrent weights, and implement the LSTM gates and activations in C. This path makes the state update, scaling operations, and stored parameter types inspectable and links the model transformations directly to the reported flash, RAM, and timing measurements.
+\section{Dataset and Preprocessing}
+\subsection{Ageing Experiments and Load Profiles}
+All experiments rely on the high-resolution LFP DoE Cycle Ageing Dataset~\cite{LFP_DoE_Cycle_Aging_Dataset}. The measurements originate from a design-of-experiments study on commercially available JGCFR18650-1800mAh-3.2V LFP cells~\cite{jgneJGCFR186501800mAh32VProductSpecification} conducted at the Technical University of Berlin. Cells were cycled inside a climatic chamber at $25^\circ\mathrm{C}$ while the following factors were systematically varied:
+\begin{align}
+    C_{\mathrm{chg}} &\in [0.5\,\mathrm{C},\,0.9\,\mathrm{C}],\\
+    C_{\mathrm{dis}} &\in [1.0\,\mathrm{C},\,2.5\,\mathrm{C}],\\
+    \mathrm{DoD} &\in [45\%,\,65\%].
+\end{align}
+The mixed full/fractional factorial plan distributes fifteen test cells across eight operating-point combinations and includes replication to assess repeatability. Figure~\ref{fig:doe_cube} shows the low and high levels of all three factors.
+
+Between ageing loops, dedicated check-ups provide capacity tests, open-circuit-voltage sweeps, and hybrid pulse-power characterisation. Stationary-storage profiles are additionally injected to emulate realistic power flows~\cite{kucevicStandardBatteryEnergy2020a}. These profiles originate from residential photovoltaic home-storage applications and contain stochastic load and generation patterns that excite the cell differently from constant-current cycling.
+
+The raw dataset contains uniformly sampled measurements at \SI{1}{\hertz}, including voltage, current, terminal temperature, and auxiliary channels. Partitioned Parquet tables support efficient retrieval of the long ageing sequences.
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/Schematics/Figure_2_DoE_Cube.png}
+    \caption[Design-of-experiments cube]{General three-factor design-of-experiments geometry used to structure the LFP ageing campaign. The cube represents the factorial design space, while the generic labels $y_1$ to $y_{15}$ denote experimental conditions within and around it. The dataset-specific charge rate, discharge rate, and depth-of-discharge levels are described in the accompanying text.}
+    \label{fig:doe_cube}
+\end{figure}
+\noindent The dataset is published in~\cite{LFP_DoE_Cycle_Aging_Dataset}. The cube notation follows standard DoE conventions as summarised in~\cite{siebertzStatistischeVersuchsplanung2017}.
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/Combined_Results/Figure_3_SOC_Test_Trajectory.png}
+    \caption[Representative SOC trajectory]{Representative SOC trajectory illustrating selected segments of the experimental protocol used in this study. The plot shows a portion of the cyclic ageing procedure with defined charge and discharge currents and a specified depth-of-discharge (DoD), followed by the diagnostic checkup sequence comprising OCV determination, HPPC pulses, and capacity tests. In addition, the trajectory includes a load profile taken from a stationary battery storage system. Together, these segments capture both controlled laboratory diagnostics and application-oriented operating conditions.}
+    \label{fig:soc_tests}
+\end{figure}
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/Combined_Results/Figure_4_SOH_All_Days.png}
+    \caption[SOH across all cells]{Evolution of the state of health across all LFP cells in the ageing campaign, shown over the total experimental duration. The spread between trajectories reflects the different operating points in the factorial plan (C-rates, depth of discharge, profile mix) and motivates the use of a data-driven SOH estimator that generalises across cells and loading conditions.}
+    \label{fig:soh_all_days}
+\end{figure}
+\noindent
+Together, Figures~\ref{fig:soc_tests} and~\ref{fig:soh_all_days} illustrate the diversity of SOC transients and ageing behaviour that the estimators must capture: short-term SOC dynamics are driven by fast current swings and mode changes between profiles, whereas SOH evolves slowly over hundreds of days and depends on the cumulative operating conditions of each cell.
+\subsection{Feature Engineering}
+The SOC model consumes the six-dimensional feature vector
+\begin{equation}
+    \mathbf{x}^{\mathrm{SOC}}_t = \bigl[U(t),\, I(t),\, T(t),\, Q_c(t),\, \tfrac{\mathrm{d}U}{\mathrm{d}t}(t),\, \tfrac{\mathrm{d}I}{\mathrm{d}t}(t)\bigr],
+\end{equation}
+where the audited preprocessing uses timestamp-aware backward differences rather than centred differences. For sample index $k>0$,
+\begin{align}
+    \Delta t_k &= \max(t_k-t_{k-1},\varepsilon_t), \qquad \varepsilon_t=10^{-6},\label{eq:feature_dt}\\
+    \left.\frac{\mathrm{d}U}{\mathrm{d}t}\right|_k &= \frac{U_k-U_{k-1}}{\Delta t_k}, \qquad
+    \left.\frac{\mathrm{d}I}{\mathrm{d}t}\right|_k = \frac{I_k-I_{k-1}}{\Delta t_k}.\label{eq:feature_backward_difference}
+\end{align}
+This causal calculation requires only the preceding voltage/current sample and timestamp and has constant work per update. In the evaluated benchmark, however, derivative and cumulative channels were prepared host-side before replay. Complete six-feature vectors were transmitted via UART, and the firmware applied the same robust-scaling parameters used during model development. Consequently, the reported DWT kernel times exclude sensor acquisition and feature construction. The exact placement of the six-feature scaling operation is documented with the STM32 measurement interval below. Each component is normalised using a robust scaling operation based on the median $m$ and interquartile range $r$:
+\begin{equation}
+    \tilde{x}^{\mathrm{SOC}}_{t,k} = \frac{x^{\mathrm{SOC}}_{t,k} - m_k}{r_k + \varepsilon}, \qquad \varepsilon=10^{-6}.
+\end{equation}
+The same $(m_k,r_k)$ pairs are embedded in the firmware so that host and STM32 inputs are normalised identically.
+The SOH model uses a slightly different feature stack to capture slow-varying degradation markers:
+\begin{equation}
+    \mathbf{x}^{\mathrm{SOH}}_t = \bigl[ t,\, U(t),\, I(t),\, T(t),\, \mathrm{EFC}(t),\, Q_c(t) \bigr],
+\end{equation}
+where $t$ is the cumulative time stamp and $\mathrm{EFC}(t)$ denotes the equivalent full cycles accrued up to sample $t$. These channels are likewise robustly normalised, relying on median and interquartile range rather than mean and variance to reduce the influence of outliers in current and voltage measurements~\cite{huberRobustStatistics2009,pedregosaScikitlearnMachineLearning2012}. During deployment, the SOC and SOH models run independently on the microcontroller and each produces one estimate per second. In principle, both estimates could be fused more tightly, but this work keeps the models separate to evaluate their resource use and accuracy independently.
+\subsection{Reference SOC and SOH targets}
+The ground-truth SOC trajectory is derived from Coulomb counting with drift compensation. Denoting the apparent cell capacity after a given check-up by $C_{\mathrm{app}}$, the SOC inside a charge-discharge segment is computed as
+\begin{equation}
+    \mathrm{SOC}(t) = \mathrm{SOC}(t_0) - \frac{1}{C_{\mathrm{app}}}\int_{t_0}^{t} I(\tau)\,\mathrm{d}\tau,
+\end{equation}
+where the integral is reset to $\mathrm{SOC}=1$ after each constant-voltage (CV) termination. The reset mitigates the bias that would otherwise accumulate due to capacity fade, yet the long-term traces still reveal gradual changes in the SOC envelope as $C_{\mathrm{app}}$ decreases.
+State of health is obtained from the periodic capacity check-ups through
+\begin{equation}
+    \mathrm{SOH}_k = \frac{C_k}{C_{\mathrm{nom}}},
+\end{equation}
+with $C_k$ representing the measured discharge capacity during the $k$-th reference cycle (comprising capacity test, open-circuit-voltage sweep, and hybrid pulse-power characterisation) relative to the nominal capacity $C_{\mathrm{nom}}$. These targets highlight the need for a data-driven estimator that remains accurate despite the evolving capacity landscape, which motivates the use of recurrent neural networks for both SOC and SOH predictions.
+The reference SOC and SOH traces are therefore offline constructs. They rely on information that is not available in deployment, such as long rest periods for OCV stabilisation and capacity from periodic full cycles, and they assume perfect initialisation and recalibration. These constructions follow common practice in battery management, where SOC is obtained by Coulomb counting and SOH is expressed as the ratio between present and nominal capacity~\cite{plettBatteryManagementSystems2015,a.m.s.m.h.s.attanayakaEstimationStateCharge2019,berecibarCriticalReviewState2016}. On the STM32 the estimators operate purely on the streamed measurements and their internal states. The reference trajectories only serve as ground truth for training and evaluation.
+\subsection{Streaming inference setup}
+Because the SOC and SOH estimators are stateful, the LSTM hidden and cell states are continuously forwarded from one sample to the next along the full input stream. At each sampling instant the current feature vector is processed together with the previous hidden and cell states, which yields the new states and the corresponding SOC or SOH estimate. We therefore operate the models in a purely step-by-step streaming regime without forming sliding input windows. On the host the full normalised sequence from the LFP DoE Cycle Ageing Dataset is processed once in this fashion, and the resulting SOC and SOH estimates are aligned with the reference trajectories. On the STM32 firmware the same step-wise LSTM implementation is used, driven by the UART feature stream, so that host and embedded benchmarks reflect identical inference conditions. The streaming dashboards in Figs.~\ref{fig:soc_dashboard} and~\ref{fig:soh_dashboard} illustrate a complete run for one representative cell.
+\subsection{SOH prediction post-processing}\label{sec:soh_filter_method}
+The SOH trajectories in the final dashboard use two sequential causal filtering stages. First, each raw model output $\hat y_t$ is multiplicatively aligned with the initial SOH label, $\hat y_t^{(0)}=(y_0/\hat y_0)\hat y_t$. Stage~1 limits the change of this calibrated prediction relative to the preceding stage output to
+\begin{equation}
+    \ell_t = \min\!\left(10^{-4}\lvert y_{t-1}^{(1)}\rvert,10^{-5}\right),
+\end{equation}
+and subsequently applies an exponential moving average (EMA) with $\alpha_1=0.02$. The limiter is symmetric, so positive and negative proposal changes are both restricted to $\pm\ell_t$. Stage~2 consumes the complete stage-1 trajectory, applies another EMA with $\alpha_2=10^{-6}$, and limits only downward changes according to
+\begin{equation}
+    y_t^{(2)}=\max\!\left(e_t^{(2)},y_{t-1}^{(2)}-2\times10^{-8}\right),\qquad
+    e_t^{(2)}=(1-\alpha_2)e_{t-1}^{(2)}+\alpha_2 y_t^{(1)}.
+\end{equation}
+Thus, the curve in Fig.~\ref{fig:soh_dashboard} is not obtained by applying $\alpha_2$ directly to an unfiltered network output.
+
+For an EMA sampled at interval $\Delta t$, the equivalent time constant and cutoff frequency are
+\begin{equation}
+    \tau=-\frac{\Delta t}{\ln(1-\alpha)},\qquad
+    f_{\mathrm c}=\frac{1}{2\pi\tau}.
+\end{equation}
+At the dataset rate of \SI{1}{\hertz}, stage~1 has $\tau=\SI{49.5}{\second}$, $f_{\mathrm c}=\SI{3.22}{\milli\hertz}$, and an EMA-only 90~\% step-response time of approximately \SI{114}{\second}. For stage~2, $\tau$ is approximately $11.57$~days, $f_{\mathrm c}=1.59\times10^{-7}$~Hz, and the corresponding 90~\% time is $26.65$~days. These frequencies characterise only the linear EMA components. The nonlinear rate limiters have no single cutoff frequency. The very strong second stage can reduce error against slowly varying labels while introducing substantial response delay, which is evaluated separately in~\ref{app:soh_filter}.
+\section{Model Architecture and Baseline Performance}
+\subsection{LSTM architecture in PyTorch}
+Both SOC and SOH estimators employ the same recurrent equation set but differ in size according to their training releases. The SOC configuration uses $H=64$ hidden units and an MLP output layer of width~64, whereas the SOH configuration increases both dimensions to~128 to cope with the longer temporal context. LSTM gates $i_t,f_t,o_t$ and candidate state $g_t$ follow the standard formulation used in modern RNN surveys~\cite{liptonCriticalReviewRecurrent2015}. All models are implemented in PyTorch~\cite{paszkePyTorchImperativeStyle2019}.
+For one streaming update with input dimension $D=6$, LSTM hidden size $H$, and fixed MLP width $M$, the matrix products require
+\begin{equation}
+    N_{\mathrm{MAC}}(H)=4H(D+H)+HM+M,
+    \label{eq:model_macs}
+\end{equation}
+where one multiply--accumulate (MAC) is counted per weight. Bias additions, nonlinearities, indexing, and memory transfers are excluded. For a hidden-unit pruning fraction $p$, the retained hidden size is $H_p=(1-p)H$. Substitution into Eq.~\eqref{eq:model_macs} gives the relative analytical MAC reduction
+\begin{align*}
+    R_{\mathrm{MAC}}(H,p)
+    &=1-\frac{N_{\mathrm{MAC}}((1-p)H)}{N_{\mathrm{MAC}}(H)}\\
+    &=\frac{4(2p-p^2)H^2+p(4D+M)H}
+    {4H^2+(4D+M)H+M},\\
+    \lim_{H\rightarrow\infty}R_{\mathrm{MAC}}(H,p)&=2p-p^2.
+\end{align*}
+The quadratic recurrent term is therefore reduced by $2p-p^2$, the linear input and MLP terms by $p$, and the fixed output term is unchanged. The finite-model reduction is a weighted combination of these contributions and remains below the large-$H$ limit. For the evaluated fraction $p=0.30$, this limit is 51~\%. The implemented integer dimensions give 22,080 to 12,124 MACs for SOC ($64\rightarrow45$), a 45.1~\% reduction, and 85,120 to 46,208 MACs for SOH ($128\rightarrow90$), a 45.7~\% reduction. \ref{app:model_complexity} visualises both this operating point and the general dependence on $p$. The relation makes the computational effect of a selected hidden-size reduction predictable before deployment, while hardware measurements translate the analytical reduction into platform-specific flash, latency, and energy changes.
+\begin{align}
+    \mathbf{z}_t &= [\mathbf{x}_t,\mathbf{h}_{t-1}],\\
+    \mathbf{i}_t &= \sigma(W_i \mathbf{z}_t + \mathbf{b}_i), \quad
+    \mathbf{f}_t = \sigma(W_f \mathbf{z}_t + \mathbf{b}_f), \nonumber\\
+    \mathbf{o}_t &= \sigma(W_o \mathbf{z}_t + \mathbf{b}_o), \quad
+    \mathbf{g}_t = \tanh(W_g \mathbf{z}_t + \mathbf{b}_g), \nonumber\\
+    \mathbf{c}_t &= \mathbf{f}_t \odot \mathbf{c}_{t-1} + \mathbf{i}_t \odot \mathbf{g}_t,\quad
+    \mathbf{h}_t = \mathbf{o}_t \odot \tanh(\mathbf{c}_t). \nonumber
+\end{align}
+Equations~\eqref{eq:model_macs} and the recurrent update above define the common Base architecture used for both tasks. Pruning changes its hidden dimension and parameter submatrices, whereas quantization changes the stored representation of selected recurrent weights. Neither transformation changes the input features, targets, or streaming state-update order.
+
+Both SOC and SOH models are trained with a mean-squared-error loss between the prediction and the corresponding reference at each training sample. During validation we additionally report mean absolute error (MAE), root-mean-square error (RMSE), and $R^2$. The trained parameters, configuration files, and optimiser statistics are retained to enable deterministic replay of both models.
+\subsection{Training Notes}
+Training is carried out on a GPU node equipped with NVIDIA A100-class accelerators using mixed-precision (FP16) arithmetic. Both models use the AdamW optimiser with cosine-annealing warm-restart scheduling, gradient clipping, and mini-batch training~\cite{loshchilovDecoupledWeightDecay2017,loshchilovSGDRStochasticGradient2016,micikeviciusMixedPrecisionTraining2017,pascanuDifficultyTrainingRecurrent2012}. The SOC configuration uses a learning rate of $1.5\times10^{-4}$, a batch size of~512, and sequence chunks of length~2024. The corresponding SOH values are $2.0\times10^{-4}$, 128, and 2048.
+
+Deployment operates the LSTM in stateful, step-by-step streaming mode, whereas training uses truncated backpropagation through time over these chunks. Hidden and cell states are propagated within every chunk in the same temporal order as during deployment. Chunking permits randomised segment sampling and tractable gradient computation without changing the recurrent update equations.
+\subsection{Baseline Accuracy}
+On the workstation the SOC and SOH base models are first evaluated in streaming mode on the full ageing trajectory of one representative LFP cell from the LFP DoE Cycle Ageing Dataset~\cite{LFP_DoE_Cycle_Aging_Dataset}, yielding baseline MAE and RMSE values for both tasks. These Python replays operate on the original PyTorch implementations and provide the numerical reference for the compression experiments. The corresponding trained models are pruned, quantized, and exported to STM32 firmware, where identical feature streams are replayed to measure accuracy, flash and RAM usage, system latency, and on-device inference time. A timing-derived energy proxy is calculated as described in Section~\ref{sec:kpis}. Figure~\ref{fig:pipeline} summarises this training-to-firmware benchmarking pipeline.
+\begin{figure*}[t!]
+    \centering
+    \includegraphics[width=\textwidth]{figures/Schematics/Figure_5_Pipeline.png}
+    \caption[End-to-end pipeline]{End-to-end pipeline from dataset to embedded benchmarking. The LFP DoE Cycle Ageing Dataset feeds PyTorch training on a GPU workstation. The resulting SOC and SOH LSTM\,+\,MLP models are pruned and quantized, exported as C headers, and deployed on an STM32H753ZI board, where flash/RAM usage, inference time, and latency are measured under streaming replay. Estimated energy per inference is derived from kernel time under a constant board-power assumption.}
+    \label{fig:pipeline}
+\end{figure*}
+\section{Pruning}
+Pruning reduces the size and computational cost of a neural network by eliminating parameters or whole units that contribute little to the overall mapping, while keeping the input-output behaviour as close as possible to the dense baseline~\cite{hanLearningBothWeights2015,blalockWhatStateNeural2020}. In our setting we apply structured pruning at the level of complete LSTM hidden units so that the resulting model remains well suited for efficient C implementations on the microcontroller.
+\subsection{Structured magnitude pruning}
+Structured magnitude pruning removes the lowest-saliency LSTM units until only $45$ hidden channels remain in the SOC model (30\% sparsity), with analogous settings for the SOH experiments. Reducing the state dimension is a prerequisite for fitting the estimators into the flash and SRAM budgets of the target STM32-based BMS and for shortening the on-device inference time, inspired by structured sparsity approaches for deep and recurrent networks~\cite{wenLearningStructuredSparsity2016,lobachevaStructuredSparsificationGated2020,narangExploringSparsityRecurrent2017}. In analogy to the group-lasso style regularisers proposed for LSTMs in~\cite{wenLearningStructuredSparsity2016,lobachevaStructuredSparsificationGated2020}, which aggregate weights across gates via L2 norms, we define a saliency score for each hidden unit $h$ that combines all incoming weights from the different gates:
+\begin{equation}
+    \label{eq:pruning_saliency}
+    s_h = \sum_{g\in\{i,f,o,g\}} \left(\lVert W_{\mathrm{ih}}^{(g)}[h,:]\rVert_2 + \lVert W_{\mathrm{hh}}^{(g)}[h,:]\rVert_2\right).
+\end{equation}
+Units are ranked by $s_h$, and the $H'$ highest-scoring indices form the retained set $\mathcal{R}$. For each gate $g$, structured pruning constructs the reduced matrices
+\begin{align}
+    \widetilde{W}_{\mathrm{ih}}^{(g)} &= W_{\mathrm{ih}}^{(g)}[\mathcal{R},:],\nonumber\\
+    \widetilde{W}_{\mathrm{hh}}^{(g)} &= W_{\mathrm{hh}}^{(g)}[\mathcal{R},\mathcal{R}],\nonumber\\
+    \widetilde{W}_{\mathrm{MLP},1} &= W_{\mathrm{MLP},1}[:,\mathcal{R}].
+    \label{eq:pruning_slicing}
+\end{align}
+Thus the same index set removes gate rows, recurrent columns, and the corresponding inputs of the first MLP layer. The reduced tensors remain dense. The computational saving comes from the smaller dimension rather than sparse indexing.
+
+The final SOC deployment uses $H'=45$ instead of 64 hidden units, while SOH uses $H'=90$ instead of 128. Both transformations remove approximately 30~\% of the recurrent channels. The fraction $p=0.30$ was selected as a single moderate operating point that provides a substantial dimensional reduction while retaining useful estimator accuracy. It was not obtained from an exhaustive pruning-rate sweep and is not claimed to be optimal. Establishing an optimal fraction would require separately pruned and fine-tuned models for each candidate rate and is reserved for a pruning-focused investigation. This is a one-shot structured operation followed by brief post-pruning fine-tuning. No iterative pruning schedule or pruning-aware training is used. The L2 aggregation gives a gate-consistent ranking that can be calculated directly from the model weights and mapped to dense C arrays. \ref{app:pruning_diagnostics} reports the resulting SOC saliency ranking and recurrent-weight distributions. These diagnostics describe the resulting weight selection but do not establish a causal regularisation effect.
+The criterion is selected because it combines all four gate rows for one recurrent unit and maps directly to removal of dense rows, recurrent columns, and the associated MLP input. It therefore provides a reproducible, gate-consistent ranking that translates directly into a smaller dense kernel. Gradient sensitivity would additionally use training data and backpropagation, while activation-based ranking would use a representative calibration stream and a temporal aggregation rule. A future comparison with these data-dependent alternatives can determine whether their additional information further improves the accuracy--efficiency trade-off. \ref{app:pruning_criterion_scope} summarises the method properties.
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/Schematics/Figure_6_Pruning_Schematic.png}
+    \caption{Structured hidden-channel pruning used in this study. Panel (a) marks one low-saliency LSTM channel and its incident connections in red. Panel (b) shows the resulting dense network after removing the corresponding gate rows, recurrent columns, and MLP input column according to Eq.~\eqref{eq:pruning_slicing}. The final SOC and SOH hidden dimensions are shown between the panels.}
+    \label{fig:pruning_schematic}
+\end{figure}
+\subsection{Resulting pruned models}
+The resulting pruned SOC and SOH models still run in FP32 but reduce flash consumption and runtime considerably once compiled for STM32. Section~\ref{sec:kpis} summarises the corresponding latency and memory savings. These pruned variants are evaluated alongside their base and quantized counterparts throughout the results section.
+\section{Quantization}
+Quantization reduces the numerical precision of selected weights while keeping the network topology unchanged. We apply post-training, weight-only quantization to the LSTM input-to-hidden and hidden-to-hidden matrices. Biases, activations, recurrent hidden and cell states, and the MLP remain FP32. The resulting firmware is therefore a mixed-precision storage implementation, not a fully integer inference path. Quantization-aware training is not used.
+
+\subsection{Per-row symmetric quantization}
+For row $r$ of either recurrent matrix, the implementation computes
+\begin{align}
+    s_r &= \max\!\left(\frac{\max_h |w_{r,h}|}{127},\varepsilon_q\right), \label{eq:int8_scale}\\
+    q_{r,h} &= \operatorname{clip}\!\left(\operatorname{round}\!\left(\frac{w_{r,h}}{s_r}\right),-127,127\right), \label{eq:int8_q}\\
+    \hat{w}_{r,h} &= s_r q_{r,h}, \label{eq:int8_w}
+\end{align}
+where $\varepsilon_q$ prevents division by zero for an all-zero row. Although the INT8 storage type provides 256 machine codes, the implementation deliberately leaves $-128$ unused and employs the symmetric 255-level set $\{-127,\ldots,127\}$. This keeps zero exactly representable and assigns equal positive and negative ranges. With the max-absolute scale in Eq.~\eqref{eq:int8_scale}, finite row weights do not clip, and nearest-integer rounding gives the element-wise reconstruction bound
+\begin{equation}
+    |w_{r,h}-\hat{w}_{r,h}| \leq \frac{s_r}{2}.
+    \label{eq:quant_error_bound}
+\end{equation}
+Per-row scaling gives small-magnitude rows a finer step size than one global scale, following standard uniform post-training quantization practice~\cite{jacobQuantizationTrainingNeural2017,krishnamoorthiQuantizingDeepConvolutional2018}.
+
+\subsection{Mixed-precision gate computation}
+Let $r$ denote one gate row. The firmware evaluates
+\begin{equation}
+\label{eq:quant}
+g_r = \sum_{d=1}^{D} x_d\bigl(s_{\mathrm{ih},r}q_{\mathrm{ih},r,d}\bigr)
+    + \sum_{j=1}^{H} h_j\bigl(s_{\mathrm{hh},r}q_{\mathrm{hh},r,j}\bigr)
+    + b_{\mathrm{fp32},r}.
+\end{equation}
+Thus the recurrent weights are stored as INT8 codes but reconstructed into FP32 products inside the current accumulation loops. A built-in streaming comparison validates the exported gate computations against the source model and typically yields MAE differences below $10^{-4}$.
+
+The recurrent matrices account for approximately 80~\% of the raw Base model constants in both tasks. Targeting these matrices concentrates the storage reduction on the dominant constants while retaining FP32 biases, activations, recurrent states, and the smaller MLP path. This creates a transparent mixed-precision configuration that reduces persistent storage without changing the recurrent state representation. Quantizing activations and states could extend the approach toward additional RAM and latency reductions and is considered as a subsequent optimisation step. \ref{app:mixed_precision} documents the precision boundary and model-constant composition.
+\begin{figure*}[t!]
+    \centering
+    \includegraphics[width=\textwidth]{figures/Schematics/Figure_7_Quantization_Schematic.png}
+    \caption{FP32-to-INT8 quantization and embedded deployment. The recurrent FP32 weight matrices are mapped row by row to INT8 codes and one FP32 scale per row. The INT8 storage type spans $\{-128,\ldots,127\}$, while the implemented symmetric quantizer generates $\{-127,\ldots,127\}$ and leaves $-128$ unused. The integer recurrent weights and scale vectors are exported as C headers and combined with FP32 biases, activations, recurrent states, and MLP operations in the STM32 kernel.}
+    \label{fig:quantization_schematic}
+\end{figure*}
+\subsection{Export for STM32}
+The exported headers are integrated into separate C firmware projects for the stateful SOC and SOH estimators. Each project combines the LSTM and MLP kernels with UART telemetry. A small driver library provides build files and flashing scripts so that identical measurement binaries can be rebuilt on other machines. This explicit tool chain, from training through pruning and quantization to firmware, exposes the numerical operations and records the build settings used for the resource measurements in Section~\ref{sec:kpis}.
+\section{Benchmark Methodology}\label{sec:kpis}
+This section describes how we benchmark the SOC and SOH models on both the host PC and an STM32 Nucleo-144 development board with an STM32H753ZI MCU~\cite{STM32Nucleo144Boards2025_Datasheet,naguibMicroprocessorExecutionTime2022}. The microcontroller provides \SI{2}{\mega\byte} of on-chip Flash and \SI{1}{\mega\byte} of SRAM, which constitute the budget for firmware code, model parameters, and runtime buffers. Starting from the trained LSTM\,+\,MLP models, we generate three embedded variants (full-precision baseline, pruned model, and quantized model) and evaluate them on the \emph{LFP DoE Cycle Ageing Dataset}. The benchmark combines long-horizon streaming simulations with hardware-in-the-loop measurements and is fully scripted to ensure reproducible accuracy and resource evaluations.
+
+On the host side, the complete reference ageing sequence is replayed in Python using the same streaming inference functions that are later exported to C. The SOC and SOH estimators are evaluated in continuous time without resetting their recurrent states, and error metrics (MAE, RMSE, $R^2$), error histograms, and parity plots are computed from the resulting trajectories. These simulations provide a high-precision reference for the embedded experiments and are used to assess how pruning and quantization affect the dynamics of the baseline models. To test whether deviations grow over time, the full-stream trajectories are divided into ten consecutive, equal-count segments. Target MAE and P95 error are computed in every segment, together with the mean absolute deviation of each compressed variant from the Base output. \ref{app:long_horizon} reports this temporal analysis.
+
+For the embedded benchmarks the base, pruned, and quantized SOC/SOH models are embedded into dedicated firmware projects for the STM32H753ZI. Because STM32Cube~AI does not natively support stateful LSTM layers, the recurrent update equations, post-processing, and UART diagnostics are implemented manually in C. Identical stimulus streams are then injected via UART, allowing a direct comparison between host-side and on-device behaviour under the same operating conditions.
+
+\subsection{Limited software-level fault sensitivity}
+Two limited software-level sensitivity analyses examine the Base, Pruned, and Quantized variants under missed reports and transient input corruption. First, randomly omitted outputs at rates of 1, 5, and 10~\%, as well as ten deterministic gaps of 60, 600, or 3600 samples, are replaced by the preceding prediction using a hold-last strategy.
+
+The second analysis evaluates how a one-sample input-buffer fault propagates through the recurrent state. Each exported C model processes 8000 consecutive C07 samples at 1~Hz. Thirty independent events are distributed over this sequence after at least 2048 preceding clean samples, with ten events each for voltage, current, and temperature. At every event, the disturbed branch starts from the same recurrent state as the clean branch. Bit 22, the most significant FP32 mantissa bit, is flipped in one input value before inference for exactly one sample. The following 60 inputs are unmodified and the recurrent state is not reset.
+
+For event $e$ and offset $k=0,\ldots,60$, the fault-induced deviation is $d_{e,k}=100|\hat{y}^{\mathrm{fault}}_{e,k}-\hat{y}^{\mathrm{clean}}_{e,k}|$ in percentage points. Peak deviation and residual deviation after 60~s quantify the transient response independently of the model's pre-existing target error. Accuracy is evaluated over the same 61-sample window using
+\begin{equation}
+\Delta\mathrm{MAE}_{61,e}=\frac{100}{61}\sum_{k=0}^{60}\left(\left|\hat{y}^{\mathrm{fault}}_{e,k}-y_{e,k}\right|-\left|\hat{y}^{\mathrm{clean}}_{e,k}-y_{e,k}\right|\right).
+\label{eq:fault_mae_change}
+\end{equation}
+A positive value indicates that the bit flip increases target MAE, while a negative value means that the disturbed prediction happens to lie closer to the target. Recovery is the first time after the peak at which $d_{e,k}$ remains below $\max(0.1d_{e,\mathrm{peak}},10^{-4}\ \mathrm{pp})$ for five consecutive samples. This test represents a transient input-buffer upset in software. It does not replace hardware fault injection into weights, activations, recurrent-state memory, communication, or MCU memory.
+
+\subsection{STM32 Measurements}
+On the STM32 Nucleo-144 development board, dedicated SOC and SOH firmware images execute the embedded estimators while host-side scripts handle stimulus injection and UART logging. Recorded feature streams are transmitted to the microcontroller, which runs the stateful LSTM\,+\,MLP and returns predictions with timing diagnostics.
+
+Each sample produces two time stamps. Host latency measures the delay between sending an input vector and receiving its estimate. On-device inference time is measured with the data watchpoint and trace (DWT) cycle counter around the LSTM and MLP kernels. Reported values are averages over 10,000 streaming inferences. The timed interval includes instructions and memory accesses executed by these kernels but excludes UART transfer, host processing, and host-side feature construction.
+
+In the SOC projects, six-feature robust scaling lies inside the timed estimator call. The SOH Base and Pruned projects apply scaling immediately before the DWT interval, whereas the Quantized SOH forward function includes it. This small affine preprocessing cost was not profiled separately and is absent from the static operation counts. All inspected benchmark projects were compiled with GCC at \code{-O0}, using the hard-float ABI and Cortex-M7 FPv5 floating-point unit. The measurements therefore characterise auditable, unoptimised reference kernels rather than production-optimised integer deployments.
+
+\subsection{Key Performance Indicators}
+For normalised target $y_n$ and prediction $\hat{y}_n$, the signed error is expressed in percentage points as $e_n=100(\hat{y}_n-y_n)$. The reported accuracy indicators are
+\begin{align}
+    \mathrm{MAE} &= \frac{1}{N}\sum_{n=1}^{N}|e_n|, &
+    \mathrm{RMSE} &= \sqrt{\frac{1}{N}\sum_{n=1}^{N}e_n^2},\label{eq:error_metrics}\\
+    \mathrm{P95} &= Q_{0.95}\!\left(\{|e_n|\}_{n=1}^{N}\right),
+\end{align}
+where $Q_{0.95}$ is the empirical 95th percentile. MAE and RMSE use all samples, whereas P95 identifies the absolute-error threshold below which 95~\% of samples lie.
+
+For each deployment we additionally report average host latency, on-device inference time, flash and SRAM usage, and an estimated energy-per-inference proxy. Tables~\ref{tab:kpi} and~\ref{tab:kpi_soh} focus on these STM32 resource and timing indicators. Latency is the end-to-end UART delay, whereas inference time covers only the DWT-measured kernel interval. RAM combines statically allocated data and BSS sections with maximum observed streaming stack usage.
+
+Energy was not measured separately for each model. Instead, we use
+\begin{equation}
+    E_{\mathrm{est}}=P_{\mathrm{assumed}}\,t_{\mathrm{inf}},\qquad P_{\mathrm{assumed}}=\SI{0.5}{\watt},
+\end{equation}
+where \SI{0.5}{\watt} is a representative average-power assumption for the complete development board. Consequently, the percentage change in $E_{\mathrm{est}}$ is identical to the percentage change in inference time. The proxy does not separate core computation, flash access, SRAM access, voltage-regulator losses, or other board consumers and cannot determine whether flash access dominates the actual energy consumption.
+\begin{table*}[t!]
+      \centering
+      \caption{Engineering KPIs for SOC models on STM32H753ZI (full-stream averages). Energy is estimated from measured inference time under an assumed constant board power of \SI{0.5}{\watt}.}
+      \label{tab:kpi}
+        \begin{tabular}{lccccc}
+            \toprule
+            Model & Latency [ms] & Inference [ms] & Flash [KB] & RAM [KB] & $E_{\mathrm{est}}$ [mJ] \\
+            \midrule
+            Base FP32 & 12.70 & 1.40 & 105.32 & 4.93 & 0.70 \\
+            Pruned FP32 & 12.20~\textcolor{mgGreen}{(-3.9\%)} & 0.80~\textcolor{mgGreen}{(-42.9\%)} & 62.27~\textcolor{mgGreen}{(-40.9\%)} & 4.03~\textcolor{mgGreen}{(-18.3\%)} & 0.40~\textcolor{mgGreen}{(-42.9\%)} \\
+            Quant INT8 & 18.48~\textcolor{mgRed}{(+45.5\%)} & 6.99~\textcolor{mgRed}{(+399\%)} & 52.48~\textcolor{mgGreen}{(-50.2\%)} & 3.96~\textcolor{mgGreen}{(-19.7\%)} & 3.49~\textcolor{mgRed}{(+399\%)} \\
+            \bottomrule
+        \end{tabular}
+  \end{table*}
+An analogous set of measurements was recorded for the SOH firmware deployments. Table~\ref{tab:kpi_soh} lists the corresponding indicators.
+  \begin{table*}[t!]
+      \centering
+      \caption{Engineering KPIs for SOH models on STM32H753ZI (full-stream averages). Energy is estimated from measured inference time under an assumed constant board power of \SI{0.5}{\watt}.}
+      \label{tab:kpi_soh}
+        \begin{tabular}{lccccc}
+            \toprule
+            Model & Latency [ms] & Inference [ms] & Flash [KB] & RAM [KB] & $E_{\mathrm{est}}$ [mJ] \\
+            \midrule
+            Base FP32 & 34.88 & 22.73 & 335.00 & 8.69 & 11.37 \\
+            Pruned FP32 & 24.69~\textcolor{mgGreen}{(-29.2\%)} & 12.72~\textcolor{mgGreen}{(-44.0\%)} & 182.41~\textcolor{mgGreen}{(-45.5\%)} & 6.96~\textcolor{mgGreen}{(-19.9\%)} & 6.36~\textcolor{mgGreen}{(-44.0\%)} \\
+            Quant INT8 & 41.23~\textcolor{mgRed}{(+18.2\%)} & 29.21~\textcolor{mgRed}{(+28.5\%)} & 138.00~\textcolor{mgGreen}{(-58.8\%)} & 6.70~\textcolor{mgGreen}{(-22.9\%)} & 14.60~\textcolor{mgRed}{(+28.5\%)} \\
+            \bottomrule
+        \end{tabular}
+\end{table*}
+
+The KPIs in Tables~\ref{tab:kpi} and~\ref{tab:kpi_soh} highlight the trade-offs introduced by pruning and quantization. For SOC, pruning reduces the flash footprint by roughly 41~\% and inference time by about 43~\%, while latency remains dominated by UART transfer. Quantization approximately halves flash usage, but per-weight scaling and integer--float conversions in the mixed-precision kernels increase on-device inference time by a factor of four relative to Base. The SOH deployments show the same qualitative behaviour. Pruning saves about 46~\% of flash and 44~\% of inference time, whereas Quantized attains the smallest flash footprint but incurs a 29~\% timing increase. Under the constant-power assumption, the estimated energy proxy follows these timing changes exactly. It is not independent evidence of board-level energy efficiency.
+
+\section{Results}
+\label{sec:results}
+The evaluation compares the full-precision Base, Pruned, and Quantized SOC and SOH estimators under the same continuous streaming replay of the LFP DoE Cycle Ageing Dataset. The following sections separate prediction accuracy, temporal behaviour, embedded resource use, and the resulting multi-objective trade-offs.
+\subsection{Streaming Prediction Accuracy}
+The primary metric for any battery state estimator is its ability to track the ground truth over extended periods without divergence. Figures~\ref{fig:soc_dashboard} and~\ref{fig:soh_dashboard} illustrate the streaming performance of the SOC and SOH models over the complete test duration.
+\begin{figure*}[tb]
+    \centering
+\includegraphics[width=\textwidth]{figures/Combined_Results/Figure_8_SOC_Streaming_Dashboard.png}
+    \caption{Streaming SOC dashboard on the full ageing trajectory. The black line represents the reference SOC, while the coloured lines show the predictions of the Base (green), Pruned (red), and Quantized (blue) models. The lower sub-panel displays the instantaneous prediction error.}
+    \label{fig:soc_dashboard}
+\end{figure*}
+Across the complete SOC replay, the Base, Pruned, and Quantized variants obtain MAE values of 2.685, 2.338, and 2.791 percentage points, respectively. The Quantized trace often overlaps the Base trace visually, whereas the Pruned model has the lowest aggregate target MAE despite a larger model-to-Base deviation in some parts of the sequence. These results confirm that post-training weight quantization preserves useful recurrent behaviour throughout the evaluated stream. Replays of additional operating sequences can extend this comparison to a wider range of temporal conditions.
+\par
+The SOH estimator faces a different challenge: it must infer slow capacity degradation from sparse check-up events and continuous monitoring. In the plotted trajectories the discrete capacity tests have been removed from the estimator input, while the remaining check-up blocks (OCV sweeps, HPPC pulses, and profile segments) are retained. The plateau-like sections of the reference curve therefore correspond to these diagnostic intervals. The dashboard applies the complete two-stage causal post-processing chain from Section~\ref{sec:soh_filter_method}: initial alignment, stage~1 with $\alpha_1=0.02$ and a symmetric limiter, followed by stage~2 with $\alpha_2=10^{-6}$ and a downward limiter. The resulting smoothing suppresses short-term variation but introduces a substantial accuracy--delay trade-off.
+\begin{figure}[tbp]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/Combined_Results/Figure_9_SOC_MAE_Hist.png}
+    \caption{SOC error distributions for Base, Pruned, and Quantized. The left panel compares absolute errors and aggregate MAE. The right panel shows signed errors, $100(\hat{y}-y)$, so that distribution shifts and tails remain visible.}
+    \label{fig:soc_error}
+\end{figure}
+\begin{figure}[tbp]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/Combined_Results/Figure_10_SOH_MAE_Hist.png}
+    \caption{SOH error analysis: MAE distribution (left) and error histogram (right). The three variants retain similar central error ranges, while their tails and aggregate MAE values differ.}
+    \label{fig:soh_error}
+\end{figure}
+\begin{figure*}[t!]
+    \centering
+    \includegraphics[width=\textwidth]{figures/Combined_Results/Figure_11_SOH_Streaming_Dashboard.png}
+    \caption{Streaming SOH dashboard with the complete two-stage causal post-processing chain from Section~\ref{sec:soh_filter_method}. The top panel shows the reference SOH and the outputs of the Base (green), Pruned (red), and Quantized (blue) models. The bottom panel depicts the corresponding filtered prediction errors.}
+    \label{fig:soh_dashboard}
+\end{figure*}
+\subsection{Temporal stability and filter interaction}
+The ten-segment analysis in~\ref{app:long_horizon} retains the natural temporal order and does not reset recurrent states between segments. SOC target error rises toward the later part of the sequence for every variant: for example, Base MAE increases from 1.116 to 4.538 percentage points and Quantized MAE from 1.234 to 4.600 percentage points between the first and final tenths. However, the Quantized-to-Base mean absolute deviation changes from 0.332 to 0.271 percentage points over the same interval and therefore shows no quantization-specific monotonic accumulation. The Pruned-to-Base deviation increases from 0.924 to 2.592 percentage points even though Pruned has the lowest aggregate target MAE. SOH window errors fluctuate with the ageing phase, and neither compressed variant exhibits monotonic model-to-Base divergence across all ten segments. The analysis therefore demonstrates stable relative behaviour throughout the complete evaluated replay and provides a basis for extending validation to further operating sequences.
+
+\ref{app:soh_filter} compares unfiltered, stage-1, and final two-stage SOH outputs for the three exported C models on a common input sequence. Stage~1 gives MAE values of 1.677, 1.644, and 1.926 percentage points for Base, Pruned, and Quantized, respectively. Applying stage~2 to the stage-1 output gives final MAE values of 1.476, 1.695, and 1.028 percentage points. The identical input and processing order reveal how filtering changes both the absolute error and the ranking of the model variants. Combining raw and filtered accuracy with the filter response time therefore provides a more complete assessment of the estimator dynamics. The final EMA has an EMA-only 90~\% response time of 26.65~days at \SI{1}{\hertz}.
+\subsection{Error Distribution Analysis}
+To quantify the reliability of the estimators, we analyse the statistical distribution of the prediction errors. Figures~\ref{fig:soc_error} and~\ref{fig:soh_error} present the Mean Absolute Error (MAE) boxplots and the error histograms for both tasks.
+The SOC error distribution is narrow and approximately centred around zero. The evaluated Pruned model attains the smallest aggregate MAE, while the Quantized model remains close to the Base result with a smaller recurrent-weight footprint. \ref{app:pruning_diagnostics} shows that the 19 removed SOC units occupy the lowest positions of the defined L2 saliency ranking and compares the central recurrent-weight distributions before and after pruning. This confirms that the implemented criterion removes the intended low-saliency channels and identifies Pruned as the most accurate variant for the evaluated model and data partition. Repeated training runs can determine the statistical consistency of this advantage without attributing it to a specific regularisation mechanism.
+For SOH, the error distribution is broader, which is inherent to the difficulty of estimating capacity fade from operational data. However, the histograms show that the bulk of the errors are still contained within a useful tolerance band (typically $\pm 2\%$), making the embedded estimator a viable tool for onboard diagnostics.
+\subsection{Transient Response and Zoomed Analysis}
+Global metrics often hide local failures. To inspect the transient behaviour, we zoom into a high-dynamic pulse discharge phase (Fig.~\ref{fig:zoom_pulse}) and into a representative check-up sequence (Fig.~\ref{fig:zoom_checkup}).
+\par
+In the pulse region (Fig.~\ref{fig:zoom_pulse}), the models must react to rapid current changes. The quantized model follows the ground truth transients with high fidelity, capturing the voltage recovery phases accurately. The pruned model, having fewer parameters to model the complex electrochemical relaxation, tends to smooth out these sharp features slightly.
+\begin{figure*}[t!]
+    \centering
+    \includegraphics[width=\textwidth]{figures/Combined_Results/Figure_12_SOC_Zoom_Pulse.png}
+    \caption[Transient response (pulse segment)]{Detailed transient analysis of SOC streaming replay (pulse segment). Response to dynamic load pulses (30k--40k\,s).}
+    \label{fig:zoom_pulse}
+\end{figure*}
+\begin{figure*}[t!]
+    \centering
+    \includegraphics[width=\textwidth]{figures/Combined_Results/Figure_13_SOC_Zoom_Checkup.png}
+    \caption[Transient response (check-up segment)]{Detailed transient analysis of SOC streaming replay (check-up segment). Behaviour during a capacity check-up (657k--897k\,s).}
+    \label{fig:zoom_checkup}
+\end{figure*}
+\noindent
+During the check-up phase (Fig.~\ref{fig:zoom_checkup}), where the cell undergoes full charge/discharge cycles, all models converge well, demonstrating stability over long integration horizons.
+\subsection{Resource Efficiency and Latency}
+Figures~\ref{fig:resources_sizes} and~\ref{fig:resources_latency} summarise the flash memory, RAM usage, parameter counts, and latency distributions for the SOC and SOH deployments on the STM32H7 microcontroller.
+For all deployments the model complexity is first characterised on the workstation side by counting parameters in each variant (base, pruned, quantized). Assuming four bytes per weight for floating point representations and one byte per weight for INT8, this directly yields an estimate of the flash footprint attributable to the neural network weights alone. The second stage of the analysis uses the linker map files of the STM32CubeIDE projects to determine the actual binary size in flash, which also includes code, constant tables, and run-time support libraries. This explains why the measured flash usage in Figure~\ref{fig:resources_sizes} is systematically higher than the idealised "weights only" estimate, and why the gap is larger for the more complex SOH firmware that contains additional diagnostic and filtering logic.
+The RAM usage shown in the lower right panel of Figure~\ref{fig:resources_sizes} is obtained from on-device measurements of the SOH and SOC firmware and applied analogously to all STM32 deployments. At boot time the firmware reports the size of the statically allocated data and BSS sections, which correspond to persistent variables and network parameters stored in SRAM. During each benchmark inference the minimum value of the stack pointer is tracked, so that the maximum additional stack consumption of the call chain can be recovered. The total RAM requirement reported in the figure is the sum of static data and worst-case stack usage, i.e.\ an upper bound on the memory needed to execute one inference including the LSTM state updates and UART handling. This procedure captures the fact that pruning reduces both the number of parameters and the recurrent state dimension, whereas the weight-only quantized implementation primarily reduces recurrent-matrix storage. Activations, hidden and cell states, biases, and the MLP remain FP32.
+Figure~\ref{fig:resources_sizes} shows that Quantized produces the smallest flash footprint, while Pruned reduces both the parameter count and recurrent-state dimension. The measured RAM and execution-time results must nevertheless be considered separately because retaining FP32 activations and changing the kernel arithmetic prevents storage reduction from translating automatically into lower latency.
+\begin{figure*}[tb]
+    \centering
+    \includegraphics[width=\textwidth]{figures/Combined_Results/Figure_14_Model_Sizes.png}
+    \caption{Resource landscape for SOC and SOH models. Comparison of parameter count, estimated Flash, actual Flash, and RAM usage. Dark bars denote SOC, light bars denote SOH.}
+    \label{fig:resources_sizes}
+\end{figure*}
+
+\noindent
+Figure~\ref{fig:resources_latency} reports the corresponding host-side latency distributions.
+\begin{figure}[tbp]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/Combined_Results/Figure_15_Latency_Hist.png}
+    \caption{Latency distributions for SOC and SOH models on the STM32H7. Histograms are computed from repeated on-device measurements.}
+    \label{fig:resources_latency}
+\end{figure}
+The latency distributions in Figure~\ref{fig:resources_latency} reveal a distinct hierarchy. SOC inference requires approximately \SIrange{0.8}{7}{\milli\second}, whereas the SOH variants require \SIrange{12}{30}{\milli\second} per update. The weight-quantized SOC deployment is slowest because the hand-written mixed-precision kernel applies FP32 row scales during the recurrent matrix products. When UART framing and host processing are included, end-to-end latencies remain below roughly \SI{20}{\milli\second} for SOC and \SI{50}{\milli\second} for SOH.
+\subsection{Composite trade-off summary}
+To make the multi-objective trade-offs easier to interpret at a glance, we report a composite utility score $U$ that aggregates accuracy and embedded resource indicators into a single, dimensionless index. For task-specific non-negative weights $\mathbf{w}=(w_A,w_F,w_R,w_E)$ with $\sum_j w_j=1$, model variant $v$ is scored as
+\begin{equation}
+\label{eq:utility_u}
+U_v(\mathbf{w}) =
+w_A\frac{\mathrm{MAE}_v}{\mathrm{MAE}_{\mathrm{Base}}} +
+w_F\frac{F_v}{F_{\mathrm{Base}}} +
+w_R\frac{R_v}{R_{\mathrm{Base}}} +
+w_E\frac{E_{\mathrm{est},v}}{E_{\mathrm{est,Base}}},
+\end{equation}
+where $\mathrm{MAE}$ is the streaming mean absolute error, $F$ is measured flash, $R$ is measured total RAM (static plus peak stack), and $E_{\mathrm{est}}$ is the timing-derived energy proxy. The main comparison uses equal weights, $w_A=w_F=w_R=w_E=0.25$. In this case, $U$ is the arithmetic mean of the four normalized objectives. By construction $U_{\mathrm{Base}}=1$ for every valid weight vector. Lower values are preferred. Because $E_{\mathrm{est}}$ is proportional to inference time under the fixed-power assumption, the energy term represents timing priority rather than an independent power measurement.
+
+Sensitivity is evaluated over all 1,771 non-negative combinations on a 0.05 grid that sum to one. \ref{app:utility_sensitivity} also varies one highlighted objective from 25 to 85~\%, sharing the remaining weight equally among the other three. Pruned is top-ranked for 94.64~\% of SOC combinations and 53.36~\% of SOH combinations. Quantized wins 5.36~\% and 17.79~\%, respectively, while Base wins 0~\% for SOC and 28.85~\% for SOH. The ranking is therefore robust for SOC Pruned but application-dependent for SOH: Base becomes preferable when accuracy dominates, whereas Quantized becomes preferable when flash receives high weight.
+Table~\ref{tab:tradeoff_summary} summarises the resulting changes for pruning and quantization. Values are reported as SOC/SOH.
+\begin{table}[tbp]
+    \centering
+    \caption[Summary of pruning/quantization effects]{At-a-glance effect of pruning and quantization relative to the corresponding Base model. Values are reported as SOC/SOH. $\Delta$MAE is reported in percentage points (pp) of full scale, where a negative value indicates improved accuracy. Flash, RAM, and estimated-energy changes are relative deltas versus Base. The composite score $U$ uses equal weights in~\eqref{eq:utility_u} (lower is better).}
+    \label{tab:tradeoff_summary}
+    \scriptsize
+    \setlength{\tabcolsep}{2.5pt}
+    \renewcommand{\arraystretch}{1.05}
+    \begin{tabular}{lccccc}
+        \toprule
+        Variant & $\Delta$MAE [pp] & $\Delta$Flash [\%] & $\Delta$RAM [\%] & $\Delta E_{\mathrm{est}}$ [\%] & $U$ \\
+        \midrule
+        Pruned & \textcolor{mgGreen}{-0.35}/\textcolor{mgRed}{+0.61} & \textcolor{mgGreen}{-41}/\textcolor{mgGreen}{-46} & \textcolor{mgGreen}{-18}/\textcolor{mgGreen}{-20} & \textcolor{mgGreen}{-43}/\textcolor{mgGreen}{-44} & 0.71/0.91 \\
+        Quantized & \textcolor{mgRed}{+0.10}/\textcolor{mgRed}{+0.56} & \textcolor{mgGreen}{-50}/\textcolor{mgGreen}{-59} & \textcolor{mgGreen}{-20}/\textcolor{mgGreen}{-23} & \textcolor{mgRed}{+399}/\textcolor{mgRed}{+29} & 1.83/1.03 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\subsection{Limited software fault sensitivity}
+In the missing-update analysis, holding the preceding output for up to 10~\% randomly omitted reports changes aggregate MAE by less than 0.001 percentage points. Ten gaps of 3600 samples increase SOC MAE by approximately 0.05 percentage points and have negligible influence on the slowly varying SOH output.
+
+Figure~\ref{fig:app_fault_sensitivity} shows the recurrent response to the one-sample input-buffer faults. Across the SOC variants, median peak deviation ranges from 3.29 to 3.82 percentage points and P95 ranges from 16.18 to 23.81 percentage points. All 30 events per SOC model meet the recovery criterion within 60~s, with median recovery times of 10.0--12.5~s. Quantized follows Base closely, whereas Pruned has a lower median peak but the largest P95 peak. For SOH, median peak deviation ranges from 0.83 to 1.59 percentage points and P95 from 3.37 to 5.85 percentage points. The share recovered within 60~s is 93.3~\% for Base, 90.0~\% for Pruned, and 86.7~\% for Quantized. Among the recovered SOH events, median recovery is 9, 7, and 5~s, respectively.
+
+The target-based measure in Eq.~\ref{eq:fault_mae_change} complements these disturbed-clean deviations. For SOC, median $\Delta\mathrm{MAE}_{61}$ ranges from 0.046 to 0.079 percentage points and P95 from 1.42 to 1.59 percentage points. For SOH, median changes lie between $-0.0009$ and 0.0012 percentage points and P95 between 0.053 and 0.122 percentage points. The small negative SOH values occur when a disturbance moves an already imperfect prediction closer to the target and are not evidence of improved fault robustness. Table~\ref{tab:app_fault_mae} gives the model-specific values. The test therefore identifies different transient response tails across the compressed variants without indicating persistent SOC divergence or non-finite outputs. Its restricted fault location and event count do not support a hardware-safety claim.
+
+\section{Discussion}
+The experiments show that pruning and quantization affect the SOC and SOH estimators differently. For SOC, the evaluated Pruned model obtains a 0.35-percentage-point lower MAE than Base, while Quantized remains 0.11 percentage points above Base. Together with the L2 saliency and weight-distribution diagnostics, this identifies structured pruning as the more balanced transformation for the evaluated model and split. The experimental design uses one training run and a predefined test split for each task because the focus is the embedded comparison of compression routes. Repeated-seed validation, cross-validation, and matched unpruned fine-tuning can extend the statistical assessment of the observed advantage. The result is therefore reported without assigning it to a specific regularisation mechanism.
+
+For SOH the picture is more nuanced. Targets evolve slowly and are anchored by periodic capacity check-ups, while the displayed online estimates undergo two strong filtering stages. The filter-stage comparison shows that post-processing can alter not only absolute MAE but also the ranking between Base, Pruned, and Quantized. Compression quality should therefore be assessed on both raw and filtered outputs, and filter selection should consider response delay rather than MAE alone.
+
+From an engineering perspective the three deployment variants represent distinct operating points. Base FP32 offers the simplest tool flow but requires the largest flash footprint. Pruning reduces the recurrent state dimension and the corresponding MLP input width, shrinking SOC flash from 105.32 to 62.27~kB and inference time from 1.40 to 0.80~ms. For SOH the corresponding changes are 335.00 to 182.41~kB and 22.73 to 12.72~ms. Within this unchanged FP32 kernel family, static MAC ratios and measured time ratios agree closely. SOC Pruned retains 54.9~\% of Base MACs and 57.2~\% of its time, while SOH retains 54.3~\% and 56.0~\%, respectively.
+
+Weight-only quantization gives the smallest flash footprints, 52.48~kB for SOC and 138.00~kB for SOH, but changes the operation types without providing a fully integer execution path. Base and Quantized retain the same 22,080 SOC and 85,120 SOH model MACs. In the current C expressions, each recurrent INT8 weight is cast to FP32 and multiplied by its row scale inside the innermost accumulation, adding 17,920 source-level FP32 scale multiplications for SOC and 68,608 for SOH. Treating one MAC and one additional multiplication as one operation each gives a static Quantized/Base ratio of approximately 1.81 for both tasks, whereas the measured time ratios are 4.99 for SOC and 1.29 for SOH.
+
+The discrepancy is expected because the count omits conversion, indexing, loop, load/store, nonlinear-function, and cache/Flash effects and because the \code{-O0} kernel uses no optimised integer dot-product path. For the larger SOH model, reduced recurrent-weight traffic may offset more of this arithmetic overhead than for SOC. Memory bandwidth was not measured, so this remains an implementation-based interpretation rather than a causal attribution. \ref{app:quant_runtime} places the static counts beside the measured DWT times.
+
+The present kernel prioritises a transparent implementation of the mixed-precision path. Potential improvements include accumulating each row before applying its shared scale, fusing scale and bias work, using DSP-optimised or integer dot-product kernels, and quantizing activations and recurrent states to enable a complete integer path. Operation-level cycle attribution and memory-bandwidth profiling are reserved for future implementation studies. The present results therefore establish total kernel timing for the tested firmware but not the fraction caused by conversion, arithmetic, or memory access.
+
+The distinction between system latency, inference time, and estimated energy is particularly relevant for resource-constrained BMS. The UART-driven tests report end-to-end latency, while on-device inference spans 0.80--6.99~ms for SOC and 12.72--29.21~ms for SOH. The reported $E_{\mathrm{est}}$ values are obtained by multiplying these times by an assumed constant \SI{0.5}{\watt}. They do not isolate CPU, flash, SRAM, UART, or regulator contributions. Consequently, the results establish timing and memory trade-offs on the STM32H753ZI, but not a component-level energy budget or a conclusion that flash access dominates consumption.
+
+The utility score makes the competing effects of compression directly comparable by expressing accuracy, flash, RAM, and the timing-derived energy proxy relative to the same Base model. A value below one indicates that the combined advantages outweigh the disadvantages for the selected priorities, while a value above one indicates an overall deterioration. With equal weights, $U=0.71$ identifies SOC Pruned as a balanced improvement, whereas $U=1.83$ shows that the flash reduction of SOC Quantized does not compensate for its timing overhead. The SOH scores remain close to one, indicating a genuine trade-off without one consistently dominant variant. The weight-grid analysis adds the important information of how stable these conclusions are when application priorities change. SOC Pruned remains preferred across most weight combinations, while the preferred SOH model depends more strongly on whether accuracy or flash receives greater emphasis. The utility analysis therefore supports a transparent selection of the model variant and distinguishes robust recommendations from priority-dependent decisions.
+
+The implementation-level storage reduction follows directly from the architecture. Removing the same number of hidden channels or storing the same recurrent matrices as INT8 therefore produces predictable parameter-count changes for a fixed model topology. The preservation of estimation accuracy depends more strongly on the cell chemistry, operating conditions, reference construction, and training data. This study quantifies the trade-off for JGC LFP cells at \SI{25}{\degreeCelsius}. Existing embedded studies across different cell chemistries demonstrate that compact data-driven estimators are broadly feasible~\cite{giazitzisCaseStudyTiny2024,liOnlineCapacityEstimation2021,rzepkaNeuralNetworkArchitecture2023a}. Validation with additional cell chemistries is needed to determine how closely their attainable MAE and preferred compression level follow the trends observed here.
+
+The present study examines two post-training compression routes. The first is one-shot structured pruning with short fine-tuning, and the second is recurrent-weight quantization of the original FP32 model. Quantization-aware training and pruning-aware or iterative training can in principle recover accuracy by adapting parameters to the imposed representation~\cite{krishnamoorthiQuantizingDeepConvolutional2018,wenLearningIntrinsicSparse2017}. Evaluating these strategies requires a separate training study and is reserved for future work. The current comparison therefore addresses deployable post-training transformations, not the best achievable result of jointly trained compression.
+
+The analytical MAC relation provides a platform-independent estimate of how structured pruning changes model complexity. The measured flash and timing ratios complement this estimate for the evaluated STM32 implementation and build configuration. Their transfer to other embedded platforms depends on clock rate, floating-point and signal-processing support, compiler optimisation, cache, and memory organisation. Benchmarks on additional controller architectures can therefore quantify how these implementation characteristics translate the same model reduction into practical resource savings.
+
+Preparing the derivative features on the host separates feature construction from neural-network inference and allows the measured timing differences to be attributed directly to pruning and quantization. The long-horizon analysis evaluates continuous inference trajectories, while the transient input-buffer analysis perturbs a measurement before inference and follows its effect through the recurrent state. The latter distinguishes immediate peak deviation, recovery, and target-MAE change. It indicates similar SOC behaviour for Base and Quantized, a larger upper-tail SOC response for Pruned, and a larger share of SOH events without confirmed 60-s recovery for Quantized. A complete embedded front-end and safety assessment can build on these results by additionally covering variable sampling, derivative filtering, recurrent-state and weight memory, activations, communication, and MCU memory.
+\section{Conclusion and Outlook}
+This study set out to quantify how two transparent compression routes change the accuracy and embedded cost of stateful SOC and SOH estimators under a common STM32 benchmark. Its contribution is an auditable comparison from trained LSTM\,+\,MLP models to continuous C inference with consistent accuracy, memory, and timing indicators. Estimated energy per inference remains a constant-power timing proxy and is not an independent power measurement.
+
+For SOC, Pruned reduces flash by 40.9~\%, RAM by approximately 18~\%, and inference time by 42.9~\%, while its MAE is 0.35 percentage points lower than Base for the evaluated model and split. Quantized reduces flash by 50.2~\% and RAM by approximately 20~\%, but increases inference time by 399~\% and MAE by 0.11 percentage points in the mixed-precision software kernel. For SOH, Pruned reduces flash by 45.5~\%, RAM by approximately 20~\%, and inference time by 44.0~\%, with a 0.61-percentage-point MAE increase. Quantized reduces flash by 58.8~\% and RAM by approximately 23~\%, while increasing inference time by 28.5~\% and MAE by 0.56 percentage points. Under the fixed-power assumption, the energy proxy changes by the same percentages as inference time.
+
+These results identify structured pruning as the more balanced operating point for the tested firmware, whereas recurrent-weight quantization is attractive primarily when flash capacity dominates and its dequantization overhead is acceptable. Ten consecutive replay segments show no quantization-specific monotonic deviation from Base. After transient input-buffer bit flips, every SOC variant recovers in all 30 events within 60~s, while 6.7--13.3~\% of the SOH events do not meet the defined recovery criterion within this horizon. The SOH filter analysis further shows that compression must be assessed together with post-processing delay. The evaluated LFP trajectories, model configurations, STM32H753ZI implementation, and compiler settings establish the trade-off under one complete deployment scenario. Validation across additional cell chemistries, embedded platforms, model initialisations, and internal fault classes can determine how broadly the observed trends transfer.
+
+The first priority for future work is to optimise and profile the mixed-precision kernel through row-scale hoisting, operator fusion, DSP-oriented dot products, and activation/state quantization, while measuring per-model board power with external instrumentation. A second priority is external validation across random seeds, temperatures, cell chemistries, and embedded platforms, including direct comparison with quantization-aware and pruning-aware training. Finally, internal weight, activation, recurrent-state, sensor, communication, and MCU fault injection is required before safety-related claims can be made. Joint pruning and quantization remains a promising route for combining a reduced state dimension with compact recurrent storage.
+\appendix
+\section{Supplementary compression and robustness analyses}\label{app:supplementary}
+This appendix presents supporting analyses of pruning structure, temporal stability, filter interaction, utility sensitivity, transient input faults, model-complexity scaling, mixed precision, and kernel operation counts.
+
+\subsection{Structured-pruning diagnostics}\label{app:pruning_diagnostics}
+\begin{figure*}[!ht]
+    \centering
+    \includegraphics[width=\textwidth]{figures/Review_1_Additional/rev_1_pruning_evidence.png}
+    \caption{Diagnostics for the one-shot SOC pruning operation. (a) L2 saliency from Eq.~\ref{eq:pruning_saliency}, sorted in ascending order. The 19 lowest-ranked units are removed and 45 units are retained. (b) Density of the central recurrent-weight range for the Base and Pruned models. The analysis confirms application of the specified ranking criterion and makes the resulting weight selection transparent. Repeated training runs can extend this structural evidence toward a statistical assessment of the observed MAE difference.}
+    \label{fig:app_pruning_diagnostics}
+\end{figure*}
+\clearpage
+
+\subsection{Long-horizon temporal stability}\label{app:long_horizon}
+\begin{figure*}[!ht]
+    \centering
+    \includegraphics[width=\textwidth]{figures/Review_1_Additional/rev_2_long_horizon_stability.png}
+    \caption{Temporal error and model-to-Base deviation over ten consecutive, equal-count segments of the full-stream replay. Recurrent states are not reset at segment boundaries. Panels (a) and (c) show target MAE for SOC and SOH. Panels (b) and (d) show the mean absolute deviation of Pruned and Quantized from Base. The absence of monotonic late-sequence divergence demonstrates stable relative behaviour across the complete evaluated replay. Further sequences can extend the tested operating horizon.}
+    \label{fig:app_long_horizon}
+\end{figure*}
+\clearpage
+
+\subsection{SOH filtering and compression interaction}\label{app:soh_filter}
+\begin{figure*}[!ht]
+    \centering
+    \includegraphics[width=\textwidth]{figures/Review_1_Additional/rev_3_soh_filter_pipeline.png}
+    \caption{Comparison of SOH compression and filtering for the Base, Pruned, and Quantized C models on a common input sequence. (a) Outputs after first-point alignment but before temporal filtering. (b) Stage~1 with $\alpha_1=0.02$ and the symmetric limiter. (c) Final sequential output after applying stage~2 with $\alpha_2=10^{-6}$ and the downward limiter to stage~1. (d) MAE after each processing stage. At \SI{1}{\hertz}, the EMA-only 90~\% response times are approximately \SI{114}{\second} and 26.65~days, respectively. The nonlinear limiters have no single cutoff frequency. All three variants use the same input and processing order to isolate the interaction between compression and filtering.}
+    \label{fig:app_soh_filter}
+\end{figure*}
+\clearpage
+
+\subsection{Utility-weight sensitivity}\label{app:utility_sensitivity}
+\begin{figure*}[!ht]
+    \centering
+    \includegraphics[width=\textwidth]{figures/Review_1_Additional/rev_4_utility_sensitivity.png}
+    \caption{Sensitivity of the utility ranking to application priorities. Panels (a) and (b) vary the highlighted objective from 25 to 85~\% and divide the remaining weight equally among the other three objectives. Each square identifies the lowest-utility model. At 25~\%, all four objectives have equal weight. Panel (c) gives the winning share across all 1,771 non-negative 0.05-spaced weight combinations that sum to one. The energy objective uses the timing-derived $E_{\mathrm{est}}$ proxy and is therefore not an independent power measurement.}
+    \label{fig:app_utility_sensitivity}
+\end{figure*}
+\clearpage
+
+\subsection{Transient input-buffer fault sensitivity}\label{app:fault_sensitivity}
+\begin{figure*}[!ht]
+    \centering
+    \includegraphics[width=\textwidth]{figures/Review_1_Additional/rev_5_limited_fault_sensitivity.png}
+    \caption{Stateful response to transient software input-buffer corruption. Thirty independent events per task and model flip the most significant FP32 mantissa bit in voltage, current, or temperature for one 1-Hz sample, with ten events per input signal. The clean and disturbed branches start from the same recurrent state and then receive 60 identical clean samples without a reset. (a) and (b) show the absolute disturbed-clean deviation for one representative voltage event. (c) summarises the median peak and P95 peak across all 30 events. (d) gives the fraction that meets the sustained recovery criterion within 60~s. The figure characterises propagation through the recurrent state, while Table~\ref{tab:app_fault_mae} reports the corresponding change in target MAE.}
+    \label{fig:app_fault_sensitivity}
+\end{figure*}
+\begin{table*}[!ht]
+    \centering
+    \caption{Change in target MAE over the 61-sample fault and recovery window. Values are percentage points and summarise 30 independent input-bitflip events per task and model. The change is defined by Eq.~\ref{eq:fault_mae_change}. Negative values indicate that the disturbed output happens to lie closer to the target in part of the window.}
+    \label{tab:app_fault_mae}
+    \small
+    \begin{tabular}{llrr}
+        \toprule
+        Task & Model & Median $\Delta\mathrm{MAE}_{61}$ [pp] & P95 $\Delta\mathrm{MAE}_{61}$ [pp] \\
+        \midrule
+        SOC & Base      & 0.0740  & 1.4235 \\
+        SOC & Pruned    & 0.0464  & 1.5867 \\
+        SOC & Quantized & 0.0785  & 1.4314 \\
+        SOH & Base      & $-0.0009$ & 0.1224 \\
+        SOH & Pruned    & $-0.00004$ & 0.0533 \\
+        SOH & Quantized & 0.0012  & 0.1055 \\
+        \bottomrule
+    \end{tabular}
+\end{table*}
+\clearpage
+
+\subsection{Analytical model-complexity scaling}\label{app:model_complexity}
+\begin{figure*}[!ht]
+    \centering
+    \includegraphics[width=\textwidth]{figures/Review_1_Additional/rev_6_model_complexity_scaling.png}
+    \caption{Architecture-level operation scaling from Eq.~\ref{eq:model_macs}. (a) Analytical MACs per streaming inference over LSTM hidden size, with markers for the implemented SOC and SOH Base and Pruned dimensions. (b) Finite-model reduction for the evaluated pruning fraction $p=0.30$, including the implemented SOC and SOH points and the 51~\% large-$H$ limit. (c) General relation between the hidden-unit pruning fraction and the asymptotic reduction $2p-p^2$. The highlighted 30~\% operating point has a theoretical limit of 51~\%, while the corresponding limits for 10, 20, 40, and 50~\% pruning are 19, 36, 64, and 75~\%. Linear input and MLP terms together with the fixed output term keep finite models below the respective limit.}
+    \label{fig:app_model_complexity}
+\end{figure*}
+\clearpage
+
+\subsection{Scope of the L2 pruning criterion}\label{app:pruning_criterion_scope}
+\begin{figure*}[!ht]
+    \centering
+    \includegraphics[width=\textwidth]{figures/Review_1_Additional/rev_8_pruning_criterion_scope.png}
+    \caption{Scope of the structured pruning criterion. (a) Normalised L2 saliency ranks for the SOC and SOH Base hidden units. The lowest 30~\% define the task-specific removal sets. (b) The implemented path aggregates row-wise L2 norms across all four gates and removes complete recurrent units together with associated recurrent columns and MLP inputs. The comparison makes the reproducibility and dense-kernel benefit of the L2 criterion explicit and provides a reference for future comparisons with gradient- and activation-based rankings.}
+    \label{fig:app_pruning_criterion_scope}
+\end{figure*}
+\clearpage
+
+\subsection{Verified mixed-precision boundary}\label{app:mixed_precision}
+\begin{figure*}[!ht]
+    \centering
+    \includegraphics[width=\textwidth]{figures/Review_1_Additional/rev_9_mixed_precision_quantization.png}
+    \caption{Verified precision path and raw model-constant composition. (a) Only recurrent input-to-hidden and hidden-to-hidden matrices are stored as INT8. Per-row scales, biases, gate activations, hidden/cell states, the MLP, and the estimator output remain FP32. (b,c) Analytical model constants for SOC and SOH Base and Quantized variants. The comparison shows how concentrating quantization on the dominant recurrent matrices reduces persistent model storage and where activation and state quantization could provide additional runtime savings.}
+    \label{fig:app_mixed_precision}
+\end{figure*}
+\clearpage
+
+\subsection{Static quantized-runtime accounting}\label{app:quant_runtime}
+\begin{figure*}[!ht]
+    \centering
+    \includegraphics[width=\textwidth]{figures/Review_1_Additional/rev_10_quantized_runtime_accounting.png}
+    \caption{Static source-level operation accounting beside measured STM32H753ZI kernel time. Panels (a,c) show model MACs and the additional FP32 row-scale multiplications implied by the current per-weight C expressions. Panels (b,d) show DWT measurements averaged over 10,000 streaming inferences. Their comparison reveals where analytical operation counts explain the timing trend and where conversion, indexing, loop, load/store, nonlinear-function, compiler, and memory-system effects create additional optimisation opportunities.}
+    \label{fig:app_quant_runtime}
+\end{figure*}
+\clearpage
+\section*{Funding}
+This research was funded by the German Federal Ministry for Education and Research (BMBF), grant number 03SF0684A (MG FARM). The authors are responsible for the content. The work was further supported by the German Research Foundation and the Open Access Publication Fund of the Technical University of Berlin.
+\section*{Acknowledgements}
+We acknowledge the High Performance Computing Service of the Technical University of Berlin for providing the computational resources used in the pruning and quantization experiments. The authors thank Nils Strassenburg (Hasso-Plattner-Institut, Potsdam) for helpful discussions on pruning and quantization, Mano Schmitz for the collaboration on the dataset creation, and Max M\"onikes and Pavel Aleinikau (Technical University of Berlin) for their collaboration on the BMS hardware.
+\section*{CRediT authorship contribution statement}
+Florian Rzepka: Conceptualization, methodology, software, validation, formal analysis, investigation, data curation, writing--original draft preparation, writing--review and editing, visualization.
+
+Julia Kowal: Resources, supervision, project administration, funding acquisition, writing--review and editing.
+
+\section*{Declaration of competing interest}
+The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
+\section*{Declaration of generative AI and AI-assisted technologies in the manuscript preparation process}
+During the preparation of this work the author(s) used ChatGPT, DeepL, and Grammarly in order to improve the linguistic quality and style of the manuscript. After using these tools, the author(s) reviewed and edited the content as needed and take(s) full responsibility for the content of the published article.
+
+\section*{Data availability}
+The LFP DoE Cycle Ageing Dataset used in this work can be obtained from the DOI repository in~\cite{LFP_DoE_Cycle_Aging_Dataset}. The landing page provides licensing information and download instructions.
+
+\bibliographystyle{elsarticle-num}
+\bibliography{bib/paper2_socsoh_fr}
+\end{document}

@@ -254,8 +254,7 @@ function Draw-StackedStorageBars($g, [float]$x, [float]$y, [float]$w, [float]$h,
         @('FP32RecurrentWeightsBytes',$PaleGreen,$Green),
         @('Int8RecurrentWeightsBytes',$PaleBlue,$Blue),
         @('FP32MLPBytes',$PalePurple,$Purple),
-        @('FP32ScalesAndBiasBytes',$PaleRed,$Red),
-        @('PersistentStateBytes',$PaleGray,$Gray)
+        @('FP32ScalesAndBiasBytes',$PaleRed,$Red)
     )
     $barWidth = [math]::Min(150,$plotWidth/4)
     $centers = @(($plotLeft + $plotWidth*0.30),($plotLeft + $plotWidth*0.70))
@@ -286,50 +285,80 @@ function Draw-StackedStorageBars($g, [float]$x, [float]$y, [float]$w, [float]$h,
 # or energy to another MCU family.
 # -----------------------------------------------------------------------------
 $scalingRows = @()
+$evaluatedPruningFraction = 0.30
 foreach ($taskSpec in @(
     [pscustomobject]@{Task='SOC'; MlpWidth=64; BaseH=64; PrunedH=45},
     [pscustomobject]@{Task='SOH'; MlpWidth=128; BaseH=128; PrunedH=90}
 )) {
     for ($h=30; $h -le 1000; $h+=10) {
-        $hp = [int][math]::Round(0.7*$h,[System.MidpointRounding]::AwayFromZero)
+        $hp = [int][math]::Round((1.0-$evaluatedPruningFraction)*$h,[System.MidpointRounding]::AwayFromZero)
         $baseMac = 4*$h*(6+$h) + $h*$taskSpec.MlpWidth + $taskSpec.MlpWidth
         $prunedMac = 4*$hp*(6+$hp) + $hp*$taskSpec.MlpWidth + $taskSpec.MlpWidth
         $scalingRows += [pscustomobject]@{
-            Task=$taskSpec.Task; HiddenSize=$h; PrunedHiddenSize=$hp; TotalMACs=$baseMac
+            Task=$taskSpec.Task; PruningFraction=$evaluatedPruningFraction
+            HiddenSize=$h; PrunedHiddenSize=$hp; TotalMACs=$baseMac
             MACReductionPct=100.0*(1.0-$prunedMac/$baseMac)
         }
     }
 }
 $scalingRows | Export-Csv -LiteralPath (Join-Path $Reviewer3Results 'model_complexity_scaling.csv') -NoTypeInformation -Encoding UTF8
 
-$chart = New-Chart 2500 2050
-$left = Add-Area $chart 'Complexity' 6 3 89 42 'LSTM hidden size H' 'Analytical MACs per inference'
-$right = Add-Area $chart 'Reduction' 6 52 89 42 'Original LSTM hidden size H' 'MAC reduction after 30% hidden-unit pruning [%]'
-Add-PanelTitle $chart 'Complexity' '(a) Architecture-level operation scaling' 21
-Add-PanelTitle $chart 'Reduction' '(b) Why 30% hidden-unit pruning approaches a 51% MAC reduction' 21
-$left.AxisX.TitleFont=Font 18; $left.AxisY.TitleFont=Font 18
-$left.AxisX.LabelStyle.Font=Font 17; $left.AxisY.LabelStyle.Font=Font 17
-$right.AxisX.TitleFont=Font 18; $right.AxisY.TitleFont=Font 18
-$right.AxisX.LabelStyle.Font=Font 17; $right.AxisY.LabelStyle.Font=Font 17
+$limitCurveRows = @()
+for ($pruningPct=0; $pruningPct -le 60; $pruningPct++) {
+    $p = $pruningPct / 100.0
+    $limitCurveRows += [pscustomobject]@{
+        PruningPct=$pruningPct
+        AsymptoticReductionPct=100.0*(2.0*$p-$p*$p)
+    }
+}
+$limitCurveRows | Export-Csv -LiteralPath (Join-Path $Reviewer3Results 'pruning_fraction_limit.csv') -NoTypeInformation -Encoding UTF8
+
+$chart = New-Chart 2500 2800
+$left = Add-Area $chart 'Complexity' 6 2 89 27 'LSTM hidden size H' 'Analytical MACs per inference'
+$right = Add-Area $chart 'Reduction' 6 35 89 27 'Original LSTM hidden size H' 'MAC reduction for p = 30% [%]'
+$limit = Add-Area $chart 'PruningLimit' 6 68 89 27 'Hidden-unit pruning fraction p [%]' 'Asymptotic MAC reduction [%]'
+Add-PanelTitle $chart 'Complexity' '(a) Architecture-level operation scaling' 30
+Add-PanelTitle $chart 'Reduction' '(b) Finite-model reduction at the evaluated pruning fraction' 30
+Add-PanelTitle $chart 'PruningLimit' '(c) General reduction limit set by the pruning fraction' 30
+$left.AxisX.TitleFont=Font 27; $left.AxisY.TitleFont=Font 27
+$left.AxisX.LabelStyle.Font=Font 24; $left.AxisY.LabelStyle.Font=Font 24
+$right.AxisX.TitleFont=Font 27; $right.AxisY.TitleFont=Font 27
+$right.AxisX.LabelStyle.Font=Font 24; $right.AxisY.LabelStyle.Font=Font 24
+$limit.AxisX.TitleFont=Font 27; $limit.AxisY.TitleFont=Font 27
+$limit.AxisX.LabelStyle.Font=Font 24; $limit.AxisY.LabelStyle.Font=Font 24
 $left.AxisX.Minimum=30; $left.AxisX.Maximum=160; $left.AxisX.Interval=20
 $left.AxisY.Minimum=0; $left.AxisY.Maximum=180000; $left.AxisY.Interval=30000
 $left.AxisY.LabelStyle.Format='N0'
 $right.AxisX.Minimum=30; $right.AxisX.Maximum=1000; $right.AxisX.Interval=100
 $right.AxisY.Minimum=38; $right.AxisY.Maximum=52; $right.AxisY.Interval=2
+$limit.AxisX.Minimum=0; $limit.AxisX.Maximum=60; $limit.AxisX.Interval=10
+$limit.AxisY.Minimum=0; $limit.AxisY.Maximum=90; $limit.AxisY.Interval=10
 
 foreach ($task in @('SOC','SOH')) {
     $color = if ($task -eq 'SOC') { $Red } else { $Blue }
     $rows = @($scalingRows | Where-Object Task -eq $task)
     $complexityRows = @($rows | Where-Object { [int]$_.HiddenSize -le 160 })
-    Add-LineSeries $chart 'Complexity' $task $color $complexityRows 'HiddenSize' 'TotalMACs' 'Solid' $false 5
-    Add-LineSeries $chart 'Reduction' $task $color $rows 'HiddenSize' 'MACReductionPct' 'Solid' $false 5
+    Add-LineSeries $chart 'Complexity' $task $color $complexityRows 'HiddenSize' 'TotalMACs' 'Solid' $false 6
+    Add-LineSeries $chart 'Reduction' $task $color $rows 'HiddenSize' 'MACReductionPct' 'Solid' $false 6
 }
 
 $limitRows = @(
     [pscustomobject]@{HiddenSize=30; MACReductionPct=51},
     [pscustomobject]@{HiddenSize=1000; MACReductionPct=51}
 )
-Add-LineSeries $chart 'Reduction' 'Quadratic limit' $Gray $limitRows 'HiddenSize' 'MACReductionPct' 'Dash' $false 4
+Add-LineSeries $chart 'Reduction' 'Quadratic limit' $Gray $limitRows 'HiddenSize' 'MACReductionPct' 'Dash' $false 5
+
+Add-LineSeries $chart 'PruningLimit' 'General quadratic limit' $Purple $limitCurveRows 'PruningPct' 'AsymptoticReductionPct' 'Solid' $false 6
+$usedHorizontal = @(
+    [pscustomobject]@{PruningPct=0; AsymptoticReductionPct=51},
+    [pscustomobject]@{PruningPct=30; AsymptoticReductionPct=51}
+)
+$usedVertical = @(
+    [pscustomobject]@{PruningPct=30; AsymptoticReductionPct=0},
+    [pscustomobject]@{PruningPct=30; AsymptoticReductionPct=51}
+)
+Add-LineSeries $chart 'PruningLimit' 'Used horizontal guide' $PaleRed $usedHorizontal 'PruningPct' 'AsymptoticReductionPct' 'Dash' $false 3
+Add-LineSeries $chart 'PruningLimit' 'Used vertical guide' $PaleRed $usedVertical 'PruningPct' 'AsymptoticReductionPct' 'Dash' $false 3
 
 $socBaseMac = 4*64*(6+64)+64*64+64
 $socPrunedMac = 4*45*(6+45)+45*64+64
@@ -337,20 +366,30 @@ $sohBaseMac = 4*128*(6+128)+128*128+128
 $sohPrunedMac = 4*90*(6+90)+90*128+128
 $socActualReduction = 100.0*(1.0-$socPrunedMac/$socBaseMac)
 $sohActualReduction = 100.0*(1.0-$sohPrunedMac/$sohBaseMac)
-Add-PointSeries $chart 'Complexity' 'SOC base' $Red 64 $socBaseMac 'SOC Base' 'Circle' 14
-Add-PointSeries $chart 'Complexity' 'SOC pruned' $Red 45 $socPrunedMac 'SOC Pruned' 'Diamond' 14
-Add-PointSeries $chart 'Complexity' 'SOH base' $Blue 128 $sohBaseMac 'SOH Base' 'Circle' 14
-Add-PointSeries $chart 'Complexity' 'SOH pruned' $Blue 90 $sohPrunedMac 'SOH Pruned' 'Diamond' 14
-Add-PointSeries $chart 'Reduction' 'SOC implemented architecture' $Red 64 $socActualReduction 'SOC 64 -> 45: 45.1%' 'Circle' 15 'Right'
-Add-PointSeries $chart 'Reduction' 'SOH implemented architecture' $Blue 128 $sohActualReduction 'SOH 128 -> 90: 45.7%' 'Circle' 15 'Right'
+Add-PointSeries $chart 'Complexity' 'SOC base' $Red 64 $socBaseMac 'SOC Base' 'Circle' 20
+Add-PointSeries $chart 'Complexity' 'SOC pruned' $Red 45 $socPrunedMac 'SOC Pruned' 'Diamond' 20
+Add-PointSeries $chart 'Complexity' 'SOH base' $Blue 128 $sohBaseMac 'SOH Base' 'Circle' 20
+Add-PointSeries $chart 'Complexity' 'SOH pruned' $Blue 90 $sohPrunedMac 'SOH Pruned' 'Diamond' 20
+Add-PointSeries $chart 'Reduction' 'SOC implemented architecture' $Red 64 $socActualReduction 'SOC 64 -> 45: 45.1%' 'Circle' 20 'BottomRight'
+Add-PointSeries $chart 'Reduction' 'SOH implemented architecture' $Blue 128 $sohActualReduction 'SOH 128 -> 90: 45.7%' 'Circle' 20 'TopRight'
 
-$legendLeft = Add-AreaLegend $chart 'ComplexityLegend' 'Complexity' 'Near' 15
+foreach ($pruningPct in @(10,20,40,50)) {
+    $p = $pruningPct / 100.0
+    $reductionPct = 100.0*(2.0*$p-$p*$p)
+    Add-PointSeries $chart 'PruningLimit' "Limit at $pruningPct percent" $Purple $pruningPct $reductionPct ("{0:0}%" -f $reductionPct) 'Circle' 20 'Top'
+}
+Add-PointSeries $chart 'PruningLimit' 'Evaluated pruning fraction' $Red 30 51 '51% limit at evaluated p = 30%' 'Diamond' 20 'Right'
+
+$legendLeft = Add-AreaLegend $chart 'ComplexityLegend' 'Complexity' 'Near' 20
 Add-CustomLineLegendItem $legendLeft 'SOC analytical MACs' $Red
 Add-CustomLineLegendItem $legendLeft 'SOH analytical MACs' $Blue
-$legendRight = Add-AreaLegend $chart 'ReductionLegend' 'Reduction' 'Near' 15
+$legendRight = Add-AreaLegend $chart 'ReductionLegend' 'Reduction' 'Near' 20
 Add-CustomLineLegendItem $legendRight 'SOC analytical MAC reduction' $Red
 Add-CustomLineLegendItem $legendRight 'SOH analytical MAC reduction' $Blue
-Add-CustomLineLegendItem $legendRight 'H^2 limit: 1 - 0.70^2 = 51%' $Gray 'Dash'
+Add-CustomLineLegendItem $legendRight 'Large-H limit for p = 30%: 51%' $Gray 'Dash'
+$legendLimit = Add-AreaLegend $chart 'PruningLimitLegend' 'PruningLimit' 'Near' 20
+Add-CustomLineLegendItem $legendLimit 'General limit: 2p - p^2' $Purple
+Add-CustomLineLegendItem $legendLimit 'Evaluated pruning fraction: p = 30%' $Red 'Dash'
 Save-Chart $chart 'rev_6_model_complexity_scaling.png'
 
 # -----------------------------------------------------------------------------
@@ -396,7 +435,7 @@ Save-Canvas $canvas 'rev_7_derivative_deployment_boundary.png'
 $saliency = Import-Csv (Join-Path $ResultsRoot 'weights\lstm_unit_saliency.csv')
 $canvas = New-Canvas 2400 1400
 $g = $canvas.Graphics
-Draw-Text $g '(a) Gate-group L2 ranking for complete hidden units' 80 55 1100 70 30 $true
+Draw-Text $g '(a) L2 saliency ranking of hidden units' 80 55 1100 70 30 $true
 Draw-Text $g '(b) Criterion scope and deployment implications' 1280 55 1040 70 30 $true
 
 $plotX=135; $plotY=185; $plotW=980; $plotH=900
@@ -415,7 +454,7 @@ for ($i=0;$i -le 5;$i++) {
 $g.DrawLine($axisPen,$plotX,$plotY,$plotX,$plotY+$plotH)
 $g.DrawLine($axisPen,$plotX,$plotY+$plotH,$plotX+$plotW,$plotY+$plotH)
 Draw-Text $g 'Unit rank [% of task units]' ($plotX+250) ($plotY+$plotH+55) 500 45 22 $false $Dark 'Center' 'Center'
-Draw-Text $g 'Normalized L2 score' $plotX 132 300 36 19 $false $Gray 'Near' 'Center'
+Draw-Text $g 'Normalized L2 saliency score' $plotX 132 360 36 19 $false $Gray 'Near' 'Center'
 Draw-Text $g 'Lowest 30% removed' ($plotX+15) ($plotY+18) ($plotW*0.30-30) 40 20 $true $Red 'Center' 'Center'
 
 foreach ($task in @('SOC','SOH')) {
@@ -435,23 +474,32 @@ foreach ($task in @('SOC','SOH')) {
     }
     $pen.Dispose()
 }
-Draw-Text $g 'SOC' ($plotX+700) ($plotY+90) 90 35 22 $true $Red 'Near' 'Center'
-Draw-Text $g 'SOH' ($plotX+830) ($plotY+90) 90 35 22 $true $Blue 'Near' 'Center'
+$legendY=$plotY+$plotH+135
+$socLegendPen=New-Object System.Drawing.Pen((C $Red),5)
+$sohLegendPen=New-Object System.Drawing.Pen((C $Blue),5)
+$g.DrawLine($socLegendPen,410,$legendY+22,475,$legendY+22)
+Draw-Text $g 'SOC' 490 $legendY 90 44 22 $false $Dark 'Near' 'Center'
+$g.DrawLine($sohLegendPen,650,$legendY+22,715,$legendY+22)
+Draw-Text $g 'SOH' 730 $legendY 90 44 22 $false $Dark 'Near' 'Center'
+$socLegendPen.Dispose(); $sohLegendPen.Dispose()
 $gridPen.Dispose(); $axisPen.Dispose()
 
-Draw-Box $g 1300 170 300 115 $VeryPaleBlue $Blue 'Four gate rows per hidden unit' 21 $true
-Draw-Arrow $g 1600 228 1680 228
-Draw-Box $g 1685 170 280 115 $VeryPaleRed $Red 'Aggregate row L2 norms' 21 $true
-Draw-Arrow $g 1965 228 2045 228
-Draw-Box $g 2050 170 270 115 $VeryPaleGreen $Green 'Remove one complete unit' 21 $true
-Draw-Arrow $g 2185 285 2185 355
-Draw-Box $g 1690 360 495 105 $VeryPaleGreen $Green 'Slice recurrent columns and MLP input' 21 $false
+Draw-Box $g 1280 170 225 115 $VeryPaleBlue $Blue 'Four gate rows per hidden unit' 19 $true
+Draw-Arrow $g 1505 228 1540 228 $Red 4
+Draw-Box $g 1545 170 225 115 $VeryPaleRed $Red 'Compute row-wise L2 norms' 19 $true
+Draw-Arrow $g 1770 228 1805 228 $Red 4
+$subscriptH = [char]0x2095
+Draw-Box $g 1810 170 240 115 $VeryPaleRed $Red "L2 saliency s$subscriptH`naggregated over gates" 18 $true
+Draw-Arrow $g 2050 228 2085 228 $Red 4
+Draw-Box $g 2090 170 230 115 $VeryPaleGreen $Green 'Rank and remove lowest 30%' 19 $true
+Draw-Arrow $g 2205 285 2205 355
+Draw-Box $g 1690 360 515 105 $VeryPaleGreen $Green 'Remove complete unit; slice recurrent columns and MLP input' 19 $false
 
 $tableX=1280; $tableY=540; $tableW=1040; $rowH=125
 $colWidths=@(270,245,245,280)
 $headers=@('Criterion','Required evidence','Unit grouping','Dense-kernel effect')
 $rows=@(
-    @('Gate-group L2`n(used)','Saved weights only','All four gates`ncombined','Direct dimension`nreduction'),
+    @('L2 saliency score`n(used)','Saved weights only','All four gates`ncombined','Direct dimension`nreduction'),
     @('Gradient sensitivity','Training data and`nbackpropagation','Must be designed`nas structured','Only if complete`nunits are removed'),
     @('Activation statistics','Calibration stream','Must aggregate`nunit activations','Only if complete`nunits are removed')
 )
@@ -467,11 +515,13 @@ for($r=0;$r -lt $rows.Count;$r++) {
         $xx += $colWidths[$c]
     }
 }
-Draw-Box $g 1325 1075 950 125 '#FFF7E8' $Red "Method-property rationale only. Gradient- and activation-based`ncriteria were not experimentally compared in this study." 22 $true
+$usedRowBorder = New-Object System.Drawing.Pen((C $Red),4)
+$g.DrawLine($usedRowBorder,$tableX,($tableY+85+$rowH),($tableX+$tableW),($tableY+85+$rowH))
+$usedRowBorder.Dispose()
 Save-Canvas $canvas 'rev_8_pruning_criterion_scope.png'
 
 # -----------------------------------------------------------------------------
-# rev_9: exact mixed-precision boundary and persistent storage composition.
+# rev_9: exact mixed-precision boundary and analytical model-constant storage.
 # -----------------------------------------------------------------------------
 $memory = Import-Csv (Join-Path $ResultsRoot 'weights\quantization_memory_accounting.csv')
 $canvas = New-Canvas 2500 1450
@@ -487,25 +537,23 @@ Draw-Arrow $g 735 580 735 675
 Draw-Box $g 505 680 460 135 $VeryPaleGreen $Green "MLP weights and`nactivations remain FP32" 23 $true
 Draw-Arrow $g 735 815 735 910
 Draw-Box $g 505 915 460 120 $VeryPaleGreen $Green "Estimator output`nFP32" 24 $true
-Draw-Box $g 110 1090 1030 145 '#FFF7E8' $Red "The export is weight-only mixed precision, not a fully integer path.`nTransient activation buffers were not separately profiled." 23 $true
 
 $socRows = @($memory | Where-Object Task -eq 'SOC' | Sort-Object { if($_.Variant -eq 'Base'){0}else{1} })
 $sohRows = @($memory | Where-Object Task -eq 'SOH' | Sort-Object { if($_.Variant -eq 'Base'){0}else{1} })
-Draw-StackedStorageBars $g 1240 160 560 980 $socRows 100 '(b) SOC persistent storage'
-Draw-StackedStorageBars $g 1870 160 560 980 $sohRows 360 '(c) SOH persistent storage'
+Draw-StackedStorageBars $g 1240 160 560 980 $socRows 100 '(b) SOC model constants'
+Draw-StackedStorageBars $g 1870 160 560 980 $sohRows 360 '(c) SOH model constants'
 
 $legendItems=@(
     @('FP32 recurrent weights',$PaleGreen,$Green),
     @('INT8 recurrent weights',$PaleBlue,$Blue),
-    @('FP32 MLP',$PalePurple,$Purple),
-    @('FP32 scales and bias',$PaleRed,$Red),
-    @('FP32 persistent h+c state',$PaleGray,$Gray)
+    @('FP32 MLP parameters',$PalePurple,$Purple),
+    @('FP32 row scales and LSTM bias',$PaleRed,$Red)
 )
 $lx=1240; $ly=1210
 for($i=0;$i -lt $legendItems.Count;$i++) {
-    $row=[math]::Floor($i/3); $col=$i%3; $xx=$lx+$col*390; $yy=$ly+$row*72
+    $row=[math]::Floor($i/2); $col=$i%2; $xx=$lx+$col*590; $yy=$ly+$row*72
     Draw-Box $g $xx $yy 48 34 $legendItems[$i][1] $legendItems[$i][2]
-    Draw-Text $g $legendItems[$i][0] ($xx+60) ($yy-5) 315 46 18 $false $Dark 'Near' 'Center'
+    Draw-Text $g $legendItems[$i][0] ($xx+60) ($yy-5) 500 46 18 $false $Dark 'Near' 'Center'
 }
 Save-Canvas $canvas 'rev_9_mixed_precision_quantization.png'
 

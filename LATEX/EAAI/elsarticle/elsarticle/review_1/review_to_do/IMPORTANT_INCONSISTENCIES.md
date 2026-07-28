@@ -49,6 +49,25 @@ is weight-only mixed-precision quantization, not full integer inference. Any sen
 claiming quantized activations or a fourfold reduction of all model memory is too
 broad.
 
+This was verified against both final STM32 projects and their linker maps. The SOC
+firmware calls `lstm_model_predict_int8()` from `lstm_model_int8.c`; despite the
+generic file name, that source includes `model_weights_lstm_int8_manual.h` and
+`mlp_weights_fp32.h`. The SOH firmware analogously calls
+`lstm_model_soh_int8_forward()` and includes `mlp_weights_fp32_soh.h`. The linked
+`MLP0_WEIGHT` and `MLP1_WEIGHT` sections have FP32 byte sizes in both map files.
+
+The README files inside the two STM32 quantized projects are stale: they describe an
+older hybrid path with an FP32 LSTM and INT8 MLP. Do not use those README statements
+to describe the benchmarked firmware. Unused headers for alternative quantization
+experiments also remain in the project directories; the functions called by
+`main.c` and the linked map sections define the evaluated implementation.
+
+The analytical raw model-constant totals are 87.5/37.0 KiB for SOC Base/Quantized
+and 335.0/138.0 KiB for SOH Base/Quantized. These totals exclude hidden/cell-state
+RAM, transient activation buffers, scaler constants, executable code, and other
+firmware sections. They must not be labelled as measured firmware Flash. The linked
+firmware values remain 105.32/52.48 KiB for SOC and 335.00/138.00 KiB for SOH.
+
 ## Pruning interpretation
 
 The available exported models show 64 to 45 SOC units and 128 to 90 SOH units. The
@@ -58,7 +77,16 @@ because no repeated seeds or matched ablation are available.
 
 ## Fault and robustness scope
 
-The new fault CSVs cover held outputs and one-bit corruption of an FP32 output value.
-They do not exercise the LSTM after corrupting recurrent state, weights, activations,
-input sensors, sampling intervals, or communication packets. Label them as limited
-software sensitivity checks, not embedded fault-injection validation.
+The former post-inference output-register bit-flip analysis has been removed from the
+manuscript because it did not exercise recurrent propagation. The replacement test in
+`DL_Models/LFP_LSTM_MLP/5_benchmark/PC/input_bitflip_recovery` runs the exported C
+models statefully. It flips the most significant FP32 mantissa bit in one voltage,
+current, or temperature input for one sample and then follows 60 clean samples without
+resetting the LSTM state.
+
+Report disturbed-clean peak and recovery together with the change in 61-sample target
+MAE. MAE alone is insufficient because a fault can accidentally move an imperfect
+prediction closer to the target and because a short peak is diluted by window
+averaging. The test is a bounded software input-buffer sensitivity analysis. It does
+not cover physical sensors, communication, recurrent-state or weight memory,
+activations, or MCU memory and must not be described as hardware-safety validation.

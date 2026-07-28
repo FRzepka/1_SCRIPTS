@@ -320,4 +320,285 @@ if ((Test-Path -LiteralPath $localBasePrunedNpz) -and (Test-Path -LiteralPath $l
 foreach($task in @('soc','soh')) {
     $pretty=$task.ToUpperInvariant()
     $windows=Import-Csv (Join-Path $ResultsRoot "long_horizon\${task}_windowed_stability.csv")
-    New-ModelLineChart $windows "$pretty error stability over the fußÎ9¶‰ËkºwµçI¥•Ì€‘¡…ÉĞ€EÕ…¹Ñ¥é•°Õ¹™¥±Ñ•É•œ€‘EÕ…¹Ñ½±½È€‘±½…±QÉ…©•Ñ½Éä€AÉ½É•ÍÍA•É•¹Ğœ€EÕ…¹Ñ¥é•‘I…Üœ€5…¥¸œ€È(€€€‘µ1¥¹•M•É¥•Ì€‘¡…ÉĞ€EÕ…¹Ñ¥é•°½‘”™¥±Ñ•Èœ€‘AÕÉÁ±•½±½È€‘±½…±QÉ…©•Ñ½Éä€AÉ½É•ÍÍA•É•¹Ğœ€EÕ…¹Ñ¥é•‘	•¹¡µ…É¬œ€5…¥¸œ€Ì(€€€M…Ù”µ¡…ÉĞ€‘¡…ÉĞ€¡)½¥¸µA…Ñ €‘¥ÕÉ•ÍI½½Ğ€É•Ù¥•İ}Í½¡}™¥±Ñ•É}ÅÕ…¹Ñ¥é•‘}É…İ}ÙÍ}™¥±Ñ•É•¹Á¹œœ¤)ô((‘ÍÑ•Àõ%µÁ½ÉĞµÍØ€¡)½¥¸µA…Ñ €‘I•ÍÕ±ÑÍI½½Ğ€™¥±Ñ•ÉqÍ½¡}™¥±Ñ•É}ÍÑ•Á}É•ÍÁ½¹Í”¹ÍØœ¤ğ]¡•É”µ=‰©•Ğì€¡Q¼µ½Õ‰±”€‘|¹M…µÁ±•Ì¤€µĞ€Àô(‘¡…ÉĞõ9•Üµ¡…ÉĞ€Q¡•½É•Ñ¥…°5ÍÑ•ÀÉ•ÍÁ½¹Í”…Ğ€Ä!èœ€Q¥µ”m‘…åÌ°±½…É¥Ñ¡µ¥tœ€9½Éµ…±¥é•É•ÍÁ½¹Í”lµtœ(‘¡…ÉĞ¹¡…ÉÑÉ•…Íl5…¥¸t¹á¥Í`¹%Í1½…É¥Ñ¡µ¥Œô‘ÑÉÕ”(‘¡…ÉĞ¹¡…ÉÑÉ•…Íl5…¥¸t¹á¥Í`¹1½…É¥Ñ¡µ	…Í”ôÄÀ)‘µ1¥¹•M•É¥•Ì€‘¡…ÉĞ€½‘”è…±Á¡„ôÀ¸ÀÈœ€‘	…Í•½±½È€‘ÍÑ•À€Q¥µ•…åÌœ€	•¹¡µ…É­}…±Á¡„À¸ÀÈœ€5…¥¸œ€Ì)‘µ1¥¹•M•É¥•Ì€‘¡…ÉĞ€Q•áĞè…±Á¡„ôÅ”´Øœ€‘AÕÉÁ±•½±½È€‘ÍÑ•À€Q¥µ•…åÌœ€5…¹ÕÍÉ¥ÁÑ}…±Á¡„Å”´Øœ€5…¥¸œ€Ì)M…Ù”µ¡…ÉĞ€‘¡…ÉĞ€¡)½¥¸µA…Ñ €‘¥ÕÉ•ÍI½½Ğ€É•Ù¥•İ}Í½¡}™¥±Ñ•É}ÍÑ•Á}É•ÍÁ½¹Í”¹Á¹œœ¤((ŒUÑ¥±¥ÑäÍ•¹Í¥Ñ¥Ù¥Ñä(‘ÕÑ¥±¥Ñå¥Èõ)½¥¸µA…Ñ €‘I•ÍÕ±ÑÍI½½Ğ€ÕÑ¥±¥Ñäœ)9•Üµ%Ñ•´€µ%Ñ•µQåÁ”¥É•Ñ½Éä€µ½É”€µA…Ñ €‘ÕÑ¥±¥Ñå¥Èğ=ÕĞµ9Õ±°(‘­Á¥Ìõì(€€€M=õì(€€€€€€€	…Í”õí5ôÈ¸ØàĞÔÄĞØí±…Í ôÄÀÔ¸ÌÈíI4ôĞ¸äÌí¹•ÉäôÜÀÀ¸àÍô(€€€€€€€AÉÕ¹•õí5ôÈ¸ÌÌÜäØÈÀí±…Í ôØÈ¸ÈÜíI4ôĞ¸ÀÌí¹•ÉäôĞÀÀ¸Ìáô(€€€€€€€EÕ…¹Ñ¥é•õí5ôÈ¸ÜäÄÄÔäÀí±…Í ôÔÈ¸ĞàíI4ôÌ¸äØí¹•ÉäôÌĞäĞ¸ØÙô(€€€ô(€€€M= õì(€€€€€€€	…Í”õí5ôÀ¸àÔÈÌÔÀÔí±…Í ôÌÌÔ¸ÀÀíI4ôà¸Øäí¹•ÉäôÄÄÌØØ¸äÍô(€€€€€€€AÉÕ¹•õí5ôÄ¸ĞÔÜÌÄÈÄí±…Í ôÄàÈ¸ĞÄíI4ôØ¸äØí¹•ÉäôØÌØÈ¸ÈÍô(€€€€€€€EÕ…¹Ñ¥é•õí5ôÄ¸ĞÄÀÌÜäĞí±…Í ôÄÌà¸ÀÀíI4ôØ¸ÜÀí¹•ÉäôÄĞØÀĞ¸Èİô(€€€ô)ô(‘É¥‘I½İÌõ  ¤ì€‘Íİ••ÁI½İÌõ  ¤ì€‘ÍÕµµ…ÉåI½İÌõ  ¤)™½É•…  ‘Ñ…Í¬¥¸  M=œ°M= œ¤¤ì(€€€€‘½Õ¹ÑÌõí	…Í”ôÀíAÉÕ¹•ôÀíEÕ…¹Ñ¥é•ôÁô(€€€™½È ‘„ôÀì‘„€µ±”€ÈÀì‘„¬¬¤ì™½È ‘˜ôÀì‘˜€µ±”€ ÈÀ´‘„¤ì‘˜¬¬¤ì™½È ‘ÈôÀì‘È€µ±”€ ÈÀ´‘„´‘˜¤ì‘È¬¬¤ì(€€€€€€€€‘”ôÈÀ´‘„´‘˜´‘Èì€‘İ•¥¡ÑÌõ   ‘„€¼€ÈÀ¸À¤°€ ‘˜€¼€ÈÀ¸À¤°€ ‘È€¼€ÈÀ¸À¤°€ ‘”€¼€ÈÀ¸À¤¤(€€€€€€€€‘Ôõí	…Í”ôÄ¸Áô(€€€€€€€™½É•…  ‘Ù…É¥…¹Ğ¥¸  AÉÕ¹•œ°EÕ…¹Ñ¥é•œ¤¤ì(€€€€€€€€€€€€‘Õl‘Ù…É¥…¹Ñtô‘İ•¥¡ÑÍlÁt¨‘­Á¥Íl‘Ñ…Í­ul‘Ù…É¥…¹Ñt¹5¼‘­Á¥Íl‘Ñ…Í­t¹	…Í”¹5€¬(€€€€€€€€€€€€€€€€‘İ•¥¡ÑÍlÅt¨‘­Á¥Íl‘Ñ…Í­ul‘Ù…É¥…¹Ñt¹±…Í ¼‘­Á¥Íl‘Ñ…Í­t¹	…Í”¹±…Í €¬(€€€€€€€€€€€€€€€€‘İ•¥¡ÑÍlÉt¨‘­Á¥Íl‘Ñ…Í­ul‘Ù…É¥…¹Ñt¹I4¼‘­Á¥Íl‘Ñ…Í­t¹	…Í”¹I4€¬(€€€€€€€€€€€€€€€€‘İ•¥¡ÑÍlÍt¨‘­Á¥Íl‘Ñ…Í­ul‘Ù…É¥…¹Ñt¹¹•Éä¼‘­Á¥Íl‘Ñ…Í­t¹	…Í”¹¹•Éä(€€€€€€€ô(€€€€€€€€‘İ¥¹¹•Èõ  	…Í”œ°AÉÕ¹•œ°EÕ…¹Ñ¥é•œ¤ğM½ÉĞµ=‰©•Ğì‘Õl‘}uôğM•±•Ğµ=‰©•Ğ€µ¥ÉÍĞ€Äì€‘½Õ¹ÑÍl‘İ¥¹¹•Ét¬¬(€€€€€€€€‘É¥‘I½İÌ€¬ômÁÍÕÍÑ½µ½‰©•ÑuíQ…Í¬ô‘Ñ…Í¬í]•¥¡ÑÕÉ…äô‘İ•¥¡ÑÍlÁtí]•¥¡Ñ±…Í ô‘İ•¥¡ÑÍlÅtí]•¥¡ÑI4ô‘İ•¥¡ÑÍlÉtí]•¥¡Ñ¹•Éäô‘İ•¥¡ÑÍlÍtíU	…Í”ôÄ¸ÀíUAÉÕ¹•ô‘Ô¹AÉÕ¹•íUEÕ…¹Ñ¥é•ô‘Ô¹EÕ…¹Ñ¥é•í]¥¹¹•Èô‘İ¥¹¹•Éô(€€€õõô(€€€€‘Ñ½Ñ…°ô ‘½Õ¹ÑÌ¹Y…±Õ•Ìğ5•…ÍÕÉ”µ=‰©•Ğ€µMÕ´¤¹MÕ´(€€€™½É•…  ‘Ù…É¥…¹Ğ¥¸  	…Í”œ°AÉÕ¹•œ°EÕ…¹Ñ¥é•œ¤¤ì€‘ÍÕµµ…ÉåI½İÌ€¬ômÁÍÕÍÑ½µ½‰©•ÑuíQ…Í¬ô‘Ñ…Í¬íY…É¥…¹Ğô‘Ù…É¥…¹Ğí]¥¹¹¥¹½µ‰¥¹…Ñ¥½¹Ìô‘½Õ¹ÑÍl‘Ù…É¥…¹Ñtí]¥¹¹¥¹M¡…É”ô‘½Õ¹ÑÍl‘Ù…É¥…¹Ñt¼‘Ñ½Ñ…±ôô((€€€™½É•…  ‘µ•ÑÉ¥Œ¥¸  ÕÉ…äœ°±…Í œ°I4œ°¹•Éäœ¤¤ì(€€€€€€€™½È ‘ÜôÀ¸ÈÔì‘Ü€µ±”€À¸àÔÀÀÄì‘Ü¬ôÀ¸ÀÔ¤ì(€€€€€€€€€€€€‘İ•¥¡ÑÌõíÕÉ…äô Ä´‘Ü¤¼Ìí±…Í ô Ä´‘Ü¤¼ÌíI4ô Ä´‘Ü¤¼Ìí¹•Éäô Ä´‘Ü¤¼Íôì€‘İ•¥¡ÑÍl‘µ•ÑÉ¥tô‘Ü(€€€€€€€€€€€€‘Õ@ô‘İ•¥¡ÑÌ¹ÕÉ…ä¨‘­Á¥Íl‘Ñ…Í­t¹AÉÕ¹•¹5¼‘­Á¥Íl‘Ñ…Í­t¹	…Í”¹5€¬€‘İ•¥¡ÑÌ¹±…Í ¨‘­Á¥Íl‘Ñ…Í­t¹AÉÕ¹•¹±…Í ¼‘­Á¥Íl‘Ñ…Í­t¹	…Í”¹±…Í €¬€‘İ•¥¡ÑÌ¹I4¨‘­Á¥Íl‘Ñ…Í­t¹AÉÕ¹•¹I4¼‘­Á¥Íl‘Ñ…Í­t¹	…Í”¹I4€¬€‘İ•¥¡ÑÌ¹¹•Éä¨‘­Á¥Íl‘Ñ…Í­t¹AÉÕ¹•¹¹•Éä¼‘­Á¥Íl‘Ñ…Í­t¹	…Í”¹¹•Éä(€€€€€€€€€€€€‘ÕDô‘İ•¥¡ÑÌ¹ÕÉ…ä¨‘­Á¥Íl‘Ñ…Í­t¹EÕ…¹Ñ¥é•¹5¼‘­Á¥Íl‘Ñ…Í­t¹	…Í”¹5€¬€‘İ•¥¡ÑÌ¹±…Í ¨‘­Á¥Íl‘Ñ…Í­t¹EÕ…¹Ñ¥é•¹±…Í ¼‘­Á¥Íl‘Ñ…Í­t¹	…Í”¹±…Í €¬€‘İ•¥¡ÑÌ¹I4¨‘­Á¥Íl‘Ñ…Í­t¹EÕ…¹Ñ¥é•¹I4¼‘­Á¥Íl‘Ñ…Í­t¹	…Í”¹I4€¬€‘İ•¥¡ÑÌ¹¹•Éä¨‘­Á¥Íl‘Ñ…Í­t¹EÕ…¹Ñ¥é•¹¹•Éä¼‘­Á¥Íl‘Ñ…Í­t¹	…Í”¹¹•Éä(€€€€€€€€€€€€‘İ¥¹¹•Èõ ¡mÁÍÕÍÑ½µ½‰©•Ñuí8ô	…Í”œíTôÄ¸Áô±mÁÍÕÍÑ½µ½‰©•Ñuí8ôAÉÕ¹•œíTô‘ÕAô±mÁÍÕÍÑ½µ½‰©•Ñuí8ôEÕ…¹Ñ¥é•œíTô‘ÕEô¤ğM½ÉĞµ=‰©•ĞTğM•±•Ğµ=‰©•Ğ€µ¥ÉÍĞ€Ä(€€€€€€€€€€€€‘Íİ••ÁI½İÌ€¬ômÁÍÕÍÑ½µ½‰©•ÑuíQ…Í¬ô‘Ñ…Í¬í½…±5•ÑÉ¥Œô‘µ•ÑÉ¥Œí½…±]•¥¡Ğô‘ÜíI•µ…¥¹¥¹… ô Ä´‘Ü¤¼ÌíU	…Í”ôÄ¸ÀíUAÉÕ¹•ô‘Õ@íUEÕ…¹Ñ¥é•ô‘ÕDíEÕ…¹Ñ5¥¹ÕÍAÉÕ¹•ô‘ÕD´‘Õ@í]¥¹¹•Èô‘İ¥¹¹•È¹9ô(€€€€€€€ô(€€€ô)ô)]É¥Ñ”µÍÙI½İÌ€‘É¥‘I½İÌ€¡)½¥¸µA…Ñ €‘ÕÑ¥±¥Ñå¥È€ÕÑ¥±¥Ñå}İ•¥¡Ñ}É¥¹ÍØœ¤)]É¥Ñ”µÍÙI½İÌ€‘Íİ••ÁI½İÌ€¡)½¥¸µA…Ñ €‘ÕÑ¥±¥Ñå¥È€ÕÑ¥±¥Ñå}ÁÉ¥½É¥Ñå}Íİ••À¹ÍØœ¤)]É¥Ñ”µÍÙI½İÌ€‘ÍÕµµ…ÉåI½İÌ€¡)½¥¸µA…Ñ €‘ÕÑ¥±¥Ñå¥È€ÕÑ¥±¥Ñå}É…¹­¥¹}ÍÕµµ…Éä¹ÍØœ¤((‘İ¥¹¹•É	…ÉÌõ  ‘ÍÕµµ…ÉåI½İÌğ½É… µ=‰©•ĞímÁÍÕÍÑ½µ½‰©•Ñuí…Ñ•½Éäô‘|¹Q…Í¬íM•É¥•Ìô‘|¹Y…É¥…¹ĞíY…±Õ”ôÄÀÀ¨‘|¹]¥¹¹¥¹M¡…É•õô¤)9•ÜµÉ½ÕÁ•‘	…É¡…ÉĞ€‘İ¥¹¹•É	…ÉÌ€	•ÍĞµÉ…¹­•µ½‘•°…É½ÍÌ…±°€Ô”µÍÁ…•ÕÑ¥±¥Ñäİ•¥¡ÑÌœ€…Ñ•½Éäœ€M•É¥•Ìœ€Y…±Õ”œ€M¡…É”½˜İ•¥¡Ğ½µ‰¥¹…Ñ¥½¹ÌÉ…¹­•‰•ÍĞl•tœ€‘5½‘•±½±½ÉÌ€¡)½¥¸µA…Ñ €‘¥ÕÉ•ÍI½½Ğ€É•Ù¥•İ}ÕÑ¥±¥Ñå}É…¹­¥¹}É½‰ÕÍÑ¹•ÍÌ¹Á¹œœ¤€‘ÑÉÕ”)™½É•…  ‘Ñ…Í¬¥¸  M=œ°M= œ¤¤ì(€€€€‘É½İÌõ  ‘Íİ••ÁI½İÌğ]¡•É”µ=‰©•ĞQ…Í¬€µ•Ä€‘Ñ…Í¬¤(€€€€‘¡…ÉĞõ9•Üµ¡…ÉĞ€ˆ‘Ñ…Í­€èEÕ…¹Ñ¥é•Ù•ÉÍÕÌAÉÕ¹•Õ¹‘•È¡…¹¥¹œÁÉ¥½É¥Ñ¥•Ìˆ€]•¥¡Ğ½˜¡¥¡±¥¡Ñ•µ•ÑÉ¥ŒìÉ•µ…¥¹¥¹œİ•¥¡ĞÍ¡…É••ÅÕ…±±äœ€T¡EÕ…¹Ñ¥é•¤€´T¡AÉÕ¹•¤€lø€ÀèAÉÕ¹•‰•ÑÑ•Èì€ğ€ÀèEÕ…¹Ñ¥é•‰•ÑÑ•Étœ(€€€€‘¡…ÉĞ¹¡…ÉÑÉ•…Íl5…¥¸t¹á¥Í`¹1…‰•±MÑå±”¹½Éµ…ĞôœÀ¸ÀÀœ(€€€¥˜ ‘Ñ…Í¬€µ•Ä€M=œ¤ì€‘¡…ÉĞ¹¡…ÉÑÉ•…Íl5…¥¸t¹á¥Íd¹5¥¹¥µÕ´ô´À¸ÈÔô(€€€€‘ÁÉ¥½É¥Ñå½±½ÉÌõíÕÉ…äô‘AÉÕ¹•‘½±½Èí±…Í ô‘EÕ…¹Ñ½±½ÈíI4ô‘AÕÉÁ±•½±½Èí¹•Éäô‘	…Í•½±½Éô(€€€™½É•…  ‘µ•ÑÉ¥Œ¥¸  ÕÉ…äœ°±…Í œ°I4œ°¹•Éäœ¤¤ì‘µ1¥¹•M•É¥•Ì€‘¡…ÉĞ€‘µ•ÑÉ¥Œ€‘ÁÉ¥½É¥Ñå½±½ÉÍl‘µ•ÑÉ¥t  ‘É½İÍñ]¡•É”µ=‰©•Ğ½…±5•ÑÉ¥Œ€µ•Ä€‘µ•ÑÉ¥Œ¤€½…±]•¥¡Ğœ€EÕ…¹Ñ5¥¹ÕÍAÉÕ¹•œ€5…¥¸œ€Ìô(€€€€‘é•É¼õ9•Üµ=‰©•ĞMåÍÑ•´¹]¥¹‘½İÌ¹½ÉµÌ¹…Ñ…Y¥ÍÕ…±¥é…Ñ¥½¸¹¡…ÉÑ¥¹œ¹MÑÉ¥Á1¥¹”ì€‘é•É¼¹%¹Ñ•ÉÙ…±=™™Í•ĞôÀì€‘é•É¼¹MÑÉ¥Á]¥‘Ñ ôÀì€‘é•É¼¹	½É‘•É½±½Èõ•Ğµ!•á½±½È€œŒÌÌÌÌÌÌœì€‘é•É¼¹	½É‘•É]¥‘Ñ ôÈì€‘¡…ÉĞ¹¡…ÉÑÉ•…Íl5…¥¸t¹á¥Íd¹MÑÉ¥Á1¥¹•Ì¹‘ ‘é•É¼¤(€€€M…Ù”µ¡…ÉĞ€‘¡…ÉĞ€¡)½¥¸µA…Ñ €‘¥ÕÉ•ÍI½½Ğ€‰É•Ù¥•İ}ÕÑ¥±¥Ñå}ÁÉ¥½É¥Ñå|‘íÑ…Í­ô¹Á¹œˆ¤)ô((Œ]•¥¡Ğ°Í…±¥•¹ä°ÅÕ…¹Ñ¥é…Ñ¥½¸°µ•µ½Éä°…¹ÍÑ…Ñ¥Œ½Á•É…Ñ¥½¸…¹…±åÍ•Ì(‘İ•¥¡ÑÍ¥Èõ)½¥¸µA…Ñ €‘I•ÍÕ±ÑÍI½½Ğ€İ•¥¡ÑÌœì€‘½Á•É…Ñ¥½¹Í¥Èõ)½¥¸µA…Ñ €‘I•ÍÕ±ÑÍI½½Ğ€½Á•É…Ñ¥½¹Ìœ)9•Üµ%Ñ•´€µ%Ñ•µQåÁ”¥É•Ñ½Éä€µ½É”€µA…Ñ €‘İ•¥¡ÑÍ¥È°‘½Á•É…Ñ¥½¹Í¥Èğ=ÕĞµ9Õ±°(‘Á…Ñ¡Ìõì(€€€M=	…Í”õI•Í½±Ù”µM½ÕÉ•A…Ñ €1}5½‘•±Íq1A}1MQ5}51ApÉ}µ½‘•±Íq‰…Í•qÍ½|Ä¸Ô¸À¸Á}‰…Í•q}¥µÁ±•µ•¹Ñ…Ñ¥½¹qµ½‘•±}İ•¥¡ÑÌ¹ œ(€€€M=AÉÕ¹•õI•Í½±Ù”µM½ÕÉ•A…Ñ €1}5½‘•±Íq1A}1MQ5}51ApÉ}µ½‘•±ÍqÁÉÕ¹•‘qÍ½|Ä¸Ô¸À¸Á}ÁÉÕ¹•‘qÁÉÕ¹•|ÌÁÁÑ|ÈÀÈÔÀäÄÙ|ÄĞÀĞÀÑq}¥µÁ±•µ•¹Ñ…Ñ¥½¹qµ½‘•±}İ•¥¡ÑÌ¹ œ(€€€M=EÕ…¹ĞõI•Í½±Ù”µM½ÕÉ•A…Ñ €1}5½‘•±Íq1A}1MQ5}51ApÉ}µ½‘•±ÍqÅÕ…¹Ñ¥é•‘qÍ½|Ä¸Ô¸À¸Á}ÅÕ…¹Ñ¥é•‘qµ½‘•±}İ•¥¡ÑÍ}±ÍÑµ}¥¹Ğá}µ…¹Õ…°¹ œ(€€€M=!	…Í”õI•Í½±Ù”µM½ÕÉ•A…Ñ €1}5½‘•±Íq1A}1MQ5}51ApÉ}µ½‘•±Íq‰…Í•qÍ½¡|È¸Ä¸À¸Á}‰…Í•q}¥µÁ±•µ•¹Ñ…Ñ¥½¹qµ½‘•±}İ•¥¡ÑÍ}Í½ ¹ œ(€€€M=!AÉÕ¹•õI•Í½±Ù”µM½ÕÉ•A…Ñ €1}5½‘•±Íq1A}1MQ5}51ApÉ}µ½‘•±ÍqÁÉÕ¹•‘qÍ½¡|È¸Ä¸À¸ÁqÁÉÕ¹•|ÌÁÁÑ|ÈÀÈÔÄÄÈÉ|ÀÄÀÄĞÉq}¥µÁ±•µ•¹Ñ…Ñ¥½¹qµ½‘•±}İ•¥¡ÑÍ}Í½ ¹ œ(€€€M=!EÕ…¹ĞõI•Í½±Ù”µM½ÕÉ•A…Ñ €1}5½‘•±Íq1A}1MQ5}51ApÉ}µ½‘•±ÍqÅÕ…¹Ñ¥é•‘qÍ½¡|È¸Ä¸À¸Á}ÅÕ…¹Ñ¥é•‘q}¥µÁ±•µ•¹Ñ…Ñ¥½¹qµ½‘•±}İ•¥¡ÑÍ}±ÍÑµ}¥¹Ğá}µ…¹Õ…±}Í½ ¹ œ)ô(‘İ•¥¡ÑMÑ…ÑÌõ  ¤ì€‘¡¥ÍÑI½İÌõ  ¤ì€‘Í…±¥•¹åI½İÌõ  ¤ì€‘ÅÕ…¹ÑMÑ…ÑÌõ  ¤ì€‘ÅÕ…¹Ñ!¥ÍĞõ  ¤ì€‘µ•µ½ÉåI½İÌõ  ¤ì€‘½Á•É…Ñ¥½¹I½İÌõ  ¤(‘Ñ…Í­…Ñ„õíô)™½É•…  ‘Ñ…Í¬¥¸  M=œ°M= œ¤¤ì(€€€€‘‰…Í•A…Ñ ô‘Á…Ñ¡Ílˆ‘íÑ…Í­õ	…Í”‰tì€‘ÁÉÕ¹•‘A…Ñ ô‘Á…Ñ¡Ílˆ‘íÑ…Í­õAÉÕ¹•‰tì€‘ÅÕ…¹ÑA…Ñ ô‘Á…Ñ¡Ílˆ‘íÑ…Í­õEÕ…¹Ğ‰t(€€€€‘ õ•Ğµ•™¥¹”€‘‰…Í•A…Ñ €!%9}M%iœì€‘%¸õ•Ğµ•™¥¹”€‘‰…Í•A…Ñ €%9AUQ}M%iœì€‘4õ•Ğµ•™¥¹”€‘‰…Í•A…Ñ €51A}!%8œ(€€€€‘!Àõ•Ğµ•™¥¹”€‘ÁÉÕ¹•‘A…Ñ €!%9}M%iœ(€€€€‘‰…Í•% õ•ĞµÉÉ…ä€‘‰…Í•A…Ñ €1MQ5}]%!Q}% œì€‘‰…Í•! õ•ĞµÉÉ…ä€‘‰…Í•A…Ñ €1MQ5}]%!Q}! œì€‘‰…Í•±°õ)½¥¸µ½Õ‰±•ÉÉ…åÌ€‘‰…Í•% €‘‰…Í•! (€€€€‘ÁÉÕ¹•‘% õ•ĞµÉÉ…ä€‘ÁÉÕ¹•‘A…Ñ €1MQ5}]%!Q}% œì€‘ÁÉÕ¹•‘! õ•ĞµÉÉ…ä€‘ÁÉÕ¹•‘A…Ñ €1MQ5}]%!Q}! œì€‘ÁÉÕ¹•‘±°õ)½¥¸µ½Õ‰±•ÉÉ…åÌ€‘ÁÉÕ¹•‘% €‘ÁÉÕ¹•‘! (€€€€‘Ñ…Í­…Ñ…l‘Ñ…Í­tõí ô‘ í!Àô‘!Àí%¸ô‘%¸í4ô‘4í	…Í•% ô‘‰…Í•% í	…Í•! ô‘‰…Í•! í	…Í•±°ô‘‰…Í•±°íAÉÕ¹•‘±°ô‘ÁÉÕ¹•‘±°íEÕ…¹ÑA…Ñ ô‘ÅÕ…¹ÑA…Ñ í	…Í•A…Ñ ô‘‰…Í•A…Ñ¡ô(€€€™½É•…  ‘Ù…É¥…¹Ğ¥¸  	…Í”œ°AÉÕ¹•œ¤¤ì(€€€€€€€€‘Ù…±Õ•Ìõ¥˜ ‘Ù…É¥…¹Ğ€µ•Ä€	…Í”œ¥ì‘‰…Í•±±õ•±Í•ì‘ÁÉÕ¹•‘±±ôì€‘Ìõ•ĞµÉÉ…åMÑ…ÑÌ€‘Ù…±Õ•Ì(€€€€€€€€‘İ•¥¡ÑMÑ…ÑÌ€¬ômÁÍÕÍÑ½µ½‰©•ÑuíQ…Í¬ô‘Ñ…Í¬íY…É¥…¹Ğô‘Ù…É¥…¹Ğí½Õ¹Ğô‘Ì¹½Õ¹Ğí5•…¸ô‘Ì¹5•…¸íMÑô‘Ì¹MÑí5•…¹‰Ìô‘Ì¹5•…¹‰Ìí@äÕ‰Ìô‘Ì¹@äÕ‰Ìí@äå‰Ìô‘Ì¹@äå‰Ìí5…á‰Ìô‘Ì¹5…á‰ÌíÉ…Ñ¥½¹‰Í	•±½ÜÁÀÀÄô‘Ì¹É…Ñ¥½¹‰Í	•±½ÜÁÀÀÅô(€€€ô(€€€€‘±¥µ¥Ğõmµ…Ñ¡tèé5…à  ‘İ•¥¡ÑMÑ…ÑÍñ]¡•É”µ=‰©•ĞQ…Í¬€µ•Ä€‘Ñ…Í­ñ5•…ÍÕÉ”µ=‰©•Ğ@äå‰Ì€µ5…á¥µÕ´¤¹5…á¥µÕ´°Å”´Ø¤(€€€€‘¡¥ÍÑI½İÌ€¬ô•Ğµ!¥ÍÑ½É…µI½İÌ€‘‰…Í•±°€äÀ€ ´‘±¥µ¥Ğ¤€‘±¥µ¥Ğ€‘Ñ…Í¬€	…Í”œ(€€€€‘¡¥ÍÑI½İÌ€¬ô•Ğµ!¥ÍÑ½É…µI½İÌ€‘ÁÉÕ¹•‘±°€äÀ€ ´‘±¥µ¥Ğ¤€‘±¥µ¥Ğ€‘Ñ…Í¬€AÉÕ¹•œ(€€€€‘Í…±¥•¹åI½İÌ€¬ô•ĞµU¹¥ÑM…±¥•¹ä€‘‰…Í•% €‘‰…Í•! €‘ €‘%¸€‘Ñ…Í¬((€€€€‘Å% õ•ĞµÉÉ…ä€‘ÅÕ…¹ÑA…Ñ €1MQ5}]}% œì€‘Å! õ•ĞµÉÉ…ä€‘ÅÕ…¹ÑA…Ñ €1MQ5}]}! œì€‘Í% õ•ĞµÉÉ…ä€‘ÅÕ…¹ÑA…Ñ €1MQ5}]}%!}M1œì€‘Í! õ•ĞµÉÉ…ä€‘ÅÕ…¹ÑA…Ñ €1MQ5}]}!!}M1œ(€€€€‘Å%!I•ÍÕ±Ğõ•ĞµEÕ…¹Ñ¥é…Ñ¥½¹MÑ…ÑÌ€‘‰…Í•% €‘Å% €‘Í% € Ğ¨‘ ¤€‘%¸€‘Ñ…Í¬€]}¥ œ(€€€€‘Å!!I•ÍÕ±Ğõ•ĞµEÕ…¹Ñ¥é…Ñ¥½¹MÑ…ÑÌ€‘‰…Í•! €‘Å! €‘Í! € Ğ¨‘ ¤€‘ €‘Ñ…Í¬€]}¡ œ(€€€€‘ÅÕ…¹ÑMÑ…ÑÌ€¬ô€‘Å%!I•ÍÕ±Ğ¹MÑ…ÑÌ°‘Å!!I•ÍÕ±Ğ¹MÑ…ÑÌ(€€€€‘ÅÕ…¹Ñ!¥ÍĞ€¬ô•Ğµ!¥ÍÑ½É…µI½İÌ€‘Å%!I•ÍÕ±Ğ¹ÉÉ½ÉÌ€àÀ€À€¡mµ…Ñ¡tèé5…à ‘Å%!I•ÍÕ±Ğ¹@ää°Å”´ÄÀ¤¤€‘Ñ…Í¬€]}¥ œ€‰Í½±ÕÑ”É•½¹ÍÑÉÕÑ¥½¸•ÉÉ½Èœ(€€€€‘ÅÕ…¹Ñ!¥ÍĞ€¬ô•Ğµ!¥ÍÑ½É…µI½İÌ€‘Å!!I•ÍÕ±Ğ¹ÉÉ½ÉÌ€àÀ€À€¡mµ…Ñ¡tèé5…à ‘Å!!I•ÍÕ±Ğ¹@ää°Å”´ÄÀ¤¤€‘Ñ…Í¬€]}¡ œ€‰Í½±ÕÑ”É•½¹ÍÑÉÕÑ¥½¸•ÉÉ½Èœ((€€€€‘‰…Í•	¥…Ìô¡•ĞµÉÉ…ä€‘‰…Í•A…Ñ €1MQ5}	%Lœ¤¹1•¹Ñ ì€‘‰…Í•5±Àô¡•ĞµÉÉ…ä€‘‰…Í•A…Ñ €51A}Å}]%!Pœ¤¹1•¹Ñ ¬¡•ĞµÉÉ…ä€‘‰…Í•A…Ñ €51A}Å}	%Lœ¤¹1•¹Ñ ¬¡•ĞµÉÉ…ä€‘‰…Í•A…Ñ €51A}É}]%!Pœ¤¹1•¹Ñ ¬¡•ĞµÉÉ…ä€‘‰…Í•A…Ñ €51A}É}	%Lœ¤¹1•¹Ñ (€€€€‘µ•µ½ÉåI½İÌ€¬ômÁÍÕÍÑ½µ½‰©•ÑuíQ…Í¬ô‘Ñ…Í¬íY…É¥…¹Ğô	…Í”œí%¹ĞáI•ÕÉÉ•¹Ñ]•¥¡ÑÍ	åÑ•ÌôÀí@ÌÉI•ÕÉÉ•¹Ñ]•¥¡ÑÍ	åÑ•ÌôĞ¨ ‘‰…Í•% ¹1•¹Ñ ¬‘‰…Í•! ¹1•¹Ñ ¤í@ÌÉM…±•Í¹‘	¥…Í	åÑ•ÌôĞ¨‘‰…Í•	¥…Ìí@ÌÉ51A	åÑ•ÌôĞ¨‘‰…Í•5±ÀíA•ÉÍ¥ÍÑ•¹ÑMÑ…Ñ•	åÑ•ÌôÈ¨‘ ¨ĞíQ½Ñ…±5½‘•±	åÑ•ÌôĞ¨ ‘‰…Í•% ¹1•¹Ñ ¬‘‰…Í•! ¹1•¹Ñ ¬‘‰…Í•	¥…Ì¬‘‰…Í•5±À¥ô(€€€€‘µ•µ½ÉåI½İÌ€¬ômÁÍÕÍÑ½µ½‰©•ÑuíQ…Í¬ô‘Ñ…Í¬íY…É¥…¹ĞôEÕ…¹Ñ¥é•œí%¹ĞáI•ÕÉÉ•¹Ñ]•¥¡ÑÍ	åÑ•Ìô‘Å% ¹1•¹Ñ ¬‘Å! ¹1•¹Ñ í@ÌÉI•ÕÉÉ•¹Ñ]•¥¡ÑÍ	åÑ•ÌôÀí@ÌÉM…±•Í¹‘	¥…Í	åÑ•ÌôĞ¨ ‘Í% ¹1•¹Ñ ¬‘Í! ¹1•¹Ñ ¬‘‰…Í•	¥…Ì¤í@ÌÉ51A	åÑ•ÌôĞ¨‘‰…Í•5±ÀíA•ÉÍ¥ÍÑ•¹ÑMÑ…Ñ•	åÑ•ÌôÈ¨‘ ¨ĞíQ½Ñ…±5½‘•±	åÑ•Ìô‘Å% ¹1•¹Ñ ¬‘Å! ¹1•¹Ñ ¬Ğ¨ ‘Í% ¹1•¹Ñ ¬‘Í! ¹1•¹Ñ ¬‘‰…Í•	¥…Ì¬‘‰…Í•5±À¥ô((€€€€‘Ñ¥µ•Ìõ¥˜ ‘Ñ…Í¬€µ•Ä€M=œ¥íí	…Í”ôÄ¸ĞÀíAÉÕ¹•ô¸àÀíEÕ…¹Ñ¥é•ôØ¸äåõõ•±Í•íí	…Í”ôÈÈ¸ÜÌíAÉÕ¹•ôÄÈ¸ÜÈíEÕ…¹Ñ¥é•ôÈä¸ÈÅõô(€€€™½É•…  ‘Ù…É¥…¹Ğ¥¸  	…Í”œ°AÉÕ¹•œ°EÕ…¹Ñ¥é•œ¤¤ì(€€€€€€€€‘¡Øõ¥˜ ‘Ù…É¥…¹Ğ€µ•Ä€AÉÕ¹•œ¥ì‘!Áõ•±Í•ì‘!ôì€‘É•ÕÉÉ•¹ĞôĞ¨‘¡Ø¨ ‘%¸¬‘¡Ø¤ì€‘µ±Àô‘¡Ø¨‘4¬‘4ì€‘•áÑÉ„õ¥˜ ‘Ù…É¥…¹Ğ€µ•Ä€EÕ…¹Ñ¥é•œ¥ì‘É•ÕÉÉ•¹Ñõ•±Í•ìÁô(€€€€€€€€‘½Á•É…Ñ¥½¹I½İÌ€¬ômÁÍÕÍÑ½µ½‰©•ÑuíQ…Í¬ô‘Ñ…Í¬íY…É¥…¹Ğô‘Ù…É¥…¹Ğí!¥‘‘•¹M¥é”ô‘¡ØíI•ÕÉÉ•¹Ñ5Ìô‘É•ÕÉÉ•¹Ğí51A5Ìô‘µ±ÀíQ½Ñ…±5Ìô‘É•ÕÉÉ•¹Ğ¬‘µ±Àí‘‘¥Ñ¥½¹…±•ÅÕ…¹ÑM…±•5Õ±Ñ¥Á±¥…Ñ¥½¹Ìô‘•áÑÉ„í=‰Í•ÉÙ•‘%¹™•É•¹•5Ìô‘Ñ¥µ•Íl‘Ù…É¥…¹Ñtí5¥É½Í•½¹‘ÍA•ÈÄÀÀÁ5ÌôÄÀÀÀ¨‘Ñ¥µ•Íl‘Ù…É¥…¹Ñt¼ ‘É•ÕÉÉ•¹Ğ¬‘µ±À¥ô(€€€ô)ô)]É¥Ñ”µÍÙI½İÌ€‘İ•¥¡ÑMÑ…ÑÌ€¡)½¥¸µA…Ñ €‘İ•¥¡ÑÍ¥È€±ÍÑµ}İ•¥¡Ñ}ÍÑ…Ñ¥ÍÑ¥Ì¹ÍØœ¤)]É¥Ñ”µÍÙI½İÌ€‘¡¥ÍÑI½İÌ€¡)½¥¸µA…Ñ €‘İ•¥¡ÑÍ¥È€±ÍÑµ}İ•¥¡Ñ}¡¥ÍÑ½É…µÌ¹ÍØœ¤)]É¥Ñ”µÍÙI½İÌ€‘Í…±¥•¹åI½İÌ€¡)½¥¸µA…Ñ €‘İ•¥¡ÑÍ¥È€±ÍÑµ}Õ¹¥Ñ}Í…±¥•¹ä¹ÍØœ¤)]É¥Ñ”µÍÙI½İÌ€‘ÅÕ…¹ÑMÑ…ÑÌ€¡)½¥¸µA…Ñ €‘İ•¥¡ÑÍ¥È€ÅÕ…¹Ñ¥é…Ñ¥½¹}É•½¹ÍÑÉÕÑ¥½¹}ÍÑ…Ñ¥ÍÑ¥Ì¹ÍØœ¤)]É¥Ñ”µÍÙI½İÌ€‘ÅÕ…¹Ñ!¥ÍĞ€¡)½¥¸µA…Ñ €‘İ•¥¡ÑÍ¥È€ÅÕ…¹Ñ¥é…Ñ¥½¹}•ÉÉ½É}¡¥ÍÑ½É…µÌ¹ÍØœ¤)]É¥Ñ”µÍÙI½İÌ€‘µ•µ½ÉåI½İÌ€¡)½¥¸µA…Ñ €‘İ•¥¡ÑÍ¥È€ÅÕ…¹Ñ¥é…Ñ¥½¹}µ•µ½Éå}…½Õ¹Ñ¥¹œ¹ÍØœ¤)]É¥Ñ”µÍÙI½İÌ€‘½Á•É…Ñ¥½¹I½İÌ€¡)½¥¸µA…Ñ €‘½Á•É…Ñ¥½¹Í¥È€ÍÑ…Ñ¥}­•É¹•±}½Á•É…Ñ¥½¹}½Õ¹ÑÌ¹ÍØœ¤()™½É•…  ‘Ñ…Í¬¥¸  M=œ°M= œ¤¤ì(€€€€‘É½İÌõ  ‘¡¥ÍÑI½İÍñ]¡•É”µ=‰©•ĞQ…Í¬€µ•Ä€‘Ñ…Í¬¤(€€€€‘¡…ÉĞõ9•Üµ¡…ÉĞ€ˆ‘Ñ…Í¬É•ÕÉÉ•¹Ğµİ•¥¡Ğ‘¥ÍÑÉ¥‰ÕÑ¥½¹Ìˆ€]•¥¡ĞÙ…±Õ”œ€•¹Í¥Ñäœ(€€€€‘¡…ÉĞ¹¡…ÉÑÉ•…Íl5…¥¸t¹á¥Í`¹1…‰•±MÑå±”¹½Éµ…ĞôœÀ¸ÀÀœ(€€€™½É•…  ‘Ù…É¥…¹Ğ¥¸  	…Í”œ°AÉÕ¹•œ¤¤ì‘µ1¥¹•M•É¥•Ì€‘¡…ÉĞ€‘Ù…É¥…¹Ğ€‘5½‘•±½±½ÉÍl‘Ù…É¥…¹Ñt  ‘É½İÍñ]¡•É”µ=‰©•ĞY…É¥…¹Ğ€µ•Ä€‘Ù…É¥…¹Ğ¤€	¥¹•¹Ñ•Èœ€•¹Í¥Ñäœ€5…¥¸œ€Ìô(€€€M…Ù”µ¡…ÉĞ€‘¡…ÉĞ€¡)½¥¸µA…Ñ €‘¥ÕÉ•ÍI½½Ğ€‰É•Ù¥•İ|‘íÑ…Í­õ}İ•¥¡Ñ}‘¥ÍÑÉ¥‰ÕÑ¥½¸¹Á¹œˆ¤(€€€9•ÜµM…±¥•¹å¡…ÉĞ  ‘Í…±¥•¹åI½İÍñ]¡•É”µ=‰©•ĞQ…Í¬€µ•Ä€‘Ñ…Í¬¤€‘Ñ…Í¬€¡)½¥¸µA…Ñ €‘¥ÕÉ•ÍI½½Ğ€‰É•Ù¥•İ|‘íÑ…Í­õ}Õ¹¥Ñ}Í…±¥•¹ä¹Á¹œˆ¤(€€€€‘ÅÉ½İÌõ  ‘ÅÕ…¹Ñ!¥ÍÑñ]¡•É”µ=‰©•ĞQ…Í¬€µ•Ä€‘Ñ…Í¬¤(€€€€‘¡…ÉĞõ9•Üµ¡…ÉĞ€ˆ‘Ñ…Í¬%9Pàİ•¥¡ĞµÉ•½¹ÍÑÉÕÑ¥½¸•ÉÉ½Èˆ€‰Í½±ÕÑ”İ•¥¡Ğ•ÉÉ½Èœ€•¹Í¥Ñäœ(€€€€‘¡…ÉĞ¹¡…ÉÑÉ•…Íl5…¥¸t¹á¥Í`¹1…‰•±MÑå±”¹½Éµ…ĞôœÀ¸ÀÀÀÀœ(€€€‘µ1¥¹•M•É¥•Ì€‘¡…ÉĞ€%¹ÁÕĞµÑ¼µ¡¥‘‘•¸œ€‘AÉÕ¹•‘½±½È  ‘ÅÉ½İÍñ]¡•É”µ=‰©•ĞY…É¥…¹Ğ€µ•Ä€]}¥ œ¤€	¥¹•¹Ñ•Èœ€•¹Í¥Ñäœ€5…¥¸œ€Ì(€€€‘µ1¥¹•M•É¥•Ì€‘¡…ÉĞ€!¥‘‘•¸µÑ¼µ¡¥‘‘•¸œ€‘EÕ…¹Ñ½±½È  ‘ÅÉ½İÍñ]¡•É”µ=‰©•ĞY…É¥…¹Ğ€µ•Ä€]}¡ œ¤€	¥¹•¹Ñ•Èœ€•¹Í¥Ñäœ€5…¥¸œ€Ì(€€€M…Ù”µ¡…ÉĞ€‘¡…ÉĞ€¡)½¥¸µA…Ñ €‘¥ÕÉ•ÍI½½Ğ€‰É•Ù¥•İ|‘íÑ…Í­õ}ÅÕ…¹Ñ¥é…Ñ¥½¹}•ÉÉ½È¹Á¹œˆ¤)ô((‘µ•µ½ÉåA±½Ğõ  ‘µ•µ½ÉåI½İÍñ½É… µ=‰©•ÑímÁÍÕÍÑ½µ½‰©•Ñuí…Ñ•½Éäôˆ ‘|¹Q…Í¬¤€ ‘|¹Y…É¥…¹Ğ¤ˆíM•É¥•Ìô5½‘•°ÍÑ½É…”œíY…±Õ”ô¡Q¼µ½Õ‰±”€‘|¹Q½Ñ…±5½‘•±	åÑ•Ì¤¼ÄÀÈÑõô¤)9•ÜµÉ½ÕÁ•‘	…É¡…ÉĞ€‘µ•µ½ÉåA±½Ğ€áÁ½ÉÑ•µ½‘•°ÍÑ½É…”€¡…Ñ¥Ù…Ñ¥½¹ÌÉ•µ…¥¸@ÌÈ¤œ€…Ñ•½Éäœ€M•É¥•Ìœ€Y…±Õ”œ€5½‘•°ÍÑ½É…”m-¥	tœì5½‘•°ÍÑ½É…”œô‘EÕ…¹Ñ½±½Éô€¡)½¥¸µA…Ñ €‘¥ÕÉ•ÍI½½Ğ€É•Ù¥•İ}ÅÕ…¹Ñ¥é…Ñ¥½¹}µ½‘•±}ÍÑ½É…”¹Á¹œœ¤(‘ÍÑ…Ñ•A±½Ğõ  ‘µ•µ½ÉåI½İÍñ½É… µ=‰©•ÑímÁÍÕÍÑ½µ½‰©•Ñuí…Ñ•½Éäôˆ ‘|¹Q…Í¬¤€ ‘|¹Y…É¥…¹Ğ¤ˆíM•É¥•ÌôA•ÉÍ¥ÍÑ•¹Ğ ­ŒÍÑ…Ñ”œíY…±Õ”ô¡Q¼µ½Õ‰±”€‘|¹A•ÉÍ¥ÍÑ•¹ÑMÑ…Ñ•	åÑ•Ì¥õô¤)9•ÜµÉ½ÕÁ•‘	…É¡…ÉĞ€‘ÍÑ…Ñ•A±½Ğ€A•ÉÍ¥ÍÑ•¹ĞÉ•ÕÉÉ•¹ĞÍÑ…Ñ”¥Ì¹½ĞÅÕ…¹Ñ¥é•œ€…Ñ•½Éäœ€M•É¥•Ìœ€Y…±Õ”œ€A•ÉÍ¥ÍÑ•¹Ğ¡¥‘‘•¸€¬•±°ÍÑ…Ñ”m‰åÑ•ÍtœìA•ÉÍ¥ÍÑ•¹Ğ ­ŒÍÑ…Ñ”œô‘AÕÉÁ±•½±½Éô€¡)½¥¸µA…Ñ €‘¥ÕÉ•ÍI½½Ğ€É•Ù¥•İ}ÅÕ…¹Ñ¥é…Ñ¥½¹}™ÀÌÉ}ÍÑ…Ñ•}µ•µ½Éä¹Á¹œœ¤((‘½ÁA±½Ğõ  ¤)™½É•…  ‘È¥¸€‘½Á•É…Ñ¥½¹I½İÌ¥ì‘½ÁA±½Ğ€¬ômÁÍÕÍÑ½µ½‰©•Ñuí…Ñ•½Éäôˆ ‘È¹Q…Í¬¤€ ‘È¹Y…É¥…¹Ğ¤ˆíM•É¥•Ìô5ÌœíY…±Õ”ô‘È¹Q½Ñ…±5Íôì‘½ÁA±½Ğ€¬ômÁÍÕÍÑ½µ½‰©•Ñuí…Ñ•½Éäôˆ ‘È¹Q…Í¬¤€ ‘È¹Y…É¥…¹Ğ¤ˆíM•É¥•Ìô‘‘¥Ñ¥½¹…°Í…±”µÕ±Ñ¥Á±¥…Ñ¥½¹ÌœíY…±Õ”ô‘È¹‘‘¥Ñ¥½¹…±•ÅÕ…¹ÑM…±•5Õ±Ñ¥Á±¥…Ñ¥½¹Íõô)9•ÜµÉ½ÕÁ•‘	…É¡…ÉĞ€‘½ÁA±½Ğ€MÑ…Ñ¥Œ½Á•É…Ñ¥½¸µ½Õ¹Ğ•áÁ±…¹…Ñ¥½¸½˜ÉÕ¹Ñ¥µ”ÑÉ•¹‘Ìœ€…Ñ•½Éäœ€M•É¥•Ìœ€Y…±Õ”œ€=Á•É…Ñ¥½¹ÌÁ•È¥¹™•É•¹”œí5Ìô‘É…å½±½Èì‘‘¥Ñ¥½¹…°Í…±”µÕ±Ñ¥Á±¥…Ñ¥½¹Ìœô‘EÕ…¹Ñ½±½Éô€¡)½¥¸µA…Ñ €‘¥ÕÉ•ÍI½½Ğ€É•Ù¥•İ}ÍÑ…Ñ¥}½Á•É…Ñ¥½¹}½Õ¹ÑÌ¹Á¹œœ¤((Œ5…¡¥¹”µÉ•…‘…‰±”ÁÉ½Ù•¹…¹”(‘ÁÉ½Ù•¹…¹”õm½É‘•É•‘uì(€€€•¹•É…Ñ•‘Ğô¡•Ğµ…Ñ”¤¹Q½MÑÉ¥¹œ Ìœ¤(€€€I•Ù¥•İI½½Ğô‘I•Ù¥•İI½½Ğ(€€€M½ÕÉ•Ìõm½É‘•É•‘uíM=MÑÉ•…µ¥¹œô‘Í½9ÁèíM=!¥±Ñ•É•‘MÑÉ•…µ¥¹œô‘Í½¡9ÁèíM=!I…İ	…Í•AÉÕ¹•ô‘É…İM½¡9Áéô(€€€½¹ÍÑÉ…¥¹ÑÌõ  9¼EPœ°9¼¹•Ü!AÑÉ…¥¹¥¹œœ°9¼¹•ÜMQ4ÌÈ•á•ÕÑ¥½¸œ°9¼µ½‘¥™¥…Ñ¥½¸½˜Ñ¡”½É¥¥¹…°•±Í…ÉÑ¥±”‘¥É•Ñ½Éäœ¤(€€€9½Ñ•Ìõ  M= ‰•¹¡µ…É­}É•ÍÕ±ÑÌ¹¹Áè…±É•…‘ä½¹Ñ…¥¹Ì™¥ÉÍĞµÁ½¥¹Ğ…±¥‰É…Ñ¥½¸…¹Ñ¡”…±Á¡„ôÀ¸ÀÈÍåµµ•ÑÉ¥Œµ…À™¥±Ñ•È¸œ°Q¡”µ…¹ÕÍÉ¥ÁĞÑ•áĞ¥¹ÍÑ•…ÍÁ•¥™¥•Ì…±Á¡„ôÅ”´Øİ¥Ñ „‘½İ¹İ…Éµ½¹±ä±¥µ¥Ñ•Èì‰½Ñ ‘•™¥¹¥Ñ¥½¹Ì…É”…¹…±åÍ•Í•Á…É…Ñ•±ä¸œ°Í•Á…É…Ñ”±½…°]¥¹‘½İÌÉ”µ•á•ÕÑ¥½¸ÁÉ½Ù¥‘•ÌÉ…Ü	…Í”°AÉÕ¹•°…¹EÕ…¹Ñ¥é•ÑÉ…©•Ñ½É¥•ÌÕ¹‘•È½¹”½µµ½¸¹Õµ•É¥…°•¹Ù¥É½¹µ•¹Ğ¸œ°	¥Ğµ™±¥À…¹…±åÍ¥ÌÑ…É•ÑÌÑ¡”™±½…Ñ¥¹œµÁ½¥¹Ğ•ÍÑ¥µ…Ñ½È½ÕÑÁÕĞÉ•¥ÍÑ•È°¹½Ğ¥¹Ñ•É¹…°İ•¥¡ÑÌ½ÈÉ•ÕÉÉ•¹ĞÍÑ…Ñ•Ì¸œ¤)ô(‘ÁÉ½Ù•¹…¹”ğ½¹Ù•ÉÑQ¼µ)Í½¸€µ•ÁÑ €ØğM•Ğµ½¹Ñ•¹Ğ€µ1¥Ñ•É…±A…Ñ €¡)½¥¸µA…Ñ €‘I•ÍÕ±ÑÍI½½Ğ€…¹…±åÍ¥Í}ÁÉ½Ù•¹…¹”¹©Í½¸œ¤€µ¹½‘¥¹œUQà()]É¥Ñ”µ!½ÍĞ€‰•¹•É…Ñ•™¥ÕÉ•Ìè€ ¡•Ğµ¡¥±‘%Ñ•´€µ1¥Ñ•É…±A…Ñ €‘¥ÕÉ•ÍI½½Ğ€µ¥±Ñ•È€É•Ù¥•İ|¨¹Á¹œœ¤¹½Õ¹Ğ¤ˆ)]É¥Ñ”µ!½ÍĞ€‰•¹•É…Ñ•É•ÍÕ±Ğ™¥±•Ìè€ ¡•Ğµ¡¥±‘%Ñ•´€µ1¥Ñ•É…±A…Ñ €‘I•ÍÕ±ÑÍI½½Ğ€µI•ÕÉÍ”€µ¥±”¤¹½Õ¹Ğ¤ˆ(
+    New-ModelLineChart $windows "$pretty error stability over the full sequence" 'Window' 'MAE_pct' 'Sequence segment' 'MAE [% of full scale]' (Join-Path $FiguresRoot "review_${task}_windowed_mae.png")
+    New-ModelLineChart $windows "$pretty tail-error stability over the full sequence" 'Window' 'P95_pct' 'Sequence segment' '95th percentile absolute error [%]' (Join-Path $FiguresRoot "review_${task}_windowed_p95.png")
+
+    $cum=Import-Csv (Join-Path $ResultsRoot "long_horizon\${task}_cumulative_mae.csv")
+    New-ModelLineChart $cum "$pretty cumulative error convergence" 'ProgressPercent' 'CumulativeMAE_pct' 'Processed sequence [%]' 'Cumulative MAE [%]' (Join-Path $FiguresRoot "review_${task}_cumulative_mae.png")
+
+    $dev=Import-Csv (Join-Path $ResultsRoot "long_horizon\${task}_compression_deviation.csv")
+    $devRows=@($dev | ForEach-Object { [pscustomobject]@{Model=$_.Variant;Window=$_.Window;MeanAbsDeviation_pp=$_.MeanAbsDeviation_pp} })
+    New-ModelLineChart $devRows "$pretty compressed-to-base deviation" 'Window' 'MeanAbsDeviation_pp' 'Sequence segment' 'Mean absolute deviation from Base [percentage points]' (Join-Path $FiguresRoot "review_${task}_compression_deviation.png")
+
+    $missing=Import-Csv (Join-Path $ResultsRoot "faults\${task}_missing_update_robustness.csv") | Where-Object { $_.Scenario -like 'RandomDrop*' -or $_.Scenario -eq 'Original' }
+    $missingRows=@($missing | ForEach-Object { [pscustomobject]@{Model=$_.Model;DroppedPercent=100*(To-Double $_.DroppedFraction);DeltaMAE_pp=$_.DeltaMAE_pp} })
+    New-ModelLineChart $missingRows "$pretty robustness to lost estimator updates (hold-last)" 'DroppedPercent' 'DeltaMAE_pp' 'Randomly lost updates [%]' 'Increase in MAE [percentage points]' (Join-Path $FiguresRoot "review_${task}_missing_updates.png")
+}
+
+$bitRows=@()
+foreach($task in @('soc','soh')) {
+    $bitRows += Import-Csv (Join-Path $ResultsRoot "faults\${task}_output_bitflip_robustness.csv") |
+        Where-Object BitClass -eq 'AnyBit' | ForEach-Object {
+            [pscustomobject]@{Category="$($task.ToUpperInvariant()) $($_.Model)";Series='Unmitigated';Value=100*(To-Double $_.CatastrophicRate_gt10pp)}
+        }
+}
+New-GroupedBarChart $bitRows 'Random output-register bit flips' 'Category' 'Series' 'Value' 'Catastrophic outcomes (>10 percentage points) [%]' @{Unmitigated=$PrunedColor} (Join-Path $FiguresRoot 'review_output_bitflip_catastrophic_rate.png')
+
+$mitRows=@()
+foreach($task in @('soc','soh')) {
+    $mitRows += Import-Csv (Join-Path $ResultsRoot "faults\${task}_output_bitflip_robustness.csv") |
+        Where-Object BitClass -eq 'AnyBit' | ForEach-Object {
+            [pscustomobject]@{Category="$($task.ToUpperInvariant()) $($_.Model)";Series='Corrupted';Value=$_.P95CorruptedError_pct}
+            [pscustomobject]@{Category="$($task.ToUpperInvariant()) $($_.Model)";Series='Range check + hold-last';Value=$_.P95MitigatedError_pct}
+        }
+}
+New-GroupedBarChart $mitRows 'Effect of a simple output range check' 'Category' 'Series' 'Value' '95th percentile absolute error [%]' @{Corrupted=$PrunedColor;'Range check + hold-last'=$BaseColor} (Join-Path $FiguresRoot 'review_output_bitflip_mitigation.png')
+
+# SOH filter figures
+$filterRows=Import-Csv (Join-Path $ResultsRoot 'filter\soh_filter_comparison.csv') | ForEach-Object {
+    $short = if($_.Filter -like 'Raw*'){'Raw'}elseif($_.Filter -like 'Benchmark*'){'Code: alpha=0.02'}else{'Text: alpha=1e-6'}
+    [pscustomobject]@{Filter=$short;Model=$_.Model;MAE_pct=$_.MAE_pct}
+}
+New-GroupedBarChart $filterRows 'SOH post-processing variants on the same raw predictions' 'Filter' 'Model' 'MAE_pct' 'MAE [% of full scale]' @{Base=$BaseColor;Pruned=$PrunedColor} (Join-Path $FiguresRoot 'review_soh_filter_mae_comparison.png')
+
+$filterPenaltyRows=@()
+foreach($filterName in @('Raw','Code: alpha=0.02','Text: alpha=1e-6')) {
+    $baseMae=To-Double (($filterRows | Where-Object {$_.Filter -eq $filterName -and $_.Model -eq 'Base'} | Select-Object -First 1).MAE_pct)
+    $prunedMae=To-Double (($filterRows | Where-Object {$_.Filter -eq $filterName -and $_.Model -eq 'Pruned'} | Select-Object -First 1).MAE_pct)
+    $filterPenaltyRows += [pscustomobject]@{Filter=$filterName;Series='Pruned minus Base';DeltaMAE_pp=$prunedMae-$baseMae}
+}
+New-GroupedBarChart $filterPenaltyRows 'How SOH filtering changes the apparent pruning penalty' 'Filter' 'Series' 'DeltaMAE_pp' 'Pruned MAE - Base MAE [percentage points]' @{'Pruned minus Base'=$PurpleColor} (Join-Path $FiguresRoot 'review_soh_filter_pruning_interaction.png')
+
+$traj=Import-Csv (Join-Path $ResultsRoot 'filter\soh_filter_trajectory_downsampled.csv')
+$chart=New-Chart 'SOH filter definitions applied to the Base predictions' 'Sequence progress [%]' 'SOH [-]'
+$chart.ChartAreas['Main'].AxisX.Minimum=0; $chart.ChartAreas['Main'].AxisX.Maximum=100; $chart.ChartAreas['Main'].AxisX.Interval=20; $chart.ChartAreas['Main'].AxisX.LabelStyle.Format='0'
+Add-LineSeries $chart 'Reference' '#222222' $traj 'ProgressPercent' 'Reference' 'Main' 3
+Add-LineSeries $chart 'Raw' $GrayColor $traj 'ProgressPercent' 'BaseRaw' 'Main' 2 'Dash'
+Add-LineSeries $chart 'Code: alpha=0.02' $BaseColor $traj 'ProgressPercent' 'BaseBenchmark' 'Main' 3
+Add-LineSeries $chart 'Text: alpha=1e-6' $PurpleColor $traj 'ProgressPercent' 'BaseManuscript' 'Main' 3
+Save-Chart $chart (Join-Path $FiguresRoot 'review_soh_filter_trajectory.png')
+
+$chart=New-Chart 'SOH filter definitions applied to the Pruned predictions' 'Sequence progress [%]' 'SOH [-]'
+$chart.ChartAreas['Main'].AxisX.Minimum=0; $chart.ChartAreas['Main'].AxisX.Maximum=100; $chart.ChartAreas['Main'].AxisX.Interval=20; $chart.ChartAreas['Main'].AxisX.LabelStyle.Format='0'
+Add-LineSeries $chart 'Reference' '#222222' $traj 'ProgressPercent' 'Reference' 'Main' 3
+Add-LineSeries $chart 'Pruned raw' $GrayColor $traj 'ProgressPercent' 'PrunedRaw' 'Main' 2 'Dash'
+Add-LineSeries $chart 'Pruned: alpha=0.02' $PrunedColor $traj 'ProgressPercent' 'PrunedBenchmark' 'Main' 3
+Add-LineSeries $chart 'Pruned: alpha=1e-6' $PurpleColor $traj 'ProgressPercent' 'PrunedManuscript' 'Main' 3
+Save-Chart $chart (Join-Path $FiguresRoot 'review_soh_filter_trajectory_pruned.png')
+
+$savedFiltered=Import-Csv $savedFilteredTrajectory
+$chart=New-Chart 'Stored SOH model outputs after benchmark filtering' 'Sequence progress [%]' 'SOH [-]'
+$chart.ChartAreas['Main'].AxisX.Minimum=0; $chart.ChartAreas['Main'].AxisX.Maximum=100; $chart.ChartAreas['Main'].AxisX.Interval=20; $chart.ChartAreas['Main'].AxisX.LabelStyle.Format='0'
+Add-LineSeries $chart 'Reference' '#222222' $savedFiltered 'ProgressPercent' 'Reference' 'Main' 3
+Add-LineSeries $chart 'Base filtered' $BaseColor $savedFiltered 'ProgressPercent' 'BaseFiltered' 'Main' 3
+Add-LineSeries $chart 'Pruned filtered' $PrunedColor $savedFiltered 'ProgressPercent' 'PrunedFiltered' 'Main' 3
+Add-LineSeries $chart 'Quantized filtered' $QuantColor $savedFiltered 'ProgressPercent' 'QuantizedFiltered' 'Main' 3
+Save-Chart $chart (Join-Path $FiguresRoot 'review_soh_saved_filtered_compressed_trajectories.png')
+
+$filteredMaeRows=@()
+$sohCumulative=Import-Csv (Join-Path $ResultsRoot 'long_horizon\soh_cumulative_mae.csv')
+foreach($model in @('Base','Pruned','Quantized')) {
+    $last=$sohCumulative | Where-Object Model -eq $model | Select-Object -Last 1
+    $filteredMaeRows += [pscustomobject]@{Pipeline='Saved filtered output';Model=$model;MAE_pct=$last.CumulativeMAE_pct}
+}
+New-GroupedBarChart $filteredMaeRows 'Accuracy of the stored filtered SOH model outputs' 'Pipeline' 'Model' 'MAE_pct' 'MAE [% of full scale]' $ModelColors (Join-Path $FiguresRoot 'review_soh_saved_filtered_compression_accuracy.png')
+
+$localFilterMetricsPath=Join-Path $ResultsRoot 'filter\soh_filter_compression_local_windows.csv'
+if (Test-Path -LiteralPath $localFilterMetricsPath) {
+    $localFilterRows=Import-Csv $localFilterMetricsPath | ForEach-Object {
+        $short=if($_.Filter -like 'Raw*'){'Raw'}elseif($_.Filter -like 'Benchmark*'){'Code: alpha=0.02'}else{'Text: alpha=1e-6'}
+        [pscustomobject]@{Filter=$short;Model=$_.Model;MAE_pct=$_.MAE_pct;LimiterActivation_pct=100*(To-Double $_.LimiterActivationFraction);PostprocessChange_pp=$_.MeanAbsPostprocessChange_pp}
+    }
+    New-GroupedBarChart $localFilterRows 'Local C re-execution: compression and SOH filtering' 'Filter' 'Model' 'MAE_pct' 'MAE [% of full scale]' $ModelColors (Join-Path $FiguresRoot 'review_soh_filter_compression_all_models_mae.png')
+
+    $localPenaltyRows=@()
+    foreach($filterName in @('Raw','Code: alpha=0.02','Text: alpha=1e-6')) {
+        $baseMae=To-Double (($localFilterRows|Where-Object {$_.Filter -eq $filterName -and $_.Model -eq 'Base'}|Select-Object -First 1).MAE_pct)
+        foreach($model in @('Pruned','Quantized')) {
+            $mae=To-Double (($localFilterRows|Where-Object {$_.Filter -eq $filterName -and $_.Model -eq $model}|Select-Object -First 1).MAE_pct)
+            $localPenaltyRows += [pscustomobject]@{Filter=$filterName;Model="$model minus Base";DeltaMAE_pp=$mae-$baseMae}
+        }
+    }
+    New-GroupedBarChart $localPenaltyRows 'Local C re-execution: compression penalty after filtering' 'Filter' 'Model' 'DeltaMAE_pp' 'Compressed MAE - Base MAE [percentage points]' @{'Pruned minus Base'=$PrunedColor;'Quantized minus Base'=$QuantColor} (Join-Path $FiguresRoot 'review_soh_filter_compression_penalty_all_models.png')
+
+    $activationRows=@($localFilterRows|Where-Object Filter -ne 'Raw'|ForEach-Object{[pscustomobject]@{Filter=$_.Filter;Model=$_.Model;Value=$_.LimiterActivation_pct}})
+    New-GroupedBarChart $activationRows 'How often SOH rate limiting is active' 'Filter' 'Model' 'Value' 'Limiter activation [% of samples]' $ModelColors (Join-Path $FiguresRoot 'review_soh_filter_limiter_activation_all_models.png')
+    $changeRows=@($localFilterRows|Where-Object Filter -ne 'Raw'|ForEach-Object{[pscustomobject]@{Filter=$_.Filter;Model=$_.Model;Value=$_.PostprocessChange_pp}})
+    New-GroupedBarChart $changeRows 'Magnitude of SOH post-processing by model' 'Filter' 'Model' 'Value' 'Mean absolute raw-to-filter change [percentage points]' $ModelColors (Join-Path $FiguresRoot 'review_soh_filter_postprocess_change_all_models.png')
+
+    $localTrajectory=Import-Csv (Join-Path $ResultsRoot 'filter\soh_filter_compression_local_trajectory.csv')
+    foreach($definition in @('Raw','Benchmark','Manuscript')) {
+        $label=if($definition -eq 'Raw'){'Unfiltered'}elseif($definition -eq 'Benchmark'){'Code filter: alpha=0.02'}else{'Text filter: alpha=1e-6'}
+        $chart=New-Chart "Local C re-execution - $label" 'Sequence progress [%]' 'SOH [-]'
+        $chart.ChartAreas['Main'].AxisX.Minimum=0; $chart.ChartAreas['Main'].AxisX.Maximum=100; $chart.ChartAreas['Main'].AxisX.Interval=20; $chart.ChartAreas['Main'].AxisX.LabelStyle.Format='0'
+        Add-LineSeries $chart 'Reference' '#222222' $localTrajectory 'ProgressPercent' 'Reference' 'Main' 3
+        foreach($model in @('Base','Pruned','Quantized')) { Add-LineSeries $chart $model $ModelColors[$model] $localTrajectory 'ProgressPercent' "${model}${definition}" 'Main' 3 }
+        Save-Chart $chart (Join-Path $FiguresRoot "review_soh_filter_local_$($definition.ToLowerInvariant())_all_models.png")
+    }
+
+    $chart=New-Chart 'Quantized SOH: direct filter interaction' 'Sequence progress [%]' 'SOH [-]'
+    $chart.ChartAreas['Main'].AxisX.Minimum=0; $chart.ChartAreas['Main'].AxisX.Maximum=100; $chart.ChartAreas['Main'].AxisX.Interval=20; $chart.ChartAreas['Main'].AxisX.LabelStyle.Format='0'
+    Add-LineSeries $chart 'Reference' '#222222' $localTrajectory 'ProgressPercent' 'Reference' 'Main' 3
+    Add-LineSeries $chart 'Quantized, unfiltered' $QuantColor $localTrajectory 'ProgressPercent' 'QuantizedRaw' 'Main' 2
+    Add-LineSeries $chart 'Quantized, code filter' $PurpleColor $localTrajectory 'ProgressPercent' 'QuantizedBenchmark' 'Main' 3
+    Save-Chart $chart (Join-Path $FiguresRoot 'review_soh_filter_quantized_raw_vs_filtered.png')
+}
+
+$step=Import-Csv (Join-Path $ResultsRoot 'filter\soh_filter_step_response.csv') | Where-Object { (To-Double $_.Samples) -gt 0 }
+$chart=New-Chart 'Theoretical EMA step response at 1 Hz' 'Time [days, logarithmic]' 'Normalized response [-]'
+$chart.ChartAreas['Main'].AxisX.IsLogarithmic=$true
+$chart.ChartAreas['Main'].AxisX.LogarithmBase=10
+Add-LineSeries $chart 'Code: alpha=0.02' $BaseColor $step 'TimeDays' 'Benchmark_alpha0.02' 'Main' 3
+Add-LineSeries $chart 'Text: alpha=1e-6' $PurpleColor $step 'TimeDays' 'Manuscript_alpha1e-6' 'Main' 3
+Save-Chart $chart (Join-Path $FiguresRoot 'review_soh_filter_step_response.png')
+
+# Utility sensitivity
+$utilityDir=Join-Path $ResultsRoot 'utility'
+New-Item -ItemType Directory -Force -Path $utilityDir | Out-Null
+$kpis=@{
+    SOC=@{
+        Base=@{MAE=2.6845146;Flash=105.32;RAM=4.93;Energy=700.83}
+        Pruned=@{MAE=2.3379620;Flash=62.27;RAM=4.03;Energy=400.38}
+        Quantized=@{MAE=2.7911590;Flash=52.48;RAM=3.96;Energy=3494.66}
+    }
+    SOH=@{
+        Base=@{MAE=0.8523505;Flash=335.00;RAM=8.69;Energy=11366.93}
+        Pruned=@{MAE=1.4573121;Flash=182.41;RAM=6.96;Energy=6362.23}
+        Quantized=@{MAE=1.4103794;Flash=138.00;RAM=6.70;Energy=14604.27}
+    }
+}
+$gridRows=@(); $sweepRows=@(); $summaryRows=@()
+foreach($task in @('SOC','SOH')) {
+    $counts=@{Base=0;Pruned=0;Quantized=0}
+    for($a=0;$a -le 20;$a++) { for($f=0;$f -le (20-$a);$f++) { for($r=0;$r -le (20-$a-$f);$r++) {
+        $e=20-$a-$f-$r; $weights=@(($a / 20.0), ($f / 20.0), ($r / 20.0), ($e / 20.0))
+        $u=@{Base=1.0}
+        foreach($variant in @('Pruned','Quantized')) {
+            $u[$variant]=$weights[0]*$kpis[$task][$variant].MAE/$kpis[$task].Base.MAE +
+                $weights[1]*$kpis[$task][$variant].Flash/$kpis[$task].Base.Flash +
+                $weights[2]*$kpis[$task][$variant].RAM/$kpis[$task].Base.RAM +
+                $weights[3]*$kpis[$task][$variant].Energy/$kpis[$task].Base.Energy
+        }
+        $winner=@('Base','Pruned','Quantized') | Sort-Object {$u[$_]} | Select-Object -First 1; $counts[$winner]++
+        $gridRows += [pscustomobject]@{Task=$task;WeightAccuracy=$weights[0];WeightFlash=$weights[1];WeightRAM=$weights[2];WeightEnergy=$weights[3];UBase=1.0;UPruned=$u.Pruned;UQuantized=$u.Quantized;Winner=$winner}
+    }}}
+    $total=($counts.Values | Measure-Object -Sum).Sum
+    foreach($variant in @('Base','Pruned','Quantized')) { $summaryRows += [pscustomobject]@{Task=$task;Variant=$variant;WinningCombinations=$counts[$variant];WinningShare=$counts[$variant]/$total} }
+
+    foreach($metric in @('Accuracy','Flash','RAM','Energy')) {
+        for($w=0.25;$w -le 0.85001;$w+=0.05) {
+            $weights=@{Accuracy=(1-$w)/3;Flash=(1-$w)/3;RAM=(1-$w)/3;Energy=(1-$w)/3}; $weights[$metric]=$w
+            $uP=$weights.Accuracy*$kpis[$task].Pruned.MAE/$kpis[$task].Base.MAE + $weights.Flash*$kpis[$task].Pruned.Flash/$kpis[$task].Base.Flash + $weights.RAM*$kpis[$task].Pruned.RAM/$kpis[$task].Base.RAM + $weights.Energy*$kpis[$task].Pruned.Energy/$kpis[$task].Base.Energy
+            $uQ=$weights.Accuracy*$kpis[$task].Quantized.MAE/$kpis[$task].Base.MAE + $weights.Flash*$kpis[$task].Quantized.Flash/$kpis[$task].Base.Flash + $weights.RAM*$kpis[$task].Quantized.RAM/$kpis[$task].Base.RAM + $weights.Energy*$kpis[$task].Quantized.Energy/$kpis[$task].Base.Energy
+            $winner=@([pscustomobject]@{N='Base';U=1.0},[pscustomobject]@{N='Pruned';U=$uP},[pscustomobject]@{N='Quantized';U=$uQ}) | Sort-Object U | Select-Object -First 1
+            $sweepRows += [pscustomobject]@{Task=$task;FocalMetric=$metric;FocalWeight=$w;RemainingEach=(1-$w)/3;UBase=1.0;UPruned=$uP;UQuantized=$uQ;QuantMinusPruned=$uQ-$uP;Winner=$winner.N}
+        }
+    }
+}
+Write-CsvRows $gridRows (Join-Path $utilityDir 'utility_weight_grid.csv')
+Write-CsvRows $sweepRows (Join-Path $utilityDir 'utility_priority_sweep.csv')
+Write-CsvRows $summaryRows (Join-Path $utilityDir 'utility_ranking_summary.csv')
+
+$winnerBars=@($summaryRows | ForEach-Object {[pscustomobject]@{Category=$_.Task;Series=$_.Variant;Value=100*$_.WinningShare}})
+New-GroupedBarChart $winnerBars 'Best-ranked model across all 5%-spaced utility weights' 'Category' 'Series' 'Value' 'Share of weight combinations ranked best [%]' $ModelColors (Join-Path $FiguresRoot 'review_utility_ranking_robustness.png') $true
+foreach($task in @('SOC','SOH')) {
+    $rows=@($sweepRows | Where-Object Task -eq $task)
+    $chart=New-Chart "$task`: Quantized versus Pruned under changing priorities" 'Weight of highlighted metric; remaining weight shared equally' 'U(Quantized) - U(Pruned)  [> 0: Pruned better; < 0: Quantized better]'
+    $chart.ChartAreas['Main'].AxisX.LabelStyle.Format='0.00'
+    if($task -eq 'SOC') { $chart.ChartAreas['Main'].AxisY.Minimum=-0.25 }
+    $priorityColors=@{Accuracy=$PrunedColor;Flash=$QuantColor;RAM=$PurpleColor;Energy=$BaseColor}
+    foreach($metric in @('Accuracy','Flash','RAM','Energy')) { Add-LineSeries $chart $metric $priorityColors[$metric] @($rows|Where-Object FocalMetric -eq $metric) 'FocalWeight' 'QuantMinusPruned' 'Main' 3 }
+    $zero=New-Object System.Windows.Forms.DataVisualization.Charting.StripLine; $zero.IntervalOffset=0; $zero.StripWidth=0; $zero.BorderColor=Get-HexColor '#333333'; $zero.BorderWidth=2; $chart.ChartAreas['Main'].AxisY.StripLines.Add($zero)
+    Save-Chart $chart (Join-Path $FiguresRoot "review_utility_priority_${task}.png")
+}
+
+# Weight, saliency, quantization, memory, and static operation analyses
+$weightsDir=Join-Path $ResultsRoot 'weights'; $operationsDir=Join-Path $ResultsRoot 'operations'
+New-Item -ItemType Directory -Force -Path $weightsDir,$operationsDir | Out-Null
+$paths=@{
+    SOCBase=Resolve-SourcePath 'DL_Models\LFP_LSTM_MLP\2_models\base\soc_1.5.0.0_base\c_implementation\model_weights.h'
+    SOCPruned=Resolve-SourcePath 'DL_Models\LFP_LSTM_MLP\2_models\pruned\soc_1.5.0.0_pruned\prune_30pct_20250916_140404\c_implementation\model_weights.h'
+    SOCQuant=Resolve-SourcePath 'DL_Models\LFP_LSTM_MLP\2_models\quantized\soc_1.5.0.0_quantized\model_weights_lstm_int8_manual.h'
+    SOHBase=Resolve-SourcePath 'DL_Models\LFP_LSTM_MLP\2_models\base\soh_2.1.0.0_base\c_implementation\model_weights_soh.h'
+    SOHPruned=Resolve-SourcePath 'DL_Models\LFP_LSTM_MLP\2_models\pruned\soh_2.1.0.0\prune_30pct_20251122_010142\c_implementation\model_weights_soh.h'
+    SOHQuant=Resolve-SourcePath 'DL_Models\LFP_LSTM_MLP\2_models\quantized\soh_2.1.0.0_quantized\c_implementation\model_weights_lstm_int8_manual_soh.h'
+}
+$weightStats=@(); $histRows=@(); $saliencyRows=@(); $quantStats=@(); $quantHist=@(); $memoryRows=@(); $operationRows=@()
+$taskData=@{}
+foreach($task in @('SOC','SOH')) {
+    $basePath=$paths["${task}Base"]; $prunedPath=$paths["${task}Pruned"]; $quantPath=$paths["${task}Quant"]
+    $H=Get-CDefine $basePath 'HIDDEN_SIZE'; $In=Get-CDefine $basePath 'INPUT_SIZE'; $M=Get-CDefine $basePath 'MLP_HIDDEN'
+    $Hp=Get-CDefine $prunedPath 'HIDDEN_SIZE'
+    $baseIH=Get-CArray $basePath 'LSTM_WEIGHT_IH'; $baseHH=Get-CArray $basePath 'LSTM_WEIGHT_HH'; $baseAll=Join-DoubleArrays $baseIH $baseHH
+    $prunedIH=Get-CArray $prunedPath 'LSTM_WEIGHT_IH'; $prunedHH=Get-CArray $prunedPath 'LSTM_WEIGHT_HH'; $prunedAll=Join-DoubleArrays $prunedIH $prunedHH
+    $taskData[$task]=@{H=$H;Hp=$Hp;In=$In;M=$M;BaseIH=$baseIH;BaseHH=$baseHH;BaseAll=$baseAll;PrunedAll=$prunedAll;QuantPath=$quantPath;BasePath=$basePath}
+    foreach($variant in @('Base','Pruned')) {
+        $values=if($variant -eq 'Base'){$baseAll}else{$prunedAll}; $s=Get-ArrayStats $values
+        $weightStats += [pscustomobject]@{Task=$task;Variant=$variant;Count=$s.Count;Mean=$s.Mean;Std=$s.Std;MeanAbs=$s.MeanAbs;P95Abs=$s.P95Abs;P99Abs=$s.P99Abs;MaxAbs=$s.MaxAbs;FractionAbsBelow0p01=$s.FractionAbsBelow0p01}
+    }
+    $limit=[math]::Max(($weightStats|Where-Object Task -eq $task|Measure-Object P99Abs -Maximum).Maximum,1e-6)
+    $histRows += Get-HistogramRows $baseAll 90 (-$limit) $limit $task 'Base'
+    $histRows += Get-HistogramRows $prunedAll 90 (-$limit) $limit $task 'Pruned'
+    $saliencyRows += Get-UnitSaliency $baseIH $baseHH $H $In $task
+
+    $qIH=Get-CArray $quantPath 'LSTM_W_IH'; $qHH=Get-CArray $quantPath 'LSTM_W_HH'; $sIH=Get-CArray $quantPath 'LSTM_W_IH_SCALE'; $sHH=Get-CArray $quantPath 'LSTM_W_HH_SCALE'
+    $qIHResult=Get-QuantizationStats $baseIH $qIH $sIH (4*$H) $In $task 'W_ih'
+    $qHHResult=Get-QuantizationStats $baseHH $qHH $sHH (4*$H) $H $task 'W_hh'
+    $quantStats += $qIHResult.Stats,$qHHResult.Stats
+    $quantHist += Get-HistogramRows $qIHResult.Errors 80 0 ([math]::Max($qIHResult.P99,1e-10)) $task 'W_ih' 'Absolute reconstruction error'
+    $quantHist += Get-HistogramRows $qHHResult.Errors 80 0 ([math]::Max($qHHResult.P99,1e-10)) $task 'W_hh' 'Absolute reconstruction error'
+
+    $baseBias=(Get-CArray $basePath 'LSTM_BIAS').Length; $baseMlp=(Get-CArray $basePath 'MLP_FC1_WEIGHT').Length+(Get-CArray $basePath 'MLP_FC1_BIAS').Length+(Get-CArray $basePath 'MLP_FC2_WEIGHT').Length+(Get-CArray $basePath 'MLP_FC2_BIAS').Length
+    $memoryRows += [pscustomobject]@{Task=$task;Variant='Base';Int8RecurrentWeightsBytes=0;FP32RecurrentWeightsBytes=4*($baseIH.Length+$baseHH.Length);FP32ScalesAndBiasBytes=4*$baseBias;FP32MLPBytes=4*$baseMlp;PersistentStateBytes=2*$H*4;TotalModelBytes=4*($baseIH.Length+$baseHH.Length+$baseBias+$baseMlp)}
+    $memoryRows += [pscustomobject]@{Task=$task;Variant='Quantized';Int8RecurrentWeightsBytes=$qIH.Length+$qHH.Length;FP32RecurrentWeightsBytes=0;FP32ScalesAndBiasBytes=4*($sIH.Length+$sHH.Length+$baseBias);FP32MLPBytes=4*$baseMlp;PersistentStateBytes=2*$H*4;TotalModelBytes=$qIH.Length+$qHH.Length+4*($sIH.Length+$sHH.Length+$baseBias+$baseMlp)}
+
+    $times=if($task -eq 'SOC'){@{Base=1.40;Pruned=.80;Quantized=6.99}}else{@{Base=22.73;Pruned=12.72;Quantized=29.21}}
+    foreach($variant in @('Base','Pruned','Quantized')) {
+        $hv=if($variant -eq 'Pruned'){$Hp}else{$H}; $recurrent=4*$hv*($In+$hv); $mlp=$hv*$M+$M; $extra=if($variant -eq 'Quantized'){$recurrent}else{0}
+        $operationRows += [pscustomobject]@{Task=$task;Variant=$variant;HiddenSize=$hv;RecurrentMACs=$recurrent;MLPMACs=$mlp;TotalMACs=$recurrent+$mlp;AdditionalDequantScaleMultiplications=$extra;ObservedInferenceMs=$times[$variant];MicrosecondsPer1000MACs=1000*$times[$variant]/($recurrent+$mlp)}
+    }
+}
+Write-CsvRows $weightStats (Join-Path $weightsDir 'lstm_weight_statistics.csv')
+Write-CsvRows $histRows (Join-Path $weightsDir 'lstm_weight_histograms.csv')
+Write-CsvRows $saliencyRows (Join-Path $weightsDir 'lstm_unit_saliency.csv')
+Write-CsvRows $quantStats (Join-Path $weightsDir 'quantization_reconstruction_statistics.csv')
+Write-CsvRows $quantHist (Join-Path $weightsDir 'quantization_error_histograms.csv')
+Write-CsvRows $memoryRows (Join-Path $weightsDir 'quantization_memory_accounting.csv')
+Write-CsvRows $operationRows (Join-Path $operationsDir 'static_kernel_operation_counts.csv')
+
+foreach($task in @('SOC','SOH')) {
+    $rows=@($histRows|Where-Object Task -eq $task)
+    $chart=New-Chart "$task recurrent-weight distributions" 'Weight value' 'Density'
+    $chart.ChartAreas['Main'].AxisX.LabelStyle.Format='0.00'
+    foreach($variant in @('Base','Pruned')) { Add-LineSeries $chart $variant $ModelColors[$variant] @($rows|Where-Object Variant -eq $variant) 'BinCenter' 'Density' 'Main' 3 }
+    Save-Chart $chart (Join-Path $FiguresRoot "review_${task}_weight_distribution.png")
+    New-SaliencyChart @($saliencyRows|Where-Object Task -eq $task) $task (Join-Path $FiguresRoot "review_${task}_unit_saliency.png")
+    $qrows=@($quantHist|Where-Object Task -eq $task)
+    $chart=New-Chart "$task INT8 weight-reconstruction error" 'Absolute weight error' 'Density'
+    $chart.ChartAreas['Main'].AxisX.LabelStyle.Format='0.0000'
+    Add-LineSeries $chart 'Input-to-hidden' $PrunedColor @($qrows|Where-Object Variant -eq 'W_ih') 'BinCenter' 'Density' 'Main' 3
+    Add-LineSeries $chart 'Hidden-to-hidden' $QuantColor @($qrows|Where-Object Variant -eq 'W_hh') 'BinCenter' 'Density' 'Main' 3
+    Save-Chart $chart (Join-Path $FiguresRoot "review_${task}_quantization_error.png")
+}
+
+$memoryPlot=@($memoryRows|ForEach-Object{[pscustomobject]@{Category="$($_.Task) $($_.Variant)";Series='Model storage';Value=(To-Double $_.TotalModelBytes)/1024}})
+New-GroupedBarChart $memoryPlot 'Exported model storage (activations remain FP32)' 'Category' 'Series' 'Value' 'Model storage [KiB]' @{'Model storage'=$QuantColor} (Join-Path $FiguresRoot 'review_quantization_model_storage.png')
+$statePlot=@($memoryRows|ForEach-Object{[pscustomobject]@{Category="$($_.Task) $($_.Variant)";Series='Persistent h+c state';Value=(To-Double $_.PersistentStateBytes)}})
+New-GroupedBarChart $statePlot 'Persistent recurrent state is not quantized' 'Category' 'Series' 'Value' 'Persistent hidden + cell state [bytes]' @{'Persistent h+c state'=$PurpleColor} (Join-Path $FiguresRoot 'review_quantization_fp32_state_memory.png')
+
+$opPlot=@()
+foreach($r in $operationRows){$opPlot += [pscustomobject]@{Category="$($r.Task) $($r.Variant)";Series='MACs';Value=$r.TotalMACs};$opPlot += [pscustomobject]@{Category="$($r.Task) $($r.Variant)";Series='Additional scale multiplications';Value=$r.AdditionalDequantScaleMultiplications}}
+New-GroupedBarChart $opPlot 'Static operation-count explanation of runtime trends' 'Category' 'Series' 'Value' 'Operations per inference' @{MACs=$GrayColor;'Additional scale multiplications'=$QuantColor} (Join-Path $FiguresRoot 'review_static_operation_counts.png')
+
+# Machine-readable provenance
+$provenance=[ordered]@{
+    GeneratedAt=(Get-Date).ToString('s')
+    ReviewRoot=$ReviewRoot
+    Sources=[ordered]@{SOCStreaming=$socNpz;SOHFilteredStreaming=$sohNpz;SOHRawBasePruned=$rawSohNpz}
+    Constraints=@('No QAT','No new HPC training','No new STM32 execution','No modification of the original elsarticle directory')
+    Notes=@('SOH benchmark_results.npz already contains first-point calibration and the alpha=0.02 symmetric-cap filter.','The manuscript text instead specifies alpha=1e-6 with a downward-only limiter; both definitions are analysed separately.','A separate local Windows C re-execution provides raw Base, Pruned, and Quantized trajectories under one common numerical environment.','Bit-flip analysis targets the floating-point estimator output register, not internal weights or recurrent states.')
+}
+$provenance | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath (Join-Path $ResultsRoot 'analysis_provenance.json') -Encoding UTF8
+
+Write-Host "Generated figures: $((Get-ChildItem -LiteralPath $FiguresRoot -Filter 'review_*.png').Count)"
+Write-Host "Generated result files: $((Get-ChildItem -LiteralPath $ResultsRoot -Recurse -File).Count)"
