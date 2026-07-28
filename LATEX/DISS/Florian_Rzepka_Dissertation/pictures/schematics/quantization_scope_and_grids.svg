@@ -1,0 +1,675 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="1800"
+   height="900"
+   viewBox="0 0 1800 900"
+   version="1.1"
+   id="svg70"
+   sodipodi:docname="quantization_scope_and_grids.svg"
+   inkscape:version="1.4.4 (dcaf3e7, 2026-05-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview70"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#505050"
+     inkscape:zoom="1.6420591"
+     inkscape:cx="932.97496"
+     inkscape:cy="520.99222"
+     inkscape:window-width="3840"
+     inkscape:window-height="2054"
+     inkscape:window-x="-11"
+     inkscape:window-y="-11"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g29" />
+  <defs
+     id="defs3">
+    <style
+       id="style1">
+      .panel { font-family: Arial, Helvetica, sans-serif; fill: #222222; font-size: 43px; font-weight: 700; }
+      .label { font-family: Arial, Helvetica, sans-serif; fill: #2c2c2c; font-size: 34px; }
+      .small { font-family: Arial, Helvetica, sans-serif; fill: #4c4c4c; font-size: 28px; }
+      .tiny { font-family: Arial, Helvetica, sans-serif; fill: #4c4c4c; font-size: 25px; }
+      .math { font-family: &quot;Times New Roman&quot;, Times, serif; fill: #222222; font-size: 38px; font-style: italic; }
+      .math-small { font-family: &quot;Times New Roman&quot;, Times, serif; fill: #222222; font-size: 31px; font-style: italic; }
+      .block { fill: #f1f1f1; stroke: #333333; stroke-width: 4; }
+      .dynamic { fill: #dcebf3; stroke: #2678b2; stroke-width: 4; }
+      .parameter { fill: #f6d0d1; stroke: #d62728; stroke-width: 4; }
+      .high-precision { fill: #eeeeee; stroke: #555555; stroke-width: 4; }
+      .line { fill: none; stroke: #444444; stroke-width: 5; marker-end: url(#arrow); }
+      .weight-line { fill: none; stroke: #d62728; stroke-width: 5; marker-end: url(#arrow-red); }
+      .state-line { fill: none; stroke: #2678b2; stroke-width: 5; marker-end: url(#arrow-blue); }
+      .divider { stroke: #d0d0d0; stroke-width: 3; }
+      .axis { stroke: #333333; stroke-width: 5; }
+      .tick { stroke: #d62728; stroke-width: 5; }
+      .zero { stroke: #2678b2; stroke-width: 6; }
+      .grid-label { font-family: Arial, Helvetica, sans-serif; fill: #222222; font-size: 32px; font-weight: 700; }
+      .accent-red { font-family: Arial, Helvetica, sans-serif; fill: #d62728; font-size: 27px; font-weight: 700; }
+      .accent-blue { font-family: Arial, Helvetica, sans-serif; fill: #2678b2; font-size: 27px; font-weight: 700; }
+    </style>
+    <marker
+       id="arrow"
+       viewBox="0 0 10 10"
+       refX="9"
+       refY="5"
+       markerWidth="8"
+       markerHeight="8"
+       orient="auto">
+      <path
+         d="M 0 0 L 10 5 L 0 10 z"
+         fill="#444444"
+         id="path1" />
+    </marker>
+    <marker
+       id="arrow-red"
+       viewBox="0 0 10 10"
+       refX="9"
+       refY="5"
+       markerWidth="8"
+       markerHeight="8"
+       orient="auto">
+      <path
+         d="M 0 0 L 10 5 L 0 10 z"
+         fill="#d62728"
+         id="path2" />
+    </marker>
+    <marker
+       id="arrow-blue"
+       viewBox="0 0 10 10"
+       refX="9"
+       refY="5"
+       markerWidth="8"
+       markerHeight="8"
+       orient="auto">
+      <path
+         d="M 0 0 L 10 5 L 0 10 z"
+         fill="#2678b2"
+         id="path3" />
+    </marker>
+  </defs>
+  <rect
+     width="1800"
+     height="900"
+     fill="#ffffff"
+     id="rect3" />
+  <line
+     x1="900"
+     y1="45"
+     x2="900"
+     y2="855"
+     class="divider"
+     id="line3" />
+  <!-- Panel (a): numerical quantities in one neural computation -->
+  <g
+     id="g29">
+    <text
+       x="32"
+       y="58"
+       class="panel"
+       id="text3">(a)</text>
+    <circle
+       cx="125"
+       cy="245"
+       r="43"
+       class="dynamic"
+       id="circle4" />
+    <circle
+       cx="125"
+       cy="405"
+       r="43"
+       class="dynamic"
+       id="circle5" />
+    <circle
+       cx="125"
+       cy="565"
+       r="43"
+       class="dynamic"
+       id="circle6" />
+    <text
+       x="106"
+       y="256"
+       class="math"
+       id="text6">x<tspan
+   baseline-shift="sub"
+   font-size="22"
+   id="tspan6">1</tspan></text>
+    <text
+       x="106"
+       y="416"
+       class="math"
+       id="text7">x<tspan
+   baseline-shift="sub"
+   font-size="22"
+   id="tspan7">2</tspan></text>
+    <text
+       x="106"
+       y="576"
+       class="math"
+       id="text8">x<tspan
+   baseline-shift="sub"
+   font-size="22"
+   id="tspan8">m</tspan></text>
+    <path
+       d="m 168.01272,244.90996 240.8642,125.79488"
+       class="weight-line"
+       id="path8"
+       style="stroke-width:4;stroke-dasharray:none" />
+    <path
+       d="M 168,405 H 402.81485"
+       class="weight-line"
+       id="path9"
+       style="stroke-width:4;stroke-dasharray:none;stroke-miterlimit:2.1" />
+    <path
+       d="M 168.03517,565.06363 410.66443,436.89883"
+       class="weight-line"
+       id="path10"
+       style="stroke-width:4;stroke-dasharray:none" />
+    <text
+       x="257"
+       y="278"
+       class="math-small"
+       id="text10">w<tspan
+   baseline-shift="sub"
+   font-size="18px"
+   id="tspan10">j1</tspan></text>
+    <text
+       x="254"
+       y="388"
+       class="math-small"
+       id="text11">w<tspan
+   baseline-shift="sub"
+   font-size="18px"
+   id="tspan11">j2</tspan></text>
+    <text
+       x="250"
+       y="541"
+       class="math-small"
+       id="text12">w<tspan
+   baseline-shift="sub"
+   font-size="18px"
+   id="tspan12">jm</tspan></text>
+    <text
+       x="225"
+       y="640"
+       class="accent-red"
+       id="text13">weights W</text>
+    <text
+       x="192"
+       y="672"
+       class="small"
+       id="text14">stored parameters</text>
+    <rect
+       x="377.55981"
+       y="138.11005"
+       width="180"
+       height="82"
+       rx="7"
+       class="parameter"
+       id="rect14" />
+    <text
+       x="448.2153"
+       y="189.9713"
+       class="math"
+       id="text15">b<tspan
+   baseline-shift="sub"
+   font-size="22px"
+   id="tspan14">j</tspan></text>
+    <path
+       d="m 465.83732,219.67943 v 118"
+       class="weight-line"
+       id="path15"
+       style="stroke-width:4;stroke-dasharray:none" />
+    <text
+       x="432.48804"
+       y="125.86124"
+       class="accent-red"
+       id="text16">bias</text>
+    <circle
+       cx="470"
+       cy="405"
+       r="63"
+       class="high-precision"
+       id="circle16" />
+    <text
+       x="429.38757"
+       y="416.13876"
+       class="label"
+       id="text17">SUM</text>
+    <path
+       d="M533 405H626"
+       class="line"
+       id="path20"
+       style="stroke-width:4;stroke-dasharray:none" />
+    <rect
+       x="630"
+       y="345"
+       width="120"
+       height="120"
+       rx="7"
+       class="block"
+       id="rect20" />
+    <text
+       x="684.05743"
+       y="416.27753"
+       class="math"
+       id="text21">f</text>
+    <text
+       x="637"
+       y="503"
+       class="small"
+       id="text22"><tspan
+         sodipodi:role="line"
+         id="tspan70"
+         x="637"
+         y="503">Activation</tspan><tspan
+         sodipodi:role="line"
+         id="tspan71"
+         x="637"
+         y="538">Function</tspan></text>
+    <path
+       d="m 752,405 h 50"
+       class="state-line"
+       id="path22"
+       style="stroke-width:4;stroke-dasharray:none" />
+    <circle
+       cx="846"
+       cy="405"
+       r="43"
+       class="dynamic"
+       id="circle22" />
+    <text
+       x="836"
+       y="414"
+       class="math"
+       id="text23">y<tspan
+   baseline-shift="sub"
+   font-size="22px"
+   id="tspan22">j</tspan></text>
+    <text
+       x="798.81604"
+       y="328.62259"
+       class="accent-blue"
+       id="text24">output</text>
+    <text
+       x="94.325272"
+       y="186.32635"
+       class="accent-blue"
+       id="text24-9"
+       style="font-weight:700;font-size:27px;font-family:Arial, Helvetica, sans-serif;fill:#2678b2">input</text>
+    <rect
+       x="55"
+       y="735"
+       width="225"
+       height="78"
+       rx="7"
+       class="dynamic"
+       id="rect24" />
+    <text
+       x="78"
+       y="783"
+       class="math-small"
+       id="text25">h<tspan
+   baseline-shift="sub"
+   font-size="18"
+   id="tspan24">t-1</tspan>, c<tspan
+   baseline-shift="sub"
+   font-size="18"
+   id="tspan25">t-1</tspan></text>
+    <path
+       d="M280 774H470V475"
+       class="state-line"
+       id="path25"
+       style="stroke-width:4;stroke-dasharray:none" />
+    <text
+       x="297.08133"
+       y="805.98083"
+       class="accent-blue"
+       id="text26">recurrent state</text>
+    <rect
+       x="520.02313"
+       y="675.02313"
+       width="366.1499"
+       height="147.95374"
+       rx="7.2198572"
+       fill="#ffffff"
+       stroke="#777777"
+       stroke-width="3.04627"
+       id="rect26" />
+    <rect
+       x="545"
+       y="700"
+       width="26"
+       height="26"
+       class="parameter"
+       id="rect27" />
+    <text
+       x="588"
+       y="722"
+       class="small"
+       id="text27">parameters: W, b</text>
+    <rect
+       x="545"
+       y="745"
+       width="26"
+       height="26"
+       class="dynamic"
+       id="rect28" />
+    <text
+       x="588"
+       y="767"
+       class="small"
+       id="text28">input, output and states</text>
+    <rect
+       x="545"
+       y="790"
+       width="26"
+       height="26"
+       class="high-precision"
+       id="rect29" />
+    <text
+       x="588"
+       y="812"
+       class="small"
+       id="text29">operations</text>
+  </g>
+  <!-- Panel (b): uniform INT8 grids -->
+  <g
+     id="g70">
+    <text
+       x="932"
+       y="58"
+       class="panel"
+       id="text30">(b)</text>
+    <text
+       x="980"
+       y="126"
+       class="grid-label"
+       id="text31">signed symmetric INT8</text>
+    <line
+       x1="1000"
+       y1="210"
+       x2="1700"
+       y2="210"
+       class="axis"
+       id="line31" />
+    <line
+       x1="1000"
+       y1="186"
+       x2="1000"
+       y2="234"
+       class="tick"
+       id="line32" />
+    <line
+       x1="1100"
+       y1="193"
+       x2="1100"
+       y2="227"
+       class="tick"
+       id="line33" />
+    <line
+       x1="1200"
+       y1="193"
+       x2="1200"
+       y2="227"
+       class="tick"
+       id="line34" />
+    <line
+       x1="1300"
+       y1="193"
+       x2="1300"
+       y2="227"
+       class="tick"
+       id="line35" />
+    <line
+       x1="1350"
+       y1="178"
+       x2="1350"
+       y2="242"
+       class="zero"
+       id="line36" />
+    <line
+       x1="1400"
+       y1="193"
+       x2="1400"
+       y2="227"
+       class="tick"
+       id="line37" />
+    <line
+       x1="1500"
+       y1="193"
+       x2="1500"
+       y2="227"
+       class="tick"
+       id="line38" />
+    <line
+       x1="1600"
+       y1="193"
+       x2="1600"
+       y2="227"
+       class="tick"
+       id="line39" />
+    <line
+       x1="1700"
+       y1="186"
+       x2="1700"
+       y2="234"
+       class="tick"
+       id="line40" />
+    <text
+       x="966"
+       y="276"
+       class="math-small"
+       id="text40">-alpha</text>
+    <text
+       x="1324"
+       y="276"
+       class="math-small"
+       id="text41">0</text>
+    <text
+       x="1664"
+       y="276"
+       class="math-small"
+       id="text42">+alpha</text>
+    <text
+       x="955"
+       y="169"
+       class="small"
+       id="text43">q = -127</text>
+    <text
+       x="1314"
+       y="169"
+       class="accent-blue"
+       id="text44">q = 0</text>
+    <text
+       x="1645"
+       y="169"
+       class="small"
+       id="text45">q = 127</text>
+    <text
+       x="1000"
+       y="313"
+       class="tiny"
+       id="text46">s = alpha / 127, zero point z = 0, code -128 unused</text>
+    <text
+       x="980"
+       y="390"
+       class="grid-label"
+       id="text47">unsigned symmetric UINT8</text>
+    <line
+       x1="1000"
+       y1="470"
+       x2="1700"
+       y2="470"
+       class="axis"
+       id="line47" />
+    <line
+       x1="1000"
+       y1="438"
+       x2="1000"
+       y2="502"
+       class="zero"
+       id="line48" />
+    <line
+       x1="1140"
+       y1="453"
+       x2="1140"
+       y2="487"
+       class="tick"
+       id="line49" />
+    <line
+       x1="1280"
+       y1="453"
+       x2="1280"
+       y2="487"
+       class="tick"
+       id="line50" />
+    <line
+       x1="1420"
+       y1="453"
+       x2="1420"
+       y2="487"
+       class="tick"
+       id="line51" />
+    <line
+       x1="1560"
+       y1="453"
+       x2="1560"
+       y2="487"
+       class="tick"
+       id="line52" />
+    <line
+       x1="1700"
+       y1="446"
+       x2="1700"
+       y2="494"
+       class="tick"
+       id="line53" />
+    <text
+       x="986"
+       y="430"
+       class="accent-blue"
+       id="text53">q = 0</text>
+    <text
+       x="1635"
+       y="430"
+       class="small"
+       id="text54">q = 255</text>
+    <text
+       x="990"
+       y="540"
+       class="math-small"
+       id="text55">0</text>
+    <text
+       x="1670"
+       y="540"
+       class="math-small"
+       id="text56">alpha</text>
+    <text
+       x="1000"
+       y="577"
+       class="tiny"
+       id="text57">suited to non-negative ranges such as ReLU outputs</text>
+    <text
+       x="980"
+       y="654"
+       class="grid-label"
+       id="text58">asymmetric UINT8</text>
+    <line
+       x1="1000"
+       y1="730"
+       x2="1700"
+       y2="730"
+       class="axis"
+       id="line58" />
+    <line
+       x1="1000"
+       y1="706"
+       x2="1000"
+       y2="754"
+       class="tick"
+       id="line59" />
+    <line
+       x1="1140"
+       y1="713"
+       x2="1140"
+       y2="747"
+       class="tick"
+       id="line60" />
+    <line
+       x1="1280"
+       y1="713"
+       x2="1280"
+       y2="747"
+       class="tick"
+       id="line61" />
+    <line
+       x1="1395"
+       y1="698"
+       x2="1395"
+       y2="762"
+       class="zero"
+       id="line62" />
+    <line
+       x1="1560"
+       y1="713"
+       x2="1560"
+       y2="747"
+       class="tick"
+       id="line63" />
+    <line
+       x1="1700"
+       y1="706"
+       x2="1700"
+       y2="754"
+       class="tick"
+       id="line64" />
+    <text
+       x="965"
+       y="690"
+       class="small"
+       id="text64">q = 0</text>
+    <text
+       x="1360"
+       y="690"
+       class="accent-blue"
+       id="text65">q = z</text>
+    <text
+       x="1635"
+       y="690"
+       class="small"
+       id="text66">q = 255</text>
+    <text
+       x="965"
+       y="800"
+       class="math-small"
+       id="text67">x<tspan
+   baseline-shift="sub"
+   font-size="18"
+   id="tspan66">min</tspan></text>
+    <text
+       x="1380"
+       y="800"
+       class="math-small"
+       id="text68">0</text>
+    <text
+       x="1652"
+       y="800"
+       class="math-small"
+       id="text69">x<tspan
+   baseline-shift="sub"
+   font-size="18"
+   id="tspan68">max</tspan></text>
+    <text
+       x="1015"
+       y="860"
+       class="math-small"
+       id="text70">q = clip(round(x / s) + z),   x̂ = s(q - z)</text>
+  </g>
+</svg>

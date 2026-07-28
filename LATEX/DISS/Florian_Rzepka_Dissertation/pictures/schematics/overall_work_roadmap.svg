@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="560" viewBox="0 0 1400 560">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L9,3 L0,6 Z" fill="#2f2f2f"/>
+    </marker>
+    <style>
+      .label { font-family: Arial, Helvetica, sans-serif; fill: #1f1f1f; }
+      .heading { font-size: 25px; font-weight: 700; }
+      .body { font-size: 22px; }
+      .box { stroke-width: 2.2; }
+      .flow { fill: none; stroke: #2f2f2f; stroke-width: 2.5; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <rect x="50" y="30" width="1300" height="100" rx="7" class="box" fill="#e8f6ee" stroke="#22a15c"/>
+  <text x="75" y="72" class="label heading">Chapter 7:</text>
+  <text x="228" y="72" class="label body">integrated discussion, deployment-oriented design lessons, conclusion, and outlook.</text>
+
+  <rect x="50" y="220" width="380" height="120" rx="7" class="box" fill="#e9f8f9" stroke="#00a6b3"/>
+  <text x="240" y="260" text-anchor="middle" class="label heading">Chapter 4</text>
+  <text x="240" y="294" text-anchor="middle" class="label body">Ageing estimation</text>
+  <text x="240" y="324" text-anchor="middle" class="label body">published study</text>
+
+  <rect x="510" y="220" width="380" height="120" rx="7" class="box" fill="#e9f8f9" stroke="#00a6b3"/>
+  <text x="700" y="260" text-anchor="middle" class="label heading">Chapter 5</text>
+  <text x="700" y="294" text-anchor="middle" class="label body">Robustness benchmark</text>
+  <text x="700" y="324" text-anchor="middle" class="label body">submitted manuscript</text>
+
+  <rect x="970" y="220" width="380" height="120" rx="7" class="box" fill="#e9f8f9" stroke="#00a6b3"/>
+  <text x="1160" y="260" text-anchor="middle" class="label heading">Chapter 6</text>
+  <text x="1160" y="294" text-anchor="middle" class="label body">Embedded AI</text>
+  <text x="1160" y="324" text-anchor="middle" class="label body">SSRN preprint</text>
+
+  <rect x="50" y="430" width="1300" height="90" rx="7" class="box" fill="#f4f4f4" stroke="#717171"/>
+  <text x="75" y="472" class="label heading">Technical and experimental basis:</text>
+  <text x="515" y="472" class="label body">battery and BMS foundations, datasets, reference quantities,</text>
+  <text x="75" y="503" class="label body">embedded targets, and the Custom BMS Platform.</text>
+
+  <path d="M240 430 L240 340" class="flow"/>
+  <path d="M700 430 L700 340" class="flow"/>
+  <path d="M1160 430 L1160 340" class="flow"/>
+  <path d="M240 220 L240 165 L390 165 L390 130" class="flow"/>
+  <path d="M700 220 L700 130" class="flow"/>
+  <path d="M1160 220 L1160 165 L1010 165 L1010 130" class="flow"/>
+</svg>

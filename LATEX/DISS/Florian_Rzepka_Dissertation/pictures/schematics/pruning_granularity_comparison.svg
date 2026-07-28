@@ -1,0 +1,548 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="1800"
+   height="720"
+   viewBox="0 0 1800 720"
+   version="1.1"
+   id="svg49"
+   sodipodi:docname="pruning_granularity_comparison.svg"
+   inkscape:version="1.4.4 (dcaf3e7, 2026-05-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview49"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#505050"
+     inkscape:zoom="0.82102954"
+     inkscape:cx="1260.0034"
+     inkscape:cy="806.91372"
+     inkscape:window-width="3840"
+     inkscape:window-height="2054"
+     inkscape:window-x="-11"
+     inkscape:window-y="-11"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg49" />
+  <defs
+     id="defs1">
+    <style
+       id="style1">
+      .panel { font-family: Arial, Helvetica, sans-serif; fill: #222222; font-size: 40px; font-weight: 700; }
+      .label { font-family: Arial, Helvetica, sans-serif; fill: #333333; font-size: 34px; }
+      .small { font-family: Arial, Helvetica, sans-serif; fill: #4a4a4a; font-size: 30px; }
+      .math { font-family: &quot;Times New Roman&quot;, Times, serif; fill: #222222; font-size: 38px; font-style: italic; }
+      .matrix { fill: #f4f4f4; stroke: #333333; stroke-width: 5; }
+      .grid { stroke: #777777; stroke-width: 2.5; }
+      .zero { fill: #f6d0d1; stroke: #d62728; stroke-width: 2.5; }
+      .zero-mark { stroke: #d62728; stroke-width: 3; }
+      .removed { fill: #f6d0d1; stroke: #d62728; stroke-width: 3; stroke-dasharray: 8 6; }
+      .ghost { fill: none; stroke: #9a9a9a; stroke-width: 3; stroke-dasharray: 9 7; }
+      .arrow { stroke: #555555; stroke-width: 5; fill: none; marker-end: url(#arrowhead); }
+      .divider { stroke: #d0d0d0; stroke-width: 3; }
+    </style>
+    <marker
+       id="arrowhead"
+       viewBox="0 0 10 10"
+       refX="9"
+       refY="5"
+       markerWidth="8"
+       markerHeight="8"
+       orient="auto">
+      <path
+         d="M 0 0 L 10 5 L 0 10 z"
+         fill="#555555"
+         id="path1" />
+    </marker>
+    <marker
+       id="arrowhead-9"
+       viewBox="0 0 10 10"
+       refX="9"
+       refY="5"
+       markerWidth="8"
+       markerHeight="8"
+       orient="auto">
+      <path
+         d="M 0,0 10,5 0,10 Z"
+         fill="#555555"
+         id="path1-4" />
+    </marker>
+  </defs>
+  <rect
+     width="1800"
+     height="720"
+     fill="#ffffff"
+     id="rect1" />
+  <line
+     x1="600"
+     y1="55"
+     x2="600"
+     y2="660"
+     class="divider"
+     id="line1" />
+  <line
+     x1="1200"
+     y1="55"
+     x2="1200"
+     y2="660"
+     class="divider"
+     id="line2" />
+  <!-- Panel (a): dense reference -->
+  <g
+     id="g10">
+    <text
+       x="34"
+       y="55"
+       class="panel"
+       id="text2">(a)</text>
+    <text
+       x="132"
+       y="130"
+       class="math"
+       id="text3">W<tspan
+   baseline-shift="super"
+   font-size="21px"
+   id="tspan2">(1)</tspan></text>
+    <text
+       x="287"
+       y="130"
+       class="math"
+       id="text4">h</text>
+    <text
+       x="436"
+       y="160"
+       class="math"
+       id="text5">W<tspan
+   baseline-shift="super"
+   font-size="21px"
+   id="tspan4">(2)</tspan></text>
+    <rect
+       x="80"
+       y="170"
+       width="150"
+       height="180"
+       class="matrix"
+       id="rect5" />
+    <path
+       d="M110 170V350 M140 170V350 M170 170V350 M200 170V350              M80 200H230 M80 230H230 M80 260H230 M80 290H230 M80 320H230"
+       class="grid"
+       id="path5" />
+    <rect
+       x="280"
+       y="170"
+       width="36"
+       height="180"
+       class="matrix"
+       id="rect6" />
+    <path
+       d="M280 200H316 M280 230H316 M280 260H316 M280 290H316 M280 320H316"
+       class="grid"
+       id="path6" />
+    <rect
+       x="367"
+       y="200"
+       width="180"
+       height="120"
+       class="matrix"
+       id="rect7" />
+    <path
+       d="M 397,200 V 320 M 427,200 V 320 M 457,200 V 320 M 487,200 V 320 M 517,200 V 320 M 367,230 h 180 m -180,30 h 180 m -180,30 h 180"
+       class="grid"
+       id="path7" />
+    <path
+       d="m 244,260 h 27"
+       class="arrow"
+       id="path8"
+       style="stroke-width:4;stroke-dasharray:none" />
+    <path
+       d="m 332,260 h 26"
+       class="arrow"
+       id="path9"
+       style="stroke-width:4;stroke-dasharray:none" />
+    <text
+       x="110"
+       y="430"
+       class="small"
+       id="text9">dense weights and activations</text>
+    <text
+       x="143"
+       y="615"
+       class="label"
+       id="text10">dense reference model</text>
+  </g>
+  <!-- Panel (b): unstructured pruning -->
+  <g
+     id="g30">
+    <text
+       x="634"
+       y="55"
+       class="panel"
+       id="text11">(b)</text>
+    <text
+       x="676"
+       y="132"
+       class="math"
+       id="text12">M<tspan
+   baseline-shift="sub"
+   font-size="21px"
+   id="tspan11">1</tspan> ⊙ W<tspan
+   baseline-shift="super"
+   font-size="21px"
+   id="tspan12">(1)</tspan></text>
+    <text
+       x="887"
+       y="131"
+       class="math"
+       id="text13">h</text>
+    <text
+       x="985"
+       y="160"
+       class="math"
+       id="text14">M<tspan
+   baseline-shift="sub"
+   font-size="21px"
+   id="tspan13">2</tspan> ⊙ W<tspan
+   baseline-shift="super"
+   font-size="21px"
+   id="tspan14">(2)</tspan></text>
+    <rect
+       x="680"
+       y="170"
+       width="150"
+       height="180"
+       class="matrix"
+       id="rect14" />
+    <path
+       d="M 710,170 V 350 M 740,170 V 350 M 770,170 V 350 M 800,170 V 350 M 680,200 h 150 m -150,30 h 150 m -150,30 h 150 m -150,30 h 150 m -150,30 h 150"
+       class="grid"
+       id="path14" />
+    <!-- Individually suppressed weights in W1 -->
+    <rect
+       x="710"
+       y="170"
+       width="30"
+       height="30"
+       class="zero"
+       id="rect15" />
+    <path
+       d="m 714,174 22,22 m 0,-22 -22,22"
+       class="zero-mark"
+       id="path15" />
+    <rect
+       x="770"
+       y="200"
+       width="30"
+       height="30"
+       class="zero"
+       id="rect16" />
+    <path
+       d="m 774,204 22,22 m 0,-22 -22,22"
+       class="zero-mark"
+       id="path16" />
+    <rect
+       x="680"
+       y="230"
+       width="30"
+       height="30"
+       class="zero"
+       id="rect17" />
+    <path
+       d="m 684,234 22,22 m 0,-22 -22,22"
+       class="zero-mark"
+       id="path17" />
+    <rect
+       x="740"
+       y="260"
+       width="30"
+       height="30"
+       class="zero"
+       id="rect18" />
+    <path
+       d="m 744,264 22,22 m 0,-22 -22,22"
+       class="zero-mark"
+       id="path18" />
+    <rect
+       x="800"
+       y="290"
+       width="30"
+       height="30"
+       class="zero"
+       id="rect19" />
+    <path
+       d="m 804,294 22,22 m 0,-22 -22,22"
+       class="zero-mark"
+       id="path19" />
+    <rect
+       x="710"
+       y="320"
+       width="30"
+       height="30"
+       class="zero"
+       id="rect20" />
+    <path
+       d="m 714,324 22,22 m 0,-22 -22,22"
+       class="zero-mark"
+       id="path20" />
+    <rect
+       x="880"
+       y="170"
+       width="36"
+       height="180"
+       class="matrix"
+       id="rect21" />
+    <path
+       d="m 880,200 h 36 m -36,30 h 36 m -36,30 h 36 m -36,30 h 36 m -36,30 h 36"
+       class="grid"
+       id="path21" />
+    <rect
+       x="967"
+       y="200"
+       width="180"
+       height="120"
+       class="matrix"
+       id="rect22" />
+    <path
+       d="m 995,200 v 120 m 30,-120 v 120 m 30,-120 v 120 m 30,-120 v 120 m 30,-120 V 320 M 965,230 h 180 m -180,30 h 180 m -180,30 h 180"
+       class="grid"
+       id="path22" />
+    <!-- Individually suppressed weights in W2 -->
+    <rect
+       x="995"
+       y="200"
+       width="30"
+       height="30"
+       class="zero"
+       id="rect23" />
+    <path
+       d="m 999,204 22,22 m 0,-22 -22,22"
+       class="zero-mark"
+       id="path23" />
+    <rect
+       x="1085"
+       y="200"
+       width="30"
+       height="30"
+       class="zero"
+       id="rect24" />
+    <path
+       d="m 1089,204 22,22 m 0,-22 -22,22"
+       class="zero-mark"
+       id="path24" />
+    <rect
+       x="965"
+       y="230"
+       width="30"
+       height="30"
+       class="zero"
+       id="rect25" />
+    <path
+       d="m 969,234 22,22 m 0,-22 -22,22"
+       class="zero-mark"
+       id="path25" />
+    <rect
+       x="1055"
+       y="260"
+       width="30"
+       height="30"
+       class="zero"
+       id="rect26" />
+    <path
+       d="m 1059,264 22,22 m 0,-22 -22,22"
+       class="zero-mark"
+       id="path26" />
+    <rect
+       x="1115"
+       y="290"
+       width="30"
+       height="30"
+       class="zero"
+       id="rect27" />
+    <path
+       d="m 1119,294 22,22 m 0,-22 -22,22"
+       class="zero-mark"
+       id="path27" />
+    <path
+       d="m 843.35407,260.21531 h 27"
+       class="arrow"
+       id="path28"
+       style="stroke-width:4;stroke-dasharray:none" />
+    <path
+       d="m 930.0622,260 h 26"
+       class="arrow"
+       id="path29"
+       style="stroke-width:4;stroke-dasharray:none" />
+    <text
+       x="706"
+       y="430"
+       class="small"
+       id="text29">same dimensions, irregular zeros</text>
+    <text
+       x="750"
+       y="615"
+       class="label"
+       id="text30">unstructured pruning</text>
+  </g>
+  <!-- Panel (c): structured pruning -->
+  <g
+     id="g49">
+    <text
+       x="1234"
+       y="55"
+       class="panel"
+       id="text31">(c)</text>
+    <text
+       x="1280"
+       y="130"
+       class="math"
+       id="text32">W<tspan
+   baseline-shift="super"
+   font-size="21px"
+   id="tspan31">(1)</tspan>[I<tspan
+   baseline-shift="sub"
+   font-size="21px"
+   id="tspan32">out</tspan>,:]</text>
+    <text
+       x="1488"
+       y="129"
+       class="math"
+       id="text33">h<tspan
+   baseline-shift="sub"
+   font-size="21px"
+   id="tspan33">I</tspan></text>
+    <text
+       x="1591"
+       y="160"
+       class="math"
+       id="text35">W<tspan
+   baseline-shift="super"
+   font-size="21px"
+   id="tspan34">(2)</tspan>[:,I<tspan
+   baseline-shift="sub"
+   font-size="21px"
+   id="tspan35">in</tspan>]</text>
+    <!-- Original dimensions retained as dashed references -->
+    <rect
+       x="1280"
+       y="170"
+       width="150"
+       height="180"
+       class="ghost"
+       id="rect35" />
+    <rect
+       x="1480"
+       y="170"
+       width="36"
+       height="180"
+       class="ghost"
+       id="rect36" />
+    <rect
+       x="1565"
+       y="200"
+       width="180"
+       height="120"
+       class="ghost"
+       id="rect37" />
+    <!-- Removed complete structures -->
+    <rect
+       x="1280"
+       y="170"
+       width="150"
+       height="30"
+       class="removed"
+       id="rect38" />
+    <rect
+       x="1280"
+       y="320"
+       width="150"
+       height="30"
+       class="removed"
+       id="rect39" />
+    <rect
+       x="1480"
+       y="170"
+       width="36"
+       height="30"
+       class="removed"
+       id="rect40" />
+    <rect
+       x="1480"
+       y="320"
+       width="36"
+       height="30"
+       class="removed"
+       id="rect41" />
+    <rect
+       x="1565"
+       y="200"
+       width="30"
+       height="120"
+       class="removed"
+       id="rect42" />
+    <rect
+       x="1715"
+       y="200"
+       width="30"
+       height="120"
+       class="removed"
+       id="rect43" />
+    <!-- Smaller dense tensors -->
+    <rect
+       x="1280"
+       y="200"
+       width="150"
+       height="120"
+       class="matrix"
+       id="rect44" />
+    <path
+       d="M1310 200V320 M1340 200V320 M1370 200V320 M1400 200V320              M1280 230H1430 M1280 260H1430 M1280 290H1430"
+       class="grid"
+       id="path44" />
+    <rect
+       x="1480"
+       y="200"
+       width="36"
+       height="120"
+       class="matrix"
+       id="rect45" />
+    <path
+       d="M1480 230H1516 M1480 260H1516 M1480 290H1516"
+       class="grid"
+       id="path45" />
+    <rect
+       x="1595"
+       y="200"
+       width="120"
+       height="120"
+       class="matrix"
+       id="rect46" />
+    <path
+       d="M1625 200V320 M1655 200V320 M1685 200V320              M1595 230H1715 M1595 260H1715 M1595 290H1715"
+       class="grid"
+       id="path46" />
+    <path
+       d="m 1442,260 h 27"
+       class="arrow"
+       id="path47"
+       style="stroke-width:4;stroke-dasharray:none" />
+    <path
+       d="m 1527.7033,258.92344 h 27"
+       class="arrow"
+       id="path47-8"
+       style="fill:none;stroke:#555555;stroke-width:4;stroke-dasharray:none;marker-end:url(#arrowhead-9)" />
+    <text
+       x="1300"
+       y="430"
+       class="small"
+       id="text48">smaller dense tensors and states</text>
+    <text
+       x="1376"
+       y="615"
+       class="label"
+       id="text49">structured pruning</text>
+  </g>
+</svg>
