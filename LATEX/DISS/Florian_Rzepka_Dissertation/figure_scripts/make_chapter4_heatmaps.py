@@ -1,8 +1,8 @@
-"""Create the red-blue heatmaps used as Figures 4.1 and 4.4.
+"""Create the heatmaps used as Figures 4.1 and 4.4.
 
 Figure 4.1 is reconstructed from the coefficients printed in the published
 source figure. Figure 4.4 retains the original MAE matrix and its numerical
-color-bar scales, but replaces the former white-ended blue map with a
+color-bar scales, but replaces the former white-ended blue map with a smooth
 blue-to-red map whose extrema remain visible.
 """
 
@@ -28,44 +28,33 @@ MDPI_FIGURES = (
 )
 
 RED = np.array(mcolors.to_rgb("#d62728"))
-RED_LIGHT = np.array(mcolors.to_rgb("#f2b2b3"))
 BLUE = np.array(mcolors.to_rgb("#1f77b4"))
-BLUE_LIGHT = np.array(mcolors.to_rgb("#d5e7f3"))
-
-
-def _blend(start: np.ndarray, end: np.ndarray, fraction: np.ndarray) -> np.ndarray:
-    return start + (end - start) * fraction[..., None]
 
 
 def red_blue_colors(values: np.ndarray) -> np.ndarray:
-    """Map normalized values to blue shades below 0.5 and red shades above."""
+    """Map normalized values continuously from blue through light gray to red."""
 
     values = np.clip(np.asarray(values, dtype=float), 0.0, 1.0)
-    colors = np.empty(values.shape + (3,), dtype=float)
-    lower = values <= 0.5
-    colors[lower] = _blend(BLUE, BLUE_LIGHT, values[lower] / 0.5)
-    colors[~lower] = _blend(
-        RED_LIGHT,
-        RED,
-        (values[~lower] - 0.5) / 0.5,
+    colormap = mcolors.LinearSegmentedColormap.from_list(
+        "continuous_blue_red",
+        [
+            (0.00, BLUE),
+            (0.50, "#f2f2f2"),
+            (1.00, RED),
+        ],
     )
-    return colors
+    return colormap(values)[..., :3]
 
 
 def correlation_colormap() -> mcolors.LinearSegmentedColormap:
-    """Negative correlations are red, positive correlations are blue.
-
-    Zero is intentionally light blue instead of white so that a measured
-    coefficient of zero is distinct from the masked upper triangle.
-    """
+    """Encode correlation magnitude from white at zero to red at both extrema."""
 
     return mcolors.LinearSegmentedColormap.from_list(
-        "correlation_red_blue",
+        "correlation_white_red",
         [
             (0.00, "#d62728"),
-            (0.495, "#f2b2b3"),
-            (0.500, "#d5e7f3"),
-            (1.00, "#1f77b4"),
+            (0.50, "#ffffff"),
+            (1.00, "#d62728"),
         ],
     )
 

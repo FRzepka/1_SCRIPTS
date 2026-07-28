@@ -65,47 +65,70 @@ def main():
     from pathlib import Path as FilePath
 
     red = "#d62728"
-    red_fill = "#eea4a5"
+    red_fill = "#f8dfe0"
     blue = "#1f77b4"
-    blue_fill = "#a1c6e0"
+    blue_fill = "#dcebf5"
     gray = "#434343"
-    gray_fill = "#eeeeee"
+    gray_fill = "#f0f0f0"
 
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(14.2, 7.4))
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(14.2, 7.7))
 
-    def box(ax, x, y, w, h, face, edge, title, lines,
-            title_size=14.5, line_size=12.5):
-        patch = mpatches.FancyBboxPatch(
-            (x, y), w, h,
-            boxstyle="round,pad=0.010,rounding_size=0.015",
-            linewidth=1.6,
-            edgecolor=edge,
-            facecolor=face,
+    def block(
+        ax,
+        x,
+        y,
+        w,
+        h,
+        body_color,
+        accent,
+        title,
+        lines,
+        title_size=13.5,
+        line_size=11.5,
+    ):
+        header_h = 0.145
+        ax.add_patch(
+            mpatches.Rectangle(
+                (x, y),
+                w,
+                h,
+                linewidth=1.7,
+                edgecolor=accent,
+                facecolor=body_color,
+            )
         )
-        ax.add_patch(patch)
+        ax.add_patch(
+            mpatches.Rectangle(
+                (x, y + h - header_h),
+                w,
+                header_h,
+                linewidth=0,
+                facecolor=accent,
+            )
+        )
         ax.text(
             x + w / 2,
-            y + h - 0.105,
+            y + h - header_h / 2,
             title,
             ha="center",
             va="center",
             fontsize=title_size,
             fontweight="bold",
-            color=gray,
+            color="white",
         )
-        if lines:
-            line_top = y + h - 0.225
-            spacing = 0.085 if len(lines) <= 3 else 0.070
-            for index, line in enumerate(lines):
-                ax.text(
-                    x + w / 2,
-                    line_top - index * spacing,
-                    line,
-                    ha="center",
-                    va="center",
-                    fontsize=line_size,
-                    color=gray,
-                )
+        body_center = y + (h - header_h) / 2
+        spacing = 0.080 if len(lines) <= 3 else 0.066
+        first_y = body_center + spacing * (len(lines) - 1) / 2
+        for index, line in enumerate(lines):
+            ax.text(
+                x + w / 2,
+                first_y - index * spacing,
+                line,
+                ha="center",
+                va="center",
+                fontsize=line_size,
+                color=gray,
+            )
 
     def connector(ax, x0, y0, x1, y1):
         ax.annotate(
@@ -123,18 +146,19 @@ def main():
         )
 
     def recurrent_loop(ax, x0, x1, y, label):
-        top = y + 0.15
+        top = y + 0.125
         ax.plot(
-            [x1 - 0.025, x1 - 0.025, x0 + 0.025, x0 + 0.025],
-            [y, top, top, y + 0.025],
+            [x1 - 0.020, x1 - 0.020, x0 + 0.020],
+            [y, top, top],
             color=red,
             linewidth=1.7,
-            solid_capstyle="round",
+            solid_capstyle="butt",
+            solid_joinstyle="miter",
         )
         ax.annotate(
             "",
-            xy=(x0 + 0.025, y),
-            xytext=(x0 + 0.025, y + 0.055),
+            xy=(x0 + 0.020, y),
+            xytext=(x0 + 0.020, top),
             arrowprops=dict(
                 arrowstyle="-|>",
                 color=red,
@@ -159,84 +183,109 @@ def main():
 
     # (a) Stateful SOC branch
     ax = ax1
-    y, h = 0.19, 0.56
-    box(
-        ax, 0.035, y, 0.205, h, gray_fill, gray, "Online inputs",
+    y, h = 0.20, 0.53
+    block(
+        ax, 0.035, y, 0.235, h, gray_fill, gray, "Online inputs",
         [r"$U,\ I,\ T,\ \widehat{\mathrm{SOH}}$",
          r"$Q_c,\ dU/dt,\ dI/dt,\ \Delta t$",
          "8 channels at 1 Hz"],
     )
-    box(
-        ax, 0.310, y, 0.205, h, red_fill, red, "GRU",
+    block(
+        ax, 0.350, y, 0.235, h, red_fill, red, "GRU core",
         ["1 recurrent layer",
          "hidden size 96",
          r"state $h_t$"],
     )
-    box(
-        ax, 0.585, y, 0.205, h, blue_fill, blue, "MLP head",
+    block(
+        ax, 0.665, y, 0.235, h, blue_fill, blue, "MLP head",
         [r"Linear $96 \rightarrow 96$ + ReLU",
          r"Linear $96 \rightarrow 1$",
          "sigmoid output"],
     )
-    box(
-        ax, 0.860, y + 0.07, 0.115, h - 0.14, gray_fill, gray, "Output",
-        [r"$\widehat{\mathrm{SOC}}_t$",
-         "each second"],
-        title_size=13.0,
-        line_size=11.5,
+    connector(ax, 0.270, y + h / 2, 0.350, y + h / 2)
+    connector(ax, 0.585, y + h / 2, 0.665, y + h / 2)
+    connector(ax, 0.900, y + h / 2, 0.955, y + h / 2)
+    ax.text(
+        0.967,
+        y + h / 2 + 0.035,
+        r"$\widehat{\mathrm{SOC}}_t$",
+        ha="center",
+        va="center",
+        fontsize=13.5,
+        color=gray,
     )
-    connector(ax, 0.240, y + h / 2, 0.310, y + h / 2)
-    connector(ax, 0.515, y + h / 2, 0.585, y + h / 2)
-    connector(ax, 0.790, y + h / 2, 0.860, y + h / 2)
-    recurrent_loop(ax, 0.310, 0.515, y + h, r"$h_{t-1}$")
+    ax.text(
+        0.967,
+        y + h / 2 - 0.050,
+        "1 Hz",
+        ha="center",
+        va="center",
+        fontsize=10.5,
+        color=gray,
+    )
+    recurrent_loop(ax, 0.350, 0.585, y + h, r"$h_{t-1}$")
     ax.text(0.003, 0.96, "(a)", fontsize=14.5, fontweight="bold", color=gray,
             ha="left", va="top")
 
     # (b) Hourly SOH branch
     ax = ax2
-    y, h = 0.16, 0.58
+    y, h = 0.17, 0.54
     specs = [
-        (0.015, 0.155, gray_fill, gray, "Hourly aggregates",
+        (0.015, 0.165, gray_fill, gray, "Hourly inputs",
          [r"$U,\ I,\ T,\ \mathrm{EFC},\ Q_c$",
           "mean, std, min, max",
           "20 features"]),
-        (0.205, 0.155, blue_fill, blue, "Projection",
+        (0.215, 0.165, blue_fill, blue, "Projection",
          [r"Linear $20 \rightarrow 128$",
           r"Linear $128 \rightarrow 128$",
           "GELU + LayerNorm"]),
-        (0.395, 0.155, red_fill, red, "LSTM",
+        (0.415, 0.165, red_fill, red, "LSTM core",
          ["2 recurrent layers",
           "hidden size 160",
           r"states $(h_t,c_t)$"]),
-        (0.585, 0.155, blue_fill, blue, "Residual MLP",
+        (0.615, 0.175, blue_fill, blue, "Residual MLP",
          ["3 residual blocks",
           "width 160 + GELU",
           "skip + LayerNorm"]),
-        (0.775, 0.115, blue_fill, blue, "Head",
+        (0.825, 0.125, blue_fill, blue, "Head",
          ["width 160",
           r"Linear $160 \rightarrow 1$"],
-         13.0, 11.2),
-        (0.925, 0.065, gray_fill, gray, "Output",
-         [r"$\widehat{\mathrm{SOH}}_k$",
-          "hourly"],
-         11.5, 10.4),
+         12.5, 10.5),
     ]
     for spec in specs:
         x, width, face, edge, title, lines, *sizes = spec
         if sizes:
-            box(ax, x, y, width, h, face, edge, title, lines, *sizes)
+            block(ax, x, y, width, h, face, edge, title, lines, *sizes)
         else:
-            box(ax, x, y, width, h, face, edge, title, lines)
+            block(ax, x, y, width, h, face, edge, title, lines)
 
     for left, right in [
-        (0.170, 0.205),
-        (0.360, 0.395),
-        (0.550, 0.585),
-        (0.740, 0.775),
-        (0.890, 0.925),
+        (0.180, 0.215),
+        (0.380, 0.415),
+        (0.580, 0.615),
+        (0.790, 0.825),
     ]:
         connector(ax, left, y + h / 2, right, y + h / 2)
-    recurrent_loop(ax, 0.395, 0.550, y + h, r"$(h_{t-1},c_{t-1})$")
+    connector(ax, 0.950, y + h / 2, 0.978, y + h / 2)
+    ax.text(
+        0.982,
+        y + h / 2 + 0.035,
+        r"$\widehat{\mathrm{SOH}}_k$",
+        ha="center",
+        va="center",
+        fontsize=12.5,
+        color=gray,
+    )
+    ax.text(
+        0.982,
+        y + h / 2 - 0.050,
+        "hourly",
+        ha="center",
+        va="center",
+        fontsize=10.0,
+        color=gray,
+    )
+    recurrent_loop(ax, 0.415, 0.580, y + h, r"$(h_{t-1},c_{t-1})$")
     ax.text(0.003, 0.96, "(b)", fontsize=14.5, fontweight="bold", color=gray,
             ha="left", va="top")
 
