@@ -62,92 +62,194 @@ def state_loop(ax, cx, top_y, label):
 
 
 def main():
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(13.2, 7.6))
+    from pathlib import Path as FilePath
 
-    # ------------------------------------------------------------------
-    # Panel (a): DD SOC estimator (stateful GRU + MLP head)
-    # ------------------------------------------------------------------
+    red = "#d62728"
+    red_fill = "#eea4a5"
+    blue = "#1f77b4"
+    blue_fill = "#a1c6e0"
+    gray = "#434343"
+    gray_fill = "#eeeeee"
+
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(14.2, 7.4))
+
+    def box(ax, x, y, w, h, face, edge, title, lines,
+            title_size=14.5, line_size=12.5):
+        patch = mpatches.FancyBboxPatch(
+            (x, y), w, h,
+            boxstyle="round,pad=0.010,rounding_size=0.015",
+            linewidth=1.6,
+            edgecolor=edge,
+            facecolor=face,
+        )
+        ax.add_patch(patch)
+        ax.text(
+            x + w / 2,
+            y + h - 0.105,
+            title,
+            ha="center",
+            va="center",
+            fontsize=title_size,
+            fontweight="bold",
+            color=gray,
+        )
+        if lines:
+            line_top = y + h - 0.225
+            spacing = 0.085 if len(lines) <= 3 else 0.070
+            for index, line in enumerate(lines):
+                ax.text(
+                    x + w / 2,
+                    line_top - index * spacing,
+                    line,
+                    ha="center",
+                    va="center",
+                    fontsize=line_size,
+                    color=gray,
+                )
+
+    def connector(ax, x0, y0, x1, y1):
+        ax.annotate(
+            "",
+            xy=(x1, y1),
+            xytext=(x0, y0),
+            arrowprops=dict(
+                arrowstyle="-|>",
+                color=gray,
+                linewidth=1.7,
+                mutation_scale=16,
+                shrinkA=0,
+                shrinkB=0,
+            ),
+        )
+
+    def recurrent_loop(ax, x0, x1, y, label):
+        top = y + 0.15
+        ax.plot(
+            [x1 - 0.025, x1 - 0.025, x0 + 0.025, x0 + 0.025],
+            [y, top, top, y + 0.025],
+            color=red,
+            linewidth=1.7,
+            solid_capstyle="round",
+        )
+        ax.annotate(
+            "",
+            xy=(x0 + 0.025, y),
+            xytext=(x0 + 0.025, y + 0.055),
+            arrowprops=dict(
+                arrowstyle="-|>",
+                color=red,
+                linewidth=1.7,
+                mutation_scale=14,
+            ),
+        )
+        ax.text(
+            (x0 + x1) / 2,
+            top + 0.028,
+            label,
+            ha="center",
+            va="bottom",
+            fontsize=10,
+            color=gray,
+        )
+
+    for ax in (ax1, ax2):
+        ax.set_xlim(0, 1)
+        ax.set_ylim(0, 1)
+        ax.axis("off")
+
+    # (a) Stateful SOC branch
     ax = ax1
-    ax.set_xlim(0, 1)
-    ax.set_ylim(0, 1)
-    ax.axis("off")
+    y, h = 0.19, 0.56
+    box(
+        ax, 0.035, y, 0.205, h, gray_fill, gray, "Online inputs",
+        [r"$U,\ I,\ T,\ \widehat{\mathrm{SOH}}$",
+         r"$Q_c,\ dU/dt,\ dI/dt,\ \Delta t$",
+         "8 channels at 1 Hz"],
+    )
+    box(
+        ax, 0.310, y, 0.205, h, red_fill, red, "GRU",
+        ["1 recurrent layer",
+         "hidden size 96",
+         r"state $h_t$"],
+    )
+    box(
+        ax, 0.585, y, 0.205, h, blue_fill, blue, "MLP head",
+        [r"Linear $96 \rightarrow 96$ + ReLU",
+         r"Linear $96 \rightarrow 1$",
+         "sigmoid output"],
+    )
+    box(
+        ax, 0.860, y + 0.07, 0.115, h - 0.14, gray_fill, gray, "Output",
+        [r"$\widehat{\mathrm{SOC}}_t$",
+         "each second"],
+        title_size=13.0,
+        line_size=11.5,
+    )
+    connector(ax, 0.240, y + h / 2, 0.310, y + h / 2)
+    connector(ax, 0.515, y + h / 2, 0.585, y + h / 2)
+    connector(ax, 0.790, y + h / 2, 0.860, y + h / 2)
+    recurrent_loop(ax, 0.310, 0.515, y + h, r"$h_{t-1}$")
+    ax.text(0.003, 0.96, "(a)", fontsize=14.5, fontweight="bold", color=gray,
+            ha="left", va="top")
 
-    bh, by = 0.52, 0.18
-    rounded_box(ax, 0.025, by, 0.21, bh, BLUE_FILL, "Online inputs (1 Hz)",
-                [r"$U,\;I,\;T,\;\widehat{\mathrm{SOH}}$",
-                 r"$Q_c,\;dU/dt,\;dI/dt,\;\Delta t$",
-                 "8 channels, robust-scaled"])
-    rounded_box(ax, 0.305, by, 0.20, bh, TEAL_FILL, "GRU layer",
-                ["1 layer, hidden size 96",
-                 "stateful: $h_t$ carried",
-                 "forward sample-by-sample"])
-    rounded_box(ax, 0.575, by, 0.20, bh, PURPLE_FILL, "MLP head",
-                [r"Linear 96$\,\rightarrow\,$96 + ReLU",
-                 r"Linear 96$\,\rightarrow\,$1 + Sigmoid"])
-    rounded_box(ax, 0.845, by + 0.07, 0.13, bh - 0.14, "#FFFFFF", "Output",
-                [r"$\widehat{\mathrm{SOC}}_t \in [0,1]$",
-                 "every sample"])
-
-    arrow(ax, 0.235, by + bh / 2, 0.303, by + bh / 2)
-    arrow(ax, 0.505, by + bh / 2, 0.573, by + bh / 2)
-    arrow(ax, 0.775, by + bh / 2, 0.843, by + bh / 2)
-    state_loop(ax, 0.405, by + bh + 0.012, r"$h_{t-1}$")
-
-    ax.text(0.405, by - 0.10,
-            "deployment-prepared variant: structured pruning to hidden size 67 + INT8 weights",
-            ha="center", va="center", fontsize=9.5, style="italic", color=NOTE_PURPLE)
-    ax.text(0.0, 0.97, "(a)  Data-driven SOC estimator (DD): stateful GRU + MLP",
-            ha="left", va="top", fontsize=12.5, fontweight="bold", fontdict=FONT)
-
-    # ------------------------------------------------------------------
-    # Panel (b): shared SOH estimator (hourly LSTM seq2seq)
-    # ------------------------------------------------------------------
+    # (b) Hourly SOH branch
     ax = ax2
-    ax.set_xlim(0, 1)
-    ax.set_ylim(0, 1)
-    ax.axis("off")
+    y, h = 0.16, 0.58
+    specs = [
+        (0.015, 0.155, gray_fill, gray, "Hourly aggregates",
+         [r"$U,\ I,\ T,\ \mathrm{EFC},\ Q_c$",
+          "mean, std, min, max",
+          "20 features"]),
+        (0.205, 0.155, blue_fill, blue, "Projection",
+         [r"Linear $20 \rightarrow 128$",
+          r"Linear $128 \rightarrow 128$",
+          "GELU + LayerNorm"]),
+        (0.395, 0.155, red_fill, red, "LSTM",
+         ["2 recurrent layers",
+          "hidden size 160",
+          r"states $(h_t,c_t)$"]),
+        (0.585, 0.155, blue_fill, blue, "Residual MLP",
+         ["3 residual blocks",
+          "width 160 + GELU",
+          "skip + LayerNorm"]),
+        (0.775, 0.115, blue_fill, blue, "Head",
+         ["width 160",
+          r"Linear $160 \rightarrow 1$"],
+         13.0, 11.2),
+        (0.925, 0.065, gray_fill, gray, "Output",
+         [r"$\widehat{\mathrm{SOH}}_k$",
+          "hourly"],
+         11.5, 10.4),
+    ]
+    for spec in specs:
+        x, width, face, edge, title, lines, *sizes = spec
+        if sizes:
+            box(ax, x, y, width, h, face, edge, title, lines, *sizes)
+        else:
+            box(ax, x, y, width, h, face, edge, title, lines)
 
-    bh, by = 0.56, 0.16
-    rounded_box(ax, 0.012, by, 0.165, bh, BLUE_FILL, "Hourly aggregates",
-                [r"$\{U, I, T, \mathrm{EFC}, Q_c\}$",
-                 r"$\times$ {mean, std, min, max}",
-                 "20 channels, 1/h"], title_size=11, line_size=9.3)
-    rounded_box(ax, 0.222, by, 0.16, bh, LAVENDER_FILL, "Projection block",
-                [r"Linear 20$\,\rightarrow\,$128 + GELU",
-                 r"Linear 128$\,\rightarrow\,$128 + GELU",
-                 "LayerNorm"], title_size=11, line_size=9.3)
-    rounded_box(ax, 0.427, by, 0.155, bh, TEAL_FILL, "LSTM core",
-                ["2 layers, hidden 160",
-                 r"stateful: $(h_t, c_t)$",
-                 "carried hour-to-hour"], title_size=11, line_size=9.3)
-    rounded_box(ax, 0.627, by, 0.16, bh, PURPLE_FILL, "3 residual blocks",
-                [r"width 160 + GELU",
-                 "residual correction",
-                 "skip + LayerNorm"], title_size=11, line_size=9.3)
-    rounded_box(ax, 0.832, by + 0.30, 0.155, 0.26, PURPLE_FILL, "Prediction head",
-                [r"width 160",
-                 r"Linear 160$\,\rightarrow\,$1"], title_size=10.5, line_size=9.0)
-    rounded_box(ax, 0.842, by - 0.075, 0.135, 0.32, "#FFFFFF", "Output",
-                [r"$\widehat{\mathrm{SOH}}_k$ hourly,",
-                 "held between updates"], title_size=10.5, line_size=8.8)
+    for left, right in [
+        (0.170, 0.205),
+        (0.360, 0.395),
+        (0.550, 0.585),
+        (0.740, 0.775),
+        (0.890, 0.925),
+    ]:
+        connector(ax, left, y + h / 2, right, y + h / 2)
+    recurrent_loop(ax, 0.395, 0.550, y + h, r"$(h_{t-1},c_{t-1})$")
+    ax.text(0.003, 0.96, "(b)", fontsize=14.5, fontweight="bold", color=gray,
+            ha="left", va="top")
 
-    arrow(ax, 0.177, by + bh / 2, 0.220, by + bh / 2)
-    arrow(ax, 0.382, by + bh / 2, 0.425, by + bh / 2)
-    arrow(ax, 0.582, by + bh / 2, 0.625, by + bh / 2)
-    arrow(ax, 0.787, by + bh / 2, 0.830, by + bh / 2 + 0.05)
-    arrow(ax, 0.909, by + 0.295, 0.909, by + 0.245)
-    state_loop(ax, 0.5045, by + bh + 0.012, r"$(h_{t-1},\,c_{t-1})$")
-
-    ax.text(0.5045, by - 0.115,
-            "deployment-prepared variant: width reduction to hidden 112 + INT8 weights",
-            ha="center", va="center", fontsize=9.5, style="italic", color=NOTE_PURPLE)
-    ax.text(0.0, 1.0, "(b)  Shared SOH estimator: hourly LSTM sequence-to-sequence model",
-            ha="left", va="top", fontsize=12.5, fontweight="bold", fontdict=FONT)
-
-    fig.subplots_adjust(left=0.005, right=0.995, top=0.99, bottom=0.01, hspace=0.12)
-    out = r"C:\Users\Florian\SynologyDrive\TUB\1_Dissertation\1_Scripts\LATEX\DISS\Florian_Rzepka_Dissertation\pictures\robustness_dd_architecture_rb.png"
-    fig.savefig(out, dpi=220, facecolor="white")
-    print("saved:", out)
+    fig.subplots_adjust(left=0.01, right=0.995, top=0.985, bottom=0.02, hspace=0.14)
+    project_root = FilePath(__file__).resolve().parents[1]
+    png_out = project_root / "pictures" / "eaai_palette" / "robustness_dd_architecture.png"
+    svg_out = project_root / "pictures" / "schematics" / "robustness_dd_architecture.svg"
+    png_out.parent.mkdir(parents=True, exist_ok=True)
+    svg_out.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(png_out, dpi=300, facecolor="white")
+    fig.savefig(svg_out, facecolor="white")
+    print("saved:", png_out)
+    print("saved:", svg_out)
     plt.close(fig)
 
 
