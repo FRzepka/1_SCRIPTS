@@ -36,6 +36,7 @@ $PaleGray = '#E5E9EC'
 $VeryPaleBlue = '#EDF4F8'
 $VeryPaleRed = '#FBEDEE'
 $VeryPaleGreen = '#EEF7EE'
+$FigureFontScale = 1.45
 
 function C([string]$hex) {
     return [System.Drawing.ColorTranslator]::FromHtml($hex)
@@ -47,7 +48,7 @@ function D([object]$value) {
 
 function Font([float]$size, [bool]$bold=$false) {
     $style = if ($bold) { [System.Drawing.FontStyle]::Bold } else { [System.Drawing.FontStyle]::Regular }
-    return New-Object System.Drawing.Font('Arial', $size, $style)
+    return New-Object System.Drawing.Font('Arial', ($size * $FigureFontScale), $style)
 }
 
 function New-Chart([int]$width=2200, [int]$height=1450) {
@@ -233,7 +234,7 @@ function Save-Canvas($canvas, [string]$name) {
 
 function Draw-StackedStorageBars($g, [float]$x, [float]$y, [float]$w, [float]$h,
     [object[]]$rows, [double]$maxValue, [string]$panelTitle) {
-    Draw-Text $g $panelTitle $x ($y-72) $w 55 30 $true $Dark 'Near' 'Center'
+    Draw-Text $g $panelTitle $x ($y-92) $w 82 30 $true $Dark 'Near' 'Center'
     $plotLeft = $x + 88
     $plotTop = $y + 25
     $plotWidth = $w - 115
@@ -280,7 +281,7 @@ function Draw-StackedStorageBars($g, [float]$x, [float]$y, [float]$w, [float]$h,
 }
 
 # -----------------------------------------------------------------------------
-# rev_6: analytical hidden-size scaling and the two implemented architecture points.
+# Figure A.21: analytical hidden-size scaling and the two implemented architecture points.
 # This figure reports operation counts only and does not extrapolate latency, flash,
 # or energy to another MCU family.
 # -----------------------------------------------------------------------------
@@ -314,12 +315,12 @@ for ($pruningPct=0; $pruningPct -le 60; $pruningPct++) {
 $limitCurveRows | Export-Csv -LiteralPath (Join-Path $Reviewer3Results 'pruning_fraction_limit.csv') -NoTypeInformation -Encoding UTF8
 
 $chart = New-Chart 2500 2800
-$left = Add-Area $chart 'Complexity' 6 2 89 27 'LSTM hidden size H' 'Analytical MACs per inference'
-$right = Add-Area $chart 'Reduction' 6 35 89 27 'Original LSTM hidden size H' 'MAC reduction for p = 30% [%]'
-$limit = Add-Area $chart 'PruningLimit' 6 68 89 27 'Hidden-unit pruning fraction p [%]' 'Asymptotic MAC reduction [%]'
-Add-PanelTitle $chart 'Complexity' '(a) Architecture-level operation scaling' 30
-Add-PanelTitle $chart 'Reduction' '(b) Finite-model reduction at the evaluated pruning fraction' 30
-Add-PanelTitle $chart 'PruningLimit' '(c) General reduction limit set by the pruning fraction' 30
+$left = Add-Area $chart 'Complexity' 6 2 89 27 'LSTM hidden size H' 'Model MACs'
+$right = Add-Area $chart 'Reduction' 6 35 89 27 'Original LSTM hidden size H' 'MAC reduction [%]'
+$limit = Add-Area $chart 'PruningLimit' 6 68 89 27 'Hidden-unit pruning fraction p [%]' 'Reduction limit [%]'
+Add-PanelTitle $chart 'Complexity' '(a)' 30
+Add-PanelTitle $chart 'Reduction' '(b)' 30
+Add-PanelTitle $chart 'PruningLimit' '(c)' 30
 $left.AxisX.TitleFont=Font 27; $left.AxisY.TitleFont=Font 27
 $left.AxisX.LabelStyle.Font=Font 24; $left.AxisY.LabelStyle.Font=Font 24
 $right.AxisX.TitleFont=Font 27; $right.AxisY.TitleFont=Font 27
@@ -383,14 +384,14 @@ Add-PointSeries $chart 'PruningLimit' 'Evaluated pruning fraction' $Red 30 51 '5
 $legendLeft = Add-AreaLegend $chart 'ComplexityLegend' 'Complexity' 'Near' 20
 Add-CustomLineLegendItem $legendLeft 'SOC analytical MACs' $Red
 Add-CustomLineLegendItem $legendLeft 'SOH analytical MACs' $Blue
-$legendRight = Add-AreaLegend $chart 'ReductionLegend' 'Reduction' 'Near' 20
-Add-CustomLineLegendItem $legendRight 'SOC analytical MAC reduction' $Red
-Add-CustomLineLegendItem $legendRight 'SOH analytical MAC reduction' $Blue
-Add-CustomLineLegendItem $legendRight 'Large-H limit for p = 30%: 51%' $Gray 'Dash'
+$legendRight = Add-AreaLegend $chart 'ReductionLegend' 'Reduction' 'Far' 20
+Add-CustomLineLegendItem $legendRight 'SOC analytical reduction' $Red
+Add-CustomLineLegendItem $legendRight 'SOH analytical reduction' $Blue
+Add-CustomLineLegendItem $legendRight 'Large-H limit: 51%' $Gray 'Dash'
 $legendLimit = Add-AreaLegend $chart 'PruningLimitLegend' 'PruningLimit' 'Near' 20
 Add-CustomLineLegendItem $legendLimit 'General limit: 2p - p^2' $Purple
 Add-CustomLineLegendItem $legendLimit 'Evaluated pruning fraction: p = 30%' $Red 'Dash'
-Save-Chart $chart 'rev_6_model_complexity_scaling.png'
+Save-Chart $chart 'Figure_21_Model_Complexity_Scaling.png'
 
 # -----------------------------------------------------------------------------
 # rev_7: audited derivative boundary. The code uses timestamp-aware backward
@@ -398,8 +399,8 @@ Save-Chart $chart 'rev_6_model_complexity_scaling.png'
 # -----------------------------------------------------------------------------
 $canvas = New-Canvas 2400 1320
 $g = $canvas.Graphics
-Draw-Text $g '(a) Audited benchmark feature path' 80 55 1060 70 34 $true
-Draw-Text $g '(b) Causal option for non-ideal sampling' 1260 55 1060 70 34 $true
+Draw-Text $g '(a)' 80 55 1060 70 34 $true
+Draw-Text $g '(b)' 1260 55 1060 70 34 $true
 
 Draw-Box $g 90 190 300 150 $VeryPaleBlue $Blue "Timestamped samples`nx[k-1], x[k]" 25 $true
 Draw-Arrow $g 390 265 485 265
@@ -429,14 +430,14 @@ Draw-Box $g 1315 1090 945 115 $VeryPaleRed $Red "Proposed mitigation path for de
 Save-Canvas $canvas 'rev_7_derivative_deployment_boundary.png'
 
 # -----------------------------------------------------------------------------
-# rev_8: cross-task L2 saliency plus a method-property comparison. The right panel
+# Figure A.22: cross-task L2 saliency plus a method-property comparison. The right panel
 # is a rationale, not an empirical comparison of pruning accuracy.
 # -----------------------------------------------------------------------------
 $saliency = Import-Csv (Join-Path $ResultsRoot 'weights\lstm_unit_saliency.csv')
 $canvas = New-Canvas 2400 1400
 $g = $canvas.Graphics
-Draw-Text $g '(a) L2 saliency ranking of hidden units' 80 55 1100 70 30 $true
-Draw-Text $g '(b) Criterion scope and deployment implications' 1280 55 1040 70 30 $true
+Draw-Text $g '(a)' 80 45 1100 95 30 $true
+Draw-Text $g '(b)' 1280 45 1040 95 30 $true
 
 $plotX=135; $plotY=185; $plotW=980; $plotH=900
 $removedBrush = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(125,(C $PaleRed)))
@@ -453,8 +454,7 @@ for ($i=0;$i -le 5;$i++) {
 }
 $g.DrawLine($axisPen,$plotX,$plotY,$plotX,$plotY+$plotH)
 $g.DrawLine($axisPen,$plotX,$plotY+$plotH,$plotX+$plotW,$plotY+$plotH)
-Draw-Text $g 'Unit rank [% of task units]' ($plotX+250) ($plotY+$plotH+55) 500 45 22 $false $Dark 'Center' 'Center'
-Draw-Text $g 'Normalized L2 saliency score' $plotX 132 360 36 19 $false $Gray 'Near' 'Center'
+Draw-Text $g 'Unit rank [% of task units]' ($plotX+240) ($plotY+$plotH+45) 520 70 22 $false $Dark 'Center' 'Center'
 Draw-Text $g 'Lowest 30% removed' ($plotX+15) ($plotY+18) ($plotW*0.30-30) 40 20 $true $Red 'Center' 'Center'
 
 foreach ($task in @('SOC','SOH')) {
@@ -478,9 +478,9 @@ $legendY=$plotY+$plotH+135
 $socLegendPen=New-Object System.Drawing.Pen((C $Red),5)
 $sohLegendPen=New-Object System.Drawing.Pen((C $Blue),5)
 $g.DrawLine($socLegendPen,410,$legendY+22,475,$legendY+22)
-Draw-Text $g 'SOC' 490 $legendY 90 44 22 $false $Dark 'Near' 'Center'
+Draw-Text $g 'SOC' 490 ($legendY-8) 110 65 22 $false $Dark 'Near' 'Center'
 $g.DrawLine($sohLegendPen,650,$legendY+22,715,$legendY+22)
-Draw-Text $g 'SOH' 730 $legendY 90 44 22 $false $Dark 'Near' 'Center'
+Draw-Text $g 'SOH' 730 ($legendY-8) 110 65 22 $false $Dark 'Near' 'Center'
 $socLegendPen.Dispose(); $sohLegendPen.Dispose()
 $gridPen.Dispose(); $axisPen.Dispose()
 
@@ -518,36 +518,36 @@ for($r=0;$r -lt $rows.Count;$r++) {
 $usedRowBorder = New-Object System.Drawing.Pen((C $Red),4)
 $g.DrawLine($usedRowBorder,$tableX,($tableY+85+$rowH),($tableX+$tableW),($tableY+85+$rowH))
 $usedRowBorder.Dispose()
-Save-Canvas $canvas 'rev_8_pruning_criterion_scope.png'
+Save-Canvas $canvas 'Figure_22_Pruning_Criterion_Scope.png'
 
 # -----------------------------------------------------------------------------
-# rev_9: exact mixed-precision boundary and analytical model-constant storage.
+# Figure A.23: exact mixed-precision boundary and analytical model-constant storage.
 # -----------------------------------------------------------------------------
 $memory = Import-Csv (Join-Path $ResultsRoot 'weights\quantization_memory_accounting.csv')
 $canvas = New-Canvas 2500 1450
 $g = $canvas.Graphics
-Draw-Text $g '(a) Precision path in the exported quantized kernel' 70 45 1080 70 32 $true
+Draw-Text $g '(a)' 70 35 1080 105 32 $true
 
-Draw-Box $g 90 170 310 145 $VeryPaleGreen $Green "Input x and previous`nhidden/cell states`nFP32" 23 $true
+Draw-Box $g 90 170 310 145 $VeryPaleGreen $Green "Input x, hidden state,`nand cell state`nFP32" 18 $true
 Draw-Arrow $g 400 242 500 242
-Draw-Box $g 505 150 460 185 $VeryPaleBlue $Blue "Recurrent matrices INT8`n+ per-row FP32 scales`nWeights reconstructed during`nmultiply-accumulate" 22 $true
+Draw-Box $g 505 150 460 185 $VeryPaleBlue $Blue "Recurrent matrices INT8`n+ per-row FP32 scales`nreconstructed in each MAC" 18 $true
 Draw-Arrow $g 735 335 735 430
-Draw-Box $g 505 435 460 145 $VeryPaleGreen $Green "Biases, gate activations,`nhidden state and cell state`nremain FP32" 22 $true
+Draw-Box $g 505 435 460 145 $VeryPaleGreen $Green "Biases, gates, hidden`nand cell states`nFP32" 18 $true
 Draw-Arrow $g 735 580 735 675
-Draw-Box $g 505 680 460 135 $VeryPaleGreen $Green "MLP weights and`nactivations remain FP32" 23 $true
+Draw-Box $g 505 680 460 135 $VeryPaleGreen $Green "MLP weights and`nactivations FP32" 23 $true
 Draw-Arrow $g 735 815 735 910
-Draw-Box $g 505 915 460 120 $VeryPaleGreen $Green "Estimator output`nFP32" 24 $true
+Draw-Box $g 505 915 460 120 $VeryPaleGreen $Green 'Estimator output FP32' 24 $true
 
 $socRows = @($memory | Where-Object Task -eq 'SOC' | Sort-Object { if($_.Variant -eq 'Base'){0}else{1} })
 $sohRows = @($memory | Where-Object Task -eq 'SOH' | Sort-Object { if($_.Variant -eq 'Base'){0}else{1} })
-Draw-StackedStorageBars $g 1240 160 560 980 $socRows 100 '(b) SOC model constants'
-Draw-StackedStorageBars $g 1870 160 560 980 $sohRows 360 '(c) SOH model constants'
+Draw-StackedStorageBars $g 1240 160 560 980 $socRows 100 '(b)'
+Draw-StackedStorageBars $g 1870 160 560 980 $sohRows 360 '(c)'
 
 $legendItems=@(
     @('FP32 recurrent weights',$PaleGreen,$Green),
     @('INT8 recurrent weights',$PaleBlue,$Blue),
     @('FP32 MLP parameters',$PalePurple,$Purple),
-    @('FP32 row scales and LSTM bias',$PaleRed,$Red)
+    @('FP32 scales and biases',$PaleRed,$Red)
 )
 $lx=1240; $ly=1210
 for($i=0;$i -lt $legendItems.Count;$i++) {
@@ -555,19 +555,19 @@ for($i=0;$i -lt $legendItems.Count;$i++) {
     Draw-Box $g $xx $yy 48 34 $legendItems[$i][1] $legendItems[$i][2]
     Draw-Text $g $legendItems[$i][0] ($xx+60) ($yy-5) 500 46 18 $false $Dark 'Near' 'Center'
 }
-Save-Canvas $canvas 'rev_9_mixed_precision_quantization.png'
+Save-Canvas $canvas 'Figure_23_Mixed_Precision_Quantization.png'
 
 # -----------------------------------------------------------------------------
-# rev_10: static operation accounting beside the observed STM32 kernel times.
+# Figure A.24: static operation accounting beside the observed STM32 kernel times.
 # It does not claim cycle-level attribution or measured memory bandwidth.
 # -----------------------------------------------------------------------------
 $operations = Import-Csv (Join-Path $ResultsRoot 'operations\static_kernel_operation_counts.csv')
 $chart = New-Chart 2300 1500
 $panels=@(
-    @('SocOps',5,4,43,41,'Model variant','Operations per inference','(a) SOC static operation accounting'),
-    @('SocTime',53,4,43,41,'Model variant','Observed inference time [ms]','(b) SOC measured kernel time'),
-    @('SohOps',5,51,43,41,'Model variant','Operations per inference','(c) SOH static operation accounting'),
-    @('SohTime',53,51,43,41,'Model variant','Observed inference time [ms]','(d) SOH measured kernel time')
+    @('SocOps',5,4,43,41,'Model variant','Operations per inference','(a)'),
+    @('SocTime',53,4,43,41,'Model variant','Observed inference time [ms]','(b)'),
+    @('SohOps',5,51,43,41,'Model variant','Operations per inference','(c)'),
+    @('SohTime',53,51,43,41,'Model variant','Observed inference time [ms]','(d)')
 )
 foreach($p in $panels) {
     $area=Add-Area $chart $p[0] $p[1] $p[2] $p[3] $p[4] $p[5] $p[6]
@@ -621,6 +621,6 @@ foreach($areaName in @('SocOps','SohOps')) {
     Add-CustomBoxLegendItem $legend 'Model MACs' $PaleGray $Gray
     Add-CustomBoxLegendItem $legend 'Additional FP32 scale multiplications' $PaleBlue $Blue
 }
-Save-Chart $chart 'rev_10_quantized_runtime_accounting.png'
+Save-Chart $chart 'Figure_24_Quantized_Runtime_Accounting.png'
 
 Write-Host 'Reviewer 3 figure generation complete.'

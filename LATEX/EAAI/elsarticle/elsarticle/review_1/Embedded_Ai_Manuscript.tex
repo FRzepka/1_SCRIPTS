@@ -75,7 +75,7 @@
             state={Berlin},
             country={Germany}}
 \begin{abstract}
-Online battery management requires accurate state-of-charge (SOC) and state-of-health (SOH) estimates within strict memory and timing budgets. This study investigates an engineering application of artificial intelligence (AI): continuous battery-state estimation on an STM32H753ZI microcontroller. The implemented AI consists of stateful long short-term memory (LSTM) networks with multi-layer perceptron (MLP) output heads. Using an open lithium iron phosphate (LFP) ageing dataset, we compare full-precision Base models with structured-pruned and recurrent-weight-quantized variants under identical long-horizon replay and hardware measurements. This paired, auditable compression benchmark is the AI contribution of the work. SOC mean absolute error (MAE) ranges from $2.3$ to $2.8$ percentage points, while SOH MAE ranges from $0.9$ to $1.5$ percentage points. Pruning reduces flash by $40.9$~\% for SOC and $45.5$~\% for SOH and reduces inference time by $42.9$~\% and $44.0$~\%, respectively. Quantization reduces flash by $50.2$~\% and $58.8$~\%, but the mixed-precision kernel increases inference time. Estimated energy is a constant-power timing proxy, not a separate power measurement. The quantitative conclusions apply to the evaluated LFP data, model configurations, firmware, and build settings. Additional cell chemistries and embedded platforms require separate validation.
+Online battery management requires accurate state-of-charge (SOC) and state-of-health (SOH) estimates within strict memory and timing budgets. To address these constraints, this work investigates how stateful long short-term memory (LSTM) networks with multi-layer perceptron (MLP) heads can be optimised for embedded artificial intelligence (AI), using structured pruning and recurrent-weight quantization to reduce memory and computational costs while retaining estimation accuracy on an STM32H753ZI microcontroller. Using the open \emph{Lithium Iron Phosphate (LFP) Cycle Ageing Dataset}, full-precision models provide the accuracy reference against which the compressed variants are evaluated. Long-horizon replay yields mean absolute error (MAE) values of $2.3$--$2.8$ percentage points for SOC and $0.9$--$1.5$ for SOH, showing that compression largely preserves accuracy. Hardware-in-the-loop benchmarks show that the evaluated 30~\% pruning configuration reduces flash by $40.9$~\% and $45.5$~\% and inference time by $42.9$~\% and $44.0$~\% for the SOC and SOH models, respectively. The analytical complexity model links these savings to pruning fraction and network dimensions. Quantization further reduces flash by $50.2$~\% and $58.8$~\%, but raises runtime in the mixed-precision implementation. Together, the study provides a reproducible reference for resource-efficient embedded battery-state estimation.
 \end{abstract}
 \begin{keyword}
 Embedded artificial intelligence \sep Battery state estimation \sep Long short-term memory network \sep Structured pruning \sep Weight quantization \sep Microcontroller deployment
@@ -123,9 +123,9 @@ Embedded artificial intelligence \sep Battery state estimation \sep Long short-t
 \item[$\odot$] Element-wise (Hadamard) product
 \item[$W$] Weight matrix (LSTM or MLP)
 \item[$b$] Bias vector
-\item[$q$] Quantized weight (INT8 code)
 \item[$s$] Per-row quantization scale (FP32)
-\item[$\hat{w}$] Reconstructed floating-point weight after dequantization
+\item[$W^{\mathrm{fp32}},W^{\mathrm{int8}}$] Original FP32 weight matrix and its stored INT8 representation
+\item[$\hat{W}$] Floating-point reconstruction of an INT8 weight matrix
 \item[$\varepsilon_q$] Positive lower bound for the quantization scale
 \item[$\mathcal{R}$] Index set of retained LSTM hidden units
 \item[$e_n$] Signed prediction error of sample $n$ in percentage points
@@ -134,7 +134,7 @@ Embedded artificial intelligence \sep Battery state estimation \sep Long short-t
 \item[$W_{\mathrm{hh}}^{\mathrm{int8}}$] Quantized hidden-to-gate weight matrix
 \item[$s_{\mathrm{ih}}, s_{\mathrm{hh}}$] Per-row quantization scale vectors for $W_{\mathrm{ih}}^{\mathrm{int8}}$ and $W_{\mathrm{hh}}^{\mathrm{int8}}$
 \item[$b_{\mathrm{fp32}}$] Floating-point bias of a given gate
-\item[$g$] Gate pre-activation used in the quantized LSTM kernel
+\item[$\mathbf{a}_t$] Stacked LSTM gate pre-activation vector at time $t$
 \item[$D,H,M$] Input dimension, LSTM hidden size, and MLP width
 \item[$N_{\mathrm{MAC}}$] Analytical multiply--accumulate count per inference
 \end{description}
@@ -331,37 +331,40 @@ The criterion is selected because it combines all four gate rows for one recurre
 \subsection{Resulting pruned models}
 The resulting pruned SOC and SOH models still run in FP32 but reduce flash consumption and runtime considerably once compiled for STM32. Section~\ref{sec:kpis} summarises the corresponding latency and memory savings. These pruned variants are evaluated alongside their base and quantized counterparts throughout the results section.
 \section{Quantization}
-Quantization reduces the numerical precision of selected weights while keeping the network topology unchanged. We apply post-training, weight-only quantization to the LSTM input-to-hidden and hidden-to-hidden matrices. Biases, activations, recurrent hidden and cell states, and the MLP remain FP32. The resulting firmware is therefore a mixed-precision storage implementation, not a fully integer inference path. Quantization-aware training is not used.
+Quantization complements pruning by reducing the numerical precision of selected weights while keeping the network topology unchanged. We apply post-training, weight-only quantization to the LSTM input-to-hidden matrix $W_{\mathrm{ih}}$ and hidden-to-hidden matrix $W_{\mathrm{hh}}$. The resulting matrices are stored as 8-bit integers together with one FP32 scale per row. Biases, activations, recurrent hidden and cell states, and the MLP remain FP32. This design concentrates the storage reduction on the dominant recurrent matrices while retaining a mixed-precision computation path.
 
 \subsection{Per-row symmetric quantization}
-For row $r$ of either recurrent matrix, the implementation computes
+The FP32 matrices $W_{\mathrm{ih}}^{\mathrm{fp32}}$ and $W_{\mathrm{hh}}^{\mathrm{fp32}}$ map the current input $\mathbf{x}_t$ and the previous hidden state $\mathbf{h}_{t-1}$, respectively, to the four stacked LSTM gates. Quantization is applied independently to every row of both matrices. For $W^{\mathrm{fp32}}\in\{W_{\mathrm{ih}}^{\mathrm{fp32}},W_{\mathrm{hh}}^{\mathrm{fp32}}\}$, row $r$ is converted according to
 \begin{align}
-    s_r &= \max\!\left(\frac{\max_h |w_{r,h}|}{127},\varepsilon_q\right), \label{eq:int8_scale}\\
-    q_{r,h} &= \operatorname{clip}\!\left(\operatorname{round}\!\left(\frac{w_{r,h}}{s_r}\right),-127,127\right), \label{eq:int8_q}\\
-    \hat{w}_{r,h} &= s_r q_{r,h}, \label{eq:int8_w}
+    s_r &= \max\!\left(\frac{\max_k |(W^{\mathrm{fp32}})_{r,k}|}{127},\varepsilon_q\right), \label{eq:int8_scale}\\
+    (W^{\mathrm{int8}})_{r,k} &= \operatorname{clip}\!\left(\operatorname{round}\!\left(\frac{(W^{\mathrm{fp32}})_{r,k}}{s_r}\right),-127,127\right), \label{eq:int8_q}\\
+    (\hat{W})_{r,k} &= s_r(W^{\mathrm{int8}})_{r,k}. \label{eq:int8_w}
 \end{align}
-where $\varepsilon_q$ prevents division by zero for an all-zero row. Although the INT8 storage type provides 256 machine codes, the implementation deliberately leaves $-128$ unused and employs the symmetric 255-level set $\{-127,\ldots,127\}$. This keeps zero exactly representable and assigns equal positive and negative ranges. With the max-absolute scale in Eq.~\eqref{eq:int8_scale}, finite row weights do not clip, and nearest-integer rounding gives the element-wise reconstruction bound
+Here, $W^{\mathrm{int8}}$ denotes the stored integer matrix and $\hat{W}$ its effective floating-point reconstruction. The lower bound $\varepsilon_q$ prevents division by zero for an all-zero row. Although the INT8 storage type provides 256 machine codes, the implementation leaves $-128$ unused and employs the symmetric 255-level set $\{-127,\ldots,127\}$. This keeps zero exactly representable and assigns equal positive and negative ranges. With the max-absolute scale in Eq.~\eqref{eq:int8_scale}, finite row weights do not clip, and nearest-integer rounding gives the element-wise reconstruction bound
 \begin{equation}
-    |w_{r,h}-\hat{w}_{r,h}| \leq \frac{s_r}{2}.
+    \left|(W^{\mathrm{fp32}})_{r,k}-(\hat{W})_{r,k}\right| \leq \frac{s_r}{2}.
     \label{eq:quant_error_bound}
 \end{equation}
 Per-row scaling gives small-magnitude rows a finer step size than one global scale, following standard uniform post-training quantization practice~\cite{jacobQuantizationTrainingNeural2017,krishnamoorthiQuantizingDeepConvolutional2018}.
 
-\subsection{Mixed-precision gate computation}
-Let $r$ denote one gate row. The firmware evaluates
+\subsection{Quantization details}
+Using the stored matrices $W_{\mathrm{ih}}^{\mathrm{int8}}$ and $W_{\mathrm{hh}}^{\mathrm{int8}}$, the complete gate pre-activation is
 \begin{equation}
 \label{eq:quant}
-g_r = \sum_{d=1}^{D} x_d\bigl(s_{\mathrm{ih},r}q_{\mathrm{ih},r,d}\bigr)
-    + \sum_{j=1}^{H} h_j\bigl(s_{\mathrm{hh},r}q_{\mathrm{hh},r,j}\bigr)
-    + b_{\mathrm{fp32},r}.
+\mathbf{a}_t =
+\mathbf{s}_{\mathrm{ih}} \odot
+\left(W_{\mathrm{ih}}^{\mathrm{int8}}\mathbf{x}_t\right)
++ \mathbf{s}_{\mathrm{hh}} \odot
+\left(W_{\mathrm{hh}}^{\mathrm{int8}}\mathbf{h}_{t-1}\right)
++ \mathbf{b}_{\mathrm{fp32}}.
 \end{equation}
-Thus the recurrent weights are stored as INT8 codes but reconstructed into FP32 products inside the current accumulation loops. A built-in streaming comparison validates the exported gate computations against the source model and typically yields MAE differences below $10^{-4}$.
+The vectors $\mathbf{s}_{\mathrm{ih}}$ and $\mathbf{s}_{\mathrm{hh}}$ apply the corresponding FP32 scale to each gate row. Equation~\eqref{eq:quant} is the compact matrix form of the C implementation. In the current kernel, each accumulation term is evaluated as an FP32 input or hidden-state value multiplied by an INT8 weight cast to FP32 and by its row scale. The recurrent weights therefore occupy INT8 storage, while the gate products and accumulations remain FP32. A built-in streaming comparison validates the exported gate computations against the source model and typically yields MAE differences below $10^{-4}$.
 
 The recurrent matrices account for approximately 80~\% of the raw Base model constants in both tasks. Targeting these matrices concentrates the storage reduction on the dominant constants while retaining FP32 biases, activations, recurrent states, and the smaller MLP path. This creates a transparent mixed-precision configuration that reduces persistent storage without changing the recurrent state representation. Quantizing activations and states could extend the approach toward additional RAM and latency reductions and is considered as a subsequent optimisation step. \ref{app:mixed_precision} documents the precision boundary and model-constant composition.
 \begin{figure*}[t!]
     \centering
     \includegraphics[width=\textwidth]{figures/Schematics/Figure_7_Quantization_Schematic.png}
-    \caption{FP32-to-INT8 quantization and embedded deployment. The recurrent FP32 weight matrices are mapped row by row to INT8 codes and one FP32 scale per row. The INT8 storage type spans $\{-128,\ldots,127\}$, while the implemented symmetric quantizer generates $\{-127,\ldots,127\}$ and leaves $-128$ unused. The integer recurrent weights and scale vectors are exported as C headers and combined with FP32 biases, activations, recurrent states, and MLP operations in the STM32 kernel.}
+    \caption{FP32-to-INT8 quantization and embedded deployment. The recurrent FP32 weight matrices are mapped row by row to signed INT8 codes in the symmetric set $\{-127,\ldots,127\}$ together with one FP32 scale per row. The integer recurrent weights and scale vectors are exported as C headers and combined with FP32 biases, activations, recurrent states, and MLP operations in the STM32 kernel.}
     \label{fig:quantization_schematic}
 \end{figure*}
 \subsection{Export for STM32}
@@ -374,16 +377,16 @@ On the host side, the complete reference ageing sequence is replayed in Python u
 For the embedded benchmarks the base, pruned, and quantized SOC/SOH models are embedded into dedicated firmware projects for the STM32H753ZI. Because STM32Cube~AI does not natively support stateful LSTM layers, the recurrent update equations, post-processing, and UART diagnostics are implemented manually in C. Identical stimulus streams are then injected via UART, allowing a direct comparison between host-side and on-device behaviour under the same operating conditions.
 
 \subsection{Limited software-level fault sensitivity}
-Two limited software-level sensitivity analyses examine the Base, Pruned, and Quantized variants under missed reports and transient input corruption. First, randomly omitted outputs at rates of 1, 5, and 10~\%, as well as ten deterministic gaps of 60, 600, or 3600 samples, are replaced by the preceding prediction using a hold-last strategy.
+Two software-level sensitivity analyses compare the Base, Pruned, and Quantized variants under temporary output-report loss and transient input corruption. The first analysis represents unavailable estimator reports while the underlying inference trajectory continues without interruption. Randomly selected reports at rates of 1, 5, and 10~\% are replaced by the most recent available prediction using a hold-last strategy. The same strategy is applied to ten deterministic reporting gaps for each duration of 60, 600, and 3600 consecutive samples, corresponding to 1, 10, and 60~min at the 1-Hz sampling rate. The controlled scope of these analyses isolates output availability and input-buffer corruption from faults in model parameters, activations, recurrent-state memory, communication, and MCU memory.
 
-The second analysis evaluates how a one-sample input-buffer fault propagates through the recurrent state. Each exported C model processes 8000 consecutive C07 samples at 1~Hz. Thirty independent events are distributed over this sequence after at least 2048 preceding clean samples, with ten events each for voltage, current, and temperature. At every event, the disturbed branch starts from the same recurrent state as the clean branch. Bit 22, the most significant FP32 mantissa bit, is flipped in one input value before inference for exactly one sample. The following 60 inputs are unmodified and the recurrent state is not reset.
+The second analysis evaluates how a one-sample input-buffer fault propagates through the recurrent state. Each exported C model processes a continuous 8000-sample segment from the evaluation trajectory of one representative LFP cell at 1~Hz. Thirty independent events are distributed over this sequence after a clean warm-up of at least 2048 samples, with ten events each for voltage, current, and temperature. At every event, the disturbed branch starts from the same recurrent state as the clean branch. FP32 bits are numbered from zero at the least significant bit. Bit~22 is therefore the highest-order bit of the 23-bit fraction field. Flipping this bit produces a pronounced but finite change in the selected input value while leaving its sign and exponent unchanged. The bit is flipped for the event sample only. The model then receives 60 subsequent unmodified inputs, corresponding to a 60-s recovery horizon, while its recurrent state continues without a reset.
 
-For event $e$ and offset $k=0,\ldots,60$, the fault-induced deviation is $d_{e,k}=100|\hat{y}^{\mathrm{fault}}_{e,k}-\hat{y}^{\mathrm{clean}}_{e,k}|$ in percentage points. Peak deviation and residual deviation after 60~s quantify the transient response independently of the model's pre-existing target error. Accuracy is evaluated over the same 61-sample window using
+For event $e$, $k=0$ denotes the corrupted sample and $k=1,\ldots,60$ the subsequent clean samples. The resulting evaluation window contains 61 samples, while $k=60$ lies 60~s after the fault because consecutive samples are separated by 1~s. The fault-induced deviation is $d_{e,k}=100|\hat{y}^{\mathrm{fault}}_{e,k}-\hat{y}^{\mathrm{clean}}_{e,k}|$ in percentage points. Peak deviation and residual deviation after 60~s quantify the transient response independently of the model's pre-existing target error. Accuracy is evaluated over the same window using
 \begin{equation}
 \Delta\mathrm{MAE}_{61,e}=\frac{100}{61}\sum_{k=0}^{60}\left(\left|\hat{y}^{\mathrm{fault}}_{e,k}-y_{e,k}\right|-\left|\hat{y}^{\mathrm{clean}}_{e,k}-y_{e,k}\right|\right).
 \label{eq:fault_mae_change}
 \end{equation}
-A positive value indicates that the bit flip increases target MAE, while a negative value means that the disturbed prediction happens to lie closer to the target. Recovery is the first time after the peak at which $d_{e,k}$ remains below $\max(0.1d_{e,\mathrm{peak}},10^{-4}\ \mathrm{pp})$ for five consecutive samples. This test represents a transient input-buffer upset in software. It does not replace hardware fault injection into weights, activations, recurrent-state memory, communication, or MCU memory.
+A positive value indicates that the bit flip increases target MAE, while a negative value means that the disturbed prediction happens to lie closer to the target. Recovery is the first time after the peak at which $d_{e,k}$ remains below $\max(0.1d_{e,\mathrm{peak}},10^{-4}\ \mathrm{pp})$ for five consecutive samples. Together, these metrics quantify the immediate output deviation, the change in target accuracy, and the decay of the disturbance through the recurrent state.
 
 \subsection{STM32 Measurements}
 On the STM32 Nucleo-144 development board, dedicated SOC and SOH firmware images execute the embedded estimators while host-side scripts handle stimulus injection and UART logging. Recorded feature streams are transmitted to the microcontroller, which runs the stateful LSTM\,+\,MLP and returns predictions with timing diagnostics.
@@ -451,7 +454,7 @@ The primary metric for any battery state estimator is its ability to track the g
     \caption{Streaming SOC dashboard on the full ageing trajectory. The black line represents the reference SOC, while the coloured lines show the predictions of the Base (green), Pruned (red), and Quantized (blue) models. The lower sub-panel displays the instantaneous prediction error.}
     \label{fig:soc_dashboard}
 \end{figure*}
-Across the complete SOC replay, the Base, Pruned, and Quantized variants obtain MAE values of 2.685, 2.338, and 2.791 percentage points, respectively. The Quantized trace often overlaps the Base trace visually, whereas the Pruned model has the lowest aggregate target MAE despite a larger model-to-Base deviation in some parts of the sequence. These results confirm that post-training weight quantization preserves useful recurrent behaviour throughout the evaluated stream. Replays of additional operating sequences can extend this comparison to a wider range of temporal conditions.
+Across the complete SOC replay, the Base, Pruned, and Quantized variants obtain MAE values of 2.68, 2.34, and 2.79 percentage points on the 0--100~\% SOC scale, respectively. The Quantized trace often overlaps the Base trace visually, whereas the Pruned model has the lowest aggregate target MAE despite a larger model-to-Base deviation in some parts of the sequence. These results confirm that post-training weight quantization preserves useful recurrent behaviour throughout the evaluated stream. Replays of additional operating sequences can extend this comparison to a wider range of temporal conditions.
 \par
 The SOH estimator faces a different challenge: it must infer slow capacity degradation from sparse check-up events and continuous monitoring. In the plotted trajectories the discrete capacity tests have been removed from the estimator input, while the remaining check-up blocks (OCV sweeps, HPPC pulses, and profile segments) are retained. The plateau-like sections of the reference curve therefore correspond to these diagnostic intervals. The dashboard applies the complete two-stage causal post-processing chain from Section~\ref{sec:soh_filter_method}: initial alignment, stage~1 with $\alpha_1=0.02$ and a symmetric limiter, followed by stage~2 with $\alpha_2=10^{-6}$ and a downward limiter. The resulting smoothing suppresses short-term variation but introduces a substantial accuracy--delay trade-off.
 \begin{figure}[tbp]
@@ -551,7 +554,7 @@ Table~\ref{tab:tradeoff_summary} summarises the resulting changes for pruning an
 \end{table}
 
 \subsection{Limited software fault sensitivity}
-In the missing-update analysis, holding the preceding output for up to 10~\% randomly omitted reports changes aggregate MAE by less than 0.001 percentage points. Ten gaps of 3600 samples increase SOC MAE by approximately 0.05 percentage points and have negligible influence on the slowly varying SOH output.
+In the missing-output-report analysis, holding the preceding output for up to 10~\% randomly unavailable reports changes aggregate MAE by less than 0.001 percentage points. Ten reporting gaps lasting 3600~s each increase SOC MAE by approximately 0.05 percentage points and have negligible influence on the slowly varying SOH output.
 
 Figure~\ref{fig:app_fault_sensitivity} shows the recurrent response to the one-sample input-buffer faults. Across the SOC variants, median peak deviation ranges from 3.29 to 3.82 percentage points and P95 ranges from 16.18 to 23.81 percentage points. All 30 events per SOC model meet the recovery criterion within 60~s, with median recovery times of 10.0--12.5~s. Quantized follows Base closely, whereas Pruned has a lower median peak but the largest P95 peak. For SOH, median peak deviation ranges from 0.83 to 1.59 percentage points and P95 from 3.37 to 5.85 percentage points. The share recovered within 60~s is 93.3~\% for Base, 90.0~\% for Pruned, and 86.7~\% for Quantized. Among the recovered SOH events, median recovery is 9, 7, and 5~s, respectively.
 
@@ -596,7 +599,7 @@ This appendix presents supporting analyses of pruning structure, temporal stabil
 \subsection{Structured-pruning diagnostics}\label{app:pruning_diagnostics}
 \begin{figure*}[!ht]
     \centering
-    \includegraphics[width=\textwidth]{figures/Review_1_Additional/rev_1_pruning_evidence.png}
+    \includegraphics[width=\textwidth]{figures/Review_1_Additional/Figure_16_Pruning_Evidence.png}
     \caption{Diagnostics for the one-shot SOC pruning operation. (a) L2 saliency from Eq.~\ref{eq:pruning_saliency}, sorted in ascending order. The 19 lowest-ranked units are removed and 45 units are retained. (b) Density of the central recurrent-weight range for the Base and Pruned models. The analysis confirms application of the specified ranking criterion and makes the resulting weight selection transparent. Repeated training runs can extend this structural evidence toward a statistical assessment of the observed MAE difference.}
     \label{fig:app_pruning_diagnostics}
 \end{figure*}
@@ -605,7 +608,7 @@ This appendix presents supporting analyses of pruning structure, temporal stabil
 \subsection{Long-horizon temporal stability}\label{app:long_horizon}
 \begin{figure*}[!ht]
     \centering
-    \includegraphics[width=\textwidth]{figures/Review_1_Additional/rev_2_long_horizon_stability.png}
+    \includegraphics[width=\textwidth]{figures/Review_1_Additional/Figure_17_Long_Horizon_Stability.png}
     \caption{Temporal error and model-to-Base deviation over ten consecutive, equal-count segments of the full-stream replay. Recurrent states are not reset at segment boundaries. Panels (a) and (c) show target MAE for SOC and SOH. Panels (b) and (d) show the mean absolute deviation of Pruned and Quantized from Base. The absence of monotonic late-sequence divergence demonstrates stable relative behaviour across the complete evaluated replay. Further sequences can extend the tested operating horizon.}
     \label{fig:app_long_horizon}
 \end{figure*}
@@ -614,7 +617,7 @@ This appendix presents supporting analyses of pruning structure, temporal stabil
 \subsection{SOH filtering and compression interaction}\label{app:soh_filter}
 \begin{figure*}[!ht]
     \centering
-    \includegraphics[width=\textwidth]{figures/Review_1_Additional/rev_3_soh_filter_pipeline.png}
+    \includegraphics[width=\textwidth]{figures/Review_1_Additional/Figure_18_SOH_Filter_Pipeline.png}
     \caption{Comparison of SOH compression and filtering for the Base, Pruned, and Quantized C models on a common input sequence. (a) Outputs after first-point alignment but before temporal filtering. (b) Stage~1 with $\alpha_1=0.02$ and the symmetric limiter. (c) Final sequential output after applying stage~2 with $\alpha_2=10^{-6}$ and the downward limiter to stage~1. (d) MAE after each processing stage. At \SI{1}{\hertz}, the EMA-only 90~\% response times are approximately \SI{114}{\second} and 26.65~days, respectively. The nonlinear limiters have no single cutoff frequency. All three variants use the same input and processing order to isolate the interaction between compression and filtering.}
     \label{fig:app_soh_filter}
 \end{figure*}
@@ -623,7 +626,7 @@ This appendix presents supporting analyses of pruning structure, temporal stabil
 \subsection{Utility-weight sensitivity}\label{app:utility_sensitivity}
 \begin{figure*}[!ht]
     \centering
-    \includegraphics[width=\textwidth]{figures/Review_1_Additional/rev_4_utility_sensitivity.png}
+    \includegraphics[width=\textwidth]{figures/Review_1_Additional/Figure_19_Utility_Sensitivity.png}
     \caption{Sensitivity of the utility ranking to application priorities. Panels (a) and (b) vary the highlighted objective from 25 to 85~\% and divide the remaining weight equally among the other three objectives. Each square identifies the lowest-utility model. At 25~\%, all four objectives have equal weight. Panel (c) gives the winning share across all 1,771 non-negative 0.05-spaced weight combinations that sum to one. The energy objective uses the timing-derived $E_{\mathrm{est}}$ proxy and is therefore not an independent power measurement.}
     \label{fig:app_utility_sensitivity}
 \end{figure*}
@@ -632,13 +635,13 @@ This appendix presents supporting analyses of pruning structure, temporal stabil
 \subsection{Transient input-buffer fault sensitivity}\label{app:fault_sensitivity}
 \begin{figure*}[!ht]
     \centering
-    \includegraphics[width=\textwidth]{figures/Review_1_Additional/rev_5_limited_fault_sensitivity.png}
-    \caption{Stateful response to transient software input-buffer corruption. Thirty independent events per task and model flip the most significant FP32 mantissa bit in voltage, current, or temperature for one 1-Hz sample, with ten events per input signal. The clean and disturbed branches start from the same recurrent state and then receive 60 identical clean samples without a reset. (a) and (b) show the absolute disturbed-clean deviation for one representative voltage event. (c) summarises the median peak and P95 peak across all 30 events. (d) gives the fraction that meets the sustained recovery criterion within 60~s. The figure characterises propagation through the recurrent state, while Table~\ref{tab:app_fault_mae} reports the corresponding change in target MAE.}
+    \includegraphics[width=\textwidth]{figures/Review_1_Additional/Figure_20_Limited_Fault_Sensitivity.png}
+    \caption{Stateful response to transient software input-buffer corruption. Thirty independent events per task and model flip bit~22, the highest-order FP32 fraction bit, in voltage, current, or temperature for one 1-Hz sample, with ten events per input signal. The clean and disturbed branches start from the same recurrent state and then receive the same 60 unmodified follow-up inputs, corresponding to 60~s, without a state reset. (a) and (b) show the absolute disturbed-clean deviation for one representative voltage event. (c) summarises the median peak and P95 peak across all 30 events. (d) gives the fraction that meets the sustained recovery criterion within 60~s. The figure characterises propagation through the recurrent state, while Table~\ref{tab:app_fault_mae} reports the corresponding change in target MAE.}
     \label{fig:app_fault_sensitivity}
 \end{figure*}
 \begin{table*}[!ht]
     \centering
-    \caption{Change in target MAE over the 61-sample fault and recovery window. Values are percentage points and summarise 30 independent input-bitflip events per task and model. The change is defined by Eq.~\ref{eq:fault_mae_change}. Negative values indicate that the disturbed output happens to lie closer to the target in part of the window.}
+    \caption{Change in target MAE over the window comprising one corrupted sample and 60 clean follow-up samples. Values are percentage points and summarise 30 independent input-bitflip events per task and model. The change is defined by Eq.~\ref{eq:fault_mae_change}. Negative values indicate that the disturbed output happens to lie closer to the target in part of the window.}
     \label{tab:app_fault_mae}
     \small
     \begin{tabular}{llrr}
@@ -659,7 +662,7 @@ This appendix presents supporting analyses of pruning structure, temporal stabil
 \subsection{Analytical model-complexity scaling}\label{app:model_complexity}
 \begin{figure*}[!ht]
     \centering
-    \includegraphics[width=\textwidth]{figures/Review_1_Additional/rev_6_model_complexity_scaling.png}
+    \includegraphics[width=\textwidth]{figures/Review_1_Additional/Figure_21_Model_Complexity_Scaling.png}
     \caption{Architecture-level operation scaling from Eq.~\ref{eq:model_macs}. (a) Analytical MACs per streaming inference over LSTM hidden size, with markers for the implemented SOC and SOH Base and Pruned dimensions. (b) Finite-model reduction for the evaluated pruning fraction $p=0.30$, including the implemented SOC and SOH points and the 51~\% large-$H$ limit. (c) General relation between the hidden-unit pruning fraction and the asymptotic reduction $2p-p^2$. The highlighted 30~\% operating point has a theoretical limit of 51~\%, while the corresponding limits for 10, 20, 40, and 50~\% pruning are 19, 36, 64, and 75~\%. Linear input and MLP terms together with the fixed output term keep finite models below the respective limit.}
     \label{fig:app_model_complexity}
 \end{figure*}
@@ -668,7 +671,7 @@ This appendix presents supporting analyses of pruning structure, temporal stabil
 \subsection{Scope of the L2 pruning criterion}\label{app:pruning_criterion_scope}
 \begin{figure*}[!ht]
     \centering
-    \includegraphics[width=\textwidth]{figures/Review_1_Additional/rev_8_pruning_criterion_scope.png}
+    \includegraphics[width=\textwidth]{figures/Review_1_Additional/Figure_22_Pruning_Criterion_Scope.png}
     \caption{Scope of the structured pruning criterion. (a) Normalised L2 saliency ranks for the SOC and SOH Base hidden units. The lowest 30~\% define the task-specific removal sets. (b) The implemented path aggregates row-wise L2 norms across all four gates and removes complete recurrent units together with associated recurrent columns and MLP inputs. The comparison makes the reproducibility and dense-kernel benefit of the L2 criterion explicit and provides a reference for future comparisons with gradient- and activation-based rankings.}
     \label{fig:app_pruning_criterion_scope}
 \end{figure*}
@@ -677,7 +680,7 @@ This appendix presents supporting analyses of pruning structure, temporal stabil
 \subsection{Verified mixed-precision boundary}\label{app:mixed_precision}
 \begin{figure*}[!ht]
     \centering
-    \includegraphics[width=\textwidth]{figures/Review_1_Additional/rev_9_mixed_precision_quantization.png}
+    \includegraphics[width=\textwidth]{figures/Review_1_Additional/Figure_23_Mixed_Precision_Quantization.png}
     \caption{Verified precision path and raw model-constant composition. (a) Only recurrent input-to-hidden and hidden-to-hidden matrices are stored as INT8. Per-row scales, biases, gate activations, hidden/cell states, the MLP, and the estimator output remain FP32. (b,c) Analytical model constants for SOC and SOH Base and Quantized variants. The comparison shows how concentrating quantization on the dominant recurrent matrices reduces persistent model storage and where activation and state quantization could provide additional runtime savings.}
     \label{fig:app_mixed_precision}
 \end{figure*}
@@ -686,7 +689,7 @@ This appendix presents supporting analyses of pruning structure, temporal stabil
 \subsection{Static quantized-runtime accounting}\label{app:quant_runtime}
 \begin{figure*}[!ht]
     \centering
-    \includegraphics[width=\textwidth]{figures/Review_1_Additional/rev_10_quantized_runtime_accounting.png}
+    \includegraphics[width=\textwidth]{figures/Review_1_Additional/Figure_24_Quantized_Runtime_Accounting.png}
     \caption{Static source-level operation accounting beside measured STM32H753ZI kernel time. Panels (a,c) show model MACs and the additional FP32 row-scale multiplications implied by the current per-weight C expressions. Panels (b,d) show DWT measurements averaged over 10,000 streaming inferences. Their comparison reveals where analytical operation counts explain the timing trend and where conversion, indexing, loop, load/store, nonlinear-function, compiler, and memory-system effects create additional optimisation opportunities.}
     \label{fig:app_quant_runtime}
 \end{figure*}

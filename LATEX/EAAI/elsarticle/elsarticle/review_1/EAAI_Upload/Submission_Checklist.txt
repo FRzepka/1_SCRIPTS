@@ -1,18 +1,20 @@
-SUBMISSION CHECKLIST
+﻿SUBMISSION CHECKLIST
 ====================
 
 [x] Title & Author Information
     - Full names: Florian Rzepka, Julia Kowal
-    - Affiliation: Technische Universit�t Berlin (Chair of Electrical Energy Storage Technology)
+    - Affiliation: Technische Universität Berlin (Chair of Electrical Energy Storage Technology)
     - Corresponding author details included in Title Page.
 
 [x] Files for Upload
-    - Manuscript_Blind.pdf (Anonymized, includes Data Availability & AI Declaration)
-    - Manuscript_Full.pdf (For reference/preprint)
-    - Title_Page.pdf (With Author Details, Acknowledgements, CRediT, Competing Interest)
-    - Cover_Letter.pdf
+    - Response_to_Reviewers.pdf (Point-by-point response to Reviewers 1--4)
+    - Manuscript_Blind.pdf (Revised, anonymized, line-numbered manuscript)
+    - Embedded_Ai_Manuscript_Anonymized.tex (Main LaTeX source file)
+    - LaTeX_Source.zip (Complete source package with bibliography and figures)
+    - Title_Page.pdf (Author details, acknowledgements, CRediT, competing interest)
+    - Cover_Letter.pdf (Revision cover letter)
     - Highlights.pdf (Created)
-    - Figures/ (15 files)
+    - Figures/ (24 files, Figure_1 through Figure_24)
 
 [ ] Graphical Abstract
     - Encouraged but not mandatory. Please check if you have a specific image for this.
@@ -29,5 +31,6 @@ SUBMISSION CHECKLIST
     - CRediT: In Title Page and Full Manuscript.
 
 [x] Formatting
-    - Single column (Word) or Double column (LaTeX) -> LaTeX Double Column used (Allowed).
+    - Single-column Elsevier review layout used.
     - Line numbering -> Included in Blind Manuscript.
+

@@ -1,0 +1,209 @@
+{
+  "created": "2026-07-20T12:48:13",
+  "data": "C:\\Users\\flori\\SynologyDrive\\TUB\\3_Projekte\\MG_Farm\\5_Data\\01_LFP\\00_Data\\Versuch_18650_standart\\MGFarm_18650_FE\\df_FE_C07.parquet",
+  "samples_loaded": 8000,
+  "warmup_minimum_samples": 2048,
+  "trials": 30,
+  "recovery_horizon_seconds": 60,
+  "fault": {
+    "type": "single-sample FP32 input-buffer bitflip",
+    "bit": 22,
+    "bit_class": "mantissa",
+    "features": [
+      "Voltage[V]",
+      "Current[A]",
+      "Temperature[\u00b0C]"
+    ]
+  },
+  "models": [
+    {
+      "task": "SOC",
+      "name": "Base",
+      "hidden_size": 64,
+      "source": "C:\\Users\\flori\\SynologyDrive\\TUB\\1_Dissertation\\1_Scripts\\DL_Models\\LFP_LSTM_MLP\\2_models\\base\\soc_1.5.0.0_base\\c_implementation\\lstm_model.c"
+    },
+    {
+      "task": "SOC",
+      "name": "Pruned",
+      "hidden_size": 45,
+      "source": "C:\\Users\\flori\\SynologyDrive\\TUB\\1_Dissertation\\1_Scripts\\DL_Models\\LFP_LSTM_MLP\\2_models\\pruned\\soc_1.5.0.0_pruned\\prune_30pct_20250916_140404\\c_implementation\\lstm_model.c"
+    },
+    {
+      "task": "SOC",
+      "name": "Quantized",
+      "hidden_size": 64,
+      "source": "C:\\Users\\flori\\SynologyDrive\\TUB\\1_Dissertation\\1_Scripts\\DL_Models\\LFP_LSTM_MLP\\2_models\\quantized\\soc_1.5.0.0_quantized\\lstm_model_lstm_int8_fp32mlp.c"
+    },
+    {
+      "task": "SOH",
+      "name": "Base",
+      "hidden_size": 128,
+      "source": "C:\\Users\\flori\\SynologyDrive\\TUB\\1_Dissertation\\1_Scripts\\DL_Models\\LFP_LSTM_MLP\\2_models\\base\\soh_2.1.0.0_base\\c_implementation\\lstm_model_soh.c"
+    },
+    {
+      "task": "SOH",
+      "name": "Pruned",
+      "hidden_size": 90,
+      "source": "C:\\Users\\flori\\SynologyDrive\\TUB\\1_Dissertation\\1_Scripts\\DL_Models\\LFP_LSTM_MLP\\2_models\\pruned\\soh_2.1.0.0\\prune_30pct_20251122_010142\\c_implementation\\lstm_model_soh.c"
+    },
+    {
+      "task": "SOH",
+      "name": "Quantized",
+      "hidden_size": 128,
+      "source": "C:\\Users\\flori\\SynologyDrive\\TUB\\1_Dissertation\\1_Scripts\\DL_Models\\LFP_LSTM_MLP\\2_models\\quantized\\soh_2.1.0.0_quantized\\c_implementation\\lstm_model_soh_int8.c"
+    }
+  ],
+  "trial_plan": [
+    {
+      "trial_id": 1,
+      "position": 2048,
+      "feature": "Voltage[V]"
+    },
+    {
+      "trial_id": 2,
+      "position": 2251,
+      "feature": "Current[A]"
+    },
+    {
+      "trial_id": 3,
+      "position": 2454,
+      "feature": "Temperature[\u00b0C]"
+    },
+    {
+      "trial_id": 4,
+      "position": 2657,
+      "feature": "Voltage[V]"
+    },
+    {
+      "trial_id": 5,
+      "position": 2860,
+      "feature": "Current[A]"
+    },
+    {
+      "trial_id": 6,
+      "position": 3063,
+      "feature": "Temperature[\u00b0C]"
+    },
+    {
+      "trial_id": 7,
+      "position": 3266,
+      "feature": "Voltage[V]"
+    },
+    {
+      "trial_id": 8,
+      "position": 3469,
+      "feature": "Current[A]"
+    },
+    {
+      "trial_id": 9,
+      "position": 3673,
+      "feature": "Temperature[\u00b0C]"
+    },
+    {
+      "trial_id": 10,
+      "position": 3876,
+      "feature": "Voltage[V]"
+    },
+    {
+      "trial_id": 11,
+      "position": 4079,
+      "feature": "Current[A]"
+    },
+    {
+      "trial_id": 12,
+      "position": 4282,
+      "feature": "Temperature[\u00b0C]"
+    },
+    {
+      "trial_id": 13,
+      "position": 4485,
+      "feature": "Voltage[V]"
+    },
+    {
+      "trial_id": 14,
+      "position": 4688,
+      "feature": "Current[A]"
+    },
+    {
+      "trial_id": 15,
+      "position": 4891,
+      "feature": "Temperature[\u00b0C]"
+    },
+    {
+      "trial_id": 16,
+      "position": 5095,
+      "feature": "Voltage[V]"
+    },
+    {
+      "trial_id": 17,
+      "position": 5298,
+      "feature": "Current[A]"
+    },
+    {
+      "trial_id": 18,
+      "position": 5501,
+      "feature": "Temperature[\u00b0C]"
+    },
+    {
+      "trial_id": 19,
+      "position": 5704,
+      "feature": "Voltage[V]"
+    },
+    {
+      "trial_id": 20,
+      "position": 5907,
+      "feature": "Current[A]"
+    },
+    {
+      "trial_id": 21,
+      "position": 6110,
+      "feature": "Temperature[\u00b0C]"
+    },
+    {
+      "trial_id": 22,
+      "position": 6313,
+      "feature": "Voltage[V]"
+    },
+    {
+      "trial_id": 23,
+      "position": 6517,
+      "feature": "Current[A]"
+    },
+    {
+      "trial_id": 24,
+      "position": 6720,
+      "feature": "Temperature[\u00b0C]"
+    },
+    {
+      "trial_id": 25,
+      "position": 6923,
+      "feature": "Voltage[V]"
+    },
+    {
+      "trial_id": 26,
+      "position": 7126,
+      "feature": "Current[A]"
+    },
+    {
+      "trial_id": 27,
+      "position": 7329,
+      "feature": "Temperature[\u00b0C]"
+    },
+    {
+      "trial_id": 28,
+      "position": 7532,
+      "feature": "Voltage[V]"
+    },
+    {
+      "trial_id": 29,
+      "position": 7735,
+      "feature": "Current[A]"
+    },
+    {
+      "trial_id": 30,
+      "position": 7939,
+      "feature": "Temperature[\u00b0C]"
+    }
+  ],
+  "recovery_definition": "First time after the peak at which disturbed-clean absolute deviation stays below max(10% of peak, 0.0001 pp) for five samples."
+}

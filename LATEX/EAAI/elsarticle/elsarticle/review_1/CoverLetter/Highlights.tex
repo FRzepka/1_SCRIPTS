@@ -7,11 +7,11 @@
 \section*{Highlights}
 
 \begin{itemize}
-    \item Pruning and quantization enable energy- and resource-efficient AI on BMS hardware.
-    \item Complex SOC and SOH models run autonomously on-device without external computing.
-    \item Pruning reduces Flash usage and energy by 40\% with negligible accuracy loss.
-    \item Quantization halves the memory footprint while maintaining high estimation accuracy.
-    \item The framework enables decentralized, real-time battery diagnostics on the edge.
+    \item Stateful neural battery-state estimators run on an STM32H753ZI microcontroller.
+    \item Thirty percent pruning cuts flash by 41--46\% and inference time by 43--44\%.
+    \item Weight quantization cuts flash by 50--59\% but increases mixed-precision runtime.
+    \item Long-horizon replay shows no quantization-specific accumulation of deviation.
+    \item Transient input faults reveal model-specific recurrent recovery behaviour.
 \end{itemize}
 
 \end{document}

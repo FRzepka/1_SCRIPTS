@@ -204,7 +204,7 @@ Do not silently replace them with stronger claims unless new evidence is found.
 
 ### Reviewer 3 figure candidates generated on 14 July 2026
 
-- `rev_6_model_complexity_scaling.png` addresses Reviewer 3.1 with analytical MAC
+- `Figure_21_Model_Complexity_Scaling.png` addresses Reviewer 3.1 with analytical MAC
   scaling over hidden size. The highlighted points identify the implemented
   64-to-45 SOC and 128-to-90 SOH architecture changes and report only their
   analytical MAC reductions. Measured flash, runtime, and energy-proxy values remain
@@ -213,13 +213,13 @@ Do not silently replace them with stronger claims unless new evidence is found.
 - `rev_7_derivative_deployment_boundary.png` was generated as an internal reasoning
   aid for Reviewer 3.2, but the final decision is not to include it in the manuscript
   or appendix. The point is clearer as a corrected equation plus bounded prose.
-- `rev_8_pruning_criterion_scope.png` addresses Reviewer 3.3 and supports Reviewer
+- `Figure_22_Pruning_Criterion_Scope.png` addresses Reviewer 3.3 and supports Reviewer
   3.5. It combines cross-task L2 rankings with a method-property rationale. It is
   not an experimental comparison against gradient- or activation-based pruning.
-- `rev_9_mixed_precision_quantization.png` addresses Reviewer 3.4 by showing the
+- `Figure_23_Mixed_Precision_Quantization.png` addresses Reviewer 3.4 by showing the
   exact INT8/FP32 boundary and persistent storage composition. Transient activation
   buffers remain FP32 but were not separately profiled.
-- `rev_10_quantized_runtime_accounting.png` addresses Reviewer 3.6 by placing static
+- `Figure_24_Quantized_Runtime_Accounting.png` addresses Reviewer 3.6 by placing static
   MAC and FP32 scale-multiplication counts beside measured kernel times. It supports
   a code-based explanation but is not cycle-level or memory-bandwidth profiling.
 - No new figure was generated for a random-seed or cross-validation study in
@@ -228,9 +228,9 @@ Do not silently replace them with stronger claims unless new evidence is found.
 
 ### Reviewer 3 discussion decisions recorded on 14 July 2026
 
-**Reviewer 3.1 and final `rev_6` interpretation**
+**Reviewer 3.1 and final Figure A.21 interpretation**
 
-- The final `rev_6_model_complexity_scaling.png` layout uses three wide panels stacked
+- The final `Figure_21_Model_Complexity_Scaling.png` layout uses three wide panels stacked
   vertically. Panels (a) and (b) retain the accepted model-size and evaluated 30%
   operating-point views. Panel (c) adds the general pruning-fraction limit.
 - Panel (a) reports architecture-level MAC counts only. For input size `D=6`, hidden
@@ -301,20 +301,20 @@ Do not silently replace them with stronger claims unless new evidence is found.
 
 **Remaining Reviewer 3 boundaries**
 
-- `rev_8` may justify why gate-group L2 ranking is simple, structured, and directly
+- Figure A.22 may justify why gate-group L2 ranking is simple, structured, and directly
   compatible with dense dimension reduction, but it must not be described as an
   experimental comparison with gradient- or activation-based criteria.
-- `rev_9` must call the implementation weight-only mixed precision: recurrent weights
+- Figure A.23 must call the implementation weight-only mixed precision: recurrent weights
   are INT8 with FP32 scales, while biases, states, activations, and MLP computation
   remain FP32. Activation quantisation was not evaluated.
-- `rev_10` may connect the quantised runtime increase to explicit per-weight FP32
+- Figure A.24 may connect the quantised runtime increase to explicit per-weight FP32
   scale multiplications and dequantisation work. It cannot provide cycle attribution,
   memory-bandwidth use, or operator-level hardware profiling that was not measured.
 - For Reviewer 3.5, report the lower SOC Pruned MAE only as a checkpoint- and split-
   specific observation. Do not retain the unsupported causal `regularisation effect`
   explanation and do not imply repeated-seed or cross-validation evidence.
 
-**Reviewer 3.4 and `rev_9` verification**
+**Reviewer 3.4 and Figure A.23 verification**
 
 - The evaluated quantized deployment is now verified from the final model packages,
   STM32 source selected by `main.c`, and the linked map sections for both tasks.
@@ -344,21 +344,21 @@ Do not silently replace them with stronger claims unless new evidence is found.
   and 335.0/138.0 KiB for SOH Base/Quantized. These values are computed from recurrent
   weights, LSTM bias/scales, and MLP parameters only.
 - Hidden/cell states and transient activations are runtime RAM and must not be stacked
-  into those model-constant bars. This was corrected in `rev_9`.
+  into those model-constant bars. This was corrected in Figure A.23.
 - The analytical totals are not the complete linked-firmware Flash values. The measured
   map-derived firmware values remain 105.32/52.48 KiB for SOC and 335.00/138.00 KiB
   for SOH. The matching SOH pairs are coincidental at the displayed precision.
-- `rev_9` now uses `model constants` rather than `persistent storage`. Panel (a)
+- Figure A.23 now uses `model constants` rather than `persistent storage`. Panel (a)
   contains only the verified precision path; the complete explanatory block below
   that path was removed at the author's request. Limitations and interpretation
   belong in the future caption or manuscript text, not inside the graphic.
 
-**Reviewer 3.6 and `rev_10` assessment**
+**Reviewer 3.6 and Figure A.24 assessment**
 
 - Reviewer 3.6 asks why the quantized implementation is slower despite its smaller
   weight storage. In particular, the reviewer suggests operation-level cycle counts,
   memory-bandwidth analysis, and a discussion of implementation optimizations.
-- `rev_10` combines two different evidence types that must remain explicitly
+- Figure A.24 combines two different evidence types that must remain explicitly
   distinguished: static operation counts derived from the architecture and C source,
   and already available total STM32 kernel-time measurements.
 - The Base and Quantized models have the same topology and therefore the same model
@@ -402,14 +402,14 @@ Do not silently replace them with stronger claims unless new evidence is found.
   kernel saves Flash but does not provide a native integer compute path: INT8 weights
   are converted into FP32 arithmetic and repeatedly combined with FP32 scales. This
   code structure is consistent with additional runtime overhead.
-- `rev_10` does not measure cycles for individual operations, cast costs, Flash/cache
+- Figure A.24 does not measure cycles for individual operations, cast costs, Flash/cache
   traffic, memory bandwidth, or compiler effects. Do not describe it as hardware
   profiling and do not attribute a measured percentage of the delay to any one cause.
 - Potential optimizations belong in the discussion: move each row scale outside the
   innermost accumulation where mathematically valid, use optimized dot-product or
   integer kernels, fuse scale/bias work, and evaluate a complete activation-quantized
   path. These were not evaluated and must be presented as future work.
-- Current recommendation: `rev_10` is optional rather than essential. The measured
+- Current recommendation: Figure A.24 is optional rather than essential. The measured
   times already appear in the main results, while the new contribution is the static
   source-level accounting. A compact appendix table plus precise manuscript text may
   answer the point more clearly than a four-panel figure. Keep the figure only if its
@@ -453,7 +453,7 @@ Do not silently replace them with stronger claims unless new evidence is found.
 
 **3.1 Model complexity and hardware transferability**
 
-- [x] `rev_6_model_complexity_scaling.png` now includes the general pruning-fraction
+- [x] `Figure_21_Model_Complexity_Scaling.png` now includes the general pruning-fraction
   limit `2p-p^2`, example limits from 10% to 50%, and the highlighted evaluated
   `p=0.30` point.
 - [x] Add text deriving the general analytical hidden-size scaling, the implemented
@@ -480,7 +480,7 @@ Do not silently replace them with stronger claims unless new evidence is found.
 
 **3.3 L2 pruning criterion**
 
-- [x] `rev_8_pruning_criterion_scope.png` and the verified saliency definition are
+- [x] `Figure_22_Pruning_Criterion_Scope.png` and the verified saliency definition are
   accepted.
 - [x] The current method already explains the structured L2 criterion, but add an
   explicit sentence contrasting it with gradient- and activation-based sensitivity:
@@ -493,7 +493,7 @@ Do not silently replace them with stronger claims unless new evidence is found.
 
 **3.4 Weight-only mixed-precision quantization**
 
-- [x] `rev_9_mixed_precision_quantization.png` was corrected against the called SOC
+- [x] `Figure_23_Mixed_Precision_Quantization.png` was corrected against the called SOC
   and SOH kernels, exported headers, and linker maps. Its panel (a) contains only the
   precision path.
 - [x] Keep the verified scope in the method: only recurrent `W_ih` and `W_hh` are
@@ -518,7 +518,7 @@ Do not silently replace them with stronger claims unless new evidence is found.
 
 **3.6 Quantized runtime increase**
 
-- [x] `rev_10_quantized_runtime_accounting.png`, its MAC formula, additional scale
+- [x] `Figure_24_Quantized_Runtime_Accounting.png`, its MAC formula, additional scale
   counts, measured DWT times, and the static-versus-measured interpretation have been
   discussed and accepted as useful evidence.
 - [x] Expand the current discussion beyond `consistent with the observed timing
@@ -692,7 +692,7 @@ Do not silently replace them with stronger claims unless new evidence is found.
   benchmark folder. Progress, elapsed time, and ETA are printed during execution.
 - [x] Final numerical run:
   `results/BITFLIP_INPUT_20260720_124813/`.
-- [x] Figure A.20 is replaced by `rev_5_limited_fault_sensitivity.png`. Panels (a) and
+- [x] Figure A.20 is stored as `Figure_20_Limited_Fault_Sensitivity.png`. Panels (a) and
   (b) show representative SOC and SOH propagation, panel (c) shows median and P95 peak,
   and panel (d) shows recovery within 60 s.
 - [x] The manuscript now defines the stateful protocol, disturbed-clean response,

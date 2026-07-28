@@ -24,7 +24,7 @@ if (-not $OutputPath) {
     $Workspace = (Resolve-Path (Join-Path $BenchmarkRoot '../../../../..')).Path
     $OutputPath = Join-Path $Workspace (
         'LATEX/EAAI/elsarticle/elsarticle/review_1/figures/' +
-        'Review_1_Additional/rev_5_limited_fault_sensitivity.png'
+        'Review_1_Additional/Figure_20_Limited_Fault_Sensitivity.png'
     )
 }
 $OutputParent = Split-Path -Parent $OutputPath
@@ -48,6 +48,7 @@ $QuantColor = '#1F77B4'
 $GridColor = '#D9DEE1'
 $AxisColor = '#4E5960'
 $TextColor = '#172026'
+$FigureFontScale = 1.60
 $ModelColors = @{Base=$BaseColor; Pruned=$PrunedColor; Quantized=$QuantColor}
 $ModelFills = @{Base='#A6D7A6'; Pruned='#EEA4A5'; Quantized='#A1C6E0'}
 
@@ -61,7 +62,7 @@ function D([object]$Value) {
 
 function Font([float]$Size, [bool]$Bold=$false) {
     $Style = if ($Bold) { [System.Drawing.FontStyle]::Bold } else { [System.Drawing.FontStyle]::Regular }
-    return New-Object System.Drawing.Font('Arial', $Size, $Style)
+    return New-Object System.Drawing.Font('Arial', ($Size * $FigureFontScale), $Style)
 }
 
 function Add-Area(
@@ -150,7 +151,8 @@ function Add-CustomXLabels($Area, [object[]]$Rows) {
     $Area.AxisX.CustomLabels.Clear()
     for ($Index = 0; $Index -lt $Rows.Count; $Index++) {
         $X = $Index + 1
-        $Text = "$($Rows[$Index].task)`n$($Rows[$Index].model)"
+        $ModelLabel = if ($Rows[$Index].model -eq 'Quantized') { 'Quant.' } else { $Rows[$Index].model }
+        $Text = "$($Rows[$Index].task)`n$ModelLabel"
         [void]$Area.AxisX.CustomLabels.Add($X - 0.48, $X + 0.48, $Text)
     }
 }
@@ -162,15 +164,15 @@ $Chart.BackColor = [System.Drawing.Color]::White
 $Chart.AntiAliasing = 'All'
 $Chart.TextAntiAliasingQuality = 'High'
 
-$SocArea = Add-Area $Chart 'SOCTrace' 5 5 42 39 'Time after fault [s]' '|disturbed - clean| [percentage points]'
-$SohArea = Add-Area $Chart 'SOHTrace' 54 5 42 39 'Time after fault [s]' '|disturbed - clean| [percentage points]'
-$PeakArea = Add-Area $Chart 'Peak' 5 55 42 37 '' 'Peak deviation [percentage points]'
-$RecoveryArea = Add-Area $Chart 'Recovery' 54 55 42 37 '' 'Recovered within 60 s [% of trials]'
+$SocArea = Add-Area $Chart 'SOCTrace' 5 5 42 39 'Time after fault [s]' 'Absolute deviation [pp]'
+$SohArea = Add-Area $Chart 'SOHTrace' 54 5 42 39 'Time after fault [s]' 'Absolute deviation [pp]'
+$PeakArea = Add-Area $Chart 'Peak' 5 55 42 37 '' 'Peak deviation [pp]'
+$RecoveryArea = Add-Area $Chart 'Recovery' 54 55 42 37 '' 'Recovery within 60 s [%]'
 
-Add-PanelTitle $Chart 'SOCTrace' '(a) SOC response to one voltage-input bitflip'
-Add-PanelTitle $Chart 'SOHTrace' '(b) SOH response to one voltage-input bitflip'
-Add-PanelTitle $Chart 'Peak' '(c) Peak response over 30 input bitflips: median and P95'
-Add-PanelTitle $Chart 'Recovery' '(d) Recovery over 30 input bitflips'
+Add-PanelTitle $Chart 'SOCTrace' '(a)'
+Add-PanelTitle $Chart 'SOHTrace' '(b)'
+Add-PanelTitle $Chart 'Peak' '(c)'
+Add-PanelTitle $Chart 'Recovery' '(d)'
 
 Add-TraceLines $Chart 'SOCTrace' 'SOC'
 Add-TraceLines $Chart 'SOHTrace' 'SOH'

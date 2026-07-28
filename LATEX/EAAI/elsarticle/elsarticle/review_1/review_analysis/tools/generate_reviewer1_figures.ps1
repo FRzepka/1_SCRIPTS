@@ -24,6 +24,7 @@ $PurpleColor = '#9467BD'
 $GrayColor = '#67727A'
 $LightGray = '#D8DEE2'
 $BlackColor = '#222222'
+$FigureFontScale = 1.60
 $ModelColors = @{ Base=$BaseColor; Pruned=$PrunedColor; Quantized=$QuantColor }
 $FillColors = @{
     Base='#A6D7A6'; Pruned='#EEA4A5'; Quantized='#A1C6E0';
@@ -40,7 +41,7 @@ function D([object]$value) {
 
 function Font([float]$size, [bool]$bold=$false) {
     $style = if ($bold) { [System.Drawing.FontStyle]::Bold } else { [System.Drawing.FontStyle]::Regular }
-    return New-Object System.Drawing.Font('Arial', $size, $style)
+    return New-Object System.Drawing.Font('Arial', ($size * $FigureFontScale), $style)
 }
 
 function New-Figure([string]$title, [int]$width=2200, [int]$height=1450, [string]$subtitle='') {
@@ -199,7 +200,7 @@ function Save-Figure($chart, [string]$name) {
     Write-Host "Saved $path"
 }
 
-# rev_1: SOC pruning evidence
+# Figure A.16: SOC pruning evidence
 $saliency = Import-Csv (Join-Path $ResultsRoot 'weights\lstm_unit_saliency.csv') |
     Where-Object Task -eq 'SOC' | Sort-Object { [int]$_.RankAscending }
 $weights = Import-Csv (Join-Path $ResultsRoot 'weights\lstm_weight_histograms.csv') |
@@ -208,8 +209,8 @@ $weights = Import-Csv (Join-Path $ResultsRoot 'weights\lstm_weight_histograms.cs
 $chart = New-Figure 'Structured SOC pruning diagnostics'
 $left = Add-Area $chart 'Saliency' 6 5 43 88 'Unit rank (ascending saliency)' 'L2 saliency score'
 $right = Add-Area $chart 'Weights' 54 5 43 88 'Recurrent-weight value' 'Density'
-Add-PanelTitle $chart 'Saliency' '(a) Unit saliency before one-shot pruning'
-Add-PanelTitle $chart 'Weights' '(b) Central recurrent-weight distribution'
+Add-PanelTitle $chart 'Saliency' '(a)'
+Add-PanelTitle $chart 'Weights' '(b)'
 $salSeries = New-Object System.Windows.Forms.DataVisualization.Charting.Series 'Saliency'
 $salSeries.ChartArea = 'Saliency'; $salSeries.ChartType = 'Column'; $salSeries.IsVisibleInLegend = $false
 $salSeries['PointWidth'] = '0.78'
@@ -233,15 +234,15 @@ Add-CustomLegendItem $legendA 'Retained units (45)' $FillColors.Retained $Pruned
 $legendB = Add-AreaLegend $chart 'WeightLegend' 'Weights' 'Far'
 Add-CustomLineLegendItem $legendB 'Base weights' $BaseColor
 Add-CustomLineLegendItem $legendB 'Pruned weights' $PrunedColor
-Save-Figure $chart 'rev_1_pruning_evidence.png'
+Save-Figure $chart 'Figure_16_Pruning_Evidence.png'
 
-# rev_2: long-horizon stability
+# Figure A.17: long-horizon stability
 $chart = New-Figure 'Long-horizon stability of compressed estimators'
 $positions = @(
-    @('SocMae',5,4,43,41,'Sequence segment','MAE [% of full scale]','(a) SOC error by sequence segment'),
-    @('SocDev',53,4,43,41,'Sequence segment','Deviation from Base [percentage points]','(b) SOC compressed-to-Base deviation'),
-    @('SohMae',5,50,43,41,'Sequence segment','MAE [% of full scale]','(c) SOH error by sequence segment'),
-    @('SohDev',53,50,43,41,'Sequence segment','Deviation from Base [percentage points]','(d) SOH compressed-to-Base deviation')
+    @('SocMae',5,4,43,41,'Sequence segment','MAE [pp]','(a)'),
+    @('SocDev',53,4,43,41,'Sequence segment','Deviation from Base [pp]','(b)'),
+    @('SohMae',5,50,43,41,'Sequence segment','MAE [pp]','(c)'),
+    @('SohDev',53,50,43,41,'Sequence segment','Deviation from Base [pp]','(d)')
 )
 foreach ($p in $positions) {
     $a = Add-Area $chart $p[0] $p[1] $p[2] $p[3] $p[4] $p[5] $p[6]
@@ -264,9 +265,9 @@ foreach ($task in @('soc','soh')) {
 }
 $legend = Add-Legend $chart
 foreach ($model in @('Base','Pruned','Quantized')) { Add-CustomLineLegendItem $legend $model $ModelColors[$model] }
-Save-Figure $chart 'rev_2_long_horizon_stability.png'
+Save-Figure $chart 'Figure_17_Long_Horizon_Stability.png'
 
-# rev_3: verified sequential SOH filter pipeline
+# Figure A.18: verified sequential SOH filter pipeline
 $trajectoryPath = Join-Path $ResultsRoot 'filter\soh_filter_compression_local_trajectory.csv'
 $metricPath = Join-Path $ResultsRoot 'filter\soh_filter_compression_local_windows.csv'
 $trajectory = Import-Csv $trajectoryPath
@@ -276,9 +277,9 @@ if (-not ($trajectory[0].PSObject.Properties.Name -contains 'BaseSequential')) {
 }
 $chart = New-Figure 'SOH filtering and compression interaction' 2200 1500 'Local C re-execution; EMA-only response at 1 Hz: T90 = 114 s (alpha=0.02) and 26.65 d (alpha=1e-6)'
 $filterPanels = @(
-    @('Raw',5,4,43,39,'Raw','(a) First-point calibration only'),
-    @('Stage1',53,4,43,39,'Benchmark','(b) Stage 1: alpha=0.02 + symmetric limiter'),
-    @('Final',5,50,43,39,'Sequential','(c) Final: Stage 1 + alpha=1e-6 + downward limiter')
+    @('Raw',5,4,43,39,'Raw','(a)'),
+    @('Stage1',53,4,43,39,'Benchmark','(b)'),
+    @('Final',5,50,43,39,'Sequential','(c)')
 )
 foreach ($p in $filterPanels) {
     $a = Add-Area $chart $p[0] $p[1] $p[2] $p[3] $p[4] 'Sequence progress [%]' 'SOH [-]'
@@ -290,9 +291,9 @@ foreach ($p in $filterPanels) {
         Add-Line $chart $p[0] $model $ModelColors[$model] $trajectory 'ProgressPercent' "$model$($p[5])" $false 'Solid' $false 3
     }
 }
-$barArea = Add-Area $chart 'FilterMae' 53 50 43 39 '' 'MAE [% of full scale]'
+$barArea = Add-Area $chart 'FilterMae' 53 50 43 39 '' 'MAE [pp]'
 $barArea.AxisX.Interval = 1
-Add-PanelTitle $chart 'FilterMae' '(d) Accuracy after each processing stage'
+Add-PanelTitle $chart 'FilterMae' '(d)'
 $barRows = @()
 $filterMap = [ordered]@{
     'Raw'='Raw_first-point-scaled'
@@ -309,18 +310,18 @@ Add-GroupedBars $chart 'FilterMae' $barRows 'Stage' 'Model' 'Value' $ModelColors
 $legend = Add-Legend $chart
 Add-CustomLineLegendItem $legend 'Reference' $BlackColor
 foreach ($model in @('Base','Pruned','Quantized')) { Add-CustomLineLegendItem $legend $model $ModelColors[$model] }
-Save-Figure $chart 'rev_3_soh_filter_pipeline.png'
+Save-Figure $chart 'Figure_18_SOH_Filter_Pipeline.png'
 
-# rev_4: utility sensitivity
+# Figure A.19: utility sensitivity
 $sweep = Import-Csv (Join-Path $ResultsRoot 'utility\utility_priority_sweep.csv')
 $ranking = Import-Csv (Join-Path $ResultsRoot 'utility\utility_ranking_summary.csv')
 $chart = New-Figure 'Utility-ranking sensitivity to application priorities' 2200 1500 'At 25%, all four objectives are weighted equally; the remaining weight is shared equally among the other objectives'
-$socArea = Add-Area $chart 'UtilitySOC' 5 4 43 37 'Weight of highlighted objective [%]' ''
-$sohArea = Add-Area $chart 'UtilitySOH' 53 4 43 37 'Weight of highlighted objective [%]' ''
-$rankArea = Add-Area $chart 'UtilityRank' 18 51 64 36 '' 'Weight combinations ranked best [%]'
-Add-PanelTitle $chart 'UtilitySOC' '(a) SOC winning model in focused-priority sweeps'
-Add-PanelTitle $chart 'UtilitySOH' '(b) SOH winning model in focused-priority sweeps'
-Add-PanelTitle $chart 'UtilityRank' '(c) Ranking across all 1,771 weight combinations'
+$socArea = Add-Area $chart 'UtilitySOC' 5 8 43 34 'Weight of highlighted objective [%]' ''
+$sohArea = Add-Area $chart 'UtilitySOH' 53 8 43 34 'Weight of highlighted objective [%]' ''
+$rankArea = Add-Area $chart 'UtilityRank' 18 54 64 33 '' 'Winning combinations [%]'
+Add-PanelTitle $chart 'UtilitySOC' '(a)'
+Add-PanelTitle $chart 'UtilitySOH' '(b)'
+Add-PanelTitle $chart 'UtilityRank' '(c)'
 $metricY = @{ Accuracy=4; Flash=3; RAM=2; Energy=1 }
 foreach ($task in @('SOC','SOH')) {
     $areaName = if ($task -eq 'SOC') { 'UtilitySOC' } else { 'UtilitySOH' }
@@ -354,15 +355,15 @@ Add-GroupedBars $chart 'UtilityRank' $rankingRows 'Task' 'Model' 'Value' $ModelC
 $rankArea.AxisX.Interval = 1; $rankArea.AxisY.Minimum = 0; $rankArea.AxisY.Maximum = 100; $rankArea.AxisY.Interval = 20
 $legend = Add-Legend $chart
 foreach ($model in @('Base','Pruned','Quantized')) { Add-CustomLegendItem $legend $model $FillColors[$model] $ModelColors[$model] }
-Save-Figure $chart 'rev_4_utility_sensitivity.png'
+Save-Figure $chart 'Figure_19_Utility_Sensitivity.png'
 
-# rev_5: transient input-buffer bitflip and recurrent recovery
+# Figure A.20: transient input-buffer bitflip and recurrent recovery
 $Workspace = (Resolve-Path (Join-Path $ReviewRoot '..\..\..\..\..')).Path
 $FaultFigureScript = Join-Path $Workspace (
     'DL_Models\LFP_LSTM_MLP\5_benchmark\PC\input_bitflip_recovery\' +
     'generate_review_figure.ps1'
 )
-$FaultFigureOutput = Join-Path $FiguresRoot 'rev_5_limited_fault_sensitivity.png'
+$FaultFigureOutput = Join-Path $FiguresRoot 'Figure_20_Limited_Fault_Sensitivity.png'
 & $FaultFigureScript -OutputPath $FaultFigureOutput
 
 Write-Host 'Reviewer 1 figures completed.'
