@@ -8,11 +8,13 @@ blue-to-red map whose extrema remain visible.
 
 from __future__ import annotations
 
+import csv
 from pathlib import Path
 
 import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.colors import SymLogNorm
 from PIL import Image
 
 
@@ -31,32 +33,26 @@ RED = np.array(mcolors.to_rgb("#d62728"))
 BLUE = np.array(mcolors.to_rgb("#1f77b4"))
 
 
+def direct_blue_red_colormap() -> mcolors.LinearSegmentedColormap:
+    """Interpolate directly between the EAAI blue and red in sRGB."""
+
+    return mcolors.LinearSegmentedColormap.from_list(
+        "direct_srgb_blue_red",
+        ["#1f77b4", "#d62728"],
+    )
+
+
 def red_blue_colors(values: np.ndarray) -> np.ndarray:
-    """Map normalized values continuously from blue through light gray to red."""
+    """Map normalized values directly from blue to red in sRGB."""
 
     values = np.clip(np.asarray(values, dtype=float), 0.0, 1.0)
-    colormap = mcolors.LinearSegmentedColormap.from_list(
-        "continuous_blue_red",
-        [
-            (0.00, BLUE),
-            (0.50, "#f2f2f2"),
-            (1.00, RED),
-        ],
-    )
-    return colormap(values)[..., :3]
+    return direct_blue_red_colormap()(values)[..., :3]
 
 
 def correlation_colormap() -> mcolors.LinearSegmentedColormap:
-    """Encode correlation magnitude from white at zero to red at both extrema."""
+    """Map negative correlations to blue and positive correlations to red."""
 
-    return mcolors.LinearSegmentedColormap.from_list(
-        "correlation_white_red",
-        [
-            (0.00, "#d62728"),
-            (0.50, "#ffffff"),
-            (1.00, "#d62728"),
-        ],
-    )
+    return direct_blue_red_colormap()
 
 
 def make_correlation_heatmap() -> None:
@@ -113,7 +109,7 @@ def make_correlation_heatmap() -> None:
                     ha="center",
                     va="center",
                     fontsize=12,
-                    color="#202020",
+                    color="white",
                 )
 
     ax.set_xticks(np.arange(-0.5, 4, 1), minor=True)
@@ -181,11 +177,135 @@ def make_mae_matrix() -> None:
     )
 
 
+def _read_cross_scenario_values() -> tuple[np.ndarray, list[str], list[str]]:
+    results = (
+        SCRIPTS_ROOT
+        / "DL_Models"
+        / "LFP_SOC_SOH_Model"
+        / "4_simulation_environment"
+        / "results"
+    )
+    class_order = [
+        "Direct measurement",
+        "Hybrid direct measurement",
+        "Hybrid ECM",
+        "Data-driven",
+    ]
+    class_short = ["DM", "HDM", "HECM", "DD"]
+    scenarios = [
+        "ADC quantization",
+        "Voltage spikes",
+        "Current noise (high)",
+        "Voltage noise",
+        "Temperature noise",
+        "Current bias",
+        "Missing samples",
+        "Irregular sampling",
+        "Burst dropout",
+    ]
+    scenario_labels = [
+        "ADC\nquantization",
+        "Voltage\nspikes",
+        "Current\nnoise",
+        "Voltage\nnoise",
+        "Temperature\nnoise",
+        "Current\nbias",
+        "Missing\nsamples",
+        "Irregular\nsampling",
+        "Burst\ndropout",
+    ]
+
+    values: dict[tuple[str, str], float] = {}
+    key_results = results / "paper_tables_v4" / "table_key_results.md"
+    with key_results.open(encoding="utf-8", newline="") as handle:
+        for row in csv.DictReader(handle):
+            values[(row["class"], row["scenario_label"])] = float(row["delta_mae"])
+
+    adc_table = (
+        results
+        / "paper_tables_v4_adc_extension"
+        / "table_adc_quantization_v4.md"
+    )
+    lines = adc_table.read_text(encoding="utf-8").splitlines()
+    headers = [part.strip() for part in lines[0].strip("|").split("|")]
+    class_index = headers.index("class")
+    delta_index = headers.index("delta_mae")
+    for line in lines[2:]:
+        parts = [part.strip() for part in line.strip("|").split("|")]
+        values[(parts[class_index], "ADC quantization")] = float(parts[delta_index])
+
+    matrix = np.array(
+        [[values[(class_name, scenario)] for scenario in scenarios] for class_name in class_order],
+        dtype=float,
+    )
+    return matrix, class_short, scenario_labels
+
+
+def make_cross_scenario_heatmap() -> None:
+    values, y_labels, x_labels = _read_cross_scenario_values()
+    vmax = float(np.nanmax(np.abs(values)))
+    norm = SymLogNorm(
+        linthresh=0.005,
+        linscale=1.0,
+        vmin=-vmax,
+        vmax=vmax,
+        base=10,
+    )
+    colormap = direct_blue_red_colormap()
+
+    plt.rcParams.update(
+        {
+            "font.family": "serif",
+            "font.size": 12,
+            "axes.linewidth": 0.8,
+        }
+    )
+    fig, ax = plt.subplots(figsize=(11.4, 4.8))
+    image = ax.imshow(values, aspect="auto", cmap=colormap, norm=norm)
+    ax.set_xticks(np.arange(len(x_labels)), labels=x_labels)
+    ax.set_yticks(np.arange(len(y_labels)), labels=y_labels)
+
+    for row in range(values.shape[0]):
+        for col in range(values.shape[1]):
+            value = values[row, col]
+            rgba = colormap(norm(value))
+            luminance = 0.2126 * rgba[0] + 0.7152 * rgba[1] + 0.0722 * rgba[2]
+            ax.text(
+                col,
+                row,
+                f"{value:+.3f}",
+                ha="center",
+                va="center",
+                fontsize=9.5,
+                color="white" if luminance < 0.55 else "#202020",
+            )
+
+    ax.set_xticks(np.arange(-0.5, values.shape[1], 1), minor=True)
+    ax.set_yticks(np.arange(-0.5, values.shape[0], 1), minor=True)
+    ax.grid(which="minor", color="#d9d9d9", linewidth=0.8, alpha=0.65)
+    ax.tick_params(which="minor", bottom=False, left=False)
+
+    colorbar = fig.colorbar(image, ax=ax, fraction=0.046, pad=0.04)
+    colorbar.set_label(r"$\Delta$MAE")
+    colorbar.set_ticks(
+        [-0.30, -0.10, -0.03, -0.01, -0.003, 0.0, 0.003, 0.01, 0.03, 0.10, 0.30]
+    )
+    fig.tight_layout()
+    fig.savefig(
+        OUTPUT_DIR / "robustness_cross_scenario.png",
+        dpi=300,
+        facecolor="white",
+        bbox_inches="tight",
+    )
+    plt.close(fig)
+
+
 def main() -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     make_correlation_heatmap()
     make_mae_matrix()
-    print("Updated Figure 4.1 and Figure 4.4.")
+    make_cross_scenario_heatmap()
+    print("Updated Figures 4.1, 4.4, and 5.12.")
 
 
 if __name__ == "__main__":
