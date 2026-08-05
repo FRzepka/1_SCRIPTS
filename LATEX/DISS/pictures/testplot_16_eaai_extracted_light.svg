@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1200" viewBox="0 0 1600 1200">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<style>
+text { font-family: Arial, Helvetica, sans-serif; fill: #1f2933; }
+.title { font-size: 28px; font-weight: 700; }
+.label { font-size: 18px; }
+.small { font-size: 15px; }
+.panel { font-size: 20px; font-weight: 700; }
+</style>
+<text class="title" x="50" y="55">16_eaai_extracted_light: real-figure palette check</text>
+<text class="label" x="50" y="90">Main colours are used for lines and outlines; light fills are used where the real plots contain bars, boxes, or filled distributions.</text>
+
+<text class="panel" x="50" y="145">Main / outline colours</text>
+<rect x="50" y="165" width="70" height="38" rx="3" fill="#2ca02c" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="132" y="181">DM / Base</text>
+<text class="small" x="132" y="201">#2ca02c</text>
+<rect x="410" y="165" width="70" height="38" rx="3" fill="#d62728" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="492" y="181">HDM / Pruned</text>
+<text class="small" x="492" y="201">#d62728</text>
+<rect x="770" y="165" width="70" height="38" rx="3" fill="#1f77b4" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="852" y="181">HECM / Quantized</text>
+<text class="small" x="852" y="201">#1f77b4</text>
+<rect x="1130" y="165" width="70" height="38" rx="3" fill="#9467bd" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="1212" y="181">DD</text>
+<text class="small" x="1212" y="201">#9467bd</text>
+
+<text class="panel" x="50" y="245">Light fill colours</text>
+<rect x="50" y="265" width="70" height="38" rx="3" fill="#a6d7a6" stroke="#2ca02c" stroke-width="3"/>
+<text class="small" x="132" y="290">#a6d7a6</text>
+<rect x="410" y="265" width="70" height="38" rx="3" fill="#eea4a5" stroke="#d62728" stroke-width="3"/>
+<text class="small" x="492" y="290">#eea4a5</text>
+<rect x="770" y="265" width="70" height="38" rx="3" fill="#a1c6e0" stroke="#1f77b4" stroke-width="3"/>
+<text class="small" x="852" y="290">#a1c6e0</text>
+<rect x="1130" y="265" width="70" height="38" rx="3" fill="#d2bfe3" stroke="#9467bd" stroke-width="3"/>
+<text class="small" x="1212" y="290">#d2bfe3</text>
+
+<text class="panel" x="50" y="355">Embedded benchmark: real EAAI error-distribution plot</text>
+<image x="50" y="375" width="700" height="350" preserveAspectRatio="xMidYMid meet" href="../Florian_Rzepka_Dissertation/pictures/eaai_palette/embedded_soc_error.png"/>
+
+<text class="panel" x="850" y="355">Robustness baseline: real JES result plot</text>
+<image x="850" y="375" width="700" height="350" preserveAspectRatio="xMidYMid meet" href="../Florian_Rzepka_Dissertation/pictures/eaai_palette/robustness_baseline.png"/>
+
+<text class="panel" x="50" y="790">Current-bias sensitivity: real JES line plot</text>
+<image x="50" y="810" width="700" height="340" preserveAspectRatio="xMidYMid meet" href="../Florian_Rzepka_Dissertation/pictures/eaai_palette/robustness_current_bias.png"/>
+
+<text class="panel" x="850" y="790">Signal integrity: real JES bar/hatch plot</text>
+<image x="850" y="810" width="700" height="340" preserveAspectRatio="xMidYMid meet" href="../Florian_Rzepka_Dissertation/pictures/eaai_palette/robustness_signal_integrity.png"/>
+</svg>

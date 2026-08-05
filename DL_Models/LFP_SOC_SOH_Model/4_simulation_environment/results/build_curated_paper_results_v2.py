@@ -867,11 +867,19 @@ def figure_missing_gap_detail(df: pd.DataFrame, cell: str) -> None:
             axes[1].axvline(float(rec), color=MODEL_META[model]["color"], ls="--", lw=1.2, alpha=0.9)
     axes[0].set_ylabel("SOC")
     axes[0].set_title("(a)", loc="left", fontsize=14, fontweight="bold", pad=6)
-    axes[0].legend(ncol=3, frameon=True, loc="upper left")
     axes[1].set_xlabel("Hours after gap end")
     axes[1].set_ylabel("Absolute SOC error")
     axes[1].set_title("(b)", loc="left", fontsize=14, fontweight="bold", pad=6)
-    axes[1].legend(ncol=2, frameon=True, loc="upper left")
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(
+        handles,
+        labels,
+        ncol=5,
+        frameon=True,
+        loc="lower center",
+        bbox_to_anchor=(0.5, -0.01),
+    )
+    fig.subplots_adjust(bottom=0.15, hspace=0.32)
     _savefig(PAPER_FIGURES_DIR / "Figure_6_missing_gap_recovery.png")
 
 

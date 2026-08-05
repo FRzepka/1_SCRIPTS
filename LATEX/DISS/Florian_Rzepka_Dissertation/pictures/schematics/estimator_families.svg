@@ -19,12 +19,12 @@
   <text x="220" y="145" text-anchor="middle" class="label body">OCV anchoring</text>
 
   <rect x="510" y="35" width="380" height="135" rx="5" class="box" fill="#f5f5f5" stroke="#4f4f4f"/>
-  <text x="700" y="77" text-anchor="middle" class="label heading">Model based</text>
+  <text x="700" y="77" text-anchor="middle" class="label heading">Model-based</text>
   <text x="700" y="113" text-anchor="middle" class="label body">ECM observers</text>
   <text x="700" y="145" text-anchor="middle" class="label body">physical states</text>
 
   <rect x="990" y="35" width="380" height="135" rx="5" class="box" fill="#f5f5f5" stroke="#4f4f4f"/>
-  <text x="1180" y="77" text-anchor="middle" class="label heading">Data driven</text>
+  <text x="1180" y="77" text-anchor="middle" class="label heading">Data-driven</text>
   <text x="1180" y="113" text-anchor="middle" class="label body">MLP, GRU, and LSTM</text>
   <text x="1180" y="145" text-anchor="middle" class="label body">learned mappings</text>
 

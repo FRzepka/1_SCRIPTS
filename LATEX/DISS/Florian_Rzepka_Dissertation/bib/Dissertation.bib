@@ -1,6 +1,7 @@
 @misc{10sBatteryPack,
   title = {10s Battery Pack Monitoring, Balancing, and Comprehensive Protection, 50-{{A}} Discharge Reference Design},
-  url = {https://www.ti.com/lit/ug/tiduar8c/tiduar8c.pdf}
+  url = {https://www.ti.com/lit/ug/tiduar8c/tiduar8c.pdf},
+  urldate = {2026-08-05}
 }
 
 @article{a.m.s.m.h.s.attanayakaEstimationStateCharge2019,
@@ -36,21 +37,6 @@
 }
 
 @article{ahmedRoleDeepLearning2026,
-  title = {Role of Deep Learning in Battery Management System ({{BMS}}) for Electric Vehicles – {{A}} Review},
-  author = {Ahmed, Rasel and Hossen, Md. Shaharia and Tithi, Nusrat Tabassum and Khatun, Humayra and Manik, Kamrul Hasan and Mim, Juhi Jannat and Hossain, Nayem},
-  date = {2026-06},
-  journaltitle = {Energy Reports},
-  shortjournal = {Energy Reports},
-  volume = {15},
-  pages = {109028},
-  issn = {23524847},
-  doi = {10.1016/j.egyr.2025.109028},
-  url = {https://linkinghub.elsevier.com/retrieve/pii/S2352484725009047},
-  urldate = {2026-06-24},
-  langid = {english}
-}
-
-@article{ahmedRoleDeepLearning2026a,
   title = {Role of Deep Learning in Battery Management System ({{BMS}}) for Electric Vehicles – {{A}} Review},
   author = {Ahmed, Rasel and Hossen, Md. Shaharia and Tithi, Nusrat Tabassum and Khatun, Humayra and Manik, Kamrul Hasan and Mim, Juhi Jannat and Hossain, Nayem},
   date = {2026-06},
@@ -164,16 +150,15 @@
   langid = {english}
 }
 
-@online{blalockWhatStateNeural2020,
+@inproceedings{blalockWhatStateNeural2020,
   title = {What Is the {{State}} of {{Neural Network Pruning}}?},
   author = {Blalock, Davis and Ortiz, Jose Javier Gonzalez and Frankle, Jonathan and Guttag, John},
   date = {2020},
-  doi = {10.48550/ARXIV.2003.03033},
+  booktitle = {Proceedings of Machine Learning and Systems},
+  volume = {2},
   url = {https://arxiv.org/abs/2003.03033},
-  urldate = {2025-12-02},
+  urldate = {2026-08-05},
   abstract = {Neural network pruning---the task of reducing the size of a network by removing parameters---has been the subject of a great deal of work in recent years. We provide a meta-analysis of the literature, including an overview of approaches to pruning and consistent findings in the literature. After aggregating results across 81 papers and pruning hundreds of models in controlled conditions, our clearest finding is that the community suffers from a lack of standardized benchmarks and metrics. This deficiency is substantial enough that it is hard to compare pruning techniques to one another or determine how much progress the field has made over the past three decades. To address this situation, we identify issues with current practices, suggest concrete remedies, and introduce ShrinkBench, an open-source framework to facilitate standardized evaluations of pruning methods. We use ShrinkBench to compare various pruning techniques and show that its comprehensive evaluation can prevent common pitfalls when comparing pruning methods.},
-  pubstate = {prepublished},
-  version = {1},
   keywords = {FOS: Computer and information sciences,Machine Learning (cs.LG),Machine Learning (stat.ML)},
   file = {C:\Users\Florian\Zotero\storage\V8CFIZMR\Blalock et al. - 2020 - What is the State of Neural Network Pruning.pdf}
 }
@@ -181,7 +166,8 @@
 @misc{BQ7961616SeriesBattery2023,
   title = {{{BQ79616}} 16-{{Series Battery Monitor}}, {{Balancer}}, and {{Integrated Hardware Protector}}},
   date = {2023},
-  url = {https://www.ti.com/lit/ds/symlink/bq79616.pdf?ts=1775312350051&ref_url=https%253A%252F%252Fwww.ti.com%252Fproduct%252FBQ79616}
+  url = {https://www.ti.com/lit/ds/symlink/bq79616.pdf?ts=1775312350051&ref_url=https%253A%252F%252Fwww.ti.com%252Fproduct%252FBQ79616},
+  urldate = {2026-08-05}
 }
 
 @article{chaouiAgingPredictionState2017,
@@ -268,7 +254,8 @@
 
 @misc{DesignConsiderationsCurrent,
   title = {Design {{Considerations}} of {{Current Sensing With BQ769x2 Family}} for {{Battery Management System}}},
-  url = {https://www.ti.com/lit/an/sluab10a/sluab10a.pdf?ts=1775276566199}
+  url = {https://www.ti.com/lit/an/sluab10a/sluab10a.pdf?ts=1775276566199},
+  urldate = {2026-08-05}
 }
 
 @inproceedings{ebertDetectionCellstackInhomogeneities2017,
@@ -445,16 +432,16 @@
   file = {C:\Users\Florian\Zotero\storage\I6T6C7Z4\Guo et al. - 2024 - A systematic review of electrochemical model-based.pdf}
 }
 
-@online{hanLearningBothWeights2015,
+@inproceedings{hanLearningBothWeights2015,
   title = {Learning Both {{Weights}} and {{Connections}} for {{Efficient Neural Networks}}},
   author = {Han, Song and Pool, Jeff and Tran, John and Dally, William J.},
   date = {2015},
-  doi = {10.48550/ARXIV.1506.02626},
-  url = {https://arxiv.org/abs/1506.02626},
-  urldate = {2025-12-02},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume = {28},
+  pages = {1135--1143},
+  url = {https://proceedings.neurips.cc/paper/2015/hash/ae0eb3eed39d2bcef4622b2499a05fe6-Abstract.html},
+  urldate = {2026-08-05},
   abstract = {Neural networks are both computationally intensive and memory intensive, making them difficult to deploy on embedded systems. Also, conventional networks fix the architecture before training starts; as a result, training cannot improve the architecture. To address these limitations, we describe a method to reduce the storage and computation required by neural networks by an order of magnitude without affecting their accuracy by learning only the important connections. Our method prunes redundant connections using a three-step method. First, we train the network to learn which connections are important. Next, we prune the unimportant connections. Finally, we retrain the network to fine tune the weights of the remaining connections. On the ImageNet dataset, our method reduced the number of parameters of AlexNet by a factor of 9x, from 61 million to 6.7 million, without incurring accuracy loss. Similar experiments with VGG-16 found that the number of parameters can be reduced by 13x, from 138 million to 10.3 million, again with no loss of accuracy.},
-  pubstate = {prepublished},
-  version = {3},
   keywords = {Computer Vision and Pattern Recognition (cs.CV),FOS: Computer and information sciences,Machine Learning (cs.LG),Neural and Evolutionary Computing (cs.NE)},
   file = {C:\Users\Florian\Zotero\storage\SAQFST3L\Han et al. - 2015 - Learning both Weights and Connections for Efficient Neural Networks.pdf}
 }
@@ -679,16 +666,16 @@
   langid = {english}
 }
 
-@online{jacobQuantizationTrainingNeural2017,
+@inproceedings{jacobQuantizationTrainingNeural2017,
   title = {Quantization and {{Training}} of {{Neural Networks}} for {{Efficient Integer-Arithmetic-Only Inference}}},
   author = {Jacob, Benoit and Kligys, Skirmantas and Chen, Bo and Zhu, Menglong and Tang, Matthew and Howard, Andrew and Adam, Hartwig and Kalenichenko, Dmitry},
-  date = {2017},
-  doi = {10.48550/ARXIV.1712.05877},
-  url = {https://arxiv.org/abs/1712.05877},
-  urldate = {2025-12-02},
+  date = {2018},
+  booktitle = {Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition},
+  pages = {2704--2713},
+  doi = {10.1109/CVPR.2018.00286},
+  url = {https://openaccess.thecvf.com/content_cvpr_2018/html/Jacob_Quantization_and_Training_CVPR_2018_paper.html},
+  urldate = {2026-08-05},
   abstract = {The rising popularity of intelligent mobile devices and the daunting computational cost of deep learning-based models call for efficient and accurate on-device inference schemes. We propose a quantization scheme that allows inference to be carried out using integer-only arithmetic, which can be implemented more efficiently than floating point inference on commonly available integer-only hardware. We also co-design a training procedure to preserve end-to-end model accuracy post quantization. As a result, the proposed quantization scheme improves the tradeoff between accuracy and on-device latency. The improvements are significant even on MobileNets, a model family known for run-time efficiency, and are demonstrated in ImageNet classification and COCO detection on popular CPUs.},
-  pubstate = {prepublished},
-  version = {1},
   keywords = {FOS: Computer and information sciences,Machine Learning (cs.LG),Machine Learning (stat.ML)},
   file = {C:\Users\Florian\Zotero\storage\FH4ILVQK\Jacob et al. - 2017 - Quantization and Training of Neural Networks for Efficient Integer-Arithmetic-Only Inference.pdf}
 }
@@ -697,6 +684,7 @@
   title = {{{JGCFR18650-1800mAh-3}}.{{2V Product Specification}}},
   author = {JGNE},
   url = {https://www.goldencellpower.com/product-item/18650-1800mah-3-2v-lifepo4-cells/},
+  urldate = {2026-08-05},
   organization = {JGNE}
 }
 
@@ -831,37 +819,7 @@
   file = {C:\Users\Florian\Zotero\storage\DMEFM4VW\Kucevic et al. - 2020 - Standard battery energy storage system profiles Analysis of various applications for stationary ene.pdf}
 }
 
-@article{kucevicStandardBatteryEnergy2020b,
-  title = {Standard Battery Energy Storage System Profiles: {{Analysis}} of Various Applications for Stationary Energy Storage Systems Using a Holistic Simulation Framework},
-  shorttitle = {Standard Battery Energy Storage System Profiles},
-  author = {Kucevic, Daniel and Tepe, Benedikt and Englberger, Stefan and Parlikar, Anupam and Mühlbauer, Markus and Bohlen, Oliver and Jossen, Andreas and Hesse, Holger},
-  date = {2020-04},
-  journaltitle = {Journal of Energy Storage},
-  shortjournal = {Journal of Energy Storage},
-  volume = {28},
-  pages = {101077},
-  issn = {2352152X},
-  doi = {10.1016/j.est.2019.101077},
-  url = {https://linkinghub.elsevier.com/retrieve/pii/S2352152X19309016},
-  urldate = {2026-04-14},
-  langid = {english}
-}
-
 @book{kurzweilElektrochemischeSpeicherSuperkondensatoren2018,
-  title = {Elektrochemische Speicher: Superkondensatoren, Batterien, Elektrolyse-Wasserstoff, Rechtliche Rahmenbedingungen},
-  shorttitle = {Elektrochemische Speicher},
-  author = {Kurzweil, Peter and Dietlmeier, Otto K.},
-  date = {2018},
-  publisher = {Springer Fachmedien Wiesbaden},
-  location = {Wiesbaden},
-  doi = {10.1007/978-3-658-21829-4},
-  url = {http://link.springer.com/10.1007/978-3-658-21829-4},
-  urldate = {2026-04-14},
-  isbn = {978-3-658-21828-7 978-3-658-21829-4},
-  langid = {ngerman}
-}
-
-@book{kurzweilElektrochemischeSpeicherSuperkondensatoren2018a,
   title = {Elektrochemische Speicher: Superkondensatoren, Batterien, Elektrolyse-Wasserstoff, Rechtliche Rahmenbedingungen},
   shorttitle = {Elektrochemische Speicher},
   author = {Kurzweil, Peter and Dietlmeier, Otto K.},
@@ -909,7 +867,8 @@
 @online{leap-reMGFARMSmart,
   title = {{{MG FARM Smart}} Stand-Alone Micro-Grids as a Solution for Agriculture Farms Electrification},
   author = {LEAP-RE},
-  url = {https://www.leap-re.eu/mg-farm/}
+  url = {https://www.leap-re.eu/mg-farm/},
+  urldate = {2026-08-05}
 }
 
 @online{leapreJointCall2021,
@@ -1070,23 +1029,6 @@
   file = {C\:\\Users\\Florian\\Zotero\\storage\\R3QWAXQP\\Liu et al. - 2025 - Assessing the Impact of Sampling Irregularity in Time Series Data Human Activity Recognition As A C.pdf;C\:\\Users\\Florian\\Zotero\\storage\\YAP3JJZZ\\2501.html}
 }
 
-@online{liuAssessingImpactSampling2025a,
-  title = {Assessing the {{Impact}} of {{Sampling Irregularity}} in {{Time Series Data}}: {{Human Activity Recognition As A Case Study}}},
-  shorttitle = {Assessing the {{Impact}} of {{Sampling Irregularity}} in {{Time Series Data}}},
-  author = {Liu, Mengxi and Geißler, Daniel and Bian, Sizhen and Zhou, Bo and Lukowicz, Paul},
-  date = {2025-01-25},
-  eprint = {2501.15330},
-  eprinttype = {arXiv},
-  eprintclass = {eess},
-  doi = {10.48550/arXiv.2501.15330},
-  url = {http://arxiv.org/abs/2501.15330},
-  urldate = {2026-04-04},
-  abstract = {Human activity recognition (HAR) ideally relies on data from wearable or environment-instrumented sensors sampled at regular intervals, enabling standard neural network models optimized for consistent time-series data as input. However, real-world sensor data often exhibits irregular sampling due to, for example, hardware constraints, power-saving measures, or communication delays, posing challenges for deployed static HAR models. This study assesses the impact of sampling irregularities on HAR by simulating irregular data through two methods: introducing slight inconsistencies in sampling intervals (timestamp variations) to mimic sensor jitter, and randomly removing data points (random dropout) to simulate missing values due to packet loss or sensor failure. We evaluate both discrete-time neural networks and continuous-time neural networks, which are designed to handle continuous-time data, on three public datasets. We demonstrate that timestamp variations do not significantly affect the performance of discrete-time neural networks, and the continuous-time neural network is also ineffective in addressing the challenges posed by irregular sampling, possibly due to limitations in modeling complex temporal patterns with missing data. Our findings underscore the necessity for new models or approaches that can robustly handle sampling irregularity in time-series data, like the reading in human activity recognition, paving the way for future research in this domain.},
-  pubstate = {prepublished},
-  keywords = {Electrical Engineering and Systems Science - Signal Processing},
-  file = {C\:\\Users\\Florian\\Zotero\\storage\\9A2ED2W4\\Liu et al. - 2025 - Assessing the Impact of Sampling Irregularity in Time Series Data Human Activity Recognition As A C.pdf;C\:\\Users\\Florian\\Zotero\\storage\\7SXXFEJ4\\2501.html}
-}
-
 @article{lobachevaStructuredSparsificationGated2020,
   title = {Structured {{Sparsification}} of {{Gated Recurrent Neural Networks}}},
   author = {Lobacheva, Ekaterina and Chirkova, Nadezhda and Markovich, Alexander and Vetrov, Dmitry},
@@ -1104,31 +1046,27 @@
   file = {C\:\\Users\\Florian\\Zotero\\storage\\8GMQXJWY\\Lobacheva et al. - 2020 - Structured Sparsification of Gated Recurrent Neural Networks.pdf;C\:\\Users\\Florian\\Zotero\\storage\\AF8DKBL6\\Lobacheva et al. - 2020 - Structured Sparsification of Gated Recurrent Neural Networks.pdf}
 }
 
-@online{loshchilovDecoupledWeightDecay2017,
+@inproceedings{loshchilovDecoupledWeightDecay2017,
   title = {Decoupled {{Weight Decay Regularization}}},
   author = {Loshchilov, Ilya and Hutter, Frank},
-  date = {2017},
-  doi = {10.48550/ARXIV.1711.05101},
-  url = {https://arxiv.org/abs/1711.05101},
-  urldate = {2025-12-02},
+  date = {2019},
+  booktitle = {International Conference on Learning Representations},
+  url = {https://openreview.net/forum?id=Bkg6RiCqY7},
+  urldate = {2026-08-05},
   abstract = {L\$\_2\$ regularization and weight decay regularization are equivalent for standard stochastic gradient descent (when rescaled by the learning rate), but as we demonstrate this is \textbackslash emph\{not\} the case for adaptive gradient algorithms, such as Adam. While common implementations of these algorithms employ L\$\_2\$ regularization (often calling it "weight decay" in what may be misleading due to the inequivalence we expose), we propose a simple modification to recover the original formulation of weight decay regularization by \textbackslash emph\{decoupling\} the weight decay from the optimization steps taken w.r.t. the loss function. We provide empirical evidence that our proposed modification (i) decouples the optimal choice of weight decay factor from the setting of the learning rate for both standard SGD and Adam and (ii) substantially improves Adam's generalization performance, allowing it to compete with SGD with momentum on image classification datasets (on which it was previously typically outperformed by the latter). Our proposed decoupled weight decay has already been adopted by many researchers, and the community has implemented it in TensorFlow and PyTorch; the complete source code for our experiments is available at https://github.com/loshchil/AdamW-and-SGDW},
-  pubstate = {prepublished},
-  version = {3},
   keywords = {FOS: Computer and information sciences,FOS: Mathematics,Machine Learning (cs.LG),Neural and Evolutionary Computing (cs.NE),Optimization and Control (math.OC)},
   file = {C:\Users\Florian\Zotero\storage\IL5ZB89N\Loshchilov und Hutter - 2017 - Decoupled Weight Decay Regularization.pdf}
 }
 
-@online{loshchilovSGDRStochasticGradient2016,
+@inproceedings{loshchilovSGDRStochasticGradient2016,
   title = {{{SGDR}}: {{Stochastic Gradient Descent}} with {{Warm Restarts}}},
   shorttitle = {{{SGDR}}},
   author = {Loshchilov, Ilya and Hutter, Frank},
-  date = {2016},
-  doi = {10.48550/ARXIV.1608.03983},
-  url = {https://arxiv.org/abs/1608.03983},
-  urldate = {2025-12-02},
+  date = {2017},
+  booktitle = {International Conference on Learning Representations},
+  url = {https://openreview.net/forum?id=Skq89Scxx},
+  urldate = {2026-08-05},
   abstract = {Restart techniques are common in gradient-free optimization to deal with multimodal functions. Partial warm restarts are also gaining popularity in gradient-based optimization to improve the rate of convergence in accelerated gradient schemes to deal with ill-conditioned functions. In this paper, we propose a simple warm restart technique for stochastic gradient descent to improve its anytime performance when training deep neural networks. We empirically study its performance on the CIFAR-10 and CIFAR-100 datasets, where we demonstrate new state-of-the-art results at 3.14\% and 16.21\%, respectively. We also demonstrate its advantages on a dataset of EEG recordings and on a downsampled version of the ImageNet dataset. Our source code is available at https://github.com/loshchil/SGDR},
-  pubstate = {prepublished},
-  version = {5},
   keywords = {FOS: Computer and information sciences,FOS: Mathematics,Machine Learning (cs.LG),Neural and Evolutionary Computing (cs.NE),Optimization and Control (math.OC)},
   file = {C:\Users\Florian\Zotero\storage\M8U9DTGF\Loshchilov und Hutter - 2016 - SGDR Stochastic Gradient Descent with Warm Restarts.pdf}
 }
@@ -1171,16 +1109,14 @@
   file = {C:\Users\Florian\Zotero\storage\Z4RNJH3E\Mazzi et al. - 2022 - State of charge estimation of an electric vehicle'.pdf}
 }
 
-@online{micikeviciusMixedPrecisionTraining2017,
+@inproceedings{micikeviciusMixedPrecisionTraining2017,
   title = {Mixed {{Precision Training}}},
   author = {Micikevicius, Paulius and Narang, Sharan and Alben, Jonah and Diamos, Gregory and Elsen, Erich and Garcia, David and Ginsburg, Boris and Houston, Michael and Kuchaiev, Oleksii and Venkatesh, Ganesh and Wu, Hao},
-  date = {2017},
-  doi = {10.48550/ARXIV.1710.03740},
+  date = {2018},
+  booktitle = {International Conference on Learning Representations},
   url = {https://arxiv.org/abs/1710.03740},
-  urldate = {2025-12-02},
+  urldate = {2026-08-05},
   abstract = {Deep neural networks have enabled progress in a wide variety of applications. Growing the size of the neural network typically results in improved accuracy. As model sizes grow, the memory and compute requirements for training these models also increases. We introduce a technique to train deep neural networks using half precision floating point numbers. In our technique, weights, activations and gradients are stored in IEEE half-precision format. Half-precision floating numbers have limited numerical range compared to single-precision numbers. We propose two techniques to handle this loss of information. Firstly, we recommend maintaining a single-precision copy of the weights that accumulates the gradients after each optimizer step. This single-precision copy is rounded to half-precision format during training. Secondly, we propose scaling the loss appropriately to handle the loss of information with half-precision gradients. We demonstrate that this approach works for a wide variety of models including convolution neural networks, recurrent neural networks and generative adversarial networks. This technique works for large scale models with more than 100 million parameters trained on large datasets. Using this approach, we can reduce the memory consumption of deep learning models by nearly 2x. In future processors, we can also expect a significant computation speedup using half-precision hardware units.},
-  pubstate = {prepublished},
-  version = {3},
   keywords = {Artificial Intelligence (cs.AI),FOS: Computer and information sciences,Machine Learning (cs.LG),Machine Learning (stat.ML)},
   file = {C:\Users\Florian\Zotero\storage\88J5R5ES\Micikevicius et al. - 2017 - Mixed Precision Training.pdf}
 }
@@ -1188,7 +1124,8 @@
 @online{microenergyMGFARMPoweringSustainable,
   title = {{{MG-FARM Powering Sustainable Agriculture}} with {{Smart Micro-Grids}}},
   author = {Microenergy},
-  url = {https://mg-farm.microenergy-consulting.com/}
+  url = {https://mg-farm.microenergy-consulting.com/},
+  urldate = {2026-08-05}
 }
 
 @article{mondalEstimatingStateofChargeLithiumIon2024,
@@ -1238,16 +1175,14 @@
   file = {C:\Users\Florian\Zotero\storage\4H5KTPSL\Naguib et al. - 2022 - Microprocessor Execution Time and Memory Use for Battery State of Charge Estimation Algorithms.pdf}
 }
 
-@online{narangExploringSparsityRecurrent2017,
+@inproceedings{narangExploringSparsityRecurrent2017,
   title = {Exploring {{Sparsity}} in {{Recurrent Neural Networks}}},
   author = {Narang, Sharan and Elsen, Erich and Diamos, Gregory and Sengupta, Shubho},
   date = {2017},
-  doi = {10.48550/ARXIV.1704.05119},
+  booktitle = {International Conference on Learning Representations},
   url = {https://arxiv.org/abs/1704.05119},
-  urldate = {2025-12-02},
+  urldate = {2026-08-05},
   abstract = {Recurrent Neural Networks (RNN) are widely used to solve a variety of problems and as the quantity of data and the amount of available compute have increased, so have model sizes. The number of parameters in recent state-of-the-art networks makes them hard to deploy, especially on mobile phones and embedded devices. The challenge is due to both the size of the model and the time it takes to evaluate it. In order to deploy these RNNs efficiently, we propose a technique to reduce the parameters of a network by pruning weights during the initial training of the network. At the end of training, the parameters of the network are sparse while accuracy is still close to the original dense neural network. The network size is reduced by 8x and the time required to train the model remains constant. Additionally, we can prune a larger dense network to achieve better than baseline performance while still reducing the total number of parameters significantly. Pruning RNNs reduces the size of the model and can also help achieve significant inference time speed-up using sparse matrix multiply. Benchmarks show that using our technique model size can be reduced by 90\% and speed-up is around 2x to 7x.},
-  pubstate = {prepublished},
-  version = {2},
   keywords = {Computation and Language (cs.CL),FOS: Computer and information sciences,Machine Learning (cs.LG)},
   file = {C:\Users\Florian\Zotero\storage\LMTGUUP3\Narang et al. - 2017 - Exploring Sparsity in Recurrent Neural Networks.pdf}
 }
@@ -1269,7 +1204,8 @@
 
 @online{NVIDIATensorRTHighPerformance,
   title = {{{NVIDIA TensorRT}}: {{High-Performance Deep Learning Inference}}},
-  url = {https://developer.nvidia.com/tensorrt}
+  url = {https://developer.nvidia.com/tensorrt},
+  urldate = {2026-08-05}
 }
 
 @article{ojiDataDrivenMethodsBattery2021,
@@ -1290,7 +1226,8 @@
 
 @online{ONNXRuntimeHighperformance,
   title = {{{ONNX Runtime}}: High-Performance Inference Engine},
-  url = {https://onnxruntime.ai/}
+  url = {https://onnxruntime.ai/},
+  urldate = {2026-08-05}
 }
 
 @article{pangPhysicsinformedNeuralNetwork2023,
@@ -1308,33 +1245,32 @@
   langid = {english}
 }
 
-@online{pascanuDifficultyTrainingRecurrent2012,
+@inproceedings{pascanuDifficultyTrainingRecurrent2012,
   title = {On the Difficulty of Training {{Recurrent Neural Networks}}},
   author = {Pascanu, Razvan and Mikolov, Tomas and Bengio, Yoshua},
-  date = {2012},
-  doi = {10.48550/ARXIV.1211.5063},
-  url = {https://arxiv.org/abs/1211.5063},
-  urldate = {2025-12-02},
+  date = {2013},
+  booktitle = {Proceedings of the 30th International Conference on Machine Learning},
+  series = {Proceedings of Machine Learning Research},
+  volume = {28},
+  pages = {1310--1318},
+  url = {https://proceedings.mlr.press/v28/pascanu13.html},
+  urldate = {2026-08-05},
   abstract = {There are two widely known issues with properly training Recurrent Neural Networks, the vanishing and the exploding gradient problems detailed in Bengio et al. (1994). In this paper we attempt to improve the understanding of the underlying issues by exploring these problems from an analytical, a geometric and a dynamical systems perspective. Our analysis is used to justify a simple yet effective solution. We propose a gradient norm clipping strategy to deal with exploding gradients and a soft constraint for the vanishing gradients problem. We validate empirically our hypothesis and proposed solutions in the experimental section.},
-  pubstate = {prepublished},
-  version = {2},
   keywords = {FOS: Computer and information sciences,Machine Learning (cs.LG)},
   file = {C:\Users\Florian\Zotero\storage\LTQLVV8D\Pascanu et al. - 2012 - On the difficulty of training Recurrent Neural Networks.pdf}
 }
 
-@online{paszkePyTorchImperativeStyle2019,
+@inproceedings{paszkePyTorchImperativeStyle2019,
   title = {{{PyTorch}}: {{An Imperative Style}}, {{High-Performance Deep Learning Library}}},
   shorttitle = {{{PyTorch}}},
   author = {Paszke, Adam and Gross, Sam and Massa, Francisco and Lerer, Adam and Bradbury, James and Chanan, Gregory and Killeen, Trevor and Lin, Zeming and Gimelshein, Natalia and Antiga, Luca and Desmaison, Alban and Köpf, Andreas and Yang, Edward and DeVito, Zach and Raison, Martin and Tejani, Alykhan and Chilamkurthy, Sasank and Steiner, Benoit and Fang, Lu and Bai, Junjie and Chintala, Soumith},
-  date = {2019-12-03},
-  eprint = {1912.01703},
-  eprinttype = {arXiv},
-  eprintclass = {cs},
-  doi = {10.48550/arXiv.1912.01703},
-  url = {http://arxiv.org/abs/1912.01703},
-  urldate = {2025-12-02},
+  date = {2019},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume = {32},
+  pages = {8024--8035},
+  url = {https://proceedings.neurips.cc/paper/2019/hash/bdbca288fee7f92f2bfa9f7012727740-Abstract.html},
+  urldate = {2026-08-05},
   abstract = {Deep learning frameworks have often focused on either usability or speed, but not both. PyTorch is a machine learning library that shows that these two goals are in fact compatible: it provides an imperative and Pythonic programming style that supports code as a model, makes debugging easy and is consistent with other popular scientific computing libraries, while remaining efficient and supporting hardware accelerators such as GPUs. In this paper, we detail the principles that drove the implementation of PyTorch and how they are reflected in its architecture. We emphasize that every aspect of PyTorch is a regular Python program under the full control of its user. We also explain how the careful and pragmatic implementation of the key components of its runtime enables them to work together to achieve compelling performance. We demonstrate the efficiency of individual subsystems, as well as the overall speed of PyTorch on several common benchmarks.},
-  pubstate = {prepublished},
   keywords = {Computer Science - Machine Learning,Computer Science - Mathematical Software,Statistics - Machine Learning},
   file = {C\:\\Users\\Florian\\Zotero\\storage\\HS9JG4R9\\Paszke et al. - 2019 - PyTorch An Imperative Style, High-Performance Deep Learning Library.pdf;C\:\\Users\\Florian\\Zotero\\storage\\AZGNA8EF\\1912.html}
 }
@@ -1433,17 +1369,17 @@
   file = {C:\Users\Florian\Zotero\storage\V47YK8LR\Sahri et al. - 2021 - Energy Management System for Hybrid PVWindBatteryFuel Cell in Microgrid-Based Hydrogen and Econom.pdf}
 }
 
-@online{salimansWeightNormalizationSimple2016,
+@inproceedings{salimansWeightNormalizationSimple2016,
   title = {Weight {{Normalization}}: {{A Simple Reparameterization}} to {{Accelerate Training}} of {{Deep Neural Networks}}},
   shorttitle = {Weight {{Normalization}}},
   author = {Salimans, Tim and Kingma, Diederik P.},
   date = {2016},
-  doi = {10.48550/ARXIV.1602.07868},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume = {29},
+  pages = {901--909},
   url = {https://arxiv.org/abs/1602.07868},
-  urldate = {2026-04-14},
+  urldate = {2026-08-05},
   abstract = {We present weight normalization: a reparameterization of the weight vectors in a neural network that decouples the length of those weight vectors from their direction. By reparameterizing the weights in this way we improve the conditioning of the optimization problem and we speed up convergence of stochastic gradient descent. Our reparameterization is inspired by batch normalization but does not introduce any dependencies between the examples in a minibatch. This means that our method can also be applied successfully to recurrent models such as LSTMs and to noise-sensitive applications such as deep reinforcement learning or generative models, for which batch normalization is less well suited. Although our method is much simpler, it still provides much of the speed-up of full batch normalization. In addition, the computational overhead of our method is lower, permitting more optimization steps to be taken in the same amount of time. We demonstrate the usefulness of our method on applications in supervised image recognition, generative modelling, and deep reinforcement learning.},
-  pubstate = {prepublished},
-  version = {3},
   keywords = {Artificial Intelligence (cs.AI),FOS: Computer and information sciences,Machine Learning (cs.LG),Neural and Evolutionary Computing (cs.NE)}
 }
 
@@ -1711,7 +1647,8 @@
 @online{technischeuniversitatberlinMGFarmSmart,
   title = {{{MG Farm Smart}} Microgrids as a Solution for Agriculture Farms Electrification},
   author = {{Technische Universität Berlin}},
-  url = {https://www.tu.berlin/eet/forschung/projekte/mg-farm}
+  url = {https://www.tu.berlin/eet/forschung/projekte/mg-farm},
+  urldate = {2026-08-05}
 }
 
 @article{tianFractionalOrderModelBasedIncremental2019,
@@ -1731,12 +1668,14 @@
 
 @misc{TLE4972HighPrecision,
   title = {{{TLE4972}} High Precision Coreless Current Sensor for Automotive Applications},
-  url = {https://www.infineon.com/assets/row/public/documents/24/49/infineon-tle4972-ae35d5-datasheet-en.pdf?fileId=8ac78c8c7c72fb9a017c7e1109e20a17}
+  url = {https://www.infineon.com/assets/row/public/documents/24/49/infineon-tle4972-ae35d5-datasheet-en.pdf?fileId=8ac78c8c7c72fb9a017c7e1109e20a17},
+  urldate = {2026-08-05}
 }
 
 @misc{TMCS11083Functional,
   title = {{{TMCS1108}} 3\% {{Functional Isolation Hall-Effect Current Sensor With}} ±100-{{V Working Voltage}}},
-  url = {https://www.ti.com/lit/ds/symlink/tmcs1108.pdf}
+  url = {https://www.ti.com/lit/ds/symlink/tmcs1108.pdf},
+  urldate = {2026-08-05}
 }
 
 @article{wangFusionEstimationLithiumion2022,
@@ -1757,30 +1696,28 @@
   file = {C:\Users\Florian\Zotero\storage\8DHUWHN5\Wang et al. - 2022 - Fusion estimation of lithium-ion battery state of .pdf}
 }
 
-@online{wenLearningIntrinsicSparse2017,
+@inproceedings{wenLearningIntrinsicSparse2017,
   title = {Learning {{Intrinsic Sparse Structures}} within {{Long Short-Term Memory}}},
   author = {Wen, Wei and He, Yuxiong and Rajbhandari, Samyam and Zhang, Minjia and Wang, Wenhan and Liu, Fang and Hu, Bin and Chen, Yiran and Li, Hai},
-  date = {2017},
-  doi = {10.48550/ARXIV.1709.05027},
+  date = {2018},
+  booktitle = {International Conference on Learning Representations},
   url = {https://arxiv.org/abs/1709.05027},
-  urldate = {2025-12-08},
+  urldate = {2026-08-05},
   abstract = {Model compression is significant for the wide adoption of Recurrent Neural Networks (RNNs) in both user devices possessing limited resources and business clusters requiring quick responses to large-scale service requests. This work aims to learn structurally-sparse Long Short-Term Memory (LSTM) by reducing the sizes of basic structures within LSTM units, including input updates, gates, hidden states, cell states and outputs. Independently reducing the sizes of basic structures can result in inconsistent dimensions among them, and consequently, end up with invalid LSTM units. To overcome the problem, we propose Intrinsic Sparse Structures (ISS) in LSTMs. Removing a component of ISS will simultaneously decrease the sizes of all basic structures by one and thereby always maintain the dimension consistency. By learning ISS within LSTM units, the obtained LSTMs remain regular while having much smaller basic structures. Based on group Lasso regularization, our method achieves 10.59x speedup without losing any perplexity of a language modeling of Penn TreeBank dataset. It is also successfully evaluated through a compact model with only 2.69M weights for machine Question Answering of SQuAD dataset. Our approach is successfully extended to non- LSTM RNNs, like Recurrent Highway Networks (RHNs). Our source code is publicly available at https://github.com/wenwei202/iss-rnns},
-  pubstate = {prepublished},
-  version = {7},
   keywords = {Artificial Intelligence (cs.AI),Computation and Language (cs.CL),FOS: Computer and information sciences,Machine Learning (cs.LG),Neural and Evolutionary Computing (cs.NE)},
   file = {C:\Users\Florian\Zotero\storage\6URVH9NZ\Wen et al. - 2017 - Learning Intrinsic Sparse Structures within Long Short-Term Memory.pdf}
 }
 
-@online{wenLearningStructuredSparsity2016,
+@inproceedings{wenLearningStructuredSparsity2016,
   title = {Learning {{Structured Sparsity}} in {{Deep Neural Networks}}},
   author = {Wen, Wei and Wu, Chunpeng and Wang, Yandan and Chen, Yiran and Li, Hai},
   date = {2016},
-  doi = {10.48550/ARXIV.1608.03665},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume = {29},
+  pages = {2074--2082},
   url = {https://arxiv.org/abs/1608.03665},
-  urldate = {2025-12-02},
+  urldate = {2026-08-05},
   abstract = {High demand for computation resources severely hinders deployment of large-scale Deep Neural Networks (DNN) in resource constrained devices. In this work, we propose a Structured Sparsity Learning (SSL) method to regularize the structures (i.e., filters, channels, filter shapes, and layer depth) of DNNs. SSL can: (1) learn a compact structure from a bigger DNN to reduce computation cost; (2) obtain a hardware-friendly structured sparsity of DNN to efficiently accelerate the DNNs evaluation. Experimental results show that SSL achieves on average 5.1x and 3.1x speedups of convolutional layer computation of AlexNet against CPU and GPU, respectively, with off-the-shelf libraries. These speedups are about twice speedups of non-structured sparsity; (3) regularize the DNN structure to improve classification accuracy. The results show that for CIFAR-10, regularization on layer depth can reduce 20 layers of a Deep Residual Network (ResNet) to 18 layers while improve the accuracy from 91.25\% to 92.60\%, which is still slightly higher than that of original ResNet with 32 layers. For AlexNet, structure regularization by SSL also reduces the error by around \textasciitilde 1\%. Open source code is in https://github.com/wenwei202/caffe/tree/scnn},
-  pubstate = {prepublished},
-  version = {4},
   keywords = {FOS: Computer and information sciences,I.2.6; I.5.1,Machine Learning (cs.LG),Machine Learning (stat.ML),Neural and Evolutionary Computing (cs.NE)},
   file = {C:\Users\Florian\Zotero\storage\NQKCSMFX\Wen et al. - 2016 - Learning Structured Sparsity in Deep Neural Networks.pdf}
 }
@@ -1804,7 +1741,8 @@
 
 @online{XCUBEAISTM32CubeExpansion,
   title = {X-{{CUBE-AI}}: {{STM32Cube Expansion Package}} for {{Artificial Intelligence}}},
-  url = {https://www.st.com/en/embedded-software/x-cube-ai.html}
+  url = {https://www.st.com/en/embedded-software/x-cube-ai.html},
+  urldate = {2026-08-05}
 }
 
 @article{xiongOnlineStateofHealthEstimation2021,
@@ -1834,22 +1772,6 @@
   doi = {10.1109/TTE.2022.3212024},
   url = {https://ieeexplore.ieee.org/document/9911693/},
   urldate = {2026-04-14}
-}
-
-@article{yaoSmarterBatteryManagement2025a,
-  title = {Towards a Smarter Battery Management System: {{A}} Critical Review on Deep Learning-Based State of Charge Estimation of Lithium-Ion Batteries},
-  shorttitle = {Towards a Smarter Battery Management System},
-  author = {Yao, Jiaqi and Kowal, Julia},
-  date = {2025-09},
-  journaltitle = {Energy and AI},
-  shortjournal = {Energy and AI},
-  volume = {21},
-  pages = {100585},
-  issn = {26665468},
-  doi = {10.1016/j.egyai.2025.100585},
-  url = {https://linkinghub.elsevier.com/retrieve/pii/S266654682500117X},
-  urldate = {2025-12-04},
-  langid = {english}
 }
 
 @article{yaoSmarterBatteryManagement2025b,
@@ -1940,18 +1862,21 @@
 @online{zotero-item-518,
   title = {{{STM32N6}}},
   date = {2026-06-25},
-  url = {https://www.st.com/en/microcontrollers-microprocessors/stm32n6-series.html}
+  url = {https://www.st.com/en/microcontrollers-microprocessors/stm32n6-series.html},
+  urldate = {2026-08-05}
 }
 
 @online{zotero-item-519,
   type = {https://www.nxp.com/products/processors-and-microcontrollers/arm-microcontrollers/general-purpose-mcus/mcx-arm-cortex-m/mcx-n-series-microcontrollers:MCX-N-SERIES},
   title = {{{MCX N Series Microcontrollers}}},
-  url = {https://www.nxp.com/products/processors-and-microcontrollers/arm-microcontrollers/general-purpose-mcus/mcx-arm-cortex-m/mcx-n-series-microcontrollers:MCX-N-SERIES}
+  url = {https://www.nxp.com/products/processors-and-microcontrollers/arm-microcontrollers/general-purpose-mcus/mcx-arm-cortex-m/mcx-n-series-microcontrollers:MCX-N-SERIES},
+  urldate = {2026-08-05}
 }
 
 @online{zotero-item-520,
   title = {Renesas {{Sets New MCU Performance Bar}} with 1-{{GHz RA8P1 Devices}} with {{AI Acceleration}}: {{RA8P1}}},
-  url = {https://www.renesas.com/en/about/newsroom/renesas-sets-new-mcu-performance-bar-1-ghz-ra8p1-devices-ai-acceleration}
+  url = {https://www.renesas.com/en/about/newsroom/renesas-sets-new-mcu-performance-bar-1-ghz-ra8p1-devices-ai-acceleration},
+  urldate = {2026-08-05}
 }
 
 @online{zotero-item-521,
@@ -1961,12 +1886,14 @@
 
 @online{zotero-item-522,
   title = {Alif {{Semiconductor}}: {{Ensemble E1}}/{{E3}}/{{E5}}/{{E7}}},
-  url = {https://alifsemi.com/products/ensemble/}
+  url = {https://alifsemi.com/products/ensemble/},
+  urldate = {2026-08-05}
 }
 
 @online{zotero-item-523,
   title = {Introducing {{Our Highest-Performance Wireless SoCs}} and {{MCU}}: {{EFR32xG26}} / {{PG26}}},
-  url = {https://www.silabs.com/wireless/efr32xg26}
+  url = {https://www.silabs.com/wireless/efr32xg26},
+  urldate = {2026-08-05}
 }
 
 @article{wang_improved_2024,
@@ -1974,6 +1901,7 @@
   volume = {80},
   issn = {2352-152X},
   url = {https://linkinghub.elsevier.com/retrieve/pii/S2352152X23036216},
+  urldate = {2026-08-05},
   doi = {10.1016/j.est.2023.110222},
   language = {en},
   journal = {Journal of Energy Storage},
@@ -1988,6 +1916,7 @@
   volume = {284},
   issn = {0360-5442},
   url = {https://linkinghub.elsevier.com/retrieve/pii/S0360544223020716},
+  urldate = {2026-08-05},
   doi = {10.1016/j.energy.2023.128677},
   language = {en},
   journal = {Energy},

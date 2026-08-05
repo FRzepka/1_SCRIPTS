@@ -1,0 +1,203 @@
+{
+  "01_tu_red_muted": {
+    "label": "TU red muted categorical",
+    "comment": "Main recommendation for four estimator classes: TU red, muted rose, desaturated brown-gray, and blue-gray.",
+    "colors": [
+      "#b6302d",
+      "#d1887e",
+      "#8b6763",
+      "#566b78"
+    ]
+  },
+  "02_tu_red_scientific": {
+    "label": "TU red scientific contrast",
+    "comment": "Still red-led, but with cool and ochre accents for stronger distinction in line and scatter plots.",
+    "colors": [
+      "#b6302d",
+      "#6b7f8f",
+      "#b88a5a",
+      "#6f857d"
+    ]
+  },
+  "03_tu_red_pastel": {
+    "label": "TU red pastel",
+    "comment": "Softest palette. Good for filled bars and boxes, slightly weaker for thin lines.",
+    "colors": [
+      "#b6302d",
+      "#e0a39b",
+      "#9f7d7a",
+      "#7f9caf"
+    ]
+  },
+  "04_tu_red_earth": {
+    "label": "TU red earth tones",
+    "comment": "Warm, calm print palette with red, clay, olive-gray, and slate.",
+    "colors": [
+      "#b6302d",
+      "#c27a54",
+      "#8b806b",
+      "#596b76"
+    ]
+  },
+  "05_tu_red_monochrome": {
+    "label": "TU red monochrome sequence",
+    "comment": "Useful when the four categories are ordered. Not ideal when categories must be equally distinct.",
+    "colors": [
+      "#7c1f1d",
+      "#b6302d",
+      "#d6766d",
+      "#edbdb8"
+    ]
+  },
+  "06_tu_red_print_safe": {
+    "label": "TU red print-safe",
+    "comment": "More conservative and robust in grayscale or print. Less pastel, but still not poppy.",
+    "colors": [
+      "#9e2a2b",
+      "#6c757d",
+      "#b06d47",
+      "#4f6d7a"
+    ]
+  },
+  "07_tu_red_muted_reordered": {
+    "label": "TU red muted reordered",
+    "comment": "Same family as the current red-muted palette, but M2 is moved to blue-gray. This is the quickest fix when M1 and M2 must be separated clearly.",
+    "colors": [
+      "#b6302d",
+      "#566b78",
+      "#d1887e",
+      "#8b6763"
+    ]
+  },
+  "08_tu_red_cool_muted": {
+    "label": "TU red with cool muted accents",
+    "comment": "Red-led but with blue, olive, and brown-gray accents. Good for nominal model classes because the four hues are not just red shades.",
+    "colors": [
+      "#b6302d",
+      "#2f6f88",
+      "#7f8f6b",
+      "#8b6763"
+    ]
+  },
+  "09_tu_red_neutral_highcontrast": {
+    "label": "TU red and neutral contrast",
+    "comment": "Very restrained palette for print-heavy figures. Red marks the main model, while the other classes use graphite, blue-gray, and light gray.",
+    "colors": [
+      "#b6302d",
+      "#434343",
+      "#6f8290",
+      "#b2b2b2"
+    ]
+  },
+  "10_user_bright_direct": {
+    "label": "Requested bright palette",
+    "comment": "Uses the requested saturated red, purple, blue, and green exactly. Strong separation, but noticeably more colorful than the dissertation style.",
+    "colors": [
+      "#c40d1e",
+      "#9013fe",
+      "#1f90cc",
+      "#49cb40"
+    ],
+    "neutrals": [
+      "#000000",
+      "#434343",
+      "#b2b2b2"
+    ]
+  },
+  "11_user_bright_tempered": {
+    "label": "Requested palette, dissertation-tempered",
+    "comment": "A calmer version inspired by the requested colors. It keeps the red-purple-blue-green structure but lowers saturation for a less poppy scientific look.",
+    "colors": [
+      "#c40d1e",
+      "#6f4a8e",
+      "#2f7898",
+      "#6f9a63"
+    ],
+    "neutrals": [
+      "#000000",
+      "#434343",
+      "#b2b2b2"
+    ]
+  },
+  "12_tu_red_colorblind_safe": {
+    "label": "TU red plus colorblind-safe accents",
+    "comment": "Scientific/high-contrast option: TU red combined with blue, green, and ochre accents. Best candidate when lines overlap heavily.",
+    "colors": [
+      "#b6302d",
+      "#0072b2",
+      "#009e73",
+      "#e69f00"
+    ],
+    "neutrals": [
+      "#000000",
+      "#434343",
+      "#b2b2b2"
+    ]
+  },
+  "13_tu_red_muted_purple_green": {
+    "label": "TU red muted with purple and soft green",
+    "comment": "Close to the current red-muted style, but the rose and brown-gray slots are replaced by muted purple and a softer light green for clearer M1/M2/M3 separation.",
+    "colors": [
+      "#b6302d",
+      "#7f5f9f",
+      "#8fbf8a",
+      "#566b78"
+    ],
+    "neutrals": [
+      "#000000",
+      "#434343",
+      "#b2b2b2"
+    ]
+  },
+  "14_tu_red_muted_purple_m2": {
+    "label": "TU red muted with purple M2",
+    "comment": "Minimal variant of the current red-muted palette: M1, M3, and M4 stay unchanged, while the rose M2 is replaced by muted purple.",
+    "colors": [
+      "#b6302d",
+      "#7f5f9f",
+      "#8b6763",
+      "#566b78"
+    ],
+    "neutrals": [
+      "#000000",
+      "#434343",
+      "#b2b2b2"
+    ]
+  },
+  "15_default_cycler_red_green_orange_cyan": {
+    "label": "Default cycler red, green, orange, cyan",
+    "comment": "Direct test of the proposed Matplotlib cycler colors. Strongly separated and readable, but more saturated than the muted dissertation palettes.",
+    "colors": [
+      "#cc0000",
+      "#22a15c",
+      "#ff8000",
+      "#00a6b3"
+    ],
+    "neutrals": [
+      "#000000",
+      "#434343",
+      "#b2b2b2"
+    ]
+  },
+  "16_eaai_extracted_light": {
+    "label": "EAAI extracted light fill palette",
+    "comment": "Palette extracted from the EAAI figures: green, red, and blue as the main colours plus matching purple for a fourth class. Use the main colours for lines and outlines; use the fill colours for bars, boxes, and histograms.",
+    "colors": [
+      "#2ca02c",
+      "#d62728",
+      "#1f77b4",
+      "#9467bd"
+    ],
+    "fills": [
+      "#a6d7a6",
+      "#eea4a5",
+      "#a1c6e0",
+      "#d2bfe3"
+    ],
+    "neutrals": [
+      "#000000",
+      "#434343",
+      "#b2b2b2"
+    ]
+  }
+}

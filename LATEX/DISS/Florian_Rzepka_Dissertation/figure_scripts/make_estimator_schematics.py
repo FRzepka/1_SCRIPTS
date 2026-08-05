@@ -2,11 +2,11 @@
 """Block-level architecture schematics for the dissertation.
 
 Generates:
-  pictures/robustness_dd_architecture_rb.png   (Ch6: DD SOC-GRU + shared SOH-LSTM)
-  pictures/embedded_architecture_rb.png         (Ch7: embedded SOC-LSTM + SOH-LSTM)
+  pictures/eaai_palette/robustness_dd_architecture.png
+  pictures/eaai_palette/embedded_architecture.png
 
-Color palette matches the existing PowerPoint-style dissertation figures
-(embedded_pipeline_original_rb.png etc.).
+The schematics use light blue for recurrent cores, light red for MLP blocks,
+and gray for inputs, outputs, and neutral processing stages.
 """
 
 import matplotlib.pyplot as plt
@@ -14,13 +14,13 @@ import matplotlib.patches as mpatches
 from matplotlib.path import Path
 
 # Palette sampled from existing dissertation figures
-BLUE_FILL = "#C9DCEA"      # light blue (dataset / input blocks)
-TEAL_FILL = "#9CCEC8"      # teal (recurrent cores)
-PURPLE_FILL = "#C7A2E6"    # purple (MLP / optimization blocks)
+BLUE_FILL = "#F5F5F5"      # neutral gray (input blocks)
+TEAL_FILL = "#A1C6E0"      # light blue (recurrent cores)
+PURPLE_FILL = "#EEA4A5"    # light red (MLP blocks)
 LAVENDER_FILL = "#E2DAF2"  # light lavender (embedding / aux blocks)
 GRAY_EDGE = "#404040"      # dark gray strokes and text
-ARROW_BLUE = "#4472C4"     # office blue arrows
-NOTE_PURPLE = "#7030A0"    # accent for pruning notes
+ARROW_BLUE = "#1F77B4"     # recurrent-state paths
+NOTE_PURPLE = "#D62728"    # accent for pruning notes
 
 FONT = {"family": "sans-serif", "color": GRAY_EDGE}
 
@@ -64,12 +64,12 @@ def state_loop(ax, cx, top_y, label):
 def main():
     from pathlib import Path as FilePath
 
-    red = "#d62728"
-    red_fill = "#f8dfe0"
     blue = "#1f77b4"
-    blue_fill = "#dcebf5"
-    gray = "#434343"
-    gray_fill = "#f0f0f0"
+    blue_fill = "#a1c6e0"
+    red = "#d62728"
+    red_fill = "#eea4a5"
+    gray = "#4f4f4f"
+    gray_fill = "#f5f5f5"
 
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(14.2, 7.7))
 
@@ -86,37 +86,28 @@ def main():
         title_size=13.5,
         line_size=11.5,
     ):
-        header_h = 0.145
         ax.add_patch(
-            mpatches.Rectangle(
+            mpatches.FancyBboxPatch(
                 (x, y),
                 w,
                 h,
+                boxstyle="round,pad=0.0,rounding_size=0.012",
                 linewidth=1.7,
                 edgecolor=accent,
                 facecolor=body_color,
             )
         )
-        ax.add_patch(
-            mpatches.Rectangle(
-                (x, y + h - header_h),
-                w,
-                header_h,
-                linewidth=0,
-                facecolor=accent,
-            )
-        )
         ax.text(
             x + w / 2,
-            y + h - header_h / 2,
+            y + h - 0.105,
             title,
             ha="center",
             va="center",
             fontsize=title_size,
             fontweight="bold",
-            color="white",
+            color="#1f1f1f",
         )
-        body_center = y + (h - header_h) / 2
+        body_center = y + (h - 0.17) / 2
         spacing = 0.080 if len(lines) <= 3 else 0.066
         first_y = body_center + spacing * (len(lines) - 1) / 2
         for index, line in enumerate(lines):
@@ -150,7 +141,7 @@ def main():
         ax.plot(
             [x1 - 0.020, x1 - 0.020, x0 + 0.020],
             [y, top, top],
-            color=red,
+            color=blue,
             linewidth=1.7,
             solid_capstyle="butt",
             solid_joinstyle="miter",
@@ -161,7 +152,7 @@ def main():
             xytext=(x0 + 0.020, top),
             arrowprops=dict(
                 arrowstyle="-|>",
-                color=red,
+                color=blue,
                 linewidth=1.7,
                 mutation_scale=14,
             ),
@@ -191,13 +182,13 @@ def main():
          "8 channels at 1 Hz"],
     )
     block(
-        ax, 0.350, y, 0.235, h, red_fill, red, "GRU core",
+        ax, 0.350, y, 0.235, h, blue_fill, blue, "GRU core",
         ["1 recurrent layer",
          "hidden size 96",
          r"state $h_t$"],
     )
     block(
-        ax, 0.665, y, 0.235, h, blue_fill, blue, "MLP head",
+        ax, 0.665, y, 0.235, h, red_fill, red, "MLP head",
         [r"Linear $96 \rightarrow 96$ + ReLU",
          r"Linear $96 \rightarrow 1$",
          "sigmoid output"],
@@ -235,19 +226,19 @@ def main():
          [r"$U,\ I,\ T,\ \mathrm{EFC},\ Q_c$",
           "mean, std, min, max",
           "20 features"]),
-        (0.215, 0.165, blue_fill, blue, "Projection",
+        (0.215, 0.165, gray_fill, gray, "Projection",
          [r"Linear $20 \rightarrow 128$",
           r"Linear $128 \rightarrow 128$",
           "GELU + LayerNorm"]),
-        (0.415, 0.165, red_fill, red, "LSTM core",
+        (0.415, 0.165, blue_fill, blue, "LSTM core",
          ["2 recurrent layers",
           "hidden size 160",
           r"states $(h_t,c_t)$"]),
-        (0.615, 0.175, blue_fill, blue, "Residual MLP",
+        (0.615, 0.175, red_fill, red, "Residual MLP",
          ["3 residual blocks",
           "width 160 + GELU",
           "skip + LayerNorm"]),
-        (0.825, 0.125, blue_fill, blue, "Head",
+        (0.825, 0.125, gray_fill, gray, "Head",
          ["width 160",
           r"Linear $160 \rightarrow 1$"],
          12.5, 10.5),

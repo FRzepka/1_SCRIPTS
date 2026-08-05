@@ -130,13 +130,13 @@ def make_correlation_heatmap() -> None:
         "SOH",
         "Voltage [V]",
         r"Temperature [$^\circ$C]",
-        r"$Q_{\mathrm{pos}}$ [Ah]",
+        r"$Q_{\mathrm{pos}}(t)$ [Ah]",
     ]
     y_labels = [
         "Voltage [V]",
         r"Temperature [$^\circ$C]",
-        r"$Q_{\mathrm{pos}}$ [Ah]",
-        r"$Q_{\mathrm{neg}}$ [Ah]",
+        r"$Q_{\mathrm{pos}}(t)$ [Ah]",
+        r"$Q_{\mathrm{neg}}(t)$ [Ah]",
     ]
 
     plt.rcParams.update(
