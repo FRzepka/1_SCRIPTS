@@ -1092,7 +1092,7 @@ The nonlinear function $f$ is an operation rather than a stored tensor. Its inpu
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth]{quantization_scope_and_grids.png}
-    \caption[Quantizable neural-network quantities and uniform 8-bit grids.]{Quantizable quantities and representative uniform 8-bit grids. Panel (a) distinguishes stored weights and biases, dynamic inputs, outputs and recurrent states, and the summation and activation operations of a neural computation. Panel (b) compares signed symmetric INT8, unsigned symmetric UINT8 for non-negative values, and asymmetric UINT8 with a non-zero zero point. The signed symmetric example uses the exactly balanced code range $-127$ to $127$ and leaves the INT8 code $-128$ unused.}
+    \caption[Quantizable neural-network quantities and uniform 8-bit grids.]{Quantizable quantities and representative uniform 8-bit grids. Panel (a) distinguishes stored weights and biases, dynamic inputs, outputs and recurrent states, and the summation and activation operations of a neural computation. From top to bottom, panel (b) shows signed symmetric INT8 with $z=0$, unsigned zero-anchored UINT8 with $z=0$ for non-negative values, and asymmetric UINT8 with $z\neq0$. Labels above each grid denote integer codes $q$, whereas labels below denote their reconstructed real values $x$. The signed symmetric example uses the exactly balanced code range $-127$ to $127$ and leaves the INT8 code $-128$ unused.}
     \label{fig:fundamental_quantization_scope}
 \end{figure}
 
@@ -1109,7 +1109,7 @@ where $M_{\mathrm{meta}}$ contains scales, zero points, tensor descriptors, alig
 
 \subsubsection{Uniform affine quantization}
 
-Uniform affine quantization places representable values on an evenly spaced grid. For a real value $x$, bit width $b$, scale $s>0$, zero point $z$, and integer limits $q_{\min}$ and $q_{\max}$, quantization and reconstruction are defined as
+Uniform affine quantization is the common mapping underlying the three grids in Figure~\ref{fig:fundamental_quantization_scope}(b), rather than a fourth grid type. It places representable values at a constant spacing. For a real value $x$, bit width $b$, scale $s>0$, zero point $z$, and integer limits $q_{\min}$ and $q_{\max}$, quantization and reconstruction are defined as
 \begin{equation}
     q=\operatorname{clip}\!\left(
     \operatorname{round}\!\left(\frac{x}{s}\right)+z,
@@ -1119,20 +1119,9 @@ Uniform affine quantization places representable values on an evenly spaced grid
     \widehat x=s(q-z).
     \label{eq:fundamental_affine_quantization}
 \end{equation}
-The scale defines the distance between neighbouring reconstruction levels. The integer zero point ensures that real zero can be represented exactly, which is important for zero padding, inactive activations, and sparse values.\autocite{jacobQuantizationTrainingNeural2017,nagelWhitePaperNeural2021}
+The scale defines the distance between neighbouring reconstruction levels. The integer zero point $z$ is the code assigned to the real value $x=0$. This distinction explains the labels in Figure~\ref{fig:fundamental_quantization_scope}(b): $x=0$ is the same real value in every grid, but its integer representation is $q=z$.\autocite{jacobQuantizationTrainingNeural2017,nagelWhitePaperNeural2021}
 
-For an asymmetric quantizer that maps a real interval $[x_{\min},x_{\max}]$ to the complete integer range, the parameters can be selected as
-\begin{align}
-    s&=\frac{x_{\max}-x_{\min}}{q_{\max}-q_{\min}}, \label{eq:fundamental_asymmetric_scale}\\
-    z&=\operatorname{clip}\!\left(
-    \operatorname{round}\!\left(q_{\min}-\frac{x_{\min}}{s}\right),
-    q_{\min},q_{\max}
-    \right).
-    \label{eq:fundamental_asymmetric_zero}
-\end{align}
-The offset permits efficient use of the available codes when the value range is not centred on zero. The correction terms associated with a non-zero zero point can, however, increase kernel complexity.
-
-Symmetric quantization sets $z=0$ and chooses equal positive and negative limits. For signed $b$-bit quantization,
+The first grid is \emph{signed symmetric} quantization. It sets $z=0$ and chooses equal positive and negative limits. For signed $b$-bit quantization,
 \begin{equation}
     q_{\max}=2^{b-1}-1,
     \qquad
@@ -1143,7 +1132,18 @@ Symmetric quantization sets $z=0$ and chooses equal positive and negative limits
 \end{equation}
 where $\alpha=\max_i|x_i|$ if the complete observed range is retained. At $b=8$, this produces the symmetric set $\{-127,\ldots,0,\ldots,127\}$. The underlying signed INT8 type also contains $-128$, but leaving this code unused gives equal-magnitude positive and negative limits. This convention is not mandatory. Other implementations use the full two's-complement interval and account for its one-code asymmetry.
 
-Unsigned symmetric quantization is useful when the represented quantity is known to be non-negative. For UINT8, $q_{\min}=0$, $q_{\max}=255$, and $z=0$. A ReLU output is a common example. Signed symmetric quantization is more natural for weights that are approximately centred around zero. Asymmetric quantization is useful when the range includes zero but is shifted or strongly unbalanced.
+The second grid is \emph{unsigned zero-anchored} quantization. It is suitable when the represented quantity is known to be non-negative. For UINT8, $q_{\min}=0$, $q_{\max}=255$, $z=0$, and $s=\alpha/255$, so the real interval $[0,\alpha]$ uses the complete code range. A ReLU output is a common example. The term ``zero-anchored'' is used here instead of ``unsigned symmetric'' because the real interval is not symmetric around zero.
+
+The third grid is \emph{asymmetric} quantization. It maps a shifted or unbalanced real interval $[x_{\min},x_{\max}]$ to the complete integer range. Its parameters can be selected as
+\begin{align}
+    s&=\frac{x_{\max}-x_{\min}}{q_{\max}-q_{\min}}, \label{eq:fundamental_asymmetric_scale}\\
+    z&=\operatorname{clip}\!\left(
+    \operatorname{round}\!\left(q_{\min}-\frac{x_{\min}}{s}\right),
+    q_{\min},q_{\max}
+    \right).
+    \label{eq:fundamental_asymmetric_zero}
+\end{align}
+Here, the real value $x=0$ maps to the integer code $q=z$, and $z$ is generally non-zero. The offset uses the available codes efficiently when the real range is not centred on zero, but its correction terms can increase kernel complexity. Signed symmetric quantization is therefore natural for weights centred approximately around zero, while the two UINT8 configurations address non-negative or shifted ranges.
 
 \subsubsection{Rounding, clipping, and range selection}
 

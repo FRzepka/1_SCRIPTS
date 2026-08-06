@@ -468,10 +468,10 @@
        class="math-small"
        id="text40">-alpha</text>
     <text
-       x="1324"
+       x="1319"
        y="276"
        class="math-small"
-       id="text41">0</text>
+       id="text41">x = 0</text>
     <text
        x="1664"
        y="276"
@@ -483,10 +483,10 @@
        class="small"
        id="text43">q = -127</text>
     <text
-       x="1314"
+       x="1288"
        y="169"
        class="accent-blue"
-       id="text44">q = 0</text>
+       id="text44">q = z = 0</text>
     <text
        x="1645"
        y="169"
@@ -501,7 +501,7 @@
        x="980"
        y="390"
        class="grid-label"
-       id="text47">unsigned symmetric UINT8</text>
+       id="text47">unsigned zero-anchored UINT8</text>
     <line
        x1="1000"
        y1="470"
@@ -552,20 +552,20 @@
        class="tick"
        id="line53" />
     <text
-       x="986"
+       x="938"
        y="430"
        class="accent-blue"
-       id="text53">q = 0</text>
+       id="text53">q = z = 0</text>
     <text
        x="1635"
        y="430"
        class="small"
        id="text54">q = 255</text>
     <text
-       x="990"
+       x="969"
        y="540"
        class="math-small"
-       id="text55">0</text>
+       id="text55">x = 0</text>
     <text
        x="1670"
        y="540"
@@ -575,7 +575,7 @@
        x="1000"
        y="577"
        class="tiny"
-       id="text57">suited to non-negative ranges such as ReLU outputs</text>
+       id="text57">s = alpha / 255, z = 0; suited to non-negative ranges</text>
     <text
        x="980"
        y="654"
@@ -636,10 +636,10 @@
        class="small"
        id="text64">q = 0</text>
     <text
-       x="1360"
+       x="1315"
        y="690"
        class="accent-blue"
-       id="text65">q = z</text>
+       id="text65">q = z, z ≠ 0</text>
     <text
        x="1635"
        y="690"
@@ -654,10 +654,10 @@
    font-size="18"
    id="tspan66">min</tspan></text>
     <text
-       x="1380"
+       x="1364"
        y="800"
        class="math-small"
-       id="text68">0</text>
+       id="text68">x = 0</text>
     <text
        x="1652"
        y="800"
