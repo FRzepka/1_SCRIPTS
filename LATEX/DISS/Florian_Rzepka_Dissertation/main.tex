@@ -1597,7 +1597,14 @@ The MLP is selected because the study examines whether explicit feature engineer
 
 The feedforward architecture therefore provides a controlled way to evaluate the proposed input representation while retaining a comparatively direct training and inference path. Model flexibility is still adapted to the task through the lag-window design, network depth, node count, and training parameters. These quantities are searched efficiently with Hyperband rather than fixed solely from the initial architecture.\autocite{liHyperbandNovelBanditBased2016}
 
-The general feedforward principle is introduced in Section~\ref{sec:fundamental_mlp} and illustrated in Figure~\ref{fig:fundamental_mlp_architecture}. The study-specific model receives the flattened voltage, temperature, and cumulative-current lag sequence and produces one linear SOH estimate. The initial search configuration is intentionally small and uses one hidden layer with eight nodes. Network depth and width are then selected through the hyperparameter search. In the tuned configuration, summarised in Table~\ref{tab:paper1_mlp_config}, the model grows into a deep dense architecture with nine hidden/output stages and a final linear regression output. The resulting structure remains conceptually feedforward, while its concrete layer widths are adapted to the ageing-estimation task.
+The general feedforward principle is introduced in Section~\ref{sec:fundamental_mlp} and illustrated in Figure~\ref{fig:fundamental_mlp_architecture}. The study-specific input and output structure is shown in Figure~\ref{fig:paper1_mlp_architecture}. Each position of the lag sequence contributes voltage, temperature, and cumulative-current information to the flattened input layer. The fully connected hidden layers combine these feature--time entries and produce one linear SOH estimate. The initial search configuration is intentionally small and uses one hidden layer with eight nodes. Network depth and width are then selected through the hyperparameter search. In the tuned configuration, summarised in Table~\ref{tab:paper1_mlp_config}, the model grows into a deep dense architecture with nine hidden/output stages and a final linear regression output. The resulting structure remains conceptually feedforward, while its concrete layer widths are adapted to the ageing-estimation task.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.78\textwidth]{paper1_architecture.png}
+    \caption[MLP input and output structure for SOH estimation.]{Study-specific MLP structure for SOH estimation. The flattened input layer contains voltage, temperature, and cumulative-current values from the lag sequence. These feature--time entries are fully connected to the dense hidden layers, and a single linear output provides the SOH estimate. The displayed node counts are schematic, while the tuned layer widths are reported in Table~\ref{tab:paper1_mlp_config}.}
+    \label{fig:paper1_mlp_architecture}
+\end{figure}
 
 \begin{table}[H]
     \centering
