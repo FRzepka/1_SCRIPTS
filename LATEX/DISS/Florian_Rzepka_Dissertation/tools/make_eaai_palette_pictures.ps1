@@ -733,6 +733,24 @@ if (Test-Path -LiteralPath $paperOneRenderer) {
     & powershell -NoProfile -ExecutionPolicy Bypass -File $paperOneRenderer -DissertationRoot $DissertationRoot
 }
 
+$paperOneSohGradientRenderer = Join-Path $PSScriptRoot 'recolor_paper1_soh_gradient.ps1'
+if (Test-Path -LiteralPath $paperOneSohGradientRenderer) {
+    Write-Host "Refreshing the Paper 1 SOH figures with the four-anchor gradient."
+    & powershell -NoProfile -ExecutionPolicy Bypass -File $paperOneSohGradientRenderer -DissertationRoot $DissertationRoot
+}
+
+$sohAllDaysRenderer = Join-Path $PSScriptRoot 'recolor_soh_all_days_four_color.ps1'
+if (Test-Path -LiteralPath $sohAllDaysRenderer) {
+    Write-Host "Refreshing the four-color SOH campaign figure."
+    & powershell -NoProfile -ExecutionPolicy Bypass -File $sohAllDaysRenderer -DissertationRoot $DissertationRoot
+}
+
+$doeCubeRenderer = Join-Path $PSScriptRoot 'recolor_doe_cube_three_color.ps1'
+if (Test-Path -LiteralPath $doeCubeRenderer) {
+    Write-Host "Refreshing the three-color DoE cube."
+    & powershell -NoProfile -ExecutionPolicy Bypass -File $doeCubeRenderer -DissertationRoot $DissertationRoot
+}
+
 $jesRecolorScript = Join-Path $PSScriptRoot 'recolor_jes_results_to_eaai_palette.ps1'
 if (Test-Path -LiteralPath $jesRecolorScript) {
     Write-Host "Refreshing JES result figures from original paper plots."
