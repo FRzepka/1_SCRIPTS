@@ -1,0 +1,177 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1420" height="1725" viewBox="0 0 1420 1725">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<style>
+text { font-family: Arial, Helvetica, sans-serif; fill: #1f2933; }
+.small { font-size: 12px; }
+.label { font-size: 13px; }
+.title { font-size: 18px; font-weight: 700; }
+.panel { font-size: 14px; font-weight: 700; }
+.axis { stroke: #404850; stroke-width: 1.2; }
+.grid { stroke: #e4e8ec; stroke-width: 1; }
+</style>
+<text class="title" x="40.0" y="42.0" text-anchor="start">Color-palette candidates for dissertation figures</text>
+<text class="label" x="40.0" y="68.0" text-anchor="start">Base TU-oriented red: #b6302d. Each row contains four colors for estimator-class comparisons.</text>
+<text class="panel" x="40.0" y="139.0" text-anchor="start">01_tu_red_muted: TU red muted categorical</text>
+<text class="small" x="40.0" y="169.0" text-anchor="start">Main recommendation for four estimator classes: TU red, muted rose, desaturated brown-gray, and blue-gray.</text>
+<rect x="730" y="115" width="92" height="46" rx="4" fill="#b6302d" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="776.0" y="182.0" text-anchor="middle">#b6302d</text>
+<rect x="885" y="115" width="92" height="46" rx="4" fill="#d1887e" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="931.0" y="182.0" text-anchor="middle">#d1887e</text>
+<rect x="1040" y="115" width="92" height="46" rx="4" fill="#8b6763" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="1086.0" y="182.0" text-anchor="middle">#8b6763</text>
+<rect x="1195" y="115" width="92" height="46" rx="4" fill="#566b78" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="1241.0" y="182.0" text-anchor="middle">#566b78</text>
+<text class="panel" x="40.0" y="244.0" text-anchor="start">02_tu_red_scientific: TU red scientific contrast</text>
+<text class="small" x="40.0" y="274.0" text-anchor="start">Still red-led, but with cool and ochre accents for stronger distinction in line and scatter plots.</text>
+<rect x="730" y="220" width="92" height="46" rx="4" fill="#b6302d" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="776.0" y="287.0" text-anchor="middle">#b6302d</text>
+<rect x="885" y="220" width="92" height="46" rx="4" fill="#6b7f8f" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="931.0" y="287.0" text-anchor="middle">#6b7f8f</text>
+<rect x="1040" y="220" width="92" height="46" rx="4" fill="#b88a5a" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="1086.0" y="287.0" text-anchor="middle">#b88a5a</text>
+<rect x="1195" y="220" width="92" height="46" rx="4" fill="#6f857d" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="1241.0" y="287.0" text-anchor="middle">#6f857d</text>
+<text class="panel" x="40.0" y="349.0" text-anchor="start">03_tu_red_pastel: TU red pastel</text>
+<text class="small" x="40.0" y="379.0" text-anchor="start">Softest palette. Good for filled bars and boxes, slightly weaker for thin lines.</text>
+<rect x="730" y="325" width="92" height="46" rx="4" fill="#b6302d" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="776.0" y="392.0" text-anchor="middle">#b6302d</text>
+<rect x="885" y="325" width="92" height="46" rx="4" fill="#e0a39b" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="931.0" y="392.0" text-anchor="middle">#e0a39b</text>
+<rect x="1040" y="325" width="92" height="46" rx="4" fill="#9f7d7a" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="1086.0" y="392.0" text-anchor="middle">#9f7d7a</text>
+<rect x="1195" y="325" width="92" height="46" rx="4" fill="#7f9caf" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="1241.0" y="392.0" text-anchor="middle">#7f9caf</text>
+<text class="panel" x="40.0" y="454.0" text-anchor="start">04_tu_red_earth: TU red earth tones</text>
+<text class="small" x="40.0" y="484.0" text-anchor="start">Warm, calm print palette with red, clay, olive-gray, and slate.</text>
+<rect x="730" y="430" width="92" height="46" rx="4" fill="#b6302d" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="776.0" y="497.0" text-anchor="middle">#b6302d</text>
+<rect x="885" y="430" width="92" height="46" rx="4" fill="#c27a54" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="931.0" y="497.0" text-anchor="middle">#c27a54</text>
+<rect x="1040" y="430" width="92" height="46" rx="4" fill="#8b806b" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="1086.0" y="497.0" text-anchor="middle">#8b806b</text>
+<rect x="1195" y="430" width="92" height="46" rx="4" fill="#596b76" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="1241.0" y="497.0" text-anchor="middle">#596b76</text>
+<text class="panel" x="40.0" y="559.0" text-anchor="start">05_tu_red_monochrome: TU red monochrome sequence</text>
+<text class="small" x="40.0" y="589.0" text-anchor="start">Useful when the four categories are ordered. Not ideal when categories must be equally distinct.</text>
+<rect x="730" y="535" width="92" height="46" rx="4" fill="#7c1f1d" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="776.0" y="602.0" text-anchor="middle">#7c1f1d</text>
+<rect x="885" y="535" width="92" height="46" rx="4" fill="#b6302d" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="931.0" y="602.0" text-anchor="middle">#b6302d</text>
+<rect x="1040" y="535" width="92" height="46" rx="4" fill="#d6766d" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="1086.0" y="602.0" text-anchor="middle">#d6766d</text>
+<rect x="1195" y="535" width="92" height="46" rx="4" fill="#edbdb8" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="1241.0" y="602.0" text-anchor="middle">#edbdb8</text>
+<text class="panel" x="40.0" y="664.0" text-anchor="start">06_tu_red_print_safe: TU red print-safe</text>
+<text class="small" x="40.0" y="694.0" text-anchor="start">More conservative and robust in grayscale or print. Less pastel, but still not poppy.</text>
+<rect x="730" y="640" width="92" height="46" rx="4" fill="#9e2a2b" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="776.0" y="707.0" text-anchor="middle">#9e2a2b</text>
+<rect x="885" y="640" width="92" height="46" rx="4" fill="#6c757d" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="931.0" y="707.0" text-anchor="middle">#6c757d</text>
+<rect x="1040" y="640" width="92" height="46" rx="4" fill="#b06d47" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="1086.0" y="707.0" text-anchor="middle">#b06d47</text>
+<rect x="1195" y="640" width="92" height="46" rx="4" fill="#4f6d7a" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="1241.0" y="707.0" text-anchor="middle">#4f6d7a</text>
+<text class="panel" x="40.0" y="769.0" text-anchor="start">07_tu_red_muted_reordered: TU red muted reordered</text>
+<text class="small" x="40.0" y="799.0" text-anchor="start">Same family as the current red-muted palette, but M2 is moved to blue-gray. This is the quickest fix when M1 and M2 must be separated clearly.</text>
+<rect x="730" y="745" width="92" height="46" rx="4" fill="#b6302d" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="776.0" y="812.0" text-anchor="middle">#b6302d</text>
+<rect x="885" y="745" width="92" height="46" rx="4" fill="#566b78" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="931.0" y="812.0" text-anchor="middle">#566b78</text>
+<rect x="1040" y="745" width="92" height="46" rx="4" fill="#d1887e" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="1086.0" y="812.0" text-anchor="middle">#d1887e</text>
+<rect x="1195" y="745" width="92" height="46" rx="4" fill="#8b6763" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="1241.0" y="812.0" text-anchor="middle">#8b6763</text>
+<text class="panel" x="40.0" y="874.0" text-anchor="start">08_tu_red_cool_muted: TU red with cool muted accents</text>
+<text class="small" x="40.0" y="904.0" text-anchor="start">Red-led but with blue, olive, and brown-gray accents. Good for nominal model classes because the four hues are not just red shades.</text>
+<rect x="730" y="850" width="92" height="46" rx="4" fill="#b6302d" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="776.0" y="917.0" text-anchor="middle">#b6302d</text>
+<rect x="885" y="850" width="92" height="46" rx="4" fill="#2f6f88" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="931.0" y="917.0" text-anchor="middle">#2f6f88</text>
+<rect x="1040" y="850" width="92" height="46" rx="4" fill="#7f8f6b" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="1086.0" y="917.0" text-anchor="middle">#7f8f6b</text>
+<rect x="1195" y="850" width="92" height="46" rx="4" fill="#8b6763" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="1241.0" y="917.0" text-anchor="middle">#8b6763</text>
+<text class="panel" x="40.0" y="979.0" text-anchor="start">09_tu_red_neutral_highcontrast: TU red and neutral contrast</text>
+<text class="small" x="40.0" y="1009.0" text-anchor="start">Very restrained palette for print-heavy figures. Red marks the main model, while the other classes use graphite, blue-gray, and light gray.</text>
+<rect x="730" y="955" width="92" height="46" rx="4" fill="#b6302d" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="776.0" y="1022.0" text-anchor="middle">#b6302d</text>
+<rect x="885" y="955" width="92" height="46" rx="4" fill="#434343" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="931.0" y="1022.0" text-anchor="middle">#434343</text>
+<rect x="1040" y="955" width="92" height="46" rx="4" fill="#6f8290" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="1086.0" y="1022.0" text-anchor="middle">#6f8290</text>
+<rect x="1195" y="955" width="92" height="46" rx="4" fill="#b2b2b2" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="1241.0" y="1022.0" text-anchor="middle">#b2b2b2</text>
+<text class="panel" x="40.0" y="1084.0" text-anchor="start">10_user_bright_direct: Requested bright palette</text>
+<text class="small" x="40.0" y="1114.0" text-anchor="start">Uses the requested saturated red, purple, blue, and green exactly. Strong separation, but noticeably more colorful than the dissertation style.</text>
+<rect x="730" y="1060" width="92" height="46" rx="4" fill="#c40d1e" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="776.0" y="1127.0" text-anchor="middle">#c40d1e</text>
+<rect x="885" y="1060" width="92" height="46" rx="4" fill="#9013fe" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="931.0" y="1127.0" text-anchor="middle">#9013fe</text>
+<rect x="1040" y="1060" width="92" height="46" rx="4" fill="#1f90cc" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="1086.0" y="1127.0" text-anchor="middle">#1f90cc</text>
+<rect x="1195" y="1060" width="92" height="46" rx="4" fill="#49cb40" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="1241.0" y="1127.0" text-anchor="middle">#49cb40</text>
+<rect x="730" y="1137" width="62" height="22" rx="3" fill="#000000" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="806.0" y="1154.0" text-anchor="start">#000000</text>
+<rect x="835" y="1137" width="62" height="22" rx="3" fill="#434343" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="911.0" y="1154.0" text-anchor="start">#434343</text>
+<rect x="940" y="1137" width="62" height="22" rx="3" fill="#b2b2b2" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="1016.0" y="1154.0" text-anchor="start">#b2b2b2</text>
+<text class="panel" x="40.0" y="1189.0" text-anchor="start">11_user_bright_tempered: Requested palette, dissertation-tempered</text>
+<text class="small" x="40.0" y="1219.0" text-anchor="start">A calmer version inspired by the requested colors. It keeps the red-purple-blue-green structure but lowers saturation for a less poppy scientific look.</text>
+<rect x="730" y="1165" width="92" height="46" rx="4" fill="#c40d1e" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="776.0" y="1232.0" text-anchor="middle">#c40d1e</text>
+<rect x="885" y="1165" width="92" height="46" rx="4" fill="#6f4a8e" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="931.0" y="1232.0" text-anchor="middle">#6f4a8e</text>
+<rect x="1040" y="1165" width="92" height="46" rx="4" fill="#2f7898" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="1086.0" y="1232.0" text-anchor="middle">#2f7898</text>
+<rect x="1195" y="1165" width="92" height="46" rx="4" fill="#6f9a63" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="1241.0" y="1232.0" text-anchor="middle">#6f9a63</text>
+<rect x="730" y="1242" width="62" height="22" rx="3" fill="#000000" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="806.0" y="1259.0" text-anchor="start">#000000</text>
+<rect x="835" y="1242" width="62" height="22" rx="3" fill="#434343" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="911.0" y="1259.0" text-anchor="start">#434343</text>
+<rect x="940" y="1242" width="62" height="22" rx="3" fill="#b2b2b2" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="1016.0" y="1259.0" text-anchor="start">#b2b2b2</text>
+<text class="panel" x="40.0" y="1294.0" text-anchor="start">12_tu_red_colorblind_safe: TU red plus colorblind-safe accents</text>
+<text class="small" x="40.0" y="1324.0" text-anchor="start">Scientific/high-contrast option: TU red combined with blue, green, and ochre accents. Best candidate when lines overlap heavily.</text>
+<rect x="730" y="1270" width="92" height="46" rx="4" fill="#b6302d" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="776.0" y="1337.0" text-anchor="middle">#b6302d</text>
+<rect x="885" y="1270" width="92" height="46" rx="4" fill="#0072b2" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="931.0" y="1337.0" text-anchor="middle">#0072b2</text>
+<rect x="1040" y="1270" width="92" height="46" rx="4" fill="#009e73" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="1086.0" y="1337.0" text-anchor="middle">#009e73</text>
+<rect x="1195" y="1270" width="92" height="46" rx="4" fill="#e69f00" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="1241.0" y="1337.0" text-anchor="middle">#e69f00</text>
+<rect x="730" y="1347" width="62" height="22" rx="3" fill="#000000" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="806.0" y="1364.0" text-anchor="start">#000000</text>
+<rect x="835" y="1347" width="62" height="22" rx="3" fill="#434343" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="911.0" y="1364.0" text-anchor="start">#434343</text>
+<rect x="940" y="1347" width="62" height="22" rx="3" fill="#b2b2b2" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="1016.0" y="1364.0" text-anchor="start">#b2b2b2</text>
+<text class="panel" x="40.0" y="1399.0" text-anchor="start">13_tu_red_muted_purple_green: TU red muted with purple and soft green</text>
+<text class="small" x="40.0" y="1429.0" text-anchor="start">Close to the current red-muted style, but the rose and brown-gray slots are replaced by muted purple and a softer light green for clearer M1/M2/M3 separation.</text>
+<rect x="730" y="1375" width="92" height="46" rx="4" fill="#b6302d" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="776.0" y="1442.0" text-anchor="middle">#b6302d</text>
+<rect x="885" y="1375" width="92" height="46" rx="4" fill="#7f5f9f" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="931.0" y="1442.0" text-anchor="middle">#7f5f9f</text>
+<rect x="1040" y="1375" width="92" height="46" rx="4" fill="#8fbf8a" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="1086.0" y="1442.0" text-anchor="middle">#8fbf8a</text>
+<rect x="1195" y="1375" width="92" height="46" rx="4" fill="#566b78" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="1241.0" y="1442.0" text-anchor="middle">#566b78</text>
+<rect x="730" y="1452" width="62" height="22" rx="3" fill="#000000" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="806.0" y="1469.0" text-anchor="start">#000000</text>
+<rect x="835" y="1452" width="62" height="22" rx="3" fill="#434343" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="911.0" y="1469.0" text-anchor="start">#434343</text>
+<rect x="940" y="1452" width="62" height="22" rx="3" fill="#b2b2b2" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="1016.0" y="1469.0" text-anchor="start">#b2b2b2</text>
+<text class="panel" x="40.0" y="1504.0" text-anchor="start">14_tu_red_muted_purple_m2: TU red muted with purple M2</text>
+<text class="small" x="40.0" y="1534.0" text-anchor="start">Minimal variant of the current red-muted palette: M1, M3, and M4 stay unchanged, while the rose M2 is replaced by muted purple.</text>
+<rect x="730" y="1480" width="92" height="46" rx="4" fill="#b6302d" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="776.0" y="1547.0" text-anchor="middle">#b6302d</text>
+<rect x="885" y="1480" width="92" height="46" rx="4" fill="#7f5f9f" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="931.0" y="1547.0" text-anchor="middle">#7f5f9f</text>
+<rect x="1040" y="1480" width="92" height="46" rx="4" fill="#8b6763" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="1086.0" y="1547.0" text-anchor="middle">#8b6763</text>
+<rect x="1195" y="1480" width="92" height="46" rx="4" fill="#566b78" stroke="#222" stroke-width="0.5"/>
+<text class="small" x="1241.0" y="1547.0" text-anchor="middle">
