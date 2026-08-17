@@ -1,0 +1,386 @@
+\documentclass[final,3p,times]{elsarticle}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{placeins}
+\usepackage{hyperref}
+
+\pdfstringdefDisableCommands{%
+  \def\corref#1{}
+}
+
+\journal{Engineering Applications of Artificial Intelligence}
+\date{}
+
+\begin{document}
+
+\newcommand{\mypar}[1]{%
+  \smallskip
+  \noindent
+  \textbf{#1.}%
+}
+
+\begin{frontmatter}
+\title{Impact of Quantization and Structured Pruning on Battery SOH Prediction Models across Architectures}
+
+\author[tu]{Jonas Schulze}
+\author[tu]{Nils Strassenburg}
+\author[tu]{Aleinikau Pavel}
+\author[tu]{Florian Rzepka\corref{cor1}}
+\ead{florian.rzepka@tu-berlin.de}
+\cortext[cor1]{Corresponding author}
+\affiliation[tu]{organization={Technical University of Berlin, Chair of Electrical Energy Storage Technology},
+            addressline={Einsteinufer 11},
+            city={Berlin},
+            postcode={10587},
+            state={Berlin},
+            country={Germany}}
+
+\begin{abstract}
+\begin{itemize}[leftmargin=*]
+\item Core objective: investigate how pruning, quantization, and knowledge distillation affect SOH prediction quality and embedded deployment cost across LSTM, GRU, CNN, and TCN architectures.
+\item Study principle: architectures are trained under a harmonized protocol first, then optimized under controlled compression settings to enable fair cross-architecture comparison.
+\item Evaluation focus: MAE/RMSE on SOH prediction and embedded KPIs (flash, RAM, latency, energy).
+\item Expected outcome: architecture-specific design guidance for resource-constrained BMS implementations.
+\end{itemize}
+\end{abstract}
+
+\begin{keyword}
+Battery SOH prediction \sep Structured pruning \sep Quantization \sep Knowledge distillation \sep Embedded AI \sep LSTM \sep GRU \sep CNN \sep TCN \sep BMS
+\end{keyword}
+\end{frontmatter}
+
+\section{Introduction}
+With the increasing demand for clean energy, driven by environmental concerns, energy storage systems play a crucial role in achieving this goal \cite{lin_towards_2022, ngoy_lithium-ion_2025}. Given the high power and energy density required for these tasks, Lithium-Ion batteries appear to be the perfect match \cite{chen_review_2021, khan_maximizing_2023}. Furthermore, Lithium-Ion batteries have a relatively high cycle life and a low self-discharge capability \cite{zhang_cycle_2024}. To ensure the safe and efficient operation of these systems, a battery management system (BMS) is used to measure and monitor voltage, current, and temperature, and to estimate State of Health (SOH) \cite{ali_towards_2019}. The SOH is defined as: 
+\begin{equation}
+    \text{SOH} = \frac{Q_\text{current}}{Q_\text{initial}} 
+\end{equation}
+Where $Q_\text{current}$ and $Q_\text{initial}$ are the current actual usable capacity and the initial capacity of the battery. The SOH is used as a metric for quantifying battery degradation \cite{tao_data-based_2024}, where $100 \%$ represents a new battery. As degradation progresses, the percentage decreases until a defined end-of-life \cite{jin_overview_2021}. Accurate SOH estimation remains a challenging task that has received significant attention in the research community \cite{yao_fast-adaptive_2025, tran_comprehensive_2021}, especially under the strict compute and memory constraints of embedded BMS hardware \cite{hu_onet_2026}. There are different SOH estimation approaches that vary in complexity. Physics-based methods require computationally intensive partial differential equations to simulate the dynamic behaviour of a battery \cite{iurilli_physics-based_2022, tu_integrating_2023}. Equivalent circuit models (ECM) are simpler and lighter models but rely on extensive experimental testing and prior knowledge \cite{noura_review_2020, chang_improvement_2022}. 
+In recent years, data-driven methods have received increasing attention in SOH Estimation research \cite{sylvestrin_state_2025}. These methods do not require knowledge of the battery's internal processes; instead, they aim to learn the ageing mechanism from historical data \cite{yao_fast-adaptive_2025}. Particularly, the field of deep learning approaches involves different types of architectures, such as Long Short-Term Memory (LSTM), gated recurrent unit (GRU), convolutional neural networks (CNN) and temporal convolutional networks (TCN) \cite{sylvestrin_state_2025, yang_state_2024}, which have been used for SOC and SOH estimation. However, deploying parameter-heavy deep learning architectures on resource-constrained microcontrollers requires optimisation techniques such as pruning and quantisation \cite{schulze_pq_2025}. Tiny Machine Learning (TinyML) enables edge execution \cite{pau_tiny_2024}, but it is unclear how different deep learning architectures respond to compression techniques in regard to accuracy and inference time. This study investigates whether compression techniques are architecture-dependent. To develop and test the SOH estimation algorithms on potent hardware, we use the STM32H755ZI-class microcontroller. The practical challenge is not only prediction accuracy but also deployability under strict flash, RAM, latency, and energy limits. With this high-performance microcontroller, new state estimation algorithms can be tested and validated, enabling further investigation into TinyML state estimation. To develop and test these four models, the Lithium Iron Phosphate (LFP) DoE Cycle Ageing Dataset \cite{rzepka_design_2025} will be used. In this dataset, cells have been long-term cycled under laboratory conditions, which include constant temperatures, regular check-ups and hybrid pulse power characterisation (HPPC) tests.
+
+This paper is structured as follows: Section 2 reviews related work on the four architectures. Section 3 describes the experimental setup, divided into six parts: the comparison metric; the dataset and embedded target used; the model architecture portfolio; the training protocol; the model optimisation methods; and the embedded benchmark protocol. 
+
+\begin{itemize}[leftmargin=*] 
+\item This study investigates whether compression effects are architecture-dependent and whether different model families remain equally usable after optimization.
+\item The paper therefore compares recurrent and convolutional architectures under one consistent pipeline from training to embedded benchmarking.
+\item Figure 1 (planned, position in this section): high-level study concept showing the flow from baseline models to compression methods and final embedded evaluation.
+\end{itemize}
+
+\section{\texorpdfstring{Related Work and Research Gap}{Related Work and Research Gap}}
+Deep Learning approaches for estimating SOH can be divided into recurrent and convolutional networks. For recurrent models, LSTMs are often used because they can capture long-term temporal ageing patterns. For example, Nguyen Van et al. \cite{nguyen_van_estimation_2023} developed a two-stage LSTM for SOH and internal resistance estimation, outperforming a reference Feedforward Neural Network (FNN) in accuracy. To improve accuracy and robustness, Xu et al. \cite{xu_lstm-based_2024} incorporated data characteristics and spatio-temporal attention into an LSTM-based SOH-estimation method. Ungurean et al. \cite{ungurean_online_2020} reduced the parameter footprint of a GRU using the adaptive moment estimation algorithm. Compared to an LSTM, the GRU had significantly fewer parameters and only a slightly higher estimation error, making it a suitable candidate for an embedded implementation on a BMS. Similarly, Vaishnani et al. \cite{vaishnani_deep_2024} observed that a GRU achieved better performance ($\text{RMSE} = 0.017$) over LSTM, RNN, and hybrid LSTM-GRU models.
+
+In contrast, convolutional architectures like the TCN enable parallel processing. Yang et al. \cite{yang_state_2024} proposed a TCN with an attention mechanism, which achieved an average RMSE of $2.10\%$, outperforming a CNN, support vector regression, and a basic TCN. Furthermore, Bi et al. \cite{bi_performance_2022} showed that the TCN outperformed the LSTM by 3\% in accuracy under accelerated ageing conditions. Additionally, Alberti et al. \cite{aliberti_comparative_2022} evaluated an LSTM, a GRU, a one-dimensional CNN, and a hybrid CNN-LSTM; in that study, the one-dimensional CNN yielded the lowest estimation error and prediction variance.
+
+Kim et al. \cite{kim_edge-compatible_2025} also propose an approach to developing a lightweight, edge-compatible deep learning framework for SOH estimation. They reduced the model size by $99\%$ using knowledge distillation, structured pruning, and dynamic quantisation and outperformed a MobileNetV1-based lightweight baseline in both accuracy and compactness. 
+
+Although existing studies compare neural network architectures for SOH estimation, these comparisons are conducted on high-performance computing platforms and do not examine compression techniques such as pruning and quantisation. Consequently, it remains unexplored whether the advantages of deep learning approaches can withstand compression and operate in resource-constrained environments. 
+\begin{itemize}[leftmargin=*]
+
+\item Existing SOH studies report promising sequence-model performance, but many evaluations remain model-specific and not directly comparable across architectures.
+\item Compression literature often focuses on algorithmic gains in isolation and rarely combines battery-domain performance with deployment-level KPIs.
+\item The open gap is a controlled cross-architecture analysis that links compression decisions directly to BMS-relevant engineering costs.
+\item Figure 2 (planned, position in this section): literature positioning map contrasting accuracy-centric studies, compression-centric studies, and the proposed integrated approach.
+\end{itemize}
+
+\section{Methodology}
+\subsection{Comparison Objective and Benchmark Design}
+The comparison is designed to determine whether the effects of model optimization transfer consistently across neural architectures or depend on the mechanism used to represent temporal battery behavior. For this purpose, strong uncompressed baseline models are first established for the LSTM, GRU, CNN, and TCN families. Structured pruning and quantization are then applied under controlled conditions. The benchmark therefore examines not only whether these methods reduce model size and embedded execution cost, but also whether the resulting loss of SOH prediction accuracy follows a comparable pattern across architectures. This makes it possible to identify cases in which an expected compression benefit generalizes across model families and cases in which a particular architecture is more sensitive to parameter removal or reduced numerical precision.
+
+The comparison is organized around the change from each architecture-specific FP32 baseline rather than around baseline accuracy alone. Prediction quality is evaluated using MAE and RMSE, while deployment cost is characterized through model footprint and the embedded metrics flash, RAM, latency, and energy. Model sizes may differ where this is required to establish competitive baseline quality. However, the data partition, target definition, preprocessing, error metrics, optimization settings, and benchmark protocol are held fixed wherever applicable. The resulting accuracy--resource trade-offs provide the basis for selecting optimization strategies according to both architecture and deployment constraints.
+
+\subsection{Data, Target, and Split Strategy}
+The dataset is based on experiments conducted with JGCFR18650-1800mAh-3.2V LFP cells \cite{noauthor_product_nodate} in a university laboratory and is publicly available as the LFP DoE Cycle Aging \cite{rzepka_design_2025}. The cells were cycled inside a climate chamber at $25^\circ$ under the following charging $C_{\text{chg}}$, discharging $C_{\text{dis}}$ and Depht of Discharge (DoD) conditions:
+\begin{equation}
+    C_{\text{chg}} \in [0.5 C, 0.9 C] \\
+    C_{\text{dis}} \in [1 C, 2.5 C] \\
+    DoD \in [45 \%, 65 \%]
+\end{equation}
+This experiment used 15 test cells across eight operating conditions, with two cells per condition to ensure reproducibility. To monitor battery degradation, check-ups consisting of capacity tests, open-circuit voltage sweeps, and HPPC tests were performed after each aging loop. Furthermore, a load profile for a stationery storage unit was included to emulate realistic power flow \cite{kucevic_standard_2020}. The Data contains voltage, current, terminal temperature, auxiliary channels and is stored in Parquet tables. 
+
+
+\begin{itemize}[leftmargin=*]
+\item Prediction target: battery SOH over aging trajectories.
+\item Feature basis from current code: Voltage, Current, Temperature, EFC, and Q\_c.
+\item Feature preprocessing: hourly aggregation into mean, std, min, and max channels.
+\item Common partitioning: train cells C01/C03/C05/C09/C13/C17/C25/C27/C29; validation cells C07/C15/C21; test cells C11/C19/C23.
+\item Figure 3 (planned, position in this subsection): SOH trajectories of all cells with color-coded train/validation/test assignment.
+\end{itemize}
+\noindent This split figure documents partition coverage and helps verify that all sets contain representative SOH evolution ranges.
+
+\subsection{Architecture Portfolio and Baseline Selection}
+The portfolio comprises two recurrent architectures, an LSTM and a GRU, and two convolutional architectures, a CNN and a TCN. This selection enables compression to be compared across different mechanisms for temporal representation instead of within a single model family. All four models receive the same 20-channel input representation obtained from the hourly mean, standard deviation, minimum, and maximum of voltage, current, temperature, EFC, and cumulative charge. One SOH target is assigned to each hourly interval. Each model is causal and produces one SOH estimate at every time step.
+
+The recurrent models use a learned feature projection followed by a unidirectional recurrent stack, layer normalization, residual MLP blocks, and an MLP output head. The selected LSTM contains two recurrent layers with a hidden size of 192 and three residual blocks. The GRU uses three recurrent layers with a hidden size of 160 and four residual blocks. The convolutional models process the same sequences using residual causal convolutions. The CNN contains three blocks with 128 channels, a kernel size of five, and dilation factors of 1, 2, and 4. The TCN extends this dilation pattern to 1, 2, 4, 8, and 16 across five blocks with 96 channels, thereby providing a wider temporal context without recurrent state propagation. Table~\ref{tab:arch_portfolio} summarizes the selected uncompressed FP32 baselines.
+
+Baseline selection followed two stages. First, a family-specific hyperparameter search determined a candidate configuration using validation RMSE. Second, a local capacity sweep evaluated coordinated reductions and increases in the internal widths while retaining the remaining architecture and training settings. The investigated hidden or channel widths were 64--256 for the LSTM, 48--256 for the GRU, 64--224 for the CNN, and 48--144 for the TCN. The final reference configuration was selected from this sweep by validation performance, while the test cells were reserved for the subsequent comparison. This procedure checks the neighborhood of the selected capacity and avoids basing the compression study on an arbitrary model size.
+
+\begin{table*}[t]
+\centering
+\caption{Architecture comparison for the SOH optimization study. Sequence lengths are given in hourly steps, and FP32 memory assumes four bytes per trainable parameter.}
+\label{tab:arch_portfolio}
+\small
+\begin{tabular}{llp{7.0cm}rr}
+\toprule
+Family & Input steps & Architecture & Parameters & FP32 weights \\
+\midrule
+LSTM & 192 & Feature projection, 2 recurrent layers ($H=192$), 3 residual MLP blocks & 895,937 & 3.418 MiB \\
+GRU  & 168 & Feature projection, 3 recurrent layers ($H=160$), 4 residual MLP blocks & 844,321 & 3.221 MiB \\
+CNN  & 96  & 3 residual causal blocks ($C=128$, $k=5$, $d=1/2/4$) & 503,297 & 1.920 MiB \\
+TCN  & 120 & 5 residual temporal blocks ($C=96$, $k=5$, $d=1/2/4/8/16$) & 439,841 & 1.678 MiB \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\subsection{Training and Evaluation Protocol}
+All architectures were trained with the same cell-level partitioning and random seed of 42. A robust scaler was fitted exclusively to the training cells and subsequently applied without refitting to the validation and test cells. The hourly feature vectors were arranged as overlapping causal sequences with a stride of one. Their architecture-specific lengths are listed in Table~\ref{tab:arch_portfolio}. Each model was trained in a sequence-to-sequence setting and therefore returned one SOH estimate for every hourly step. The first 8 steps were excluded from the loss for the recurrent models, compared with 12 steps for the CNN and 16 steps for the TCN, to reduce the influence of state initialization and incomplete convolutional context.
+
+The training objective combined the mean squared prediction error with a temporal smoothness penalty,
+\begin{equation}
+    \mathcal{L}
+    = \frac{1}{N}\sum_{i=1}^{N}\left(\hat{y}_i-y_i\right)^2
+    + \lambda_{\mathrm{s}}\,\mathcal{R}\!\left(\Delta\hat{y}\right),
+    \qquad
+    \Delta\hat{y}_t=\hat{y}_t-\hat{y}_{t-1},
+\end{equation}
+where $\mathcal{R}$ denotes the mean absolute step change for the LSTM, CNN, and TCN and the mean squared step change for the GRU. The smoothness term discourages implausible hour-to-hour fluctuations without imposing a fixed degradation trajectory. AdamW was used for parameter optimization, followed by a cosine-annealing schedule with warm restarts. Gradient clipping and early stopping limited unstable updates and unnecessary training. Table~\ref{tab:training_protocol} reports the architecture-specific settings retained after the hyperparameter search.
+
+\begin{table*}[t]
+\centering
+\caption{Training settings of the selected FP32 baseline models. The epoch entry gives the maximum number of training epochs, and $\lambda_{\mathrm{s}}$ denotes the weight of the temporal smoothness penalty.}
+\label{tab:training_protocol}
+\small
+\begin{tabular}{lrrrrrl}
+\toprule
+Family & Batch size & Epochs & Learning rate & Weight decay & $\lambda_{\mathrm{s}}$ & Penalty \\
+\midrule
+LSTM & 128 & 60 & $9.28\times10^{-5}$ & $3.49\times10^{-4}$ & 0.0830 & L1 \\
+GRU  & 128 & 60 & $2.81\times10^{-4}$ & $2.60\times10^{-5}$ & 0.0051 & L2 \\
+CNN  & 48  & 50 & $3.23\times10^{-4}$ & $3.76\times10^{-5}$ & 0.0843 & L1 \\
+TCN  & 64  & 60 & $1.97\times10^{-4}$ & $5.88\times10^{-5}$ & 0.0480 & L1 \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+Validation was performed every three epochs. The checkpoint with the lowest validation RMSE was retained, with an early-stopping patience of 12 epochs for the LSTM, GRU, and TCN and 10 epochs for the CNN. The held-out test cells were used only after model and capacity selection. Prediction quality was quantified by
+\begin{equation}
+    \mathrm{MAE}=\frac{1}{N}\sum_{i=1}^{N}\left|\hat{y}_i-y_i\right|,
+    \qquad
+    \mathrm{RMSE}=\sqrt{\frac{1}{N}\sum_{i=1}^{N}\left(\hat{y}_i-y_i\right)^2}.
+\end{equation}
+The metrics were first calculated for each test cell and then combined using the number of samples per cell as weights. All errors are reported on the dimensionless 0--1 SOH scale. Accordingly, an MAE or RMSE of 0.01 corresponds to one SOH percentage point on the 0--100\% scale.
+
+\subsection{Model Optimization Methods}
+
+
+\mypar{Pruning}
+Pruning, in the scope of our work, is the process of removing weights from a model. Typically, the model components that contribute the least to a model's performance are candidates for removal. Pruning can be classified as either \textit{unstructured} or \textit{structured}. In unstructured pruning, we pinpoint the exact, individual weights we seek to remove. As the name suggests, the resulting model loses its structure; thus, to keep the matrices in an integral form, the selected weights are simply set to zero. We achieve high sparsity with minimal loss in accuracy, but the irregular matrices do not run faster on standard hardware that does not support sparse execution. In structured pruning, entire weight clusters, such as matrix rows/columns, filters, and channels, are removed. This physically shrinks the model architecture, making it faster and more efficient on typical hardware but usually comes with a sharper drop in accuracy than unstructured pruning.
+
+
+\mypar{Quantization}
+Quantization refers to reducing the precision of model parameters, usually the weights. Typical models are stored in FP32 (32-bit floating point), meaning each parameter uses 32 bits to represent it. When quantized, these parameters would then only be saved with e.g., 16 (FP16), 8 (INT8) or 4 (INT4) bits. This directly results in smaller file sizes. If the underlying hardware supports the quantized representation, these models can be executed significantly faster at minimal accuracy loss. Quantization can be paired with pruning to leverage both techniques. In this case, the model is usually pruned first, and the resulting, sparse model is quantized afterward.
+
+\begin{itemize}[leftmargin=*]
+% \item Knowledge distillation: teacher-student training is integrated to recover predictive quality of compressed models.
+
+
+\item Figure 6 (planned, position in this subsection): optimization pipeline diagram showing baseline model, individual optimization branches, and combined branch.
+\end{itemize}
+
+\subsection{Embedded Benchmark Protocol}
+\begin{itemize}[leftmargin=*]
+\item All variants are benchmarked with the same target platform and firmware toolchain.
+\item Inference is performed with batch size 1 and fixed warm-up, because deployment is stateful and sample-by-sample in online BMS operation.
+\item Embedded KPIs: MAE, flash, RAM, latency (mean and std), and energy.
+\item Quantization path in current code: dynamic INT8 for LSTM/GRU, static FX INT8 for CNN, and stabilized head-focused static FX for TCN.
+\item Figure 7 (planned, position in this subsection): benchmark setup including host pipeline, firmware execution, and metric logging flow.
+\end{itemize}
+
+\section{Results}
+\subsection{Baseline Model Comparison}
+The uncompressed FP32 models were first compared independently of any optimization. Figure~\ref{fig:baseline_model_comparison}(a) reports sample-weighted errors on the held-out test set using the 0--1 SOH scale defined in Section~3.4. The four architectures lie within a narrow accuracy range, with MAE values between 0.0121 and 0.0142 and RMSE values between 0.0152 and 0.0179. The TCN achieves the lowest MAE, whereas the GRU yields the lowest RMSE, showing that the baseline ranking depends on the selected error metric.
+
+The parameter footprints differ more clearly than the prediction errors. As shown in Figure~\ref{fig:baseline_model_comparison}(b), the TCN and CNN require 1.678 and 1.920 MiB of FP32 weights, respectively, compared with 3.221 MiB for the GRU and 3.418 MiB for the LSTM. The largest baseline is therefore approximately twice the size of the smallest one despite their similar prediction accuracy. These differences provide distinct starting points for evaluating the architecture-dependent effects of compression in the following sections.
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=\textwidth]{figures/baseline_model_comparison.png}
+    \caption{Comparison of the uncompressed FP32 baseline models. (a) Sample-weighted MAE and RMSE on the held-out test set using the dimensionless 0--1 SOH scale. A value of 0.01 corresponds to one SOH percentage point. (b) Parameter-only FP32 memory calculated with four bytes per trainable parameter.}
+    \label{fig:baseline_model_comparison}
+\end{figure*}
+
+Figure~\ref{fig:selected_baseline_trajectory} complements the aggregated errors with a trajectory-level comparison for one of the held-out test cells. All selected baseline models reproduce the long-term SOH decline and the principal local variations. Their deviations from the reference nevertheless differ over time, which explains why the aggregate ranking cannot be inferred from a single operating interval. This single-cell view is therefore illustrative, while Figure~\ref{fig:baseline_model_comparison}(a) remains the quantitative comparison across the complete test set.
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=\textwidth]{figures/selected_baseline_soh_trajectory.png}
+    \caption{SOH trajectories of the selected uncompressed FP32 baseline models for one of the held-out test cells over 2716 hourly samples. The black line denotes the reference SOH, and the colored lines denote the predictions of the four architecture families.}
+    \label{fig:selected_baseline_trajectory}
+\end{figure*}
+
+The local capacity sweep provides an additional sensitivity check around the initial configuration obtained for each architecture. Figure~\ref{fig:baseline_capacity_sensitivity} compares coordinated reductions and increases in the internal widths on the same held-out test-cell trajectory. The relationship between parameter count and prediction error is non-monotonic across all four families. Increasing capacity therefore does not guarantee a lower error, while some compact variants remain competitive with substantially larger networks. This observation supports architecture-specific capacity searches rather than selecting the largest feasible model by default.
+
+Only MAE is shown in Figure~\ref{fig:baseline_capacity_sensitivity} to keep the four-family comparison legible. The single-cell analysis is used to characterize local size sensitivity, whereas the final reference configurations were selected using validation RMSE as described in Section~3.3 and are compared across all held-out test cells in Figure~\ref{fig:baseline_model_comparison}.
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=\textwidth]{figures/baseline_capacity_sensitivity.png}
+    \caption{Local capacity sensitivity on one held-out test-cell trajectory for (a) CNN, (b) GRU, (c) LSTM, and (d) TCN. The label \emph{base} denotes the initial configuration around which coordinated smaller (s1--s3) and larger (l1--l3) variants were generated. MAE is shown on the normalized 0--1 SOH scale, where 0.01 corresponds to one SOH percentage point.}
+    \label{fig:baseline_capacity_sensitivity}
+\end{figure*}
+\FloatBarrier
+
+\subsection{Pruning Results}
+\begin{itemize}[leftmargin=*]
+\item Report MAE/RMSE trends over pruning levels per architecture.
+\item Report flash/RAM/latency/energy changes over pruning levels.
+\item Identify pruning thresholds where performance leaves the acceptable operating range.
+\item Figure 9 (planned, position in this subsection): pruning sensitivity curves and per-architecture Pareto view.
+\end{itemize}
+
+\subsection{Quantization Results}
+\begin{itemize}[leftmargin=*]
+\item Compare FP32 and lower precision variants per architecture.
+\item Quantify trade-offs between prediction quality and embedded resource gains.
+\item Distinguish robust quantization cases from degradation-prone cases.
+\item Figure 10 (planned, position in this subsection): precision-vs-MAE and precision-vs-resource multi-panel plot.
+\end{itemize}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\textwidth]{figures/cnn_metrics_dashboard} 
+    \caption{CNN metrics.}
+    \label{fig:cnn_metrics}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\textwidth]{figures/tcn_metrics_dashboard} 
+    \caption{TCN metrics.}
+    \label{fig:tcn_metrics}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\textwidth]{figures/gru_metrics_dashboard} 
+    \caption{GRU metrics.}
+    \label{fig:gru_metrics}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\textwidth]{figures/lstm_metrics_dashboard} 
+    \caption{LSTM metrics.}
+    \label{fig:lstm_metrics}
+\end{figure}
+
+%%%%%
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\textwidth]{figures/cnn_pareto.pdf} 
+    \caption{CNN pareto.}
+    \label{fig:cnn_pareto}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\textwidth]{figures/tcn_pareto} 
+    \caption{TCN pareto.}
+    \label{fig:tcn_pareto}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\textwidth]{figures/gru_pareto.pdf} 
+    \caption{GRU pareto.}
+    \label{fig:gru_pareto}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\textwidth]{figures/lstm_pareto} 
+    \caption{LSTM pareto.}
+    \label{fig:lstm_pareto}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\textwidth]{figures/all_architectures_pareto.pdf} 
+    \caption{Overall pareto.}
+    \label{fig:overall_pareto}
+\end{figure}
+
+
+\subsection{Distillation and Combined Optimization Results}
+\begin{itemize}[leftmargin=*]
+\item Evaluate whether distillation recovers accuracy for compressed student models.
+\item Compare single-method and combined-method variants within one decision space.
+\item Analyze additive versus interaction effects between optimization methods.
+\item Figure 11 (planned, position in this subsection): combined optimization scatter with non-dominated configurations.
+\end{itemize}
+
+\subsection{Cross-Architecture Decision View}
+\begin{itemize}[leftmargin=*]
+\item Summarize all accepted variants in architecture-wise and global Pareto fronts.
+\item Highlight architecture-dependent operating regions for low-memory, low-latency, and low-energy constraints.
+\item Figure 12 (planned, position in this subsection): final decision map for architecture and optimization selection.
+\end{itemize}
+
+\section{Discussion}
+\subsection{Baseline Architecture Comparison (Flo, EET)}
+The baseline comparison shows that architecture choice affects resource demand more clearly than SOH prediction accuracy. Although all four models operate within a narrow MAE and RMSE range, their FP32 parameter footprints differ by approximately a factor of two. The TCN combines the lowest MAE with the smallest baseline footprint, whereas the GRU achieves the lowest RMSE at a larger model size. Consequently, no architecture is uniformly superior across error metrics and storage requirements. The appropriate baseline depends on whether average absolute deviation, stronger penalization of larger errors, or memory demand is prioritized by the application.
+
+The local capacity sweeps further show that increasing the number of parameters does not produce a monotonic accuracy improvement. Compact configurations can remain competitive, while larger variants may generalize less effectively despite their additional capacity. This finding is important for the subsequent optimization comparison because it separates compression effects from arbitrary over-sizing of the original network. Each architecture must first be evaluated near a suitable capacity before the effect of pruning or quantization can be interpreted fairly. The trajectory comparison supports this conclusion at the single-cell level: all selected models reproduce the long-term degradation trend, but their local deviations occur at different points in time. Aggregate metrics across all test cells therefore remain necessary for the final ranking.
+
+\subsection{Cross-Architecture Effects of Optimization (HPI)}
+\begin{itemize}[leftmargin=*]
+\item Interpret why architectures react differently to identical optimization settings.
+\item Discuss where higher model complexity is justified by robustness gains and where lightweight structures dominate.
+\item Clarify methodological limits (data regime, target platform scope, and configuration breadth).
+\item Figure 13 (planned, position in this section): qualitative decision matrix linking constraints to recommended architecture-method combinations.
+\end{itemize}
+
+\section{Conclusion and Outlook}
+\subsection{Summary of Optimization Results (HPI)}
+\begin{itemize}[leftmargin=*]
+\item The study provides a controlled architecture-level comparison of pruning, quantization, and distillation for SOH prediction.
+\item The central contribution is a reproducible accuracy-cost analysis that directly supports embedded design decisions.
+\item Future work extends the study to additional chemistries, broader operating regimes, and tighter hardware-in-the-loop integration.
+\end{itemize}
+
+\subsection{Implications for Battery Management Systems (Flo, EET and Pavel, EET)}
+For a BMS, optimization is useful only when the reduction in resource demand preserves an SOH estimate that remains sufficiently accurate for monitoring, maintenance planning, and operating-limit adaptation. The combined structured-pruning and INT8-quantization variants reduce parameter storage by approximately 80.0--81.5\% for the CNN, GRU, and LSTM, while the absolute change in normalized MAE remains below 0.0008. These results indicate that substantial storage reductions are possible without a corresponding increase of the same magnitude in estimation error. The small accuracy improvements observed for some variants should not be interpreted as a general benefit of compression, but rather as evidence that the optimized models remain within the accuracy range of their baselines.
+
+The TCN result also demonstrates why a BMS implementation cannot be selected from prediction accuracy or a nominal precision label alone. Although the TCN is the smallest FP32 baseline and achieves the lowest baseline MAE, its current combined optimization path reduces parameter storage by only 29.2\%. In particular, quantization provides no further storage reduction after pruning for the evaluated implementation. The achievable benefit therefore depends on the architecture, the supported operators, and the representation generated by the deployment toolchain. Relative compression and absolute deployed footprint must consequently be considered together.
+
+From a system perspective, reduced model storage can create flash headroom for firmware, diagnostics, communication functions, and future model updates. However, parameter count and stored model size do not directly determine runtime RAM, latency, or energy consumption. These quantities must be evaluated on the target hardware because conversion overhead and operator support can offset theoretical savings. 
+
+\section*{Figure Directory (Working Draft)}
+\begin{itemize}[leftmargin=*]
+\item Figure 1: Study concept from baseline training to compression and embedded evaluation.
+\item Figure 2: Literature positioning map and research gap framing.
+\item Figure 3: SOH trajectories with train/validation/test split highlighting.
+\item Figure 4: Architecture panel for LSTM, GRU, CNN, and TCN.
+\item Figure 5: Training and baseline-selection workflow.
+\item Figure 6: Optimization workflow (pruning, quantization, distillation, combined branch).
+\item Figure 7: Embedded benchmark setup and metric acquisition flow.
+\item Figure 8: Baseline MAE/RMSE and footprint comparison.
+\item Figure 9: Pruning sensitivity and pruning Pareto view.
+\item Figure 10: Quantization sensitivity and precision-resource trade-off.
+\item Figure 11: Distillation and combined optimization scatter with non-dominated points.
+\item Figure 12: Cross-architecture decision map.
+\item Figure 13: Discussion matrix linking deployment constraints to model-method choices.
+\end{itemize}
+
+\section*{Data availability (placeholder)}
+\begin{itemize}[leftmargin=*]
+\item Dataset DOI, code repository links, and benchmark scripts will be inserted in the final manuscript version.
+\end{itemize}
+
+\bibliographystyle{elsarticle-num}
+\bibliography{references_EET}
+%\bibliography{references}
+\end{document}

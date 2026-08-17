@@ -78,6 +78,7 @@ env/
 *.toc
 *.nav
 *.snm
+*.spl
 
 # ── STM32 / C Build Artifacts ──
 *.o
@@ -115,6 +116,12 @@ env/
 _pytemp/
 *.tmp
 *.bak
+**/_page_check/
+**/_render*/
+**/_appendix_preview/
+
+# Oversized presentation is stored as reproducible Git chunks.
+/LATEX/DISS/Florian_Rzepka_Dissertation/presentation/Diss_FR.pptx
 
 # ── Jupyter ──
 .ipynb_checkpoints/
