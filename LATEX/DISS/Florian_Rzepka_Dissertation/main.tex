@@ -349,14 +349,22 @@ The central conclusion is that AI-enabled battery-state estimation should not be
 \item[$\mathbf{A}$] State-transition matrix of the equivalent-circuit observer
 \item[$\mathbf{b}$] Input vector of the equivalent-circuit observer
 \item[$\mathbf{c}_t$] LSTM cell state at sample $t$
+\item[$\mathbf{F}_k$] Jacobian of the nonlinear state-transition function in the EKF
 \item[$\mathbf{f}_t$] LSTM forget-gate activation
+\item[$\mathbf{H}_k$] Jacobian of the nonlinear measurement function in the EKF
 \item[$\tilde{\mathbf{c}}_t$] LSTM candidate cell state at sample $t$
 \item[$\mathbf{h}_t$] Recurrent hidden state at sample $t$
 \item[$\tilde{\mathbf{h}}_t$] GRU candidate hidden state at sample $t$
 \item[$\mathbf{i}_t$] LSTM input-gate activation
+\item[$\mathbf{K}_k$] Kalman gain at discrete time index $k$
 \item[$\mathbf{o}_t$] LSTM output-gate activation
+\item[$\mathbf{P}_k$] State-estimation error covariance in the EKF
+\item[$\mathbf{Q}_k$] Process-noise covariance in the EKF
 \item[$\mathbf{r}_t$] GRU reset-gate activation
+\item[$\mathbf{R}_k$] Measurement-noise covariance in the EKF
 \item[$\mathbf{x}$] State vector or model input vector, depending on context
+\item[$\tilde{\mathbf{y}}_k$] Measurement innovation or residual in the EKF
+\item[$\mathbf{z}_k$] Measurement vector used by the EKF correction step
 \item[$\mathbf{z}_t$] GRU update-gate activation
 \item[$b$] Neural-network bias vector
 \item[$C(t)$] Capacity measured at time $t$
@@ -378,7 +386,6 @@ The central conclusion is that AI-enabled battery-state estimation should not be
 \item[$L_\mathrm{SOC}$] SOC training sequence length
 \item[$m_k$] Median of feature channel $k$ used for robust normalization
 \item[$n$] Number of evaluated samples
-\item[$P$] Covariance matrix of the observer correction step
 \item[$q$] INT8 quantized weight code
 \item[$Q$] Cumulative charge or charge throughput
 \item[$Q_c$] Online cumulative charge state
@@ -555,26 +562,51 @@ Equivalent-circuit models (ECMs) represent the terminal behaviour of a cell thro
 A nonlinear discrete state-space model can be written as
 \begin{align}
     \mathbf{x}_k &= f(\mathbf{x}_{k-1},\mathbf{u}_k)+\mathbf{w}_k, \\
-    \mathbf{y}_k &= h(\mathbf{x}_k,\mathbf{u}_k)+\mathbf{v}_k,
+    \mathbf{z}_k &= h(\mathbf{x}_k,\mathbf{u}_k)+\mathbf{v}_k,
     \label{eq:fundamental_state_space}
 \end{align}
-where $\mathbf{x}_k$ contains the hidden battery states, $\mathbf{u}_k$ contains measured inputs, and $\mathbf{y}_k$ contains the predicted measurements. The process-noise term $\mathbf{w}_k$ represents uncertainty in the state model, while $\mathbf{v}_k$ represents measurement uncertainty.
+where $\mathbf{x}_k$ contains the hidden battery states, $\mathbf{u}_k$ contains known or measured inputs, and $\mathbf{z}_k$ contains the sensor measurements used for correction. In a battery observer, $\mathbf{u}_k$ commonly contains the cell current and $\mathbf{z}_k$ the terminal voltage. The process-noise term $\mathbf{w}_k$ represents uncertainty in the state model, while $\mathbf{v}_k$ represents measurement uncertainty. Their covariance matrices are denoted by $\mathbf{Q}_k$ and $\mathbf{R}_k$, respectively.
 
-The extended Kalman filter (EKF) alternates between model-based prediction and measurement-based correction. Using the local Jacobians $\mathbf{F}_k$ and $\mathbf{H}_k$, the principal steps are
+The extended Kalman filter (EKF) repeats two phases at every sample. \textbf{Prediction.} The prediction phase propagates the previous state estimate through the nonlinear system model and predicts the associated uncertainty:
+\begin{subequations}\label{eq:fundamental_ekf_prediction}
 \begin{align}
     \hat{\mathbf{x}}^-_k
-    &=f(\hat{\mathbf{x}}_{k-1},\mathbf{u}_k), \\
+    &=f(\hat{\mathbf{x}}_{k-1},\mathbf{u}_k),
+    \label{eq:fundamental_ekf_state_prediction}\\
+    \mathbf{F}_k
+    &=\left.\frac{\partial f}{\partial \mathbf{x}}\right|_{\hat{\mathbf{x}}_{k-1},\mathbf{u}_k},
+    \label{eq:fundamental_ekf_state_jacobian}\\
     \mathbf{P}^-_k
-    &=\mathbf{F}_k\mathbf{P}_{k-1}\mathbf{F}_k^\mathsf{T}+\mathbf{Q}_k, \\
+    &=\mathbf{F}_k\mathbf{P}_{k-1}\mathbf{F}_k^\mathsf{T}+\mathbf{Q}_k.
+    \label{eq:fundamental_ekf_covariance_prediction}
+\end{align}
+\end{subequations}
+The superscript minus identifies a prior quantity. It denotes the estimate available before the new sensor measurement has been incorporated and is not a negative value. The Jacobian $\mathbf{F}_k$ locally linearizes the nonlinear state-transition function around the previous estimate and the current input.
+
+\textbf{Measurement update.} The correction phase compares the new measurement with the measurement predicted from the prior state. It then uses the resulting innovation to update both the state estimate and its uncertainty:
+\begin{subequations}\label{eq:fundamental_ekf_update}
+\begin{align}
+    \mathbf{H}_k
+    &=\left.\frac{\partial h}{\partial \mathbf{x}}\right|_{\hat{\mathbf{x}}^-_k,\mathbf{u}_k},
+    \label{eq:fundamental_ekf_measurement_jacobian}\\
     \mathbf{K}_k
     &=\mathbf{P}^-_k\mathbf{H}_k^\mathsf{T}
-      \left(\mathbf{H}_k\mathbf{P}^-_k\mathbf{H}_k^\mathsf{T}+\mathbf{R}_k\right)^{-1}, \\
+      \left(\mathbf{H}_k\mathbf{P}^-_k\mathbf{H}_k^\mathsf{T}+\mathbf{R}_k\right)^{-1},
+    \label{eq:fundamental_ekf_gain}\\
+    \tilde{\mathbf{y}}_k
+    &=\mathbf{z}_k-h(\hat{\mathbf{x}}^-_k,\mathbf{u}_k),
+    \label{eq:fundamental_ekf_innovation}\\
     \hat{\mathbf{x}}_k
-    &=\hat{\mathbf{x}}^-_k
-      +\mathbf{K}_k\left(\mathbf{y}_k-h(\hat{\mathbf{x}}^-_k,\mathbf{u}_k)\right).
-    \label{eq:fundamental_ekf}
+    &=\hat{\mathbf{x}}^-_k+\mathbf{K}_k\tilde{\mathbf{y}}_k,
+    \label{eq:fundamental_ekf_state_update}\\
+    \mathbf{P}_k
+    &=\left(\mathbf{I}-\mathbf{K}_k\mathbf{H}_k\right)\mathbf{P}^-_k.
+    \label{eq:fundamental_ekf_covariance_update}
 \end{align}
-The covariance matrix $\mathbf{P}_k$ describes state uncertainty, while $\mathbf{Q}_k$ and $\mathbf{R}_k$ tune the assumed process and measurement uncertainty. The Kalman gain $\mathbf{K}_k$ determines how strongly the voltage residual corrects the predicted state. The unscented Kalman filter avoids explicit local linearization by propagating selected sigma points through the nonlinear functions. Both approaches depend on a sufficiently accurate cell model and suitable parameterization over SOC, temperature, and ageing.\autocite{liJointEstimationState2021,gaoEnhancedStateofchargeEstimation2022,guoSystematicReviewElectrochemical2024}
+\end{subequations}
+Here, $\mathbf{H}_k$ is the Jacobian of the measurement function, $\tilde{\mathbf{y}}_k$ is the innovation or measurement residual, and $\mathbf{K}_k$ is the Kalman gain. A larger gain gives the new measurement more influence, while a smaller gain retains more of the model prediction. The symbol $\mathsf{T}$ denotes matrix transposition, $^{-1}$ denotes matrix inversion, and $\mathbf{I}$ is the identity matrix. The covariance matrix $\mathbf{P}_k$ describes the remaining uncertainty of the corrected state estimate.
+
+The unscented Kalman filter avoids explicit local linearization by propagating selected sigma points through the nonlinear functions. Both approaches depend on a sufficiently accurate cell model and suitable parameterization over SOC, temperature, and ageing.\autocite{liJointEstimationState2021,gaoEnhancedStateofchargeEstimation2022,guoSystematicReviewElectrochemical2024}
 
 Kalman-filter-based estimators remain an important application benchmark because they combine causal execution, voltage correction, and physical interpretation. Their limitations are equally important. Model mismatch, inaccurate open-circuit-voltage relations, poorly identified resistance-capacitance parameters, and inappropriate covariance tuning can introduce systematic errors. LFP cells are particularly challenging when the voltage residual is small on the flat OCV plateau. Neural estimators exchange this explicit physical structure for a learned nonlinear mapping and therefore require a different form of validation.
 
