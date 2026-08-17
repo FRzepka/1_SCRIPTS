@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1700" height="900" viewBox="0 0 1700 900">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L9,3 L0,6 Z" fill="#2f2f2f"/>
+    </marker>
+    <marker id="blue-arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L9,3 L0,6 Z" fill="#1f77b4"/>
+    </marker>
+    <style>
+      .label { font-family: Arial, Helvetica, sans-serif; fill: #1f1f1f; }
+      .panel { font-size: 30px; font-weight: 700; }
+      .heading { font-size: 27px; font-weight: 700; }
+      .body { font-size: 22px; }
+      .small { font-size: 20px; }
+      .box { stroke-width: 2.2; }
+      .neutral { fill: #f5f5f5; stroke: #4f4f4f; }
+      .recurrent { fill: #a1c6e0; stroke: #1f77b4; }
+      .mlp { fill: #eea4a5; stroke: #d62728; }
+      .flow { fill: none; stroke: #2f2f2f; stroke-width: 2.5; marker-end: url(#arrow); }
+      .state { fill: none; stroke: #1f77b4; stroke-width: 2.5; marker-end: url(#blue-arrow); }
+    </style>
+  </defs>
+
+  <text x="24" y="48" class="label panel">(a)</text>
+
+  <rect x="35" y="105" width="385" height="235" rx="5" class="box neutral"/>
+  <text x="227.5" y="155" text-anchor="middle" class="label heading">Online inputs</text>
+  <text x="227.5" y="205" text-anchor="middle" class="label body">U, I, T</text>
+  <text x="227.5" y="245" text-anchor="middle" class="label body">Q<tspan baseline-shift="sub" font-size="16">c</tspan>, dU/dt, dI/dt</text>
+  <text x="227.5" y="290" text-anchor="middle" class="label small">6 channels at 1 Hz</text>
+
+  <rect x="520" y="105" width="350" height="235" rx="5" class="box recurrent"/>
+  <text x="695" y="155" text-anchor="middle" class="label heading">LSTM core</text>
+  <text x="695" y="205" text-anchor="middle" class="label body">1 recurrent layer</text>
+  <text x="695" y="245" text-anchor="middle" class="label body">hidden size 64</text>
+  <text x="695" y="290" text-anchor="middle" class="label small">states h(t), c(t)</text>
+
+  <rect x="970" y="105" width="380" height="235" rx="5" class="box mlp"/>
+  <text x="1160" y="155" text-anchor="middle" class="label heading">MLP head</text>
+  <text x="1160" y="205" text-anchor="middle" class="label body">Linear 64 &#8594; 64 + ReLU</text>
+  <text x="1160" y="245" text-anchor="middle" class="label body">Linear 64 &#8594; 1</text>
+  <text x="1160" y="290" text-anchor="middle" class="label small">sigmoid output</text>
+
+  <rect x="1450" y="125" width="215" height="195" rx="5" class="box neutral"/>
+  <text x="1557.5" y="175" text-anchor="middle" class="label heading">Output</text>
+  <text x="1557.5" y="225" text-anchor="middle" class="label body">SOC estimate</text>
+  <text x="1557.5" y="270" text-anchor="middle" class="label small">1 Hz</text>
+
+  <path d="M420 222.5 H520" class="flow"/>
+  <path d="M870 222.5 H970" class="flow"/>
+  <path d="M1350 222.5 H1450" class="flow"/>
+  <path d="M835 105 V72 H555 V105" class="state"/>
+  <text x="695" y="58" text-anchor="middle" class="label small">h(t&#8722;1), c(t&#8722;1)</text>
+
+  <line x1="24" y1="430" x2="1676" y2="430" stroke="#d0d0d0" stroke-width="1.5"/>
+  <text x="24" y="488" class="label panel">(b)</text>
+
+  <rect x="35" y="545" width="385" height="235" rx="5" class="box neutral"/>
+  <text x="227.5" y="595" text-anchor="middle" class="label heading">Online inputs</text>
+  <text x="227.5" y="645" text-anchor="middle" class="label body">t, U, I, T</text>
+  <text x="227.5" y="685" text-anchor="middle" class="label body">EFC, Q<tspan baseline-shift="sub" font-size="16">c</tspan></text>
+  <text x="227.5" y="730" text-anchor="middle" class="label small">6 channels at 1 Hz</text>
+
+  <rect x="520" y="545" width="350" height="235" rx="5" class="box recurrent"/>
+  <text x="695" y="595" text-anchor="middle" class="label heading">LSTM core</text>
+  <text x="695" y="645" text-anchor="middle" class="label body">1 recurrent layer</text>
+  <text x="695" y="685" text-anchor="middle" class="label body">hidden size 128</text>
+  <text x="695" y="730" text-anchor="middle" class="label small">states h(t), c(t)</text>
+
+  <rect x="970" y="545" width="380" height="235" rx="5" class="box mlp"/>
+  <text x="1160" y="595" text-anchor="middle" class="label heading">MLP head</text>
+  <text x="1160" y="645" text-anchor="middle" class="label body">Linear 128 &#8594; 128 + ReLU</text>
+  <text x="1160" y="685" text-anchor="middle" class="label body">Linear 128 &#8594; 1</text>
+  <text x="1160" y="730" text-anchor="middle" class="label small">linear output</text>
+
+  <rect x="1450" y="565" width="215" height="195" rx="5" class="box neutral"/>
+  <text x="1557.5" y="615" text-anchor="middle" class="label heading">Output</text>
+  <text x="1557.5" y="665" text-anchor="middle" class="label body">SOH estimate</text>
+  <text x="1557.5" y="710" text-anchor="middle" class="label small">1 Hz</text>
+
+  <path d="M420 662.5 H520" class="flow"/>
+  <path d="M870 662.5 H970" class="flow"/>
+  <path d="M1350 662.5 H1450" class="flow"/>
+  <path d="M835 545 V512 H555 V545" class="state"/>
+  <text x="695" y="500" text-anchor="middle" class="label small">h(t&#8722;1), c(t&#8722;1)</text>
+</svg>

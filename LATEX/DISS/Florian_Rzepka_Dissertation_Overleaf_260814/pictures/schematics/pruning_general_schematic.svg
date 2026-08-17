@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="610" viewBox="0 0 1600 610">
+  <defs>
+    <style>
+      .panel { font-family: Arial, Helvetica, sans-serif; fill: #222222; font-size: 34px; font-weight: 700; }
+      .label { font-family: Arial, Helvetica, sans-serif; fill: #434343; font-size: 29px; }
+      .math { font-family: "Times New Roman", Times, serif; fill: #222222; font-size: 36px; font-style: italic; }
+      .math-red { font-family: "Times New Roman", Times, serif; fill: #d62728; font-size: 32px; font-style: italic; }
+      .edge { stroke: #555555; stroke-width: 4; fill: none; }
+      .edge-removed { stroke: #d62728; stroke-width: 5; fill: none; }
+      .node { fill: #f7f7f7; stroke: #434343; stroke-width: 6; }
+      .node-removed { fill: #eea4a5; stroke: #d62728; stroke-width: 7; }
+      .arrow { stroke: #d62728; stroke-width: 7; fill: none; marker-end: url(#arrowhead); }
+    </style>
+    <marker id="arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#d62728"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="610" fill="#ffffff"/>
+
+  <text x="55" y="62" class="panel">(a)</text>
+  <text x="1255" y="62" class="panel">(b)</text>
+
+  <!-- Original network -->
+  <g>
+    <line x1="145" y1="210" x2="410" y2="145" class="edge-removed"/>
+    <line x1="145" y1="210" x2="410" y2="300" class="edge"/>
+    <line x1="145" y1="210" x2="410" y2="455" class="edge"/>
+    <line x1="145" y1="400" x2="410" y2="145" class="edge-removed"/>
+    <line x1="145" y1="400" x2="410" y2="300" class="edge"/>
+    <line x1="145" y1="400" x2="410" y2="455" class="edge"/>
+    <line x1="410" y1="145" x2="650" y2="305" class="edge-removed"/>
+    <line x1="410" y1="300" x2="650" y2="305" class="edge"/>
+    <line x1="410" y1="455" x2="650" y2="305" class="edge"/>
+
+    <circle cx="145" cy="210" r="28" class="node"/>
+    <circle cx="145" cy="400" r="28" class="node"/>
+    <circle cx="410" cy="145" r="31" class="node-removed"/>
+    <circle cx="410" cy="300" r="28" class="node"/>
+    <circle cx="410" cy="455" r="28" class="node"/>
+    <circle cx="650" cy="305" r="28" class="node"/>
+
+    <text x="250" y="555" class="label">original network</text>
+    <text x="322" y="105" class="math-red">low s<tspan baseline-shift="sub" font-size="22">h</tspan></text>
+  </g>
+
+  <!-- General score-based removal -->
+  <g>
+    <text x="740" y="190" class="math">s<tspan baseline-shift="sub" font-size="24">h</tspan> = &#934;(&#952;<tspan baseline-shift="sub" font-size="24">h</tspan>)</text>
+    <text x="700" y="255" class="label">rank by importance</text>
+    <path d="M 720 325 L 930 325" class="arrow"/>
+    <text x="680" y="420" class="label">remove low-scoring structures</text>
+  </g>
+
+  <!-- Compact network -->
+  <g>
+    <line x1="1125" y1="210" x2="1340" y2="235" class="edge"/>
+    <line x1="1125" y1="210" x2="1340" y2="390" class="edge"/>
+    <line x1="1125" y1="400" x2="1340" y2="235" class="edge"/>
+    <line x1="1125" y1="400" x2="1340" y2="390" class="edge"/>
+    <line x1="1340" y1="235" x2="1530" y2="305" class="edge"/>
+    <line x1="1340" y1="390" x2="1530" y2="305" class="edge"/>
+
+    <circle cx="1125" cy="210" r="28" class="node"/>
+    <circle cx="1125" cy="400" r="28" class="node"/>
+    <circle cx="1340" cy="235" r="28" class="node"/>
+    <circle cx="1340" cy="390" r="28" class="node"/>
+    <circle cx="1530" cy="305" r="28" class="node"/>
+
+    <text x="1240" y="555" class="label">compact network</text>
+  </g>
+</svg>
