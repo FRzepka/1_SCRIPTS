@@ -1,0 +1,71 @@
+﻿===== SLIDE 1 layout=1_Titel - Text und Bild =====
+1: name=TextBox 6; type=17; x=43,4; y=391,6; w=655,8; h=72,7; text=Real-Time State Estimation Using Embedded Neural Networks in BMS
+2: name=TextBox 8; type=17; x=43,4; y=479,2; w=655,8; h=22,3; text=Florian Rzepka | EET | Embedded AI for BMS | 9. April 2025
+3: name=Picture Placeholder 3; type=14; x=-1,1; y=99,3; w=699,6; h=257,8; text=
+===== SLIDE 2 layout=3_Inhalt - Text und Stichpunkte =====
+1: name=Text Placeholder 1; type=14; x=43,4; y=117,9; w=765,5; h=226,2; text=Objective: AI-Based State Estimation on Embedded Hardware | Test BMS: Design and Functionality  | Requirements and Challenges in Embedded State Estimation | AI Models for State Estimation: Possibilities and Evaluation | Firmware- und Software Integration | Conclusion and Outlook |  |  | 
+2: name=Text Placeholder 3; type=14; x=43,8; y=31,2; w=654,5; h=56,5; text=Structure
+===== SLIDE 3 layout=2_Titel - Text  =====
+1: name=Rectangle 1; type=1; x=59,3; y=262,0; w=778,8; h=116,3; text=Objective: AI-Based State Estimation on Embedded Hardware | 
+===== SLIDE 4 layout=5_Inhalt - Bild und Stichpunkte =====
+1: name=Text Placeholder 3; type=14; x=43,8; y=31,2; w=654,5; h=56,5; text=Embedded AI for State Estimation
+2: name=Rectangle 6; type=1; x=36,6; y=118,8; w=748,9; h=138,1; text=Objective: Enhance battery state estimation (SOC/SOH) using AI on embedded hardware. | Context: Integration of neural network models into resource-constrained systems. | Scope: Focus on evaluated models and their feasibility for real-time applications.
+3: name=Rechteck 5; type=5; x=815,0; y=0,0; w=145,0; h=465,1; text=
+4: name=Rectangle 8; type=1; x=815,0; y=116,8; w=174,5; h=187,4; text=1. Objective  | 2. Test BMS | 3. Requirements | 4. AI Models | 5. Software Integration | 6. Outlook
+===== SLIDE 6 layout=5_Inhalt - Bild und Stichpunkte =====
+1: name=Inhaltsplatzhalter 3; type=13; x=235,9; y=133,8; w=343,4; h=287,6; text=
+2: name=Rechteck 5; type=5; x=815,0; y=0,0; w=145,0; h=465,1; text=
+3: name=Rectangle 6; type=1; x=815,0; y=116,8; w=174,5; h=187,4; text=1. Objective  | 2. Test BMS | 3. Requirements | 4. AI Models | 5. Software Integration | 6. Outlook
+4: name=Picture 7; type=13; x=634,3; y=104,9; w=105,3; h=105,3; text=
+5: name=Rectangle 11; type=1; x=72,7; y=138,2; w=104,5; h=84,1; text=
+6: name=Picture 2; type=13; x=72,8; y=112,1; w=93,6; h=136,0; text=
+7: name=Rectangle 60; type=1; x=336,8; y=222,3; w=45,7; h=44,2; text=
+8: name=Elbow Connector 19; type=1; x=177,2; y=180,2; w=159,7; h=64,1; text=
+9: name=Rectangle 67; type=1; x=631,6; y=113,1; w=106,9; h=90,6; text=
+10: name=Rectangle 69; type=1; x=380,0; y=289,0; w=81,0; h=82,7; text=
+11: name=Elbow Connector 70; type=1; x=469,3; y=137,9; w=141,8; h=182,8; text=
+12: name=Text Placeholder 35; type=14; x=43,8; y=31,2; w=654,5; h=56,5; text=Main Components
+13: name=TextBox 1; type=17; x=14,7; y=232,6; w=221,2; h=181,8; text=Analog-to-digital conversion of cell voltages, temperatures, and currents | Passive balancing | Maximum number of cells: 12 | Application: 48V systems
+14: name=TextBox 18; type=17; x=33,9; y=104,9; w=194,6; h=29,1; text=Battery Monitoring IC
+15: name=TextBox 20; type=17; x=593,9; y=79,7; w=221,1; h=29,1; text=Micro Controller Unit
+16: name=TextBox 9; type=17; x=573,4; y=204,9; w=249,0; h=290,8; text=Dual-core (M7 up to 480 MHz, M4 up to 240 MHz) ideal for parallel tasks such as state estimation and communication | Advanced algorithms like Kalman filters or Neural networks possible | Large internal memory:– 1 MB Flash per core– 1 MB SRAM (shared) | 
+17: name=TextBox 3; type=17; x=175,7; y=198,7; w=47,1; h=29,1; text=[1]
+18: name=TextBox 21; type=17; x=735,4; y=181,7; w=47,1; h=29,1; text=[2]
+===== SLIDE 17 layout=5_Inhalt - Bild und Stichpunkte =====
+1: name=Text Placeholder 3; type=14; x=43,8; y=31,2; w=654,5; h=56,5; text=BMS System Constraints & Performance Requirements
+2: name=Rechteck 5; type=5; x=815,0; y=0,0; w=145,0; h=465,1; text=
+3: name=Rectangle 5; type=1; x=815,0; y=116,8; w=174,5; h=187,4; text=1. Objective  | 2. Test BMS | 3. Requirements | 4. AI Models | 5. Software Integration | 6. Outlook
+4: name=Table 1; type=19; x=43,8; y=104,7; w=727,8; h=309,6; text=
+5: name=Right Arrow 6; type=1; x=300,1; y=143,2; w=24,3; h=25,0; text=
+6: name=Right Arrow 8; type=1; x=300,1; y=198,0; w=24,3; h=25,0; text=
+7: name=Right Arrow 9; type=1; x=300,0; y=249,7; w=24,3; h=25,0; text=
+8: name=Right Arrow 11; type=1; x=300,1; y=302,9; w=24,3; h=25,0; text=
+9: name=Right Arrow 12; type=1; x=301,2; y=346,0; w=24,3; h=25,0; text=
+10: name=Right Arrow 13; type=1; x=301,2; y=390,1; w=24,3; h=25,0; text=
+===== SLIDE 27 layout=5_Inhalt - Bild und Stichpunkte =====
+1: name=Rectangle 25; type=1; x=569,0; y=103,7; w=233,1; h=258,6; text=
+2: name=Rectangle 27; type=1; x=306,5; y=103,7; w=233,1; h=258,6; text=
+3: name=Rectangle 30; type=1; x=43,5; y=103,7; w=233,1; h=258,6; text=
+4: name=Rectangle 44; type=1; x=569,0; y=371,3; w=233,1; h=85,5; text=
+5: name=Rectangle 43; type=1; x=306,5; y=370,4; w=233,1; h=85,5; text=
+6: name=Rectangle 42; type=1; x=43,5; y=370,4; w=233,1; h=85,5; text=
+7: name=Text Placeholder 3; type=14; x=43,8; y=22,9; w=654,5; h=56,5; text=High-Level Workflow — From Python to STM32
+8: name=Rechteck 5; type=5; x=815,0; y=-8,3; w=145,0; h=465,1; text=
+9: name=Rectangle 7; type=1; x=815,0; y=116,8; w=174,5; h=192,2; text=1. Objective  | 2. Test BMS | 3. Requirements | 4. AI Models | 5. Software Integration | 6. Outlook
+10: name=Picture 18; type=13; x=476,5; y=103,4; w=44,4; h=66,6; text=
+11: name=Picture 20; type=13; x=194,3; y=86,7; w=75,4; h=113,1; text=
+12: name=Picture 22; type=13; x=641,5; y=362,3; w=87,6; h=87,6; text=
+13: name=Picture 24; type=13; x=114,0; y=365,7; w=77,8; h=77,8; text=
+14: name=Picture 26; type=13; x=379,7; y=367,2; w=77,8; h=77,8; text=
+15: name=Picture 28; type=13; x=725,8; y=116,3; w=60,4; h=35,0; text=
+16: name=TextBox 29; type=17; x=56,2; y=109,8; w=141,4; h=42,4; text=Creating Neural Network
+17: name=TextBox 31; type=17; x=321,8; y=109,8; w=173,7; h=42,4; text=Transfer and Simulation
+18: name=TextBox 32; type=17; x=581,5; y=109,8; w=161,5; h=42,4; text=Deployment on Hardware
+19: name=TextBox 33; type=17; x=47,1; y=432,7; w=219,9; h=42,4; text=Trained NN
+20: name=TextBox 34; type=17; x=311,7; y=431,6; w=219,9; h=42,4; text=Pruned NN
+21: name=TextBox 35; type=17; x=306,7; y=167,4; w=242,5; h=245,8; text=Import Model into embedded-friendly formats. | Code generation (C/C++)  | Pruning: optimization for resource-constrained environments. | Simulation
+22: name=TextBox 45; type=17; x=571,4; y=167,4; w=222,2; h=142,9; text=Final firmware integration on the STM32H755 platform  | Testing in Debugging Mode |  | 
+23: name=TextBox 46; type=17; x=43,0; y=167,4; w=219,9; h=98,9; text=Selection and Testing | Optimization | 
+24: name=Rectangle 47; type=1; x=595,6; y=432,9; w=186,8; h=29,1; text=NN on Micro Controller
+25: name=Isosceles Triangle 2; type=1; x=274,8; y=207,2; w=34,1; h=15,0; text=
+26: name=Isosceles Triangle 36; type=1; x=538,7; y=207,8; w=34,1; h=15,0; text=
