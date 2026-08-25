@@ -118,10 +118,15 @@ _pytemp/
 *.bak
 **/_page_check/
 **/_render*/
+**/_check_render*/
 **/_appendix_preview/
 
 # Oversized presentation is stored as reproducible Git chunks.
 /LATEX/DISS/Florian_Rzepka_Dissertation/presentation/Diss_FR.pptx
+
+# Personal doctoral-administration documents must not enter the public repository.
+/LATEX/DISS/Florian_Rzepka_Dissertation/administration/
+/LATEX/DISS/Florian_Rzepka_Dissertation/NEU_Formular_Eroeffnung_2021_ausgefuellt_Entwurf.pdf
 
 # ── Jupyter ──
 .ipynb_checkpoints/

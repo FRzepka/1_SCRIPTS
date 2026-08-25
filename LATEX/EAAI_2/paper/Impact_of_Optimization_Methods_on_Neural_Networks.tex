@@ -92,23 +92,18 @@ The comparison is designed to determine whether the effects of model optimizatio
 The comparison is organized around the change from each architecture-specific FP32 baseline rather than around baseline accuracy alone. Prediction quality is evaluated using MAE and RMSE, while deployment cost is characterized through model footprint and the embedded metrics flash, RAM, latency, and energy. Model sizes may differ where this is required to establish competitive baseline quality. However, the data partition, target definition, preprocessing, error metrics, optimization settings, and benchmark protocol are held fixed wherever applicable. The resulting accuracy--resource trade-offs provide the basis for selecting optimization strategies according to both architecture and deployment constraints.
 
 \subsection{Data, Target, and Split Strategy}
-The dataset is based on experiments conducted with JGCFR18650-1800mAh-3.2V LFP cells \cite{noauthor_product_nodate} in a university laboratory and is publicly available as the LFP DoE Cycle Aging \cite{rzepka_design_2025}. The cells were cycled inside a climate chamber at $25^\circ$ under the following charging $C_{\text{chg}}$, discharging $C_{\text{dis}}$ and Depht of Discharge (DoD) conditions:
-\begin{equation}
-    C_{\text{chg}} \in [0.5 C, 0.9 C] \\
-    C_{\text{dis}} \in [1 C, 2.5 C] \\
-    DoD \in [45 \%, 65 \%]
-\end{equation}
-This experiment used 15 test cells across eight operating conditions, with two cells per condition to ensure reproducibility. To monitor battery degradation, check-ups consisting of capacity tests, open-circuit voltage sweeps, and HPPC tests were performed after each aging loop. Furthermore, a load profile for a stationery storage unit was included to emulate realistic power flow \cite{kucevic_standard_2020}. The Data contains voltage, current, terminal temperature, auxiliary channels and is stored in Parquet tables. 
+The experiments use the publicly available LFP DoE Cycle Aging Dataset recorded with 15 commercial 1.8-Ah, 3.2-V LFP 18650 cells at a controlled ambient temperature of $25\,^{\circ}\mathrm{C}$ \cite{ProductSpecificationJGCFR186501800mAh32V,rzepka_design_2025}. The mixed full- and fractional-factorial design varies charge rate, discharge rate, and depth of discharge. Its factorial core covers $C_{\mathrm{chg}}=0.5$--$0.9\,\mathrm{C}$, $C_{\mathrm{dis}}=1.0$--$2.5\,\mathrm{C}$, and a depth of discharge of $45$--$65\,\%$, with additional boundary conditions extending the investigated operating range. Periodic check-ups comprising capacity tests, open-circuit-voltage sweeps, and hybrid pulse-power characterization track degradation between the aging loops. Stationary-storage load profiles complement the controlled cycling conditions with application-oriented power trajectories \cite{kucevicStandardBatteryEnergy2020}. The raw 1-Hz records contain voltage, current, terminal temperature, and auxiliary measurements.
 
+The prediction target is the capacity-based state of health, defined as the ratio between the measured available capacity and the nominal capacity. Capacity references are obtained from the periodic check-ups and interpolated along each aging trajectory. Figure~\ref{fig:lfp_soh_trajectories} shows the resulting reference trajectories and their pronounced spread across operating conditions. Local increases between successive check-ups reflect variability in the measured available capacity and do not indicate a reversal of long-term aging. For model training, one SOH target is assigned to each hourly feature vector.
 
-\begin{itemize}[leftmargin=*]
-\item Prediction target: battery SOH over aging trajectories.
-\item Feature basis from current code: Voltage, Current, Temperature, EFC, and Q\_c.
-\item Feature preprocessing: hourly aggregation into mean, std, min, and max channels.
-\item Common partitioning: train cells C01/C03/C05/C09/C13/C17/C25/C27/C29; validation cells C07/C15/C21; test cells C11/C19/C23.
-\item Figure 3 (planned, position in this subsection): SOH trajectories of all cells with color-coded train/validation/test assignment.
-\end{itemize}
-\noindent This split figure documents partition coverage and helps verify that all sets contain representative SOH evolution ranges.
+The partition is performed by complete cells to prevent samples from one cell from appearing in more than one subset. Cells C01, C03, C05, C07, C09, C13, C17, C19, C25, and C27 form the training set, C15 and C21 form the validation set, and C11, C23, and C29 are retained exclusively for testing. This cell-level split and the resulting hourly samples are held fixed across all four architecture families.
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=0.74\textwidth]{figures/lfp_soh_trajectories.png}
+    \caption{Capacity-based SOH reference trajectories of the 15 LFP cells over the aging campaign. Colors denote the investigated combinations of charge rate, discharge rate, and depth of discharge. The trajectory spread provides the common data basis for training and comparing the four neural architectures.}
+    \label{fig:lfp_soh_trajectories}
+\end{figure*}
 
 \subsection{Architecture Portfolio and Baseline Selection}
 The portfolio comprises two recurrent architectures, an LSTM and a GRU, and two convolutional architectures, a CNN and a TCN. This selection enables compression to be compared across different mechanisms for temporal representation instead of within a single model family. All four models receive the same 20-channel input representation obtained from the hourly mean, standard deviation, minimum, and maximum of voltage, current, temperature, EFC, and cumulative charge. One SOH target is assigned to each hourly interval. Each model is causal and produces one SOH estimate at every time step.
