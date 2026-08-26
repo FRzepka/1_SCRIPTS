@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "model": "JES2 DD pruned/fine-tuned GRU-MLP",
+  "checkpoint": "/home/florianr/MG_Farm/1_Scripts/DL_Models/LFP_SOC_SOH_Model/2_models/SOC_1.7.0.0/PrunedFT_1.7.0.0_s30_struct/checkpoints/best_model_finetuned.pt",
+  "checkpoint_sha256": "df5c542b2b9df79b46b6a3c39e6e94817261f651857f9adbe650b55ca1b11f6c",
+  "config": "/home/florianr/MG_Farm/1_Scripts/DL_Models/LFP_SOC_SOH_Model/2_models/SOC_1.7.0.0/PrunedFT_1.7.0.0_s30_struct/config/train_soc.yaml",
+  "config_sha256": "9261958581b3b9a7c236afaaa5643c71dab9fbe2aec6f4477426f841e582c871",
+  "scaler": "/home/florianr/MG_Farm/1_Scripts/DL_Models/LFP_SOC_SOH_Model/2_models/SOC_1.7.0.0/PrunedFT_1.7.0.0_s30_struct/scaler_robust.joblib",
+  "scaler_sha256": "3ae68f735c4b8fea90f2baf055359bed544fbe9b24de44bf328752f04e794f3a",
+  "scaler_header": "jes2_dd_scaler.h",
+  "scaler_header_sha256": "6fa29937df953042a68077f59cbb9f0b6628d79d1065d514edf21f5c07cb5039",
+  "scaler_center": [
+    3.361799955368042,
+    0.6542999744415283,
+    27.399999618530273,
+    0.943250834941864,
+    -0.5183248519897461,
+    0.0,
+    0.0,
+    1.0
+  ],
+  "scaler_scale": [
+    0.198699951171875,
+    1.0643000155687332,
+    1.1000003814697266,
+    0.05663776397705078,
+    0.544902540743351,
+    1.0,
+    1.0,
+    1.0
+  ],
+  "features": [
+    "Voltage[V]",
+    "Current[A]",
+    "Temperature[\u00b0C]",
+    "SOH",
+    "Q_c",
+    "dU_dt[V/s]",
+    "dI_dt[A/s]",
+    "dt_s"
+  ],
+  "sequence_length": 2024,
+  "hidden_size": 67,
+  "num_layers": 1,
+  "fixed_window_onnx": "jes2_dd_window2024.onnx",
+  "fixed_window_onnx_sha256": "6045f4d29bb9c0ed0655598ebe3dc534d20acbe0d971b5839d72a36c454625cb",
+  "stateful_onnx": "jes2_dd_stateful_step.onnx",
+  "stateful_onnx_sha256": "75a73e862689aeef6ae734b4e2a8b85c84070683d98c0d469a40db666a58eecc",
+  "primary_hardware_comparison": "fixed_window_2024",
+  "stateful_role": "separate deployment optimization; validate against rolling-window reference",
+  "input_scaling": "RobustScaler is external to ONNX and must be reproduced in firmware",
+  "validation": {
+    "fixed_window_max_abs_difference": 5.960464477539063e-08
+  }
+}

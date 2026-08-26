@@ -1,0 +1,39 @@
+{
+  "model_id": "SOH_JES2_0.1.0",
+  "architecture_source": "0.1.2.5_base_h160_s30_struct_ft",
+  "training_run": "train_20260825_112151",
+  "seed": 42,
+  "best_epoch": 21,
+  "validation_metrics": {
+    "rmse": 0.021919964155667746,
+    "mae": 0.015769433,
+    "r2": 0.7291238307952881,
+    "max_error": 0.09424353
+  },
+  "parameters": 382353,
+  "scaler_fit_samples": 22986,
+  "split": {
+    "train": ["C01", "C03", "C05", "C11", "C17", "C23"],
+    "validation": ["C07", "C19", "C21"],
+    "holdout": ["C09", "C13", "C15", "C25", "C27", "C29"]
+  },
+  "holdout_metrics": {
+    "aggregation": "unweighted_across_cells",
+    "mean_rmse": 0.0315566884,
+    "mean_mae": 0.0249448883,
+    "mean_r2": 0.8874680599,
+    "median_rmse": 0.0325099974,
+    "median_mae": 0.0259731130,
+    "median_r2": 0.8893956,
+    "pooled_samples": 13038,
+    "pooled_rmse": 0.0323259023,
+    "pooled_mae": 0.0217921665,
+    "file": "holdout_metrics.csv"
+  },
+  "sha256": {
+    "config": "f30113a5891385901fe2a4dbd688f591ea67bf233fb02b31986beaa0f7b42628",
+    "checkpoint": "282fb92c50458f92e87ccbee95f3cf81b13d2753902db1d5f670932d6d03ff3f",
+    "scaler": "11be437a3e0f4d8c88d9ecf1cab3bd19a1303efc56052df1691ba7eb896abacd",
+    "holdout_metrics": "df51914d21bfba4644cb47cc5ce1bde6f2e148ebbb3853c7405236b7ead8ad0f"
+  }
+}

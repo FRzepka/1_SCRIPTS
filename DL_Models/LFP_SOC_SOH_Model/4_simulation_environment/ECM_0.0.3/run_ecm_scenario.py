@@ -30,9 +30,12 @@ from robustness_common import (
     add_common_scenario_args,
     apply_measurement_scenario,
     build_online_aux_features,
+    compute_protocol_event_metrics,
     compute_robustness_metrics,
+    compute_stratified_error_metrics,
     load_cell_dataframe,
 )
+from shared_soh_trace import load_soh_trace
 
 WEEK_SECONDS = 7 * 24 * 3600
 CACHE_DIR = Path(__file__).resolve().parent / "cache"
@@ -153,6 +156,7 @@ def main():
     ap.add_argument("--dt_mode", choices=["data", "fixed"], default="data")
     ap.add_argument("--dt_s", type=float, default=1.0)
     ap.add_argument("--max_rows", type=int, default=0, help="Limit rows (0 = full)")
+    ap.add_argument("--start_row", type=int, default=0)
     ap.add_argument("--downsample", type=int, default=1, help="Take every Nth row (>=1)")
     ap.add_argument("--warmup_seconds", type=float, default=600.0)
     ap.add_argument("--soh_mode", choices=["gru", "data", "const"], default="gru")
@@ -161,6 +165,11 @@ def main():
     ap.add_argument("--soh_config", default="/home/florianr/MG_Farm/1_Scripts/DL_Models/LFP_SOC_SOH_Model/2_models/SOH_0.1.2.3/train_soh.yaml")
     ap.add_argument("--soh_ckpt", default="/home/florianr/MG_Farm/1_Scripts/DL_Models/LFP_SOC_SOH_Model/2_models/SOH_0.1.2.3/best_epoch0093_rmse0.02165.pt")
     ap.add_argument("--soh_scaler", default="/home/florianr/MG_Farm/1_Scripts/DL_Models/LFP_SOC_SOH_Model/2_models/SOH_0.1.2.3/scaler_robust.joblib")
+    ap.add_argument("--soh_trace", default=None,
+                    help="Shared causal SOH .npz trace; takes precedence over soh_mode.")
+    ap.add_argument("--ecm_resistance_scale", type=float, default=1.0)
+    ap.add_argument("--ecm_tau_scale", type=float, default=1.0)
+    ap.add_argument("--ecm_ocv_offset_v", type=float, default=0.0)
     ap.add_argument("--current_sign", type=float, default=1.0)
     ap.add_argument("--v_max", type=float, default=3.65)
     ap.add_argument("--v_tol", type=float, default=0.02)
@@ -170,20 +179,20 @@ def main():
 
     np.random.seed(int(args.seed))
     load_start = time.time()
-    raw_df = load_cell_dataframe(args.data_root, args.cell)
+    raw_df = load_cell_dataframe(args.data_root, args.cell, args.start_row, args.max_rows)
     raw_df = raw_df.replace([np.inf, -np.inf], np.nan)
     print(f"[LOAD] rows={len(raw_df):,} hours={raw_df['Testtime[s]'].iloc[-1] / 3600.0:.1f} load_s={time.time() - load_start:.1f}", flush=True)
 
     soh_source = "const"
     soh_cache_info = {"cache_path": None, "cache_hit": False}
-    if args.soh_mode == "gru":
+    if args.soh_trace:
+        soh_source = "external_trace"
+    elif args.soh_mode == "gru":
         soh_cache_info = compute_or_load_weekly_soh(raw_df, args.cell, args)
         soh_source = f"shared_recurrent_weekly_cached::{Path(args.soh_config).resolve().parent.name}"
-    
+
     df, scenario_info = apply_measurement_scenario(raw_df, args.scenario, args)
     df = df.dropna(subset=["Testtime[s]", "Current[A]", "Voltage[V]", "SOC"]).reset_index(drop=True)
-    if args.max_rows and args.max_rows > 0:
-        df = df.head(args.max_rows).copy()
     if args.downsample and args.downsample > 1:
         df = df.iloc[::args.downsample].reset_index(drop=True)
 
@@ -205,7 +214,10 @@ def main():
             if freeze_mask[k - 1] and not freeze_mask[k]:
                 dt_s[k] = nominal_dt
 
-    if args.soh_mode == "gru":
+    trace_metadata = None
+    if args.soh_trace:
+        soh, trace_metadata = load_soh_trace(args.soh_trace, t)
+    elif args.soh_mode == "gru":
         soh = expand_weekly_soh_to_rows(
             time_s=t,
             week_bins=soh_cache_info["week_bins"],
@@ -218,12 +230,19 @@ def main():
     else:
         soh = np.full(len(df), float(args.soh_const), dtype=np.float64)
 
-    if has_gap and np.any(freeze_mask):
+    if has_gap and np.any(freeze_mask) and not args.soh_trace:
         first_gap = int(np.argmax(freeze_mask))
         hold = float(soh[first_gap - 1]) if first_gap > 0 else float(args.soh_const)
         soh[freeze_mask] = hold
 
     table = FastECMTable()
+    for mode_grids in table.param_grids.values():
+        for name in ("Ri", "R1", "R2"):
+            mode_grids[name] *= float(args.ecm_resistance_scale)
+        for name in ("tau1", "tau2"):
+            mode_grids[name] *= float(args.ecm_tau_scale)
+        mode_grids["ocv"] += float(args.ecm_ocv_offset_v)
+    table._curve_cache.clear()
     model = FastBatteryEKF(float(soh[0]), table=table)
     model.x[0] = float(np.clip(float(args.soc_init) + float(scenario_info.get("soc_init_delta", 0.0)), 0.0, 1.0))
     soc_true = df["SOC"].to_numpy(dtype=np.float64)
@@ -231,7 +250,7 @@ def main():
     i = df["Current[A]"].to_numpy(dtype=np.float64)
 
     print(
-        f"[SETUP] scenario={args.scenario} rows={len(df):,} weekly_soh_bins={len(np.unique(np.floor_divide(t.astype(np.int64), int(args.soh_hold_seconds)))):,} cache_hit={soh_cache_info.get('cache_hit', False)}",
+        f"[SETUP] scenario={args.scenario} rows={len(df):,} soh_source={soh_source} cache_hit={soh_cache_info.get('cache_hit', False)}",
         flush=True,
     )
 
@@ -261,8 +280,82 @@ def main():
         warmup_seconds=float(args.warmup_seconds),
         disturbance_mask=np.asarray(scenario_info.get("disturbance_mask", freeze_mask), dtype=bool),
     )
+    metrics.update(compute_protocol_event_metrics(
+        scenario=args.scenario,
+        time_s=t,
+        y_true=soc_true,
+        y_pred=soc_est,
+        current_a=i,
+        freeze_mask=freeze_mask,
+        threshold=args.recovery_abs_error_threshold,
+        sustain_seconds=args.recovery_sustain_seconds,
+        horizon_seconds=args.recovery_horizon_seconds,
+    ))
+    stratified_mask = t >= float(args.warmup_seconds)
+    if not np.any(stratified_mask):
+        stratified_mask = np.ones(len(t), dtype=bool)
+    stratified_metrics = compute_stratified_error_metrics(
+        y_true=soc_true[stratified_mask],
+        y_pred=soc_est[stratified_mask],
+        reference_soh=(
+            df["_reference_soh"].to_numpy(dtype=np.float64)[stratified_mask]
+            if "_reference_soh" in df else None
+        ),
+        reference_temperature_c=(
+            df["_reference_temperature_c"].to_numpy(dtype=np.float64)[stratified_mask]
+            if "_reference_temperature_c" in df else None
+        ),
+        reference_c_rate=(
+            df["_reference_c_rate"].to_numpy(dtype=np.float64)[stratified_mask]
+            if "_reference_c_rate" in df else None
+        ),
+    )
     out_dir = Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
+
+    summary = {
+        "model": "ECM_0.0.3",
+        "cell": args.cell,
+        "scenario": args.scenario,
+        "soc_init": float(np.clip(float(args.soc_init) + float(scenario_info.get("soc_init_delta", 0.0)), 0.0, 1.0)),
+        "capacity_ah": float(args.capacity_ah),
+        "dt_mode": args.dt_mode,
+        "dt_s": float(args.dt_s),
+        "max_rows": int(args.max_rows),
+        "start_row": int(args.start_row),
+        "downsample": int(args.downsample),
+        "warmup_seconds": float(args.warmup_seconds),
+        "missing_gap_seconds": float(args.missing_gap_seconds),
+        "rmse": metrics["rmse"],
+        "mae": metrics["mae"],
+        "engine": "ECM_v2_qinnan_fast_python",
+        "ecm_parameter_sensitivity": {
+            "resistance_scale": float(args.ecm_resistance_scale),
+            "tau_scale": float(args.ecm_tau_scale),
+            "ocv_offset_v": float(args.ecm_ocv_offset_v),
+        },
+        "soh_mode": "external_trace" if args.soh_trace else args.soh_mode,
+        "soh_source": soh_source,
+        "soh_trace": args.soh_trace,
+        "soh_trace_metadata": trace_metadata,
+        "soh_hold_seconds": int(
+            trace_metadata["interval_seconds"] * trace_metadata.get("publish_every_intervals", 1)
+        )
+        if trace_metadata is not None
+        else int(args.soh_hold_seconds),
+        "soh_cache_path": soh_cache_info.get("cache_path"),
+        "soh_cache_hit": bool(soh_cache_info.get("cache_hit", False)),
+        "scenario_meta": {k: v for k, v in scenario_info.items() if k not in ("freeze_mask", "disturbance_mask")},
+        "stratified_metrics": stratified_metrics,
+        "output_policy": "summary_only" if args.summary_only else "full_run_artifacts",
+    }
+    summary.update(metrics)
+    with open(out_dir / "summary.json", "w") as f:
+        json.dump(summary, f, indent=2)
+
+    if args.summary_only:
+        print(json.dumps(summary, indent=2), flush=True)
+        return
 
     out_df = pd.DataFrame(
         {
@@ -278,33 +371,7 @@ def main():
         }
     )
     out_df.to_csv(out_dir / f"ecm_soc_fullcell_{args.cell}.csv", index=False)
-
     mask = out_df["time_s"] >= float(args.warmup_seconds)
-    summary = {
-        "model": "ECM_0.0.3",
-        "cell": args.cell,
-        "scenario": args.scenario,
-        "soc_init": float(np.clip(float(args.soc_init) + float(scenario_info.get("soc_init_delta", 0.0)), 0.0, 1.0)),
-        "capacity_ah": float(args.capacity_ah),
-        "dt_mode": args.dt_mode,
-        "dt_s": float(args.dt_s),
-        "max_rows": int(args.max_rows),
-        "downsample": int(args.downsample),
-        "warmup_seconds": float(args.warmup_seconds),
-        "missing_gap_seconds": float(args.missing_gap_seconds),
-        "rmse": metrics["rmse"],
-        "mae": metrics["mae"],
-        "engine": "ECM_v2_qinnan_fast_python",
-        "soh_mode": args.soh_mode,
-        "soh_source": soh_source,
-        "soh_hold_seconds": int(args.soh_hold_seconds),
-        "soh_cache_path": soh_cache_info.get("cache_path"),
-        "soh_cache_hit": bool(soh_cache_info.get("cache_hit", False)),
-        "scenario_meta": {k: v for k, v in scenario_info.items() if k not in ("freeze_mask", "disturbance_mask")},
-    }
-    summary.update(metrics)
-    with open(out_dir / "summary.json", "w") as f:
-        json.dump(summary, f, indent=2)
 
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 8), sharex=True)
     ax1.plot(out_df["time_s"] / 3600.0, out_df["soc_true"], label="SOC true", linewidth=1.0)

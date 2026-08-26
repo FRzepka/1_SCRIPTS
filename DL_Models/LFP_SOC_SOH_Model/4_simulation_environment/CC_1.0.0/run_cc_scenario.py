@@ -21,7 +21,9 @@ from cc_model import CCModel, CCModelConfig
 from robustness_common import (
     add_common_scenario_args,
     apply_measurement_scenario,
+    compute_protocol_event_metrics,
     compute_robustness_metrics,
+    compute_stratified_error_metrics,
     load_cell_dataframe,
 )
 
@@ -42,13 +44,15 @@ def main():
     ap.add_argument("--cv_seconds", type=float, default=300.0)
     ap.add_argument("--warmup_seconds", type=float, default=600.0,
                     help="Ignore first N seconds for error plot/metrics")
+    ap.add_argument("--start_row", type=int, default=0)
+    ap.add_argument("--max_rows", type=int, default=0)
 
     ap.add_argument("--data_root", default="/home/florianr/MG_Farm/0_Data/MGFarm_18650_FE")
 
     args = ap.parse_args()
     np.random.seed(int(args.seed))
 
-    df = load_cell_dataframe(args.data_root, args.cell)
+    df = load_cell_dataframe(args.data_root, args.cell, args.start_row, args.max_rows)
     df = df.replace([np.inf, -np.inf], np.nan)
     df, scenario_info = apply_measurement_scenario(df, args.scenario, args)
     df = df.dropna(subset=['Testtime[s]', 'Current[A]', 'Voltage[V]', 'SOC']).reset_index(drop=True)
@@ -112,19 +116,38 @@ def main():
         warmup_seconds=float(args.warmup_seconds),
         disturbance_mask=np.asarray(scenario_info.get('disturbance_mask', freeze_mask), dtype=bool),
     )
+    metrics.update(compute_protocol_event_metrics(
+        scenario=args.scenario,
+        time_s=t,
+        y_true=soc_true,
+        y_pred=soc_cc,
+        current_a=i,
+        freeze_mask=freeze_mask,
+        threshold=args.recovery_abs_error_threshold,
+        sustain_seconds=args.recovery_sustain_seconds,
+        horizon_seconds=args.recovery_horizon_seconds,
+    ))
+    stratified_mask = t >= float(args.warmup_seconds)
+    if not np.any(stratified_mask):
+        stratified_mask = np.ones(len(t), dtype=bool)
+    stratified_metrics = compute_stratified_error_metrics(
+        y_true=soc_true[stratified_mask],
+        y_pred=soc_cc[stratified_mask],
+        reference_soh=(
+            df['_reference_soh'].to_numpy(dtype=np.float64)[stratified_mask]
+            if '_reference_soh' in df else None
+        ),
+        reference_temperature_c=(
+            df['_reference_temperature_c'].to_numpy(dtype=np.float64)[stratified_mask]
+            if '_reference_temperature_c' in df else None
+        ),
+        reference_c_rate=(
+            df['_reference_c_rate'].to_numpy(dtype=np.float64)[stratified_mask]
+            if '_reference_c_rate' in df else None
+        ),
+    )
 
     os.makedirs(args.out_dir, exist_ok=True)
-
-    out_df = pd.DataFrame({
-        'index': np.arange(len(df)),
-        'time_s': t,
-        'soc_true': soc_true,
-        'soc_cc': soc_cc,
-        'q_m_new': q_m_new,
-        'abs_err': abs_err,
-    })
-    out_csv = os.path.join(args.out_dir, f"soc_cc_fullcell_{args.cell}.csv")
-    out_df.to_csv(out_csv, index=False)
 
     summary = {
         'model': 'CC_1.0.0',
@@ -143,11 +166,30 @@ def main():
         'bias': metrics['bias'],
         'missing_gap_seconds': float(args.missing_gap_seconds),
         'data_root': args.data_root,
+        'start_row': int(args.start_row),
+        'max_rows': int(args.max_rows),
+        'output_policy': 'summary_only' if args.summary_only else 'full_run_artifacts',
         'scenario_meta': {k: v for k, v in scenario_info.items() if k not in ('freeze_mask', 'disturbance_mask')},
+        'stratified_metrics': stratified_metrics,
     }
     summary.update(metrics)
     with open(os.path.join(args.out_dir, 'summary.json'), 'w') as f:
         json.dump(summary, f, indent=2)
+
+    if args.summary_only:
+        print(json.dumps(summary, indent=2))
+        return
+
+    out_df = pd.DataFrame({
+        'index': np.arange(len(df)),
+        'time_s': t,
+        'soc_true': soc_true,
+        'soc_cc': soc_cc,
+        'q_m_new': q_m_new,
+        'abs_err': abs_err,
+    })
+    out_csv = os.path.join(args.out_dir, f"soc_cc_fullcell_{args.cell}.csv")
+    out_df.to_csv(out_csv, index=False)
 
     try:
         mask = out_df['time_s'] >= float(args.warmup_seconds)

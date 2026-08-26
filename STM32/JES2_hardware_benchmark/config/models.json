@@ -1,0 +1,45 @@
+{
+  "protocol": "JES2_HW_V1",
+  "target": "STM32H753ZI",
+  "models": {
+    "DM": {
+      "kind": "coulomb_counting",
+      "soh_input": false,
+      "primary_inputs": ["current_a", "voltage_v", "dt_s"],
+      "state_reset_required": true
+    },
+    "HDM": {
+      "kind": "soh_adaptive_coulomb_counting",
+      "soh_input": true,
+      "primary_inputs": ["current_a", "voltage_v", "soh", "dt_s"],
+      "state_reset_required": true
+    },
+    "HECM": {
+      "kind": "two_rc_ekf",
+      "soh_input": true,
+      "primary_inputs": ["current_a", "voltage_v", "soh", "dt_s"],
+      "state_reset_required": true
+    },
+    "DD": {
+      "kind": "gru_mlp",
+      "checkpoint": "DL_Models/LFP_SOC_SOH_Model/2_models/SOC_1.7.0.0/PrunedFT_1.7.0.0_s30_struct/checkpoints/best_model_finetuned.pt",
+      "scaler": "DL_Models/LFP_SOC_SOH_Model/2_models/SOC_1.7.0.0/PrunedFT_1.7.0.0_s30_struct/scaler_robust.joblib",
+      "hidden_size": 67,
+      "mlp_hidden": 96,
+      "num_layers": 1,
+      "sequence_length": 2024,
+      "soh_input": true,
+      "primary_inputs": [
+        "voltage_v",
+        "current_a",
+        "temperature_c",
+        "soh",
+        "q_c_ah",
+        "dv_dt_v_s",
+        "di_dt_a_s",
+        "dt_s"
+      ],
+      "state_reset_required": true
+    }
+  }
+}

@@ -17,13 +17,53 @@ CC_SOH_DIR = os.path.join(
 )
 sys.path.append(os.path.abspath(CC_SOH_DIR))
 from cc_soh_model import CCSOHModel, CCSOHConfig
+from cc_model import CCModel, CCModelConfig
 from robustness_common import (
     add_common_scenario_args,
     apply_measurement_scenario,
     build_online_aux_features,
+    compute_protocol_event_metrics,
     compute_robustness_metrics,
+    compute_stratified_error_metrics,
     load_cell_dataframe,
 )
+from shared_soh_trace import load_soh_trace
+
+
+def run_cc_with_external_soh(df, soh, gap_mask, args, soc_init):
+    model = CCModel(
+        CCModelConfig(
+            capacity_ah=float(args.nominal_capacity_ah),
+            soc_init=float(soc_init),
+            current_sign=float(args.current_sign),
+            v_max=float(args.v_max),
+            v_tol=float(args.v_tol),
+            cv_seconds=float(args.cv_seconds),
+        )
+    )
+    time_s = df['Testtime[s]'].to_numpy(dtype=np.float64)
+    dt_s = np.diff(time_s, prepend=time_s[0])
+    dt_s[dt_s < 0] = 0.0
+    has_gap = bool(np.any(gap_mask))
+    if has_gap:
+        nominal_dt = np.median(dt_s[(~gap_mask) & (dt_s > 0)])
+        if not np.isfinite(nominal_dt) or nominal_dt <= 0:
+            nominal_dt = 1.0
+        dt_s[gap_mask] = 0.0
+        for idx in range(1, len(dt_s)):
+            if gap_mask[idx - 1] and not gap_mask[idx]:
+                dt_s[idx] = nominal_dt
+
+    current = df['Current[A]'].to_numpy(dtype=np.float64)
+    voltage = df['Voltage[V]'].to_numpy(dtype=np.float64)
+    soc = np.zeros(len(df), dtype=np.float32)
+    for idx in range(len(df)):
+        if has_gap and gap_mask[idx]:
+            soc[idx] = float(soc_init) if idx == 0 else soc[idx - 1]
+            continue
+        capacity = float(args.nominal_capacity_ah) * float(soh[idx])
+        soc[idx] = model.step(current[idx], voltage[idx], capacity_ah=capacity, dt_s=dt_s[idx])
+    return soc
 
 
 def main():
@@ -35,12 +75,16 @@ def main():
                     help="Fail if CUDA is not available.")
     ap.add_argument("--warmup_seconds", type=float, default=600.0,
                     help="Ignore first N seconds for error plot/metrics")
+    ap.add_argument("--start_row", type=int, default=0)
+    ap.add_argument("--max_rows", type=int, default=0)
     add_common_scenario_args(ap)
 
     # model paths
     ap.add_argument("--soh_config", default="/home/florianr/MG_Farm/1_Scripts/DL_Models/LFP_SOC_SOH_Model/2_models/SOH_0.1.2.3/train_soh.yaml")
     ap.add_argument("--soh_ckpt", default="/home/florianr/MG_Farm/1_Scripts/DL_Models/LFP_SOC_SOH_Model/2_models/SOH_0.1.2.3/best_epoch0093_rmse0.02165.pt")
     ap.add_argument("--soh_scaler", default="/home/florianr/MG_Farm/1_Scripts/DL_Models/LFP_SOC_SOH_Model/2_models/SOH_0.1.2.3/scaler_robust.joblib")
+    ap.add_argument("--soh_trace", default=None,
+                    help="Shared causal SOH .npz trace; skips local SOH inference when set.")
 
     ap.add_argument("--soh_init", type=float, default=1.0)
     ap.add_argument("--nominal_capacity_ah", type=float, default=1.8)
@@ -57,7 +101,7 @@ def main():
     args = ap.parse_args()
     np.random.seed(int(args.seed))
 
-    df = load_cell_dataframe(args.data_root, args.cell)
+    df = load_cell_dataframe(args.data_root, args.cell, args.start_row, args.max_rows)
     df = df.replace([np.inf, -np.inf], np.nan)
     df, scenario_info = apply_measurement_scenario(df, args.scenario, args)
     df = df.dropna(subset=['Testtime[s]', 'Current[A]', 'Voltage[V]', 'SOC']).reset_index(drop=True)
@@ -66,24 +110,25 @@ def main():
     freeze_mask = np.asarray(scenario_info.get('freeze_mask', np.zeros(len(df), dtype=bool)), dtype=bool)
     soc_init = float(np.clip(float(args.soc_init) + float(scenario_info.get('soc_init_delta', 0.0)), 0.0, 1.0))
 
-    cfg = CCSOHConfig(
-        soh_config=args.soh_config,
-        soh_checkpoint=args.soh_ckpt,
-        soh_scaler=args.soh_scaler,
-        nominal_capacity_ah=float(args.nominal_capacity_ah),
-        soh_init=float(args.soh_init),
-        device=args.device,
-        soc_init=soc_init,
-        current_sign=float(args.current_sign),
-        v_max=float(args.v_max),
-        v_tol=float(args.v_tol),
-        cv_seconds=float(args.cv_seconds),
-    )
-
-    model = CCSOHModel(cfg)
-    if args.require_gpu and model.device.type != 'cuda':
-        raise RuntimeError("GPU required (--require_gpu), but CUDA is not available.")
-    print(f"Using device: {model.device}")
+    model = None
+    if not args.soh_trace:
+        cfg = CCSOHConfig(
+            soh_config=args.soh_config,
+            soh_checkpoint=args.soh_ckpt,
+            soh_scaler=args.soh_scaler,
+            nominal_capacity_ah=float(args.nominal_capacity_ah),
+            soh_init=float(args.soh_init),
+            device=args.device,
+            soc_init=soc_init,
+            current_sign=float(args.current_sign),
+            v_max=float(args.v_max),
+            v_tol=float(args.v_tol),
+            cv_seconds=float(args.cv_seconds),
+        )
+        model = CCSOHModel(cfg)
+        if args.require_gpu and model.device.type != 'cuda':
+            raise RuntimeError("GPU required (--require_gpu), but CUDA is not available.")
+        print(f"Using device: {model.device}")
     df = build_online_aux_features(
         df=df,
         freeze_mask=freeze_mask,
@@ -93,7 +138,8 @@ def main():
         cv_seconds=float(args.cv_seconds),
         nominal_capacity_ah=float(args.nominal_capacity_ah),
     )
-    req_cols = sorted(set(model.soh_base_features + ['Testtime[s]', 'Current[A]', 'Voltage[V]', 'SOC']))
+    soh_features = [] if model is None else model.soh_base_features
+    req_cols = sorted(set(soh_features + ['Testtime[s]', 'Current[A]', 'Voltage[V]', 'SOC']))
     miss = [c for c in req_cols if c not in df.columns]
     if miss:
         raise ValueError(f"Missing required online features for CC+SOH: {miss}")
@@ -108,7 +154,14 @@ def main():
         if len(freeze_mask) < len(df):
             freeze_mask = np.pad(freeze_mask, (0, len(df) - len(freeze_mask)), constant_values=False)
 
-    soc_cc, soh_pred = model.process_dataframe(df, gap_mask=freeze_mask)
+    trace_metadata = None
+    if args.soh_trace:
+        soh_pred, trace_metadata = load_soh_trace(args.soh_trace, df['Testtime[s]'].to_numpy(dtype=np.float64))
+        soc_cc = run_cc_with_external_soh(df, soh_pred, freeze_mask, args, soc_init)
+        device_label = "external_soh_trace"
+    else:
+        soc_cc, soh_pred = model.process_dataframe(df, gap_mask=freeze_mask)
+        device_label = str(model.device)
 
     soc_true = df['SOC'].to_numpy(dtype=np.float32)
     t = df['Testtime[s]'].to_numpy(dtype=np.float64)
@@ -120,21 +173,38 @@ def main():
         warmup_seconds=float(args.warmup_seconds),
         disturbance_mask=np.asarray(scenario_info.get('disturbance_mask', freeze_mask), dtype=bool),
     )
+    metrics.update(compute_protocol_event_metrics(
+        scenario=args.scenario,
+        time_s=t,
+        y_true=soc_true,
+        y_pred=soc_cc,
+        current_a=df['_protocol_current_a'].to_numpy(dtype=np.float64),
+        freeze_mask=freeze_mask,
+        threshold=args.recovery_abs_error_threshold,
+        sustain_seconds=args.recovery_sustain_seconds,
+        horizon_seconds=args.recovery_horizon_seconds,
+    ))
+    stratified_mask = t >= float(args.warmup_seconds)
+    if not np.any(stratified_mask):
+        stratified_mask = np.ones(len(t), dtype=bool)
+    stratified_metrics = compute_stratified_error_metrics(
+        y_true=soc_true[stratified_mask],
+        y_pred=soc_cc[stratified_mask],
+        reference_soh=(
+            df['_reference_soh'].to_numpy(dtype=np.float64)[stratified_mask]
+            if '_reference_soh' in df else None
+        ),
+        reference_temperature_c=(
+            df['_reference_temperature_c'].to_numpy(dtype=np.float64)[stratified_mask]
+            if '_reference_temperature_c' in df else None
+        ),
+        reference_c_rate=(
+            df['_reference_c_rate'].to_numpy(dtype=np.float64)[stratified_mask]
+            if '_reference_c_rate' in df else None
+        ),
+    )
 
     os.makedirs(args.out_dir, exist_ok=True)
-
-    out_df = pd.DataFrame({
-        'index': np.arange(len(df)),
-        'time_s': t,
-        'soc_true': soc_true,
-        'soc_cc': soc_cc,
-        'soh_pred': soh_pred,
-        'abs_err': abs_err,
-    })
-    out_csv = os.path.join(args.out_dir, f"soc_cc_soh_fullcell_{args.cell}.csv")
-    out_df.to_csv(out_csv, index=False)
-
-    mask = out_df['time_s'] >= float(args.warmup_seconds)
 
     summary = {
         'model': 'CC_SOH_1.0.0',
@@ -151,13 +221,36 @@ def main():
         'soh_config': args.soh_config,
         'soh_ckpt': args.soh_ckpt,
         'soh_scaler': args.soh_scaler,
+        'soh_source': 'external_trace' if args.soh_trace else 'local_lstm',
+        'soh_trace': args.soh_trace,
+        'soh_trace_metadata': trace_metadata,
         'missing_gap_seconds': float(args.missing_gap_seconds),
-        'device': str(model.device),
+        'device': device_label,
+        'start_row': int(args.start_row),
+        'max_rows': int(args.max_rows),
+        'output_policy': 'summary_only' if args.summary_only else 'full_run_artifacts',
         'scenario_meta': {k: v for k, v in scenario_info.items() if k not in ('freeze_mask', 'disturbance_mask')},
+        'stratified_metrics': stratified_metrics,
     }
     summary.update(metrics)
     with open(os.path.join(args.out_dir, 'summary.json'), 'w') as f:
         json.dump(summary, f, indent=2)
+
+    if args.summary_only:
+        print(json.dumps(summary, indent=2))
+        return
+
+    out_df = pd.DataFrame({
+        'index': np.arange(len(df)),
+        'time_s': t,
+        'soc_true': soc_true,
+        'soc_cc': soc_cc,
+        'soh_pred': soh_pred,
+        'abs_err': abs_err,
+    })
+    out_csv = os.path.join(args.out_dir, f"soc_cc_soh_fullcell_{args.cell}.csv")
+    out_df.to_csv(out_csv, index=False)
+    mask = out_df['time_s'] >= float(args.warmup_seconds)
 
     # Plot
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 8), sharex=True)

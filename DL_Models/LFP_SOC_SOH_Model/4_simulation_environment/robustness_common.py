@@ -1,6 +1,6 @@
 import math
 import os
-from typing import Dict, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -25,8 +25,36 @@ SCENARIO_CHOICES = [
     "missing_segments",
 ]
 
+STRATIFICATION_PROTOCOL = {
+    "soh_state": {
+        "aged": "SOH < 0.80",
+        "mid_life": "0.80 <= SOH < 0.90",
+        "fresh": "SOH >= 0.90",
+    },
+    "temperature_state": {
+        "nominal": "T <= 30 degC",
+        "elevated": "30 < T <= 35 degC",
+        "hot": "T > 35 degC",
+    },
+    "instantaneous_load": {
+        "low": "|C-rate| < 0.5",
+        "medium": "0.5 <= |C-rate| < 1.5",
+        "high": "|C-rate| >= 1.5",
+    },
+    "soc_state": {
+        "low": "SOC < 0.20",
+        "middle": "0.20 <= SOC <= 0.80",
+        "high": "SOC > 0.80",
+    },
+}
 
-def load_cell_dataframe(data_root: str, cell: str) -> pd.DataFrame:
+
+def load_cell_dataframe(
+    data_root: str,
+    cell: str,
+    start_row: int = 0,
+    max_rows: int = 0,
+) -> pd.DataFrame:
     path = os.path.join(data_root, f"df_FE_{cell.split('_')[-1]}.parquet")
     if not os.path.exists(path):
         path = os.path.join(data_root, f"df_FE_{cell}.parquet")
@@ -37,7 +65,32 @@ def load_cell_dataframe(data_root: str, cell: str) -> pd.DataFrame:
             path = alt
     if not os.path.exists(path):
         raise FileNotFoundError(f"Could not locate parquet for cell {cell} in {data_root}")
-    return pd.read_parquet(path)
+    start = int(start_row)
+    limit = int(max_rows)
+    if start < 0 or limit < 0:
+        raise ValueError("start_row and max_rows must not be negative")
+    if start == 0 and limit == 0:
+        return pd.read_parquet(path)
+
+    import pyarrow.parquet as pq
+
+    parquet = pq.ParquetFile(path)
+    stop = start + limit if limit > 0 else parquet.metadata.num_rows
+    group_offsets: list[tuple[int, int]] = []
+    offset = 0
+    for group in range(parquet.num_row_groups):
+        group_stop = offset + parquet.metadata.row_group(group).num_rows
+        if group_stop > start and offset < stop:
+            group_offsets.append((group, offset))
+        offset = group_stop
+    if not group_offsets:
+        return pd.DataFrame()
+    groups = [group for group, _ in group_offsets]
+    loaded_start = group_offsets[0][1]
+    frame = parquet.read_row_groups(groups).to_pandas()
+    local_start = start - loaded_start
+    local_stop = local_start + limit if limit > 0 else None
+    return frame.iloc[local_start:local_stop].copy().reset_index(drop=True)
 
 
 def add_common_scenario_args(ap) -> None:
@@ -71,6 +124,14 @@ def add_common_scenario_args(ap) -> None:
     ap.add_argument("--downsample_hz", type=float, default=None)
     ap.add_argument("--drop_pct", type=float, default=None)
     ap.add_argument("--drop_segment_len", type=int, default=None)
+    ap.add_argument("--recovery_abs_error_threshold", type=float, default=0.02,
+                    help="Common absolute SOC-error threshold for cross-model recovery metrics.")
+    ap.add_argument("--recovery_sustain_seconds", type=float, default=300.0,
+                    help="Required continuous time inside the common recovery band.")
+    ap.add_argument("--recovery_horizon_seconds", type=float, default=86400.0,
+                    help="Post-event horizon for common recovery metrics.")
+    ap.add_argument("--summary_only", action="store_true",
+                    help="Write summary.json only; omit per-sample CSV and diagnostic plots.")
 
 
 def compute_center_window_mask(t: np.ndarray, gap_seconds: float) -> np.ndarray:
@@ -151,6 +212,13 @@ def _resample_irregular_timebase(df: pd.DataFrame, jitter_s: float, rng) -> Tupl
 
 def apply_measurement_scenario(df: pd.DataFrame, scenario: str, args) -> Tuple[pd.DataFrame, Dict]:
     out = df.copy()
+    for source, target in [
+        ("SOH", "_reference_soh"),
+        ("Temperature[°C]", "_reference_temperature_c"),
+        ("C_Rate", "_reference_c_rate"),
+    ]:
+        if source in out.columns and target not in out.columns:
+            out[target] = out[source].to_numpy(dtype=np.float64, copy=True)
     rng = _scenario_rng(getattr(args, "seed", 42))
     n = len(out)
     freeze_mask = np.zeros(n, dtype=bool)
@@ -168,6 +236,8 @@ def apply_measurement_scenario(df: pd.DataFrame, scenario: str, args) -> Tuple[p
 
     if scenario == "initial_soc_error":
         meta["soc_init_delta"] = float(getattr(args, "soc_init_error", 0.0) or 0.0)
+        meta["uses_only_measurement_manipulation"] = False
+        meta["perturbation_scope"] = "explicit_soc_state_only"
         return out, meta
 
     if scenario == "current_offset":
@@ -306,6 +376,10 @@ def apply_measurement_scenario(df: pd.DataFrame, scenario: str, args) -> Tuple[p
         meta["freeze_mask"] = freeze_mask
         meta["disturbance_mask"] = freeze_mask.copy()
         meta["missing_gap_seconds"] = float(getattr(args, "missing_gap_seconds", 0.0) or 0.0)
+        if np.any(freeze_mask):
+            gap_indices = np.flatnonzero(freeze_mask)
+            meta["missing_gap_start_time_s"] = float(t[gap_indices[0]])
+            meta["missing_gap_end_time_s"] = float(t[gap_indices[-1]])
         return out, meta
 
     if scenario == "missing_samples":
@@ -351,6 +425,8 @@ def build_online_aux_features(
     initial_soc_delta: float = 0.0,
 ) -> pd.DataFrame:
     out = df.copy()
+    if "_protocol_current_a" not in out.columns and "Current[A]" in out.columns:
+        out["_protocol_current_a"] = out["Current[A]"].to_numpy(dtype=np.float64, copy=True)
     has_freeze = bool(np.any(freeze_mask))
     base_cols = [c for c in ["Current[A]", "Voltage[V]", "Temperature[°C]"] if c in out.columns]
     if has_freeze:
@@ -462,6 +538,189 @@ def compute_robustness_metrics(
         metrics.update(rec)
 
     return metrics
+
+
+def compute_stratified_error_metrics(
+    y_true: np.ndarray,
+    y_pred: np.ndarray,
+    reference_soh: Optional[np.ndarray] = None,
+    reference_temperature_c: Optional[np.ndarray] = None,
+    reference_c_rate: Optional[np.ndarray] = None,
+) -> List[Dict[str, Any]]:
+    """Compute run-level metrics for fixed physical-state strata."""
+    yt = np.asarray(y_true, dtype=np.float64)
+    yp = np.asarray(y_pred, dtype=np.float64)
+    if len(yt) != len(yp):
+        raise ValueError("Stratified metrics require aligned targets and predictions")
+
+    strata: list[tuple[str, str, np.ndarray]] = [
+        ("soc_state", "low", yt < 0.20),
+        ("soc_state", "middle", (yt >= 0.20) & (yt <= 0.80)),
+        ("soc_state", "high", yt > 0.80),
+    ]
+    if reference_soh is not None:
+        soh = np.asarray(reference_soh, dtype=np.float64)
+        strata.extend([
+            ("soh_state", "aged", soh < 0.80),
+            ("soh_state", "mid_life", (soh >= 0.80) & (soh < 0.90)),
+            ("soh_state", "fresh", soh >= 0.90),
+        ])
+    if reference_temperature_c is not None:
+        temperature = np.asarray(reference_temperature_c, dtype=np.float64)
+        strata.extend([
+            ("temperature_state", "nominal", temperature <= 30.0),
+            ("temperature_state", "elevated", (temperature > 30.0) & (temperature <= 35.0)),
+            ("temperature_state", "hot", temperature > 35.0),
+        ])
+    if reference_c_rate is not None:
+        c_rate = np.abs(np.asarray(reference_c_rate, dtype=np.float64))
+        strata.extend([
+            ("instantaneous_load", "low", c_rate < 0.5),
+            ("instantaneous_load", "medium", (c_rate >= 0.5) & (c_rate < 1.5)),
+            ("instantaneous_load", "high", c_rate >= 1.5),
+        ])
+
+    finite_error = np.isfinite(yt) & np.isfinite(yp)
+    rows: List[Dict[str, Any]] = []
+    for dimension, stratum, mask in strata:
+        mask = np.asarray(mask, dtype=bool) & finite_error
+        n_samples = int(mask.sum())
+        if n_samples == 0:
+            continue
+        error = yp[mask] - yt[mask]
+        absolute = np.abs(error)
+        rows.append({
+            "dimension": dimension,
+            "stratum": stratum,
+            "n_samples": n_samples,
+            "coverage_fraction": float(n_samples / max(int(finite_error.sum()), 1)),
+            "mae": float(np.mean(absolute)),
+            "rmse": float(np.sqrt(np.mean(error ** 2))),
+            "bias": float(np.mean(error)),
+            "p95_error": float(np.percentile(absolute, 95.0)),
+        })
+    return rows
+
+
+def compute_common_recovery_metrics(
+    time_s: np.ndarray,
+    y_true: np.ndarray,
+    y_pred: np.ndarray,
+    start_index: int,
+    threshold: float = 0.02,
+    sustain_seconds: float = 300.0,
+    horizon_seconds: float = 86400.0,
+) -> Dict[str, float]:
+    """Measure recovery with one estimator-independent absolute error band."""
+    t = np.asarray(time_s, dtype=np.float64)
+    abs_err = np.abs(np.asarray(y_pred, dtype=np.float64) - np.asarray(y_true, dtype=np.float64))
+    if len(t) == 0 or len(t) != len(abs_err):
+        return {}
+
+    start_index = int(np.clip(start_index, 0, len(t) - 1))
+    horizon_end = float(t[start_index]) + float(horizon_seconds)
+    stop_index = int(np.searchsorted(t, horizon_end, side="right"))
+    stop_index = max(start_index + 1, min(stop_index, len(t)))
+    t_post = t[start_index:stop_index]
+    err_post = abs_err[start_index:stop_index]
+    valid = err_post <= float(threshold)
+
+    recovery_time_s = None
+    candidates = np.flatnonzero(valid)
+    if len(candidates):
+        bad = np.flatnonzero(~valid)
+        bad_positions = np.searchsorted(bad, candidates, side="left")
+        next_bad = np.full(len(candidates), len(valid), dtype=np.int64)
+        has_bad = bad_positions < len(bad)
+        next_bad[has_bad] = bad[bad_positions[has_bad]]
+        sustain_end = np.searchsorted(
+            t_post,
+            t_post[candidates] + float(sustain_seconds),
+            side="left",
+        )
+        full_window = (t_post[candidates] + float(sustain_seconds)) <= t_post[-1]
+        recovered = full_window & (next_bad >= sustain_end)
+        if np.any(recovered):
+            first = int(candidates[np.flatnonzero(recovered)[0]])
+            recovery_time_s = float(t_post[first] - t_post[0])
+
+    elapsed_h = (t_post - t_post[0]) / 3600.0
+    observed_horizon_s = float(t_post[-1] - t_post[0])
+    capped_time_s = (
+        recovery_time_s
+        if recovery_time_s is not None
+        else min(float(horizon_seconds), observed_horizon_s)
+    )
+    excess = np.maximum(err_post - float(threshold), 0.0)
+    metrics: Dict[str, float] = {
+        "common_recovery_threshold_abs_err": float(threshold),
+        "common_recovery_sustain_seconds": float(sustain_seconds),
+        "common_recovery_horizon_seconds": float(horizon_seconds),
+        "common_recovery_initial_abs_err": float(err_post[0]),
+        "common_recovery_excess_auc_soc_h": float(np.trapezoid(excess, elapsed_h)) if len(excess) > 1 else 0.0,
+        "common_recovery_time_s": recovery_time_s,
+        "common_recovery_time_h": None if recovery_time_s is None else recovery_time_s / 3600.0,
+        "common_recovery_or_censor_time_h": capped_time_s / 3600.0,
+        "common_recovery_observed_horizon_h": observed_horizon_s / 3600.0,
+        "common_recovery_censored": recovery_time_s is None,
+    }
+    for hours in (1.0, 6.0):
+        mask = elapsed_h <= hours
+        if np.any(mask):
+            metrics[f"common_recovery_mae_{int(hours)}h"] = float(np.mean(err_post[mask]))
+    return metrics
+
+
+def compute_protocol_event_metrics(
+    scenario: str,
+    time_s: np.ndarray,
+    y_true: np.ndarray,
+    y_pred: np.ndarray,
+    current_a: np.ndarray,
+    freeze_mask: np.ndarray,
+    threshold: float,
+    sustain_seconds: float,
+    horizon_seconds: float,
+) -> Dict[str, float]:
+    """Return fair recovery and physical gap metrics for JES2 event scenarios."""
+    t = np.asarray(time_s, dtype=np.float64)
+    current = np.asarray(current_a, dtype=np.float64)
+    freeze = np.asarray(freeze_mask, dtype=bool)
+    if scenario == "initial_soc_error":
+        return compute_common_recovery_metrics(
+            t, y_true, y_pred, 0, threshold, sustain_seconds, horizon_seconds
+        )
+    if scenario != "missing_gap" or not np.any(freeze):
+        return {}
+
+    gap_indices = np.flatnonzero(freeze)
+    first_gap = int(gap_indices[0])
+    last_gap = int(gap_indices[-1])
+    recovery_start = min(last_gap + 1, len(t) - 1)
+    dt_s = np.diff(t, prepend=t[0])
+    dt_s[dt_s < 0.0] = 0.0
+    gap_dt = dt_s[freeze]
+    gap_current = current[freeze]
+    pre_gap = max(0, first_gap - 1)
+    event = {
+        "gap_net_charge_ah": float(np.sum(gap_current * gap_dt) / 3600.0),
+        "gap_throughput_ah": float(np.sum(np.abs(gap_current) * gap_dt) / 3600.0),
+        "gap_reference_soc_change": float(np.asarray(y_true)[last_gap] - np.asarray(y_true)[pre_gap]),
+        "gap_start_time_s": float(t[first_gap]),
+        "gap_end_time_s": float(t[last_gap]),
+    }
+    event.update(
+        compute_common_recovery_metrics(
+            t,
+            y_true,
+            y_pred,
+            recovery_start,
+            threshold,
+            sustain_seconds,
+            horizon_seconds,
+        )
+    )
+    return event
 
 
 def _fit_slope_per_hour(t: np.ndarray, y: np.ndarray) -> float:

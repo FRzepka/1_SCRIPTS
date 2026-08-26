@@ -1,0 +1,140 @@
+JES 2.0 - NEW TEST MATRIX AND STATISTICAL ANALYSIS
+Updated: 2026-08-25
+
+IMPORTANT DISTINCTION
+  The software now contains the tests and analysis paths below. Publication
+  numbers do not exist until the complete six-cell HPC campaign has finished.
+  Smoke and synthetic tests validate code only and must not enter the paper.
+
+1. INDEPENDENT HOLDOUT CELLS AND FIXED LOAD CLASSES
+  Cell load class is frozen before looking at estimator errors. The classification
+  uses only each holdout cell's 95th-percentile absolute C-rate and forms balanced
+  tertiles (two cells per class).
+
+  LOW LOAD
+    C27: p95 |C-rate| = 0.696; mild-aging control, SOH never below 0.930.
+    C25: p95 |C-rate| = 1.761; long trajectory, moderate current envelope.
+
+  MIDDLE LOAD
+    C13: p95 |C-rate| = 2.495; shorter trajectory, deep aging.
+    C09: p95 |C-rate| = 2.508; long trajectory, broad aging range.
+
+  HIGH LOAD
+    C15: p95 |C-rate| = 2.527; elevated thermal exposure, deep aging.
+    C29: p95 |C-rate| = 3.003; highest current/temperature stress, deepest aging.
+
+2. FIXED WITHIN-TRAJECTORY STATE TESTS
+  Every model run reports MAE, RMSE, bias, P95 error, sample count, and coverage
+  fraction separately for the following predeclared states. The strata use the
+  uncorrupted reference operating state, not the disturbed sensor value.
+
+  SOH STATE
+    Fresh:    SOH >= 0.90
+    Mid-life: 0.80 <= SOH < 0.90
+    Aged:     SOH < 0.80
+
+  INSTANTANEOUS LOAD
+    Low:      |C-rate| < 0.5
+    Medium:   0.5 <= |C-rate| < 1.5
+    High:     |C-rate| >= 1.5
+
+  TEMPERATURE STATE
+    Nominal:  T <= 30 degC
+    Elevated: 30 < T <= 35 degC
+    Hot:      T > 35 degC
+
+  SOC STATE
+    Low:      SOC < 0.20
+    Middle:   0.20 <= SOC <= 0.80
+    High:     SOC > 0.80
+
+3. DISTURBANCE TESTS TO RUN ON ALL SIX CELLS
+  Baseline.
+  Current noise: sigma = 0.02 A and 0.10 A.
+  Voltage noise: sigma = 0.01 V.
+  Temperature noise: sigma = 1.0 degC.
+  Current bias: +0.5%, +1.5%, and +3.0%.
+  Voltage offset: +0.02 V.
+  Temperature offset: +3 degC.
+  ADC quantization.
+  Initial SOC-equivalent mismatch: -10% for DM/HDM coulomb-counting state,
+  HECM EKF SOC state, and DD via Q_c offset of -0.10 times nominal capacity.
+  The realized initial estimator-output error is reported for every model.
+  Periodic missing samples: every 50th sample.
+  Random missing samples: 2%.
+  Timing jitter: +/-0.1 s, +/-0.5 s, and +/-0.9 s.
+  Burst dropout: one central 1 h gap.
+  Voltage spikes: +/-0.20 V every 1000 samples with randomized sign.
+
+  Gaussian sensor-noise scenarios use 10 deterministic seeds per window. Random
+  missing-sample, jitter, and spike scenarios use 5 seeds. Deterministic scenarios
+  run once. Primary SOH-aware results use the shared causal LSTM-SOH.
+  Selected scenarios additionally run with ideal reference SOH as a paired
+  explanatory ablation.
+
+4. NEW CROSS-FACTOR ANALYSES
+  Baseline estimator accuracy by SOH state.
+  Baseline estimator accuracy by instantaneous load, temperature, and SOC state.
+  Cell-load class x SOH-state interaction for each estimator.
+  Disturbance delta-MAE by SOH state for current noise, temperature noise, and
+  one-hour dropout.
+  Paired LSTM-SOH versus reference-SOH error propagation by cell and scenario.
+  SOH publication cadence at 1 h, 6 h, and 24 h under baseline conditions.
+  Separate HECM resistance/tau/OCV lookup-table sensitivity.
+
+5. STATISTICAL ANALYSIS
+  Independent statistical unit: holdout cell, not individual time sample.
+  Frozen SOH windows are averaged inside each cell/seed before inferential
+  comparison; random seeds are then nested inside each cell.
+  Point estimate: equal-weight cell-macro mean, so C27's longer trajectory does
+  not dominate C13's shorter trajectory.
+  Uncertainty: hierarchical bootstrap with random seeds nested inside cells;
+  report 95% confidence intervals.
+  Scenario test: paired cell-level delta-MAE versus the cell-matched baseline.
+  Model ranking test: paired cell-level differences for every estimator pair.
+  Exact inference: two-sided paired sign-flip test on cell-level differences.
+  Multiplicity: Holm correction across the reported family of tests.
+  Effect size: paired standardized mean difference dz, plus raw mean/median
+  difference and bootstrap CI.
+  Reporting: always include n_cells and the minimum/maximum seeds per cell.
+
+6. NEW TABLES AND FIGURES AFTER THE FULL CAMPAIGN
+  jes2_stratified_run_metrics.csv
+  jes2_stratified_statistics.csv
+  jes2_load_class_stratified_statistics.csv
+  jes2_paired_scenario_tests.csv
+  jes2_paired_model_tests.csv
+  jes2_statistical_method.txt
+  Figure_20_SOH_State_Performance.png
+  Figure_21_Load_Class_SOH_Interaction.png
+  Figure_22_SOH_State_Robustness.png
+  Figure_23_Operating_State_Performance.png
+
+7. LIMITATIONS THAT MUST REMAIN EXPLICIT
+  Load class is a descriptive dataset stratum, not a different battery chemistry
+  or a randomized treatment.
+  Each cell-load class contains only two cells. Interaction panels are exploratory
+  and must show cell counts; they cannot support broad population claims alone.
+  C27 contains no mid-life/aged SOH and no hot-temperature interval. Missing cells
+  in a state are reported as N/A, never imputed.
+  The same trajectory contributes to several within-cell states; time samples are
+  not treated as independent replicates.
+  Results remain limited to the available LFP dataset and its operating envelope.
+
+8. EXECUTION STATUS
+  IMPLEMENTED: fixed strata, all four model summaries, cell classification,
+  hierarchical aggregation, paired tests, Holm adjustment, effect sizes, tables,
+  and DISS-colored Figure 20-Figure 23 generators.
+  VERIFIED: automated tests and real short C29 runner/result smoke tests.
+  VERIFIED: 16 frozen full-charge windows cover every available cell/SOH state;
+  C27 contributes Fresh only. DD baseline completed for all 16 windows with both
+  LSTM-SOH and reference-SOH (32 runs).
+  COMPLETE: DD-only one-seed pilot over all 19 scenarios and all 16 windows;
+  304/304 runs completed successfully.
+  COMPLETE: full four-estimator 10/5-seed campaign; 6720/6720 runs completed
+  successfully across C09, C13, C15, C25, C27, and C29.
+  RUNNING: final publication result build with 10000 hierarchical bootstrap
+  repetitions per metric group.
+  PREPARED: isolated target-hardware SOC benchmark handoff and host-side tools;
+  physical STM32 latency, peak RAM, flash, and optional energy measurements must
+  be executed on the local PC with the board attached.

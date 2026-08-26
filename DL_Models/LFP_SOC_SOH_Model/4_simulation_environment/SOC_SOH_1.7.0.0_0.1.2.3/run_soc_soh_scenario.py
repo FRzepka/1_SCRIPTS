@@ -23,9 +23,12 @@ from robustness_common import (
     add_common_scenario_args,
     apply_measurement_scenario,
     build_online_aux_features,
+    compute_protocol_event_metrics,
     compute_robustness_metrics,
+    compute_stratified_error_metrics,
     load_cell_dataframe,
 )
+from shared_soh_trace import load_soh_trace
 
 # -------------------------
 # SOC model (config-driven 1.6/1.7)
@@ -372,15 +375,33 @@ def rolling_predict_soc(Xs: np.ndarray, y_true: np.ndarray, chunk: int, model: L
     return y_pred, rmse, mae
 
 
-def stateful_stream_predict_soc(Xs: np.ndarray, y_true: np.ndarray, model: nn.Module, device: torch.device) -> Tuple[np.ndarray, float, float]:
+def stateful_stream_predict_soc(
+    Xs: np.ndarray,
+    y_true: np.ndarray,
+    model: nn.Module,
+    device: torch.device,
+    stream_chunk: int = 8192,
+    show_progress: bool = True,
+) -> Tuple[np.ndarray, float, float]:
+    """Run one causal recurrent stream while batching contiguous time steps.
+
+    Chunk boundaries preserve the hidden state, so this is equivalent to calling
+    the stateful one-step export repeatedly but avoids one Python/GPU call per row.
+    """
+    if stream_chunk < 1:
+        raise ValueError("stream_chunk must be positive")
     preds = np.empty(len(Xs), dtype=np.float32)
     state = None
     model.eval()
-    with torch.no_grad():
-        for i in tqdm(range(len(Xs)), desc="SOC stateful", unit="step"):
-            xb = torch.from_numpy(Xs[i:i+1]).unsqueeze(1).to(device)
-            pred, state = model(xb, state=state, return_state=True)
-            preds[i] = float(pred.squeeze().detach().cpu().item())
+    recurrent = model.gru if hasattr(model, "gru") else model.lstm
+    with torch.inference_mode():
+        starts = range(0, len(Xs), int(stream_chunk))
+        for start in tqdm(starts, desc="SOC stateful", unit="chunk", disable=not show_progress):
+            end = min(start + int(stream_chunk), len(Xs))
+            xb = torch.from_numpy(np.ascontiguousarray(Xs[start:end])).unsqueeze(0).to(device)
+            recurrent_out, state = recurrent(xb, state)
+            chunk_pred = model.mlp(recurrent_out).squeeze(0).squeeze(-1)
+            preds[start:end] = chunk_pred.detach().cpu().numpy()
     rmse = math.sqrt(np.mean((y_true - preds) ** 2)) if len(preds) else float('nan')
     mae = np.mean(np.abs(y_true - preds)) if len(preds) else float('nan')
     return preds, rmse, mae
@@ -402,9 +423,14 @@ def main():
                     help="Fail if CUDA is not available.")
     ap.add_argument("--soc_batch", type=int, default=64)
     ap.add_argument("--soc_inference_mode", choices=["rolling", "stateful_streaming"], default="rolling")
+    ap.add_argument("--soc_stream_chunk", type=int, default=8192,
+                    help="Contiguous samples per call in stateful streaming mode; hidden state crosses chunks.")
     ap.add_argument("--soh_init", type=float, default=1.0)
     ap.add_argument("--warmup_seconds", type=float, default=600.0,
                     help="Ignore first N seconds for error plot/metrics")
+    ap.add_argument("--start_row", type=int, default=0)
+    ap.add_argument("--max_rows", type=int, default=0)
+    ap.add_argument("--data_root", default=None)
     ap.add_argument("--current_sign", type=float, default=1.0,
                     help="Sign convention for current integration.")
     ap.add_argument("--v_max", type=float, default=3.65,
@@ -423,6 +449,8 @@ def main():
     ap.add_argument("--soh_config", default="/home/florianr/MG_Farm/1_Scripts/DL_Models/LFP_SOC_SOH_Model/2_models/SOH_0.1.2.3/train_soh.yaml")
     ap.add_argument("--soh_ckpt", default="/home/florianr/MG_Farm/1_Scripts/DL_Models/LFP_SOC_SOH_Model/2_models/SOH_0.1.2.3/best_epoch0093_rmse0.02165.pt")
     ap.add_argument("--soh_scaler", default="/home/florianr/MG_Farm/1_Scripts/DL_Models/LFP_SOC_SOH_Model/2_models/SOH_0.1.2.3/scaler_robust.joblib")
+    ap.add_argument("--soh_trace", default=None,
+                    help="Shared causal SOH .npz trace; skips local SOH inference when set.")
 
     args = ap.parse_args()
 
@@ -442,7 +470,7 @@ def main():
     soc_mlp_hidden = int(soc_cfg['model']['mlp_hidden'])
     soc_num_layers = int(soc_cfg['model'].get('num_layers', 1))
     soc_dropout = float(soc_cfg['model'].get('dropout', 0.05))
-    data_root = soc_cfg['paths']['data_root']
+    data_root = args.data_root or soc_cfg['paths']['data_root']
 
     with open(args.soh_config, 'r') as f:
         soh_cfg = yaml.safe_load(f)
@@ -458,7 +486,7 @@ def main():
     interval_seconds = int(sampling_cfg.get('interval_seconds', 3600))
     feature_aggs = sampling_cfg.get('feature_aggs', ['mean', 'std', 'min', 'max'])
 
-    df = load_cell_dataframe(data_root, args.cell)
+    df = load_cell_dataframe(data_root, args.cell, args.start_row, args.max_rows)
     df = df.replace([np.inf, -np.inf], np.nan)
 
     df, scenario_info = apply_measurement_scenario(df, args.scenario, args)
@@ -505,36 +533,48 @@ def main():
 
     from joblib import load
     soc_scaler: RobustScaler = load(args.soc_scaler)
-    soh_scaler: RobustScaler = load(args.soh_scaler)
+    trace_metadata = None
+    if args.soh_trace:
+        soh_per_row, trace_metadata = load_soh_trace(
+            args.soh_trace,
+            df['Testtime[s]'].to_numpy(dtype=np.float64),
+        )
+        hourly_frame = pd.DataFrame({
+            'bin': (df['Testtime[s]'].to_numpy(dtype=np.int64) // interval_seconds),
+            'soh': soh_per_row,
+        }).groupby('bin', sort=True)['soh'].last()
+        bins = hourly_frame.index.to_numpy(dtype=np.int64)
+        soh_hourly = hourly_frame.to_numpy(dtype=np.float32)
+        soh_model_type = str(trace_metadata.get('source', 'external_trace'))
+    else:
+        soh_scaler: RobustScaler = load(args.soh_scaler)
+        soh_model_type = str(soh_cfg['model'].get('type', 'GRU_Hybrid_Seq2Seq'))
+        soh_model_cls = SOH_LSTM_Seq2Seq if 'LSTM' in soh_model_type.upper() else SOH_GRU_Seq2Seq
+        soh_model = soh_model_cls(
+            in_features=len(expand_features_for_sampling(soh_base_features, feature_aggs)),
+            embed_size=soh_embed,
+            hidden_size=soh_hidden,
+            mlp_hidden=soh_mlp_hidden,
+            num_layers=soh_num_layers,
+            res_blocks=soh_res_blocks,
+            bidirectional=soh_bidirectional,
+            dropout=soh_dropout,
+        ).to(device)
+        soh_state = torch.load(args.soh_ckpt, map_location=device)
+        soh_model.load_state_dict(soh_state['model_state_dict'])
+        soh_hourly, bins = predict_soh_hourly(
+            df_raw=df,
+            base_features=soh_base_features,
+            interval_seconds=interval_seconds,
+            feature_aggs=feature_aggs,
+            scaler=soh_scaler,
+            model=soh_model,
+            device=device,
+            soh_init=args.soh_init,
+        )
+        soh_per_row = expand_soh_to_rows(df, bins, soh_hourly, interval_seconds, soh_init=args.soh_init)
 
-    soh_model_type = str(soh_cfg['model'].get('type', 'GRU_Hybrid_Seq2Seq'))
-    soh_model_cls = SOH_LSTM_Seq2Seq if 'LSTM' in soh_model_type.upper() else SOH_GRU_Seq2Seq
-    soh_model = soh_model_cls(
-        in_features=len(expand_features_for_sampling(soh_base_features, feature_aggs)),
-        embed_size=soh_embed,
-        hidden_size=soh_hidden,
-        mlp_hidden=soh_mlp_hidden,
-        num_layers=soh_num_layers,
-        res_blocks=soh_res_blocks,
-        bidirectional=soh_bidirectional,
-        dropout=soh_dropout,
-    ).to(device)
-    soh_state = torch.load(args.soh_ckpt, map_location=device)
-    soh_model.load_state_dict(soh_state['model_state_dict'])
-
-    soh_hourly, bins = predict_soh_hourly(
-        df_raw=df,
-        base_features=soh_base_features,
-        interval_seconds=interval_seconds,
-        feature_aggs=feature_aggs,
-        scaler=soh_scaler,
-        model=soh_model,
-        device=device,
-        soh_init=args.soh_init,
-    )
-
-    soh_per_row = expand_soh_to_rows(df, bins, soh_hourly, interval_seconds, soh_init=args.soh_init)
-    if freeze_mask is not None and freeze_mask.any():
+    if freeze_mask is not None and freeze_mask.any() and not args.soh_trace:
         first_gap = int(np.argmax(freeze_mask))
         hold = float(soh_per_row[first_gap - 1]) if first_gap > 0 else float(args.soh_init)
         soh_per_row[freeze_mask] = hold
@@ -563,6 +603,7 @@ def main():
             y_true=y_soc_true,
             model=soc_model,
             device=device,
+            stream_chunk=int(args.soc_stream_chunk),
         )
         soc_start_idx = 0
     else:
@@ -602,9 +643,6 @@ def main():
         soh_df = soh_df.drop(columns=['_bin'])
         soh_df = soh_df.rename(columns={'SOH': 'soh_true_last'})
 
-    soh_csv = os.path.join(args.out_dir, f"soh_hourly_{args.cell}.csv")
-    soh_df.to_csv(soh_csv, index=False)
-
     soc_idx = np.arange(soc_start_idx, len(df_soc))
     soc_time_s = df_soc['Testtime[s]'].to_numpy(dtype=np.float64)[soc_start_idx:]
     soc_abs_err = np.abs(y_soc_true[soc_start_idx:] - soc_pred)
@@ -615,16 +653,36 @@ def main():
         warmup_seconds=float(args.warmup_seconds),
         disturbance_mask=np.asarray(scenario_info.get('disturbance_mask', freeze_mask), dtype=bool)[soc_start_idx:],
     )
-    soc_df = pd.DataFrame({
-        'index': soc_idx,
-        'time_s': soc_time_s,
-        'soc_true': y_soc_true[soc_start_idx:],
-        'soc_pred': soc_pred,
-        'abs_err': soc_abs_err,
-    })
-    soc_csv = os.path.join(args.out_dir, f"soc_pred_fullcell_{args.cell}.csv")
-    soc_df.to_csv(soc_csv, index=False)
-
+    metrics.update(compute_protocol_event_metrics(
+        scenario=args.scenario,
+        time_s=soc_time_s,
+        y_true=y_soc_true[soc_start_idx:],
+        y_pred=soc_pred,
+        current_a=df_soc['_protocol_current_a'].to_numpy(dtype=np.float64)[soc_start_idx:],
+        freeze_mask=freeze_mask[soc_start_idx:],
+        threshold=args.recovery_abs_error_threshold,
+        sustain_seconds=args.recovery_sustain_seconds,
+        horizon_seconds=args.recovery_horizon_seconds,
+    ))
+    stratified_mask = soc_time_s >= float(args.warmup_seconds)
+    if not np.any(stratified_mask):
+        stratified_mask = np.ones(len(soc_time_s), dtype=bool)
+    stratified_metrics = compute_stratified_error_metrics(
+        y_true=y_soc_true[soc_start_idx:][stratified_mask],
+        y_pred=soc_pred[stratified_mask],
+        reference_soh=(
+            df_soc['_reference_soh'].to_numpy(dtype=np.float64)[soc_start_idx:][stratified_mask]
+            if '_reference_soh' in df_soc else None
+        ),
+        reference_temperature_c=(
+            df_soc['_reference_temperature_c'].to_numpy(dtype=np.float64)[soc_start_idx:][stratified_mask]
+            if '_reference_temperature_c' in df_soc else None
+        ),
+        reference_c_rate=(
+            df_soc['_reference_c_rate'].to_numpy(dtype=np.float64)[soc_start_idx:][stratified_mask]
+            if '_reference_c_rate' in df_soc else None
+        ),
+    )
     summary = {
         'model': 'SOC_SOH_1.7.0.0_0.1.2.3',
         'cell': args.cell,
@@ -637,14 +695,21 @@ def main():
         'soc_mae': metrics['mae'],
         'soc_chunk': int(soc_chunk),
         'soc_inference_mode': str(args.soc_inference_mode),
+        'soc_stream_chunk': int(args.soc_stream_chunk),
         'soc_model_type': soc_model_type,
         'soc_features': soc_features,
         'soh_interval_seconds': int(interval_seconds),
         'soh_feature_aggs': feature_aggs,
         'soh_model_type': soh_model_type,
+        'soh_source': 'external_trace' if args.soh_trace else 'local_lstm',
+        'soh_trace': args.soh_trace,
+        'soh_trace_metadata': trace_metadata,
         'soh_init': float(args.soh_init),
         'soh_hours': int(len(soh_hourly)),
         'warmup_seconds': float(args.warmup_seconds),
+        'start_row': int(args.start_row),
+        'max_rows': int(args.max_rows),
+        'output_policy': 'summary_only' if args.summary_only else 'full_run_artifacts',
         'missing_gap_seconds': float(args.missing_gap_seconds),
         'online_feature_build': {
             'current_sign': float(args.current_sign),
@@ -667,11 +732,27 @@ def main():
             'q_c_init_delta_soc': float(scenario_info.get('soc_init_delta', 0.0)),
             'method': 'initial offset applied to online Q_c feature before SOC inference',
         },
+        'stratified_metrics': stratified_metrics,
     }
     summary.update(metrics)
-    mask = soc_df['time_s'] >= float(args.warmup_seconds)
     with open(os.path.join(args.out_dir, 'summary.json'), 'w') as f:
         json.dump(summary, f, indent=2)
+
+    if args.summary_only:
+        print(json.dumps(summary, indent=2))
+        return
+
+    soh_csv = os.path.join(args.out_dir, f"soh_hourly_{args.cell}.csv")
+    soh_df.to_csv(soh_csv, index=False)
+    soc_df = pd.DataFrame({
+        'index': soc_idx,
+        'time_s': soc_time_s,
+        'soc_true': y_soc_true[soc_start_idx:],
+        'soc_pred': soc_pred,
+        'abs_err': soc_abs_err,
+    })
+    soc_csv = os.path.join(args.out_dir, f"soc_pred_fullcell_{args.cell}.csv")
+    soc_df.to_csv(soc_csv, index=False)
 
     try:
         fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 8), sharex=True)

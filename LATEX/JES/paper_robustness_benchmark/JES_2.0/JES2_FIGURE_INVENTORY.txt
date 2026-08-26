@@ -1,0 +1,67 @@
+JES 2.0 - FIGURE INVENTORY AND DATA STATUS
+Updated: 2026-08-25
+
+OUTPUT LOCATIONS
+  Main figure directory:
+    LATEX/JES/paper_robustness_benchmark/figures/Results
+  Current visual overview:
+    LATEX/JES/paper_robustness_benchmark/JES_2.0/JES2_Figure_Overview.png
+  Automatically generated pilot figures after the running campaign completes:
+    LATEX/JES/paper_robustness_benchmark/figures/Results/JES2_Pilot
+  Compiled JES2 method/coverage preview PDFs:
+    LATEX/JES/paper_robustness_benchmark/JES_2.0/
+    Robustness_Benchmark_Manuscript_JES2.pdf
+    Robustness_Benchmark_Manuscript_Anonymized_JES2.pdf
+
+STATUS LEGEND
+  REAL_DATA_READY      Complete real-data coverage/design figure; safe to inspect now.
+  LEGACY_REPLACE       Existing C07 result graphic; must be replaced by JES2 results.
+  PILOT_RUNNING        Layout and calculation path exist; real six-cell pilot is running.
+  FULL_RUN_REQUIRED    Requires scenarios/cadences from the complete campaign.
+
+CURRENT RESULT FIGURES
+  Figure 04  Baseline performance                         LEGACY_REPLACE / PILOT_RUNNING
+  Figure 05  Current-bias sensitivity                     LEGACY_REPLACE / FULL_RUN_REQUIRED
+  Figure 06  Repeated noise robustness                    LEGACY_REPLACE / FULL_RUN_REQUIRED
+  Figure 07  Initial mismatch realization and recovery   LEGACY_REPLACE / PILOT_RUNNING
+  Figure 08  Signal integrity and timing                  LEGACY_REPLACE / FULL_RUN_REQUIRED
+  Figure 09  One-hour dropout transition                  LEGACY_REPLACE / PILOT_RUNNING
+  Figure 10  One-hour dropout recovery/censoring          LEGACY_REPLACE / PILOT_RUNNING
+  Figure 11  Voltage-spike response                       LEGACY_REPLACE / FULL_RUN_REQUIRED
+  Figure 12  Cross-scenario delta-MAE heatmap             LEGACY_REPLACE / PILOT_RUNNING
+  Figure 13  Decision evidence without composite ranking  LEGACY_REPLACE / PILOT_RUNNING
+  Figure 14  ADC quantization                             LEGACY_REPLACE / FULL_RUN_REQUIRED
+  Figure 15  LSTM-SOH versus reference-SOH ablation       PILOT_RUNNING
+
+REAL SIX-CELL COVERAGE AND DESIGN FIGURES
+  Figure 16  Aging/load/thermal/SOH coverage              REAL_DATA_READY
+  Figure 24  Aging trajectories over EFC                  REAL_DATA_READY
+  Figure 25  SOH/temperature/load/SOC coverage matrix     REAL_DATA_READY
+  Figure 26  Joint load-temperature-SOH envelope          REAL_DATA_READY
+  Figure 27  Complete 19-case JES2 test matrix            REAL_DATA_READY
+  Figure 28  Cell-based statistical-analysis workflow     REAL_DATA_READY
+  Figure 29  Frozen evaluation-window protocol            REAL_DATA_READY
+
+NEW STRATIFIED RESULT FIGURES
+  Figure 17  Repeated-noise effects with hierarchical CI  FINAL_BUILD_RUNNING
+  Figure 18  SOH publication cadence 1/6/24 h             FINAL_BUILD_RUNNING
+  Figure 19  HECM lookup-table parameter sensitivity      FULL_RUN_REQUIRED
+  Figure 20  Baseline MAE across SOH states               FINAL_BUILD_RUNNING
+  Figure 21  Cell-load class x SOH-state interaction      FINAL_BUILD_RUNNING
+  Figure 22  Disturbance delta-MAE across SOH states      FINAL_BUILD_RUNNING
+  Figure 23  Accuracy across load/temperature states      FINAL_BUILD_RUNNING
+
+RUNNING JOBS
+  Final 6720-run publication result build with 10000 hierarchical bootstrap
+  repetitions per metric group. Pilot, smoke test, and all six full cell shards
+  have completed successfully.
+
+SCIENTIFIC DATA BOUNDARY
+  No synthetic layout-test value is copied into a manuscript figure directory.
+  Figures 16 and 24-28 use the full measured holdout trajectories; Figure 29 uses
+  the frozen measured window manifest. The aging and
+  operating-envelope plots use evenly spaced samples only for rendering density;
+  all reported state fractions are calculated from every sample in every cell.
+  Pilot figures are diagnostic evidence. The complete six-cell campaign with 10
+  Gaussian-noise seeds and 5 seeds for secondary stochastic integrity scenarios
+  is complete; final numerical claims await its running strict result build.
