@@ -85,6 +85,12 @@ gegen die Rolling-Window-Referenz zu quantifizieren.
   `campaigns/jes2_full_holdout_merged_20260825.json` zusammengefuehrt.
 - Die Skripte in diesem Verzeichnis definieren Host-Protokoll, Speicheranalyse
   und Ergebniszusammenfassung fuer den Hardwaretest.
+- Der tatsaechlich verwendete pruned/fine-tuned JES2-DD-Checkpoint wurde als
+  Fixed-Window- und Stateful-ONNX exportiert. Fixed-Window ONNX und PyTorch
+  stimmen bis auf eine maximale Abweichung von 5.96e-08 ueberein.
+- Eine nominale 4096-Sample-Sequenz aus dem eingefrorenen C27-Fresh-Fenster mit
+  gemeinsamer SOH-Spur und Referenzausgaben aller vier Estimatoren liegt unter
+  `test_vectors/jes2_nominal_vectors.csv`.
 
 ## Aktuell laufend
 
@@ -100,10 +106,6 @@ Upload ausgeschlossen; Paper-Tabellen und Diagramme werden versioniert.
 
 - Abschluss der Bootstrap-Auswertung bestaetigen.
 - Finale Tabellen/Diagramme auf Plausibilitaet pruefen.
-- Kleine nominale Hardware-Testvektoren mit Software-Referenzausgaben erzeugen
-  und unter `test_vectors/` versionieren.
-- JES2-DD-Fixed-Window-ONNX aus dem tatsaechlich verwendeten pruned/fine-tuned
-  Checkpoint exportieren und gegen PyTorch pruefen.
 - Reviewer-To-do-Dateien auf den finalen Kampagnenstatus aktualisieren.
 
 ## Noch am lokalen STM32-PC zu erledigen

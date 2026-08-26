@@ -1,8 +1,8 @@
 # Testvektoren
 
-Die finale Datei `jes2_nominal_vectors.csv` wird auf dem HPC erzeugt und klein
-genug fuer Git gehalten. Sie enthaelt ausschliesslich nominale Messwerte und die
-zugehoerigen float32-Softwareausgaben.
+Die Datei `jes2_nominal_vectors.csv` wurde auf dem HPC aus dem eingefrorenen
+frischen C27-Baselinefenster erzeugt. Sie enthaelt 4096 ausschliesslich nominale
+Messwerte, die gemeinsame kausale SOH-Spur und die Software-Referenzausgaben.
 
 Pflichtspalten:
 

@@ -37,6 +37,10 @@ python STM32/JES2_hardware_benchmark/scripts/collect_serial_benchmark.py \
 Das DD-Image muss die ersten 2023 Samples als Fenster-Warm-up kennzeichnen. Bei
 DM, HDM und HECM kann jede Zeile nach dem letzten Reset ausgewertet werden.
 
+Die versionierte nominale Sequenz enthaelt 4096 geordnete C27-Samples. Sie wurde
+aus dem eingefrorenen frischen Baselinefenster erzeugt und enthaelt die
+Software-Referenzausgaben aller vier Estimatoren.
+
 ## DD-Export auf dem HPC
 
 ```bash
