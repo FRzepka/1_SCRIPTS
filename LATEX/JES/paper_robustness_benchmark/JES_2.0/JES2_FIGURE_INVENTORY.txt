@@ -43,18 +43,17 @@ REAL SIX-CELL COVERAGE AND DESIGN FIGURES
   Figure 29  Frozen evaluation-window protocol            REAL_DATA_READY
 
 NEW STRATIFIED RESULT FIGURES
-  Figure 17  Repeated-noise effects with hierarchical CI  FINAL_BUILD_RUNNING
-  Figure 18  SOH publication cadence 1/6/24 h             FINAL_BUILD_RUNNING
+  Figure 17  Repeated-noise effects with hierarchical CI  FINAL_REAL_DATA_READY
+  Figure 18  SOH publication cadence 1/6/24 h             FINAL_REAL_DATA_READY
   Figure 19  HECM lookup-table parameter sensitivity      FULL_RUN_REQUIRED
-  Figure 20  Baseline MAE across SOH states               FINAL_BUILD_RUNNING
-  Figure 21  Cell-load class x SOH-state interaction      FINAL_BUILD_RUNNING
-  Figure 22  Disturbance delta-MAE across SOH states      FINAL_BUILD_RUNNING
-  Figure 23  Accuracy across load/temperature states      FINAL_BUILD_RUNNING
+  Figure 20  Baseline MAE across SOH states               FINAL_REAL_DATA_READY
+  Figure 21  Cell-load class x SOH-state interaction      FINAL_REAL_DATA_READY
+  Figure 22  Disturbance delta-MAE across SOH states      FINAL_REAL_DATA_READY
+  Figure 23  Accuracy across load/temperature states      FINAL_REAL_DATA_READY
 
 RUNNING JOBS
-  Final 6720-run publication result build with 10000 hierarchical bootstrap
-  repetitions per metric group. Pilot, smoke test, and all six full cell shards
-  have completed successfully.
+  None. Pilot, smoke test, all six full cell shards, manifest merge, and final
+  10000-repeat publication result build completed successfully.
 
 SCIENTIFIC DATA BOUNDARY
   No synthetic layout-test value is copied into a manuscript figure directory.
@@ -64,4 +63,4 @@ SCIENTIFIC DATA BOUNDARY
   all reported state fractions are calculated from every sample in every cell.
   Pilot figures are diagnostic evidence. The complete six-cell campaign with 10
   Gaussian-noise seeds and 5 seeds for secondary stochastic integrity scenarios
-  is complete; final numerical claims await its running strict result build.
+  and its strict final result build are complete.

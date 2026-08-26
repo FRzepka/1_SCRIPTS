@@ -229,18 +229,18 @@ FIGURE STATUS
   DONE: DD-only one-seed all-19-scenario window pilot completed with 304/304 runs.
   DONE: complete four-estimator campaign completed with 6720/6720 runs and no
   failed records. The six cell shards were merged successfully.
-  RUNNING: final publication result build with 10000 hierarchical bootstrap
-  repetitions per metric group.
+  DONE: final publication result build with 10000 hierarchical bootstrap
+  repetitions per metric group. It produced 62901 stratified records, 72 paired
+  scenario tests, 60 paired model tests, and Figures 04-18 plus 20-23.
 
 NEXT EXECUTION ORDER
-  1. Finish the running 10000-repeat bootstrap result build.
-  2. Inspect final statistics and figures for completeness and plausibility.
-  3. Generate and version nominal STM32 test vectors with float32 references.
-  4. Execute the prepared isolated SOC hardware benchmark on STM32H753ZI.
-  5. Rewrite abstract, results, discussion, limitations, tables, and captions from
+  1. Inspect final statistics and figures for scientific plausibility.
+  2. Run the separate HECM parameter-sensitivity analysis for Figure 19.
+  3. Execute the prepared isolated SOC hardware benchmark on STM32H753ZI.
+  4. Rewrite abstract, results, discussion, limitations, tables, and captions from
      JES2 outputs; remove every old single-C07 numeric claim.
-  6. Compile full/anonymized papers and perform citation/reference/figure checks.
-  7. Insert target-hardware measurements and update deployment claims.
+  5. Compile full/anonymized papers and perform citation/reference/figure checks.
+  6. Insert target-hardware measurements and update deployment claims.
   HPC execution can be sharded into one independent job per holdout cell. Merge
   the six manifests with merge_jes2_manifests.py; publication output is blocked
   unless every expected cell/scenario/seed/SOH/model record is present.
@@ -281,8 +281,8 @@ LOCAL SOFTWARE VERIFICATION (2026-08-25)
     compiled successfully with Tectonic; no missing figure, undefined-reference,
     or fatal LaTeX error was reported. JES2 PDF copies are stored under JES_2.0.
   - The complete campaign now contains 6720 successful records: DM 1200, HDM
-    1840, HECM 1840, and DD 1840. Final paper tables and figures are being built
-    from the merged manifest with 10000 bootstrap repetitions.
+    1840, HECM 1840, and DD 1840. Final paper tables and Figures 04-18 plus
+    20-23 were built from the merged manifest with 10000 bootstrap repetitions.
   - The isolated STM32 SOC benchmark handoff, UART protocol, DD ONNX exports,
     scaler C header, serial host runner, memory parser, and summary tool are under
     STM32/JES2_hardware_benchmark. Measurement-error scenarios are deliberately

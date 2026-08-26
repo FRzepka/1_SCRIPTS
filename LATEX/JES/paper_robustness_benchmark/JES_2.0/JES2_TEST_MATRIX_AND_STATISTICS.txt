@@ -133,8 +133,9 @@ IMPORTANT DISTINCTION
   304/304 runs completed successfully.
   COMPLETE: full four-estimator 10/5-seed campaign; 6720/6720 runs completed
   successfully across C09, C13, C15, C25, C27, and C29.
-  RUNNING: final publication result build with 10000 hierarchical bootstrap
-  repetitions per metric group.
+  COMPLETE: final publication result build with 10000 hierarchical bootstrap
+  repetitions per metric group; strict result manifest reports 6720 completed
+  runs, 62901 stratified records, 72 scenario tests, and 60 model-pair tests.
   PREPARED: isolated target-hardware SOC benchmark handoff and host-side tools;
   physical STM32 latency, peak RAM, flash, and optional energy measurements must
   be executed on the local PC with the board attached.

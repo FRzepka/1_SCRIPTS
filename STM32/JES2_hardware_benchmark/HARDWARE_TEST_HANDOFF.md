@@ -92,19 +92,17 @@ gegen die Rolling-Window-Referenz zu quantifizieren.
   gemeinsamer SOH-Spur und Referenzausgaben aller vier Estimatoren liegt unter
   `test_vectors/jes2_nominal_vectors.csv`.
 
-## Aktuell laufend
+## Finale Softwareauswertung
 
-Die finale Softwareauswertung verarbeitet 6720 Runs mit 10000 hierarchischen
-Bootstrap-Wiederholungen pro Metrikgruppe. Beim Erstellen dieser Uebergabe lief
-der Prozess noch. Erfolgreicher Abschluss ist an
-`FULL_POSTPROCESS_EXIT_STATUS=0` in
+Die finale Softwareauswertung der 6720 Runs mit 10000 hierarchischen Bootstrap-
+Wiederholungen pro Metrikgruppe wurde am 2026-08-26 erfolgreich abgeschlossen.
+Der Abschluss ist durch `FULL_POSTPROCESS_EXIT_STATUS=0` in
 `DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/campaigns/jes2_full_postprocess_20260825.log`
-zu erkennen. Die Kampagnen-Rohdaten sind absichtlich per `.gitignore` vom Git-
+belegt. Die Kampagnen-Rohdaten sind absichtlich per `.gitignore` vom Git-
 Upload ausgeschlossen; Paper-Tabellen und Diagramme werden versioniert.
 
 ## Noch auf dem HPC zu erledigen
 
-- Abschluss der Bootstrap-Auswertung bestaetigen.
 - Finale Tabellen/Diagramme auf Plausibilitaet pruefen.
 - Reviewer-To-do-Dateien auf den finalen Kampagnenstatus aktualisieren.
 
