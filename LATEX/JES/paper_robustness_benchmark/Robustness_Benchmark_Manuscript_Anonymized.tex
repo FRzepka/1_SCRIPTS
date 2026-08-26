@@ -282,7 +282,7 @@ The disturbance magnitudes are not intended as one-to-one copies of a single fie
     \endlastfoot
     ADC quantization & $\Delta I=\SI{0.01}{A}$; $\Delta U=\SI{0.005}{V}$; $\Delta T=\SI{0.5}{\celsius}$ & ADC steps; sensor scaling; rounding; coarse deployment-level discretization \cite{BQ7961616SeriesBattery2023,DesignConsiderationsCurrent,10sBatteryPack} \\
     \addlinespace[2pt]
-    Current bias & Signed constant-offset sweep: $\pm0.5\%$, $\pm1.5\%$, and $\pm3.0\%$ of $|I|_{\max}$ & Sensor offset; miscalibration; drift; upper bound as stress case \cite{DesignConsiderationsCurrent,TMCS11083Functional,TLE4972HighPrecision} \\
+    Current gain error & Signed gain sweep: $I_{\mathrm{meas}}=I(1+b)$ with $b=\pm0.5\%$, $\pm1.5\%$, and $\pm3.0\%$ & Sensor gain error; miscalibration; drift; upper bound as stress case \cite{DesignConsiderationsCurrent,TMCS11083Functional,TLE4972HighPrecision} \\
     \addlinespace[2pt]
     Current noise & Gaussian; $\sigma_I=\SI{0.02}{A}$ and $\SI{0.10}{A}$ & Sensing-chain noise; EMI pickup; low and high sensor-noise levels \cite{liRobustnessSOCEstimation2015,naseriReliableWirelessBMS2025} \\
     \addlinespace[2pt]
@@ -387,12 +387,12 @@ Figure~\ref{fig:baseline_mae} summarizes the nominal baseline performance on the
 \end{figure}
 
 \subsection{Current-bias sensitivity}
-Figure~\ref{fig:offset_sensitivity} summarizes a signed current-offset sweep at $\pm0.5\%$, $\pm1.5\%$, and $\pm3.0\%$ of $|I|_{\max}$. DM and HDM show the steepest approximately linear response, HECM is less sensitive, and DD has the smallest mean response with confidence intervals crossing zero. The sign dependence is important: the baseline errors of DM and HDM are predominantly positive, so a positive current offset partially compensates their existing error whereas the negative offset reinforces it. At $-3\%$, the cell-macro MAE increases by $0.0107$ for DM, $0.0100$ for HDM, $0.0048$ for HECM, and $0.0019$ for DD. The symmetric protocol therefore reports sensitivity without selecting only the error-amplifying direction.
+Figure~\ref{fig:offset_sensitivity} summarizes the adverse response to a signed current-gain sweep at $\pm0.5\%$, $\pm1.5\%$, and $\pm3.0\%$. For each magnitude and holdout cell, the larger MAE change from the two signs is reported because the opposite sign can partially compensate a pre-existing baseline error. The resulting worst-case degradation increases monotonically with gain-error magnitude for every estimator. DM and HDM show the strongest response, HECM is less sensitive, and DD is least sensitive. At $3\%$, the cell-macro MAE increases by $0.0107$ for DM, $0.0100$ for HDM, $0.0059$ for HECM, and $0.0038$ for DD.
 
 \begin{figure*}[t]
     \centering
     \benchfig{figures/Results/Figure_05_Current_Bias.png}{Current-bias sensitivity figure missing.}
-    \caption{Symmetric current-offset sensitivity across the six independent holdout cells. Points show equal-weight cell-macro changes in MAE relative to each estimator's baseline; error bars show hierarchical 95\% bootstrap confidence intervals. Negative offsets reinforce the positive baseline errors of DM and HDM, whereas positive offsets partially compensate them.}
+    \caption{Worst-case sensitivity to current-gain error across the six independent holdout cells. For each gain-error magnitude and cell, the adverse direction from the matched $\pm b$ pair is retained. Points show equal-weight cell-macro changes in MAE relative to each estimator's baseline; error bars show 95\% bootstrap confidence intervals across cells.}
     \label{fig:offset_sensitivity}
 \end{figure*}
 

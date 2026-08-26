@@ -69,31 +69,40 @@ def main() -> None:
         lambda row: row.mae - baseline.loc[(row.cell, row.window_id, row.model)], axis=1
     )
     cells = runs.groupby(["model", "offset_pct", "cell"], as_index=False).delta_mae.mean()
+    cells["bias_magnitude_pct"] = cells.offset_pct.abs()
+    # Report the adverse direction at each magnitude. This prevents an existing
+    # baseline error from making one bias direction look artificially beneficial.
+    cells = cells.loc[
+        cells.groupby(["model", "bias_magnitude_pct", "cell"]).delta_mae.idxmax()
+    ].copy()
 
     rows = []
-    for index, ((model, offset), group) in enumerate(cells.groupby(["model", "offset_pct"])):
+    for index, ((model, magnitude), group) in enumerate(
+        cells.groupby(["model", "bias_magnitude_pct"])
+    ):
         mean, low, high = bootstrap_cell_macro(group.delta_mae, args.bootstrap_samples, 2608 + index)
-        rows.append({"model": model, "offset_pct": offset, "mean": mean, "ci_low": low, "ci_high": high,
-                     "n_cells": group.cell.nunique()})
-    statistics = pd.DataFrame(rows).sort_values(["model", "offset_pct"])
+        rows.append({
+            "model": model, "bias_magnitude_pct": magnitude, "mean": mean,
+            "ci_low": low, "ci_high": high, "n_cells": group.cell.nunique(),
+        })
+    statistics = pd.DataFrame(rows).sort_values(["model", "bias_magnitude_pct"])
     args.out_csv.parent.mkdir(parents=True, exist_ok=True)
     statistics.to_csv(args.out_csv, index=False)
 
     setup_style()
     fig, ax = plt.subplots(figsize=(10.5, 5.3))
     for model in MODELS:
-        part = statistics[statistics.model == model].sort_values("offset_pct")
+        part = statistics[statistics.model == model].sort_values("bias_magnitude_pct")
         ax.errorbar(
-            part.offset_pct, part["mean"],
+            part.bias_magnitude_pct, part["mean"],
             yerr=np.vstack([part["mean"] - part.ci_low, part.ci_high - part["mean"]]),
             color=MODEL_COLORS[model], marker="o", linewidth=2.0, capsize=3, label=model,
         )
     ax.axhline(0.0, color="#333333", linewidth=0.9)
-    ax.axvline(0.0, color="#777777", linewidth=0.8, linestyle="--")
-    ax.set_xlabel("Signed current-sensor bias [%]")
-    ax.set_ylabel(r"Cell-macro $\Delta$MAE [SOC]")
-    ax.set_title("Symmetric current-bias sensitivity across independent holdout cells")
-    ax.set_xticks([-3.0, -1.5, -0.5, 0.0, 0.5, 1.5, 3.0])
+    ax.set_xlabel("Current-gain error magnitude [%]")
+    ax.set_ylabel(r"Worst-case cell-macro $\Delta$MAE [SOC]")
+    ax.set_title("SOC degradation increases with current-gain error magnitude")
+    ax.set_xticks([0.0, 0.5, 1.5, 3.0])
     ax.legend(ncol=4, frameon=False)
     clean_axes(ax)
     fig.tight_layout()
