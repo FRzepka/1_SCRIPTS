@@ -282,7 +282,7 @@ The disturbance magnitudes are not intended as one-to-one copies of a single fie
     \endlastfoot
     ADC quantization & $\Delta I=\SI{0.01}{A}$; $\Delta U=\SI{0.005}{V}$; $\Delta T=\SI{0.5}{\celsius}$ & ADC steps; sensor scaling; rounding; coarse deployment-level discretization \cite{BQ7961616SeriesBattery2023,DesignConsiderationsCurrent,10sBatteryPack} \\
     \addlinespace[2pt]
-    Current bias & Gain-error sweep: $+0.5\%$, $+1.5\%$, and $+3.0\%$ & Sensor gain error; miscalibration; drift; upper bound as stress case \cite{DesignConsiderationsCurrent,TMCS11083Functional,TLE4972HighPrecision} \\
+    Current bias & Signed constant-offset sweep: $\pm0.5\%$, $\pm1.5\%$, and $\pm3.0\%$ of $|I|_{\max}$ & Sensor offset; miscalibration; drift; upper bound as stress case \cite{DesignConsiderationsCurrent,TMCS11083Functional,TLE4972HighPrecision} \\
     \addlinespace[2pt]
     Current noise & Gaussian; $\sigma_I=\SI{0.02}{A}$ and $\SI{0.10}{A}$ & Sensing-chain noise; EMI pickup; low and high sensor-noise levels \cite{liRobustnessSOCEstimation2015,naseriReliableWirelessBMS2025} \\
     \addlinespace[2pt]
@@ -387,12 +387,12 @@ Figure~\ref{fig:baseline_mae} summarizes the nominal baseline performance on the
 \end{figure}
 
 \subsection{Current-bias sensitivity}
-Figure~\ref{fig:offset_sensitivity} summarizes the current-bias results and includes in panel (a) a representative example of the applied $+3\%$ bias; the exact bias protocol is listed in Table~\ref{tab:scenario_protocol}. Across the matched bias sweep ($0.5\%$, $1.5\%$, and $3.0\%$ of $|I|_{\max}$), the hybrid equivalent-circuit model (HECM) remains the most robust estimator, the data-driven model (DD) is intermediate, and both direct-measurement variants degrade strongly. In the reported current-bias scenario, HECM reaches $\mathrm{MAE}=0.0932$, compared with $0.2859$ for DD, $0.3068$ for HDM, and $0.3143$ for DM. The detailed numerical results for the bias scenario are included in Appendix Table~\ref{tab:appendix_key_results}.
+Figure~\ref{fig:offset_sensitivity} summarizes a signed current-offset sweep at $\pm0.5\%$, $\pm1.5\%$, and $\pm3.0\%$ of $|I|_{\max}$. DM and HDM show the steepest approximately linear response, HECM is less sensitive, and DD has the smallest mean response with confidence intervals crossing zero. The sign dependence is important: the baseline errors of DM and HDM are predominantly positive, so a positive current offset partially compensates their existing error whereas the negative offset reinforces it. At $-3\%$, the cell-macro MAE increases by $0.0107$ for DM, $0.0100$ for HDM, $0.0048$ for HECM, and $0.0019$ for DD. The symmetric protocol therefore reports sensitivity without selecting only the error-amplifying direction.
 
 \begin{figure*}[t]
     \centering
     \benchfig{figures/Results/Figure_05_Current_Bias.png}{Current-bias sensitivity figure missing.}
-    \caption{Sensitivity to current measurement bias. (a) Example of the applied current bias ($+3\%$) in a representative 30~min window. (b) Global degradation of SOC estimation accuracy as a function of bias magnitude. (c) SOC trajectory divergence over the first 12~h for a $+3\%$ current bias.}
+    \caption{Symmetric current-offset sensitivity across the six independent holdout cells. Points show equal-weight cell-macro changes in MAE relative to each estimator's baseline; error bars show hierarchical 95\% bootstrap confidence intervals. Negative offsets reinforce the positive baseline errors of DM and HDM, whereas positive offsets partially compensate them.}
     \label{fig:offset_sensitivity}
 \end{figure*}
 

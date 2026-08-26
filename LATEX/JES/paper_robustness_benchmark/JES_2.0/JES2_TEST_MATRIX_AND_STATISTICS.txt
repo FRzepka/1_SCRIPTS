@@ -53,7 +53,9 @@ IMPORTANT DISTINCTION
   Current noise: sigma = 0.02 A and 0.10 A.
   Voltage noise: sigma = 0.01 V.
   Temperature noise: sigma = 1.0 degC.
-  Current bias: +0.5%, +1.5%, and +3.0%.
+  Current bias: symmetric supplemental sweep at +/-0.5%, +/-1.5%, and +/-3.0%
+  of |I|max. Both signs are reported because one direction can compensate an
+  estimator's pre-existing baseline bias while the other reinforces it.
   Voltage offset: +0.02 V.
   Temperature offset: +3 degC.
   ADC quantization.
