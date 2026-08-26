@@ -5,19 +5,20 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 
 
-# Palette 01_tu_red_muted from LATEX/DISS/pictures/palette_settings.json.
+# Palette used by the existing dissertation robustness figures in
+# pictures/eaai_palette: green DM, purple HDM, blue HECM, and red DD.
 MODEL_COLORS = {
-    "DM": "#b6302d",
-    "HDM": "#d1887e",
-    "HECM": "#8b6763",
-    "DD": "#566b78",
+    "DM": "#2ca02c",
+    "HDM": "#9467bd",
+    "HECM": "#1f77b4",
+    "DD": "#d62728",
 }
 MODEL_HATCHES = {"DM": "//", "HDM": "..", "HECM": "xx", "DD": "\\\\"}
 MODEL_ORDER = ["DM", "HDM", "HECM", "DD"]
 NEUTRAL_DARK = "#434343"
 NEUTRAL_MID = "#777777"
 NEUTRAL_LIGHT = "#d9d9d9"
-TU_RED = "#b6302d"
+TU_RED = "#d62728"
 
 
 def setup_style() -> None:
