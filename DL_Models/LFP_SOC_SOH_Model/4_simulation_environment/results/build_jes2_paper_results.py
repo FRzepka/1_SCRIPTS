@@ -26,7 +26,7 @@ from jes2_protocol import (
     SCENARIO_LABELS,
     STOCHASTIC_ALIASES,
 )
-from characterize_jes2_cells import characterize_cell
+from characterize_jes2_cells import CELL_LOAD_CLASSES, characterize_cell
 from jes2_plot_style import MODEL_COLORS, MODEL_HATCHES, TU_RED, clean_axes, save_figure, setup_style
 
 
@@ -85,6 +85,11 @@ def load_campaign(manifest_path: Path) -> tuple[dict, pd.DataFrame]:
     frame = pd.DataFrame(rows)
     if frame.empty:
         raise ValueError(f"No completed JES2 runs found in {manifest_path}")
+    # Campaign manifests preserve historical metadata. Always apply the current,
+    # frozen analysis classification so reclassification never requires reruns.
+    frame["cell_load_class"] = frame["cell"].map(
+        lambda cell: CELL_LOAD_CLASSES.get(str(cell).rsplit("_", 1)[-1], "unassigned")
+    )
     return manifest, frame
 
 
@@ -757,10 +762,13 @@ def plot_load_soh_interaction(aggregate: pd.DataFrame, out: Path) -> None:
                 ax.text(col_idx, row_idx, "N/A" if not np.isfinite(value) else f"{value:.3f}",
                         ha="center", va="center", fontsize=8,
                         color="white" if np.isfinite(value) and value > 0.60 * vmax else "#222222")
-    axes[0].set_yticks(np.arange(3), ["Low-load cells", "Middle-load cells", "High-load cells"])
+    axes[0].set_yticks(
+        np.arange(3),
+        ["Low load (n=2)", "Middle load (n=3)", "High load (C29; n=1)"],
+    )
     colorbar_axis = fig.add_axes([0.92, 0.18, 0.015, 0.55])
     fig.colorbar(image, cax=colorbar_axis, label="Baseline MAE [SOC]")
-    fig.suptitle("Cell-load class x SOH-state interaction (two holdout cells per load tertile)")
+    fig.suptitle("Cell-load group x SOH-state interaction (High: exploratory C29 case)")
     fig.subplots_adjust(left=0.12, right=0.90, bottom=0.15, top=0.78, wspace=0.12)
     save_figure(fig, out / "Figure_21_Load_Class_SOH_Interaction.png")
 

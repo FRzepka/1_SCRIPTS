@@ -7,9 +7,9 @@ IMPORTANT DISTINCTION
   Smoke and synthetic tests validate code only and must not enter the paper.
 
 1. INDEPENDENT HOLDOUT CELLS AND FIXED LOAD CLASSES
-  Cell load class is frozen before looking at estimator errors. The classification
-  uses only each holdout cell's 95th-percentile absolute C-rate and forms balanced
-  tertiles (two cells per class).
+  Cell load group is frozen before looking at estimator errors. The classification
+  uses only visible separation in each holdout cell's 95th-percentile absolute
+  C-rate; groups are not forced to have equal size.
 
   LOW LOAD
     C27: p95 |C-rate| = 0.696; mild-aging control, SOH never below 0.930.
@@ -18,9 +18,9 @@ IMPORTANT DISTINCTION
   MIDDLE LOAD
     C13: p95 |C-rate| = 2.495; shorter trajectory, deep aging.
     C09: p95 |C-rate| = 2.508; long trajectory, broad aging range.
+    C15: p95 |C-rate| = 2.527; elevated thermal exposure, deep aging.
 
   HIGH LOAD
-    C15: p95 |C-rate| = 2.527; elevated thermal exposure, deep aging.
     C29: p95 |C-rate| = 3.003; highest current/temperature stress, deepest aging.
 
 2. FIXED WITHIN-TRAJECTORY STATE TESTS
@@ -116,8 +116,9 @@ IMPORTANT DISTINCTION
 7. LIMITATIONS THAT MUST REMAIN EXPLICIT
   Load class is a descriptive dataset stratum, not a different battery chemistry
   or a randomized treatment.
-  Each cell-load class contains only two cells. Interaction panels are exploratory
-  and must show cell counts; they cannot support broad population claims alone.
+  Group sizes are low n=2, middle n=3, and high n=1. Interaction panels show
+  these counts. The C29 high-load row is an exploratory single-cell case and
+  cannot support population-level high-load claims.
   C27 contains no mid-life/aged SOH and no hot-temperature interval. Missing cells
   in a state are reported as N/A, never imputed.
   The same trajectory contributes to several within-cell states; time samples are

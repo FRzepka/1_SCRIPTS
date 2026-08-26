@@ -30,7 +30,7 @@ LOAD_CLASS = {
     "C27": "low",
     "C09": "middle",
     "C13": "middle",
-    "C15": "high",
+    "C15": "middle",
     "C29": "high",
 }
 LOAD_COLORS = {"low": "#566b78", "middle": "#8b6763", "high": "#b6302d"}
@@ -367,7 +367,7 @@ def plot_statistical_workflow(out: Path) -> None:
     ax.axis("off")
 
     top = [
-        ((0.03, 0.64), "Independent holdouts", "6 cells\n2 per load class", "#e8edf0"),
+        ((0.03, 0.64), "Independent holdouts", "6 cells\nclass sizes: 2 / 3 / 1", "#e8edf0"),
         ((0.27, 0.64), "Scenario execution", "19 cases\n10/5 seeds if random", "#f5e3df"),
         ((0.51, 0.64), "Run-level metrics", "MAE, RMSE, bias, P95\ncoverage + recovery", "#f3e9e7"),
         ((0.75, 0.64), "Fixed state strata", "SOH, load, temperature\nand SOC states", "#e8edf0"),

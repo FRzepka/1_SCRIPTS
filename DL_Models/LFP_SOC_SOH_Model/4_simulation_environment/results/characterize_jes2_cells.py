@@ -26,13 +26,14 @@ CELL_ROLES = {
     "MGFarm_18650_C29": "highest thermal/current stress; deepest aging",
 }
 
-# Balanced tertiles frozen from holdout-cell 95th-percentile absolute C-rate.
+# Descriptive groups frozen from the visible gaps in holdout-cell p95 |C-rate|.
+# High is intentionally a single-cell exploratory case rather than a forced tertile.
 CELL_LOAD_CLASSES = {
     "C25": "low",
     "C27": "low",
     "C09": "middle",
     "C13": "middle",
-    "C15": "high",
+    "C15": "middle",
     "C29": "high",
 }
 
