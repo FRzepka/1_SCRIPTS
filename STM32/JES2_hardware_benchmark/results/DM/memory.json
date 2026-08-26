@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "created_utc": "2026-08-26T08:07:53.991784+00:00",
+  "size_tool": "arm-none-eabi-size",
+  "notes": "Static section sizes only; add measured peak stack and activation buffers separately.",
+  "models": [
+    {
+      "model": "DM",
+      "elf": "C:\\Users\\Florian\\SynologyDrive\\TUB\\1_Dissertation\\1_Scripts\\STM32\\JES2_hardware_benchmark\\firmware\\JES2_HW_DM\\build\\Release\\JES2_HW_DM.elf",
+      "elf_sha256": "4acdf3c7a607a8260cfc49c366647cba249c3e525daa769727bc5a4bebad3bb3",
+      "elf_file_bytes": 1768728,
+      "flash_load_bytes": 27658,
+      "static_ram_bytes": 4964,
+      "data_bytes": 472,
+      "bss_bytes": 396,
+      "heap_stack_reserved_bytes": 4096,
+      "sections": {
+        ".isr_vector": 664,
+        ".text": 25076,
+        ".rodata": 1384,
+        ".ARM": 8,
+        ".init_array": 4,
+        ".fini_array": 4,
+        ".data": 472,
+        ".bss": 396,
+        "._user_heap_stack": 4096,
+        ".ARM.attributes": 46,
+        ".debug_info": 36653,
+        ".debug_abbrev": 6011,
+        ".debug_loclists": 7864,
+        ".debug_aranges": 1464,
+        ".debug_rnglists": 1888,
+        ".debug_macro": 219925,
+        ".debug_line": 44005,
+        ".debug_str": 1388601,
+        ".comment": 67,
+        ".debug_frame": 8552
+      }
+    }
+  ]
+}

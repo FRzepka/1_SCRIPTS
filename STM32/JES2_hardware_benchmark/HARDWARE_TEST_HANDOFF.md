@@ -120,6 +120,32 @@ Upload ausgeschlossen; Paper-Tabellen und Diagramme werden versioniert.
 9. Alle Resultate mit `scripts/summarize_results.py` zusammenfassen.
 10. Rohresultate, Build-Metadaten und Firmware-Commit nach Git pushen.
 
+## Lokaler Hardwarestatus 2026-08-26
+
+- Das angeschlossene Board wurde als `NUCLEO-H753ZI` mit STM32H753, 2 MB Flash,
+  Cortex-M7 und ST-Link V3 erkannt. Der virtuelle serielle Port ist `COM7`.
+- Eine eigenstaendige Release-Firmware fuer DM liegt unter
+  `firmware/JES2_HW_DM`. Sie implementiert das Protokoll `JES2_HW_V1`, die
+  DWT-Zyklusmessung und getrennte LED-Zustaende fuer Idle, Aktivitaet und Fehler.
+- Drei vollstaendige Durchlaeufe der 4096 nominalen Samples waren erfolgreich.
+  Alle 12288 Antworten hatten Status `OK`. Der Median und P95 lagen bei 82
+  Zyklen, das Maximum bei 155 Zyklen.
+- Die Abweichung der float32-MCU-Ausgabe zur Software-Referenz betrug im DM-Lauf
+  MAE `5.11e-6` und maximal `2.99e-5` SOC.
+- Das DM-Image belegt statisch 27650 B Flash und 4964 B RAM einschliesslich der
+  im Linkerskript reservierten 4096 B fuer Heap und Stack.
+- Eine eigenstaendige DD-Firmware liegt unter `firmware/JES2_HW_DD`. GRU,
+  MLP, RobustScaler und das 2024-Sample-Rolling-Window sind direkt in float32-C
+  implementiert. Auf dem Board werden weder ONNX noch X-CUBE-AI ausgefuehrt.
+- Der DD-Smoke-Test wertete nach 2023 Warm-up-Samples 307 vollstaendige Fenster
+  aus. Gegenueber der DD-Software-Referenz betrugen der MAE `2.98e-8` und die
+  maximale absolute Abweichung `1.24e-7` SOC. Der Laufzeitmedian lag bei
+  347034659 Zyklen beziehungsweise 722.99 ms bei 480 MHz.
+- Das DD-Image belegt statisch 118910 B Flash und 71452 B RAM einschliesslich
+  der im Linkerskript reservierten 4096 B fuer Heap und Stack. Die vorgegebene
+  kausale SOH-Spur wird als Eingangsmerkmal verwendet. Das SOH-LSTM laeuft nicht
+  auf dem Board.
+
 ## Akzeptanzkriterien
 
 - Identische geordnete Testvektoren fuer alle vier Estimatoren.

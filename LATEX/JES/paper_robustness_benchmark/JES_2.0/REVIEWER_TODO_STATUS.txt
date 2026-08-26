@@ -233,6 +233,54 @@ FIGURE STATUS
   repetitions per metric group. It produced 62901 stratified records, 72 paired
   scenario tests, 60 paired model tests, and Figures 04-18 plus 20-23.
 
+RESULT VALIDATION TODO (2026-08-26)
+  OPEN: Revalidate the complete JES2 result campaign before using the current
+  figures or numerical conclusions in the manuscript. The current Figure 05
+  shows a systematic decrease of global Delta-MAE under increasing current bias
+  for several models, which is physically unexpected and requires investigation.
+  First verify that the implemented current-bias protocol matches the declared
+  protocol: a fixed additive offset of 0.5%, 1.5%, and 3.0% of |I|max, rather
+  than multiplying each instantaneous current sample by (1 + percentage).
+  Then rerun the affected bias scenarios and compare absolute MAE/RMSE, Delta-
+  MAE, signed bias, local SOC drift, and per-window/per-cell results against the
+  matched baseline. Do not interpret a negative Delta-MAE as improved robustness
+  until this check is complete.
+  Apply the same plausibility review to every JES2 scenario before regenerating
+  publication figures and tables: verify disturbance magnitude and direction,
+  affected input channels, unchanged target/reference signals, identical frozen
+  windows and seeds, baseline pairing, absolute metrics versus deltas, and the
+  scale of the resulting errors. Investigate the currently very small errors
+  and rerun tests where the disturbance is not visibly or numerically expressed.
+  Record the final protocol decision, validation checks, rerun tag, and updated
+  result manifest before marking this item DONE.
+
+FIGURE EDITORIAL TODO (2026-08-26)
+  OPEN: Figure 17 is substantively redundant with Figure 06 because both report
+  the same global Delta-MAE noise comparison; Figure 06 is the clearer overview
+  and Figure 17 can be removed from the final figure set. Retain the point-based
+  estimate with horizontal confidence-interval style as a possible visual
+  variation for later figures, but use it only when the number of series and
+  labels remains small enough to stay immediately readable. Avoid replacing a
+  clear grouped-bar overview with a denser statistical plot without adding new
+  evidence.
+
+  OPEN: Figure 22 currently omits the voltage-noise condition even though the
+  main noise block contains current noise, voltage noise, and temperature noise.
+  Reassess the panel selection and add voltage noise to the SOH-state robustness
+  view, or document a deliberate exclusion. Check the updated figure title,
+  caption, manuscript discussion, and scenario-to-evidence mapping together.
+
+  OPEN: The frozen cell-load grouping is methodologically misleading for C15.
+  C15 reaches approximately the same visible maximum absolute C-rate as C09
+  and C13 (about 2.5 C), so labeling C15 as high load solely because of a
+  balanced six-cell tertile artificially separates nearly indistinguishable
+  cells. Reclassify the load groups using the intended transparent grouping:
+  low = C25/C27, middle = C09/C13/C15, high = C29. Regenerate all dependent
+  load-class assignments, coverage and operating-envelope figures, stratified
+  statistics, interaction plots, tables, captions, manuscript text, and any
+  conclusions that use load classes. Preserve the old campaign as historical
+  provenance and do not mix old and reclassified results.
+
 NEXT EXECUTION ORDER
   1. Inspect final statistics and figures for scientific plausibility.
   2. Run the separate HECM parameter-sensitivity analysis for Figure 19.
