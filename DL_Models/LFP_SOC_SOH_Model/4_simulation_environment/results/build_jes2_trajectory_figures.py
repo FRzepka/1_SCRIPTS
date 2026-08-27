@@ -163,66 +163,102 @@ def spike_jump_deltas(run_metrics: Path) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def spike_event_penalties(campaigns: Path) -> pd.DataFrame:
+    rows = []
+    pattern = "jes2_full_C*_20260825/runs/*/*/voltage_spikes/seed_*/*/*/summary.json"
+    for path in campaigns.glob(pattern):
+        summary = json.loads(path.read_text(encoding="utf-8"))
+        model = path.parent.name
+        condition = path.parent.parent.name
+        expected = "no_soh" if model == "DM" else "lstm_h1"
+        if model not in MODEL_ORDER or condition != expected:
+            continue
+        window = next(part for part in path.parts if part[:3] in {"C09", "C13", "C15", "C25", "C27", "C29"}
+                      and "_" in part)
+        rows.append({"cell": window[:3], "model": model,
+                     "penalty": float(summary["disturbed_mae"] - summary["calm_mae"])})
+    raw = pd.DataFrame(rows)
+    result = []
+    for index, model in enumerate(MODEL_ORDER):
+        values = raw[raw.model == model].groupby("cell").penalty.mean().to_numpy()
+        rng = np.random.default_rng(1127 + index)
+        draws = rng.choice(values, size=(10000, len(values)), replace=True).mean(axis=1)
+        result.append({"model": model, "mean": values.mean(), "ci_low": np.percentile(draws, 2.5),
+                       "ci_high": np.percentile(draws, 97.5)})
+    return pd.DataFrame(result)
+
+
 def plot_spikes(root: Path, aggregate: pd.DataFrame, run_metrics: Path, out: Path) -> None:
     del aggregate, run_metrics
     baseline = {model: load_run(root, "baseline", model)[0] for model in MODEL_ORDER}
     spikes = {model: load_run(root, "voltage_spikes", model)[0] for model in MODEL_ORDER}
 
-    # Locate real injection samples from the measured voltage, then select the
-    # event with the largest immediate causal HECM output change.
+    # Locate real injection samples and select a typical DD response rather than
+    # centering the panel on a later model deviation.
     hecm_voltage = spikes["HECM"]["U"].to_numpy()
     base_voltage = baseline["HECM"]["U"].to_numpy()
     event_indices = np.flatnonzero(np.abs(hecm_voltage - base_voltage) > 0.1)
     event_indices = event_indices[(event_indices > 0) & (event_indices < len(hecm_voltage) - 1)]
-    hecm_delta = spikes["HECM"].soc_pred.to_numpy() - baseline["HECM"].soc_pred.to_numpy()
-    causal_jumps = np.abs(hecm_delta[event_indices] - hecm_delta[event_indices - 1])
-    event_index = int(event_indices[int(np.nanargmax(causal_jumps))])
+    dd_time = spikes["DD"].time_s.to_numpy()
+    dd_delta = spikes["DD"].soc_pred.to_numpy() - baseline["DD"].soc_pred.to_numpy()
+    dd_event_indices = np.searchsorted(dd_time, spikes["HECM"].time_s.iloc[event_indices].to_numpy())
+    valid = (dd_event_indices > 0) & (dd_event_indices < len(dd_delta))
+    event_indices = event_indices[valid]
+    dd_event_indices = dd_event_indices[valid]
+    causal_jumps = np.abs(dd_delta[dd_event_indices] - dd_delta[dd_event_indices - 1])
+    target = np.nanpercentile(causal_jumps, 50)
+    event_index = int(event_indices[int(np.nanargmin(np.abs(causal_jumps - target)))])
     center = float(spikes["HECM"].time_s.iloc[event_index])
-    start, end = center - 12, center + 40
-
-    fig, axes = plt.subplots(1, 3, figsize=(14.2, 4.2))
-    hecm_spike = spikes["HECM"]
-    hecm_base = baseline["HECM"]
-    mask = (hecm_spike.time_s >= start) & (hecm_spike.time_s <= end)
-    time = hecm_spike.loc[mask, "time_s"] - center
-    axes[0].plot(time, hecm_base.loc[mask, "U"], color="#444444", linestyle="--",
-                 linewidth=1.5, label="Baseline voltage")
-    axes[0].plot(time, hecm_spike.loc[mask, "U"], color=MODEL_COLORS["HECM"],
-                 linewidth=1.5, label="Voltage with spike")
-    axes[0].set(xlabel="Seconds relative to spike", ylabel="Measured voltage [V]",
-                title="(a) Injected C15 voltage spike")
-    axes[0].legend(frameon=False, fontsize=8)
-    clean_axes(axes[0])
-
-    axes[1].plot(time, hecm_base.loc[mask, "soc_pred"], color=MODEL_COLORS["HECM"],
-                 linestyle="--", linewidth=1.6, label="HECM baseline")
-    axes[1].plot(time, hecm_spike.loc[mask, "soc_pred"], color=MODEL_COLORS["HECM"],
-                 linewidth=1.6, label="HECM with spike")
-    axes[1].plot(time, hecm_spike.loc[mask, "soc_true"], color="#222222", linewidth=1.1,
-                 alpha=0.75, label="Reference SOC")
-    axes[1].set(xlabel="Seconds relative to spike", ylabel="SOC",
-                title="(b) HECM baseline vs disturbed output")
-    axes[1].legend(frameon=False, fontsize=8)
-    clean_axes(axes[1])
-
+    start, end = center - 60, center + 180
+    rel_grid = np.arange(-60, 181, dtype=float)
+    fig = plt.figure(figsize=(13.6, 8.2))
+    grid = fig.add_gridspec(2, 2, height_ratios=[1.15, 1.0], hspace=0.34, wspace=0.26)
+    ax_soc = fig.add_subplot(grid[0, :])
+    ax_bar = fig.add_subplot(grid[1, 0])
+    ax_local = fig.add_subplot(grid[1, 1])
+    reference = spikes["DM"]
+    ref_mask = (reference.time_s >= start) & (reference.time_s <= end)
+    ax_soc.plot(reference.loc[ref_mask, "time_s"] - center, reference.loc[ref_mask, "soc_true"],
+                color="#111111", linestyle="--", linewidth=1.7, label="Reference SOC")
     for model in MODEL_ORDER:
         frame = spikes[model]
         base = baseline[model]
         mask = (frame.time_s >= start) & (frame.time_s <= end)
         part = frame.loc[mask]
         indices = part.index
-        deviation = part.soc_pred.to_numpy() - base.loc[indices, "soc_pred"].to_numpy()
-        before = np.flatnonzero(part.time_s.to_numpy() < center)
-        offset = deviation[before[-1]] if len(before) else deviation[0]
-        axes[2].plot(part.time_s - center, deviation - offset,
-                     color=MODEL_COLORS[model], linewidth=1.5, label=model)
-    axes[2].set(xlabel="Seconds relative to spike", ylabel="Output change from pre-spike offset",
-                title="(c) Causal transient response")
-    axes[2].legend(frameon=False, fontsize=8)
-    clean_axes(axes[2])
-    for axis in axes:
-        axis.axvline(0, color="#111111", linestyle=":", linewidth=1.0)
-    fig.tight_layout()
+        ax_soc.plot(part.time_s - center, base.loc[indices, "soc_pred"], color=MODEL_COLORS[model],
+                    linestyle="--", linewidth=1.3, alpha=0.65)
+        ax_soc.plot(part.time_s - center, part.soc_pred, color=MODEL_COLORS[model], linewidth=1.8, label=model)
+
+        aligned = []
+        model_times = frame.time_s.to_numpy()
+        for event_time in spikes["HECM"].time_s.iloc[event_indices[:40]].to_numpy():
+            event = int(np.searchsorted(model_times, event_time))
+            if event < 60 or event + 180 >= len(frame):
+                continue
+            window = frame.iloc[event - 60:event + 181]
+            pre_error = float(window.abs_err.iloc[50:60].mean())
+            aligned.append(window.abs_err.to_numpy() - pre_error)
+        if aligned:
+            values = np.vstack(aligned)
+            mean = np.nanmean(values, axis=0)
+            low, high = np.nanpercentile(values, [25, 75], axis=0)
+            ax_local.plot(rel_grid, mean, color=MODEL_COLORS[model], linewidth=1.8, label=model)
+            ax_local.fill_between(rel_grid, low, high, color=MODEL_COLORS[model], alpha=0.14)
+
+    penalties = spike_event_penalties(root.parent)
+    draw_model_bars(ax_bar, penalties, r"Spike-sample $\Delta$MAE [SOC]",
+                    "(b) Direct spike effect across six cells")
+    ax_soc.set(xlabel="Seconds relative to representative voltage spike", ylabel="SOC",
+               title="(a) C15 mid-life response: baseline (dashed) vs spike run (solid)")
+    ax_local.set(xlabel="Seconds relative to voltage spike", ylabel="Excess absolute error",
+                 title="(c) C15 aligned response over 40 spikes")
+    for axis in (ax_soc, ax_local):
+        axis.axvline(0, color="#111111", linestyle="--", linewidth=1.1)
+        axis.legend(frameon=False, ncol=3, fontsize=8)
+        clean_axes(axis)
+    clean_axes(ax_bar)
+    fig.subplots_adjust(top=0.94, bottom=0.08, left=0.07, right=0.98)
     save_figure(fig, out / "Figure_11_Voltage_Spike_Response.png")
 
 
