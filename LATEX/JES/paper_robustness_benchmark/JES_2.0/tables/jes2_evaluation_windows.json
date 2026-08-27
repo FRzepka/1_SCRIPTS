@@ -189,7 +189,7 @@
     {
       "cell": "MGFarm_18650_C15",
       "canonical_cell": "C15",
-      "cell_load_class": "high",
+      "cell_load_class": "middle",
       "soh_state": "fresh",
       "start_row": 1071509,
       "primary_rows": 86400,
@@ -215,7 +215,7 @@
     {
       "cell": "MGFarm_18650_C15",
       "canonical_cell": "C15",
-      "cell_load_class": "high",
+      "cell_load_class": "middle",
       "soh_state": "mid_life",
       "start_row": 2623747,
       "primary_rows": 86400,
@@ -241,7 +241,7 @@
     {
       "cell": "MGFarm_18650_C15",
       "canonical_cell": "C15",
-      "cell_load_class": "high",
+      "cell_load_class": "middle",
       "soh_state": "aged",
       "start_row": 4154449,
       "primary_rows": 86400,

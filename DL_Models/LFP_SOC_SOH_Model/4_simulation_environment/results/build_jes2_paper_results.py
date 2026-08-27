@@ -1022,7 +1022,7 @@ def main() -> None:
         "paired_scenario_tests": int(len(scenario_tests)),
         "paired_model_tests": int(len(model_pair_tests)),
         "stratification_dimensions": ["cell_load_class", "soh_state", "temperature_state", "instantaneous_load", "soc_state"],
-        "palette": "DISS 01_tu_red_muted",
+        "palette": "DISS EAAI categorical (green, purple, blue, red)",
     }
     (args.out_dir / "jes2_results_manifest.json").write_text(json.dumps(result_manifest, indent=2), encoding="utf-8")
     print(json.dumps(result_manifest, indent=2))

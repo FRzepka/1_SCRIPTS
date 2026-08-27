@@ -47,7 +47,7 @@
   },
   {
     "cell": "MGFarm_18650_C15",
-    "cell_load_class": "high",
+    "cell_load_class": "middle",
     "role": "elevated thermal exposure; deep aging",
     "samples": 5248334,
     "duration_h": 1455.9206666666807,

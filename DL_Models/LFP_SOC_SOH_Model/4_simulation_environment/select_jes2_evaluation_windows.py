@@ -28,7 +28,7 @@ CELL_LOAD_CLASSES = {
     "C27": "low",
     "C09": "middle",
     "C13": "middle",
-    "C15": "high",
+    "C15": "middle",
     "C29": "high",
 }
 

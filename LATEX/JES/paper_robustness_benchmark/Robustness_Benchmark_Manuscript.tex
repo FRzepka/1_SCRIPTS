@@ -402,7 +402,7 @@ Figure~\ref{fig:offset_sensitivity} summarizes the adverse response to a signed 
 \begin{figure*}[t]
     \centering
     \benchfig{figures/Results/Figure_05_Current_Bias.png}{Current-bias sensitivity figure missing.}
-    \caption{Worst-case sensitivity to current-gain error across the six independent holdout cells. For each gain-error magnitude and cell, the adverse direction from the matched $\pm b$ pair is retained. Points show equal-weight cell-macro changes in MAE relative to each estimator's baseline; error bars show 95\% bootstrap confidence intervals across cells.}
+    \caption{Current-gain sensitivity. (a) Representative measured-current segment before and after the $+3\%$ gain error. (b) Six-cell worst-case MAE change, retaining the adverse direction from each matched $\pm b$ pair; error bars show 95\% bootstrap confidence intervals across cells. (c) Representative C29 mid-life SOC trajectories at $+3\%$.}
     \label{fig:offset_sensitivity}
 \end{figure*}
 
@@ -422,7 +422,7 @@ Initialization performance must be analyzed locally and in an evaluation window 
 \begin{figure*}[t]
     \centering
     \benchfig{figures/Results/Figure_07_Initial_State_Recovery.png}{Initial-state recovery figure missing.}
-    \caption{Initial-state recovery in a reset-free evaluation window. The top panel shows SOC trajectories after the imposed state mismatch, and the lower panel shows the corresponding absolute SOC error over time.}
+    \caption{Initial-state recovery. (a) Representative C29 mid-life SOC trajectories during the first 6~h after the imposed mismatch. (b) Six-cell recovery or censor time. (c) Six-cell excess-error burden during recovery. Error bars show 95\% bootstrap confidence intervals across cells.}
     \label{fig:init_recovery}
 \end{figure*}
 
@@ -439,14 +439,14 @@ Missing samples are the strongest global signal-integrity stressor in the benchm
 \begin{figure*}[t]
     \centering
     \benchfig{figures/Results/Figure_09_Burst_Dropout_Transition.png}{Missing-gap transition figure missing.}
-    \caption{Local transition into the burst-dropout window. The shaded region marks the missing-data interval, and the lower panel shows how the estimators behave while the measurements are frozen.}
+    \caption{Transition through a 1~h burst dropout. (a) Representative C29 mid-life SOC trajectories; the shaded region marks the missing-input interval. (b) Absolute error immediately after measurements resume, aggregated across the six holdout cells with 95\% bootstrap confidence intervals.}
     \label{fig:missing_gap_transition}
 \end{figure*}
 
 \begin{figure*}[t]
     \centering
     \benchfig{figures/Results/Figure_10_Burst_Dropout_Recovery.png}{Missing-gap recovery figure missing.}
-    \caption{Post-gap recovery after the burst dropout. The upper panel shows the SOC trajectories after the gap, and the lower panel shows the corresponding absolute SOC error together with the recovery markers.}
+    \caption{Post-gap recovery. (a) Representative C29 mid-life absolute-error trajectories during the first 6~h after measurements resume. (b) Six-cell recovery or censor time with 95\% bootstrap confidence intervals.}
     \label{fig:missing_gap_recovery}
 \end{figure*}
 
@@ -456,7 +456,7 @@ Single voltage spikes have very different local effects across model classes, ev
 \begin{figure*}[t]
     \centering
     \benchfig{figures/Results/Figure_11_Voltage_Spike_Response.png}{Spike-response figure missing.}
-    \caption{Voltage-spike sensitivity. The figure combines a representative SOC window around a spike, a local spike-severity summary based on the $95$th percentile of the post-spike peak excess error, and the aligned local excess-error response across repeated spikes.}
+    \caption{Voltage-spike sensitivity. (a) Representative C29 mid-life SOC response around a spike. (b) Absolute deviation of the disturbed output from the corresponding baseline output. (c) Six-cell global MAE penalty. (d) Six-cell frequency of output jumps above 5\%; error bars show 95\% bootstrap confidence intervals.}
     \label{fig:spike_recovery}
 \end{figure*}
 

@@ -33,8 +33,8 @@ LOAD_CLASS = {
     "C15": "middle",
     "C29": "high",
 }
-LOAD_COLORS = {"low": "#566b78", "middle": "#8b6763", "high": "#b6302d"}
-STATE_COLORS = {"fresh": "#566b78", "mid_life": "#d1887e", "aged": "#b6302d"}
+LOAD_COLORS = {"low": "#2ca02c", "middle": "#9467bd", "high": "#d62728"}
+STATE_COLORS = {"fresh": "#2ca02c", "mid_life": "#9467bd", "aged": "#d62728"}
 STATE_LABELS = {"fresh": "Fresh (SOH >= 0.90)", "mid_life": "Mid-life (0.80-0.90)", "aged": "Aged (SOH < 0.80)"}
 
 
