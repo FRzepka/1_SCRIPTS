@@ -31,6 +31,7 @@ from jes2_plot_style import MODEL_COLORS, TU_RED, clean_axes, model_fill, save_f
 
 
 PRIMARY_CONDITIONS = {"DM": "none", "HDM": "lstm_h1", "HECM": "lstm_h1", "DD": "lstm_h1"}
+INTERNAL_REFERENCE_ALIASES = {"missing_gap_baseline_48h"}
 METRICS = [
     "mae",
     "rmse",
@@ -45,6 +46,9 @@ METRICS = [
     "common_recovery_initial_abs_err",
     "common_recovery_mae_1h",
     "common_recovery_mae_6h",
+    "common_recovery_first_relapse_time_h",
+    "common_stable_recovery_time_h",
+    "common_stable_recovery_or_censor_time_h",
     "gap_net_charge_ah",
     "gap_throughput_ah",
     "gap_reference_soc_change",
@@ -97,6 +101,8 @@ def add_baseline_deltas(frame: pd.DataFrame) -> pd.DataFrame:
     frame = frame.copy()
     if "window_id" not in frame.columns:
         frame["window_id"] = "single_window"
+    if "max_rows" not in frame.columns:
+        frame["max_rows"] = 0
     baseline = frame[frame["alias"] == "baseline"].copy()
     baseline = baseline.sort_values("seed").drop_duplicates(
         ["cell", "window_id", "model", "soh_condition"]
@@ -109,6 +115,27 @@ def add_baseline_deltas(frame: pd.DataFrame) -> pd.DataFrame:
     )
     merged["delta_mae"] = merged["mae"] - merged["baseline_mae"]
     merged["delta_rmse"] = merged["rmse"] - merged["baseline_rmse"]
+
+    event = frame[frame["alias"] == "missing_gap_baseline_48h"].copy()
+    event = event.sort_values("seed").drop_duplicates(
+        ["cell", "window_id", "model", "soh_condition"]
+    )
+    event = event[["cell", "window_id", "model", "soh_condition", "mae", "rmse", "max_rows"]].rename(
+        columns={"mae": "event_baseline_mae", "rmse": "event_baseline_rmse", "max_rows": "event_baseline_rows"}
+    )
+    merged = merged.merge(event, on=["cell", "window_id", "model", "soh_condition"], how="left")
+    gap = merged["alias"] == "missing_gap_1h"
+    duration_matched = gap & (merged["max_rows"] == merged["event_baseline_rows"])
+    merged.loc[duration_matched, "baseline_mae"] = merged.loc[duration_matched, "event_baseline_mae"]
+    merged.loc[duration_matched, "baseline_rmse"] = merged.loc[duration_matched, "event_baseline_rmse"]
+    merged.loc[duration_matched, "delta_mae"] = (
+        merged.loc[duration_matched, "mae"] - merged.loc[duration_matched, "event_baseline_mae"]
+    )
+    merged.loc[duration_matched, "delta_rmse"] = (
+        merged.loc[duration_matched, "rmse"] - merged.loc[duration_matched, "event_baseline_rmse"]
+    )
+    unmatched_gap = gap & ~duration_matched
+    merged.loc[unmatched_gap, ["baseline_mae", "baseline_rmse", "delta_mae", "delta_rmse"]] = np.nan
     return merged
 
 
@@ -118,6 +145,7 @@ def load_stratified_run_metrics(frame: pd.DataFrame) -> pd.DataFrame:
         "cell", "alias", "scenario", "seed", "model", "soh_mode",
         "soh_condition", "soh_publish_intervals", "summary_path", "window_id",
         "window_soh_state", "cell_load_class",
+        "max_rows",
     ]
     for record in frame.itertuples(index=False):
         summary = json.loads(Path(record.summary_path).read_text(encoding="utf-8"))
@@ -138,6 +166,18 @@ def add_stratified_baseline_deltas(frame: pd.DataFrame) -> pd.DataFrame:
     merged = frame.merge(baseline, on=keys, how="left")
     merged["delta_mae"] = merged["mae"] - merged["baseline_mae"]
     merged["delta_rmse"] = merged["rmse"] - merged["baseline_rmse"]
+    event = frame[frame["alias"] == "missing_gap_baseline_48h"].sort_values("seed").drop_duplicates(keys)
+    event = event[keys + ["mae", "rmse", "max_rows"]].rename(
+        columns={"mae": "event_baseline_mae", "rmse": "event_baseline_rmse", "max_rows": "event_baseline_rows"}
+    )
+    merged = merged.merge(event, on=keys, how="left")
+    gap = merged["alias"] == "missing_gap_1h"
+    duration_matched = gap & (merged["max_rows"] == merged["event_baseline_rows"])
+    merged.loc[duration_matched, "baseline_mae"] = merged.loc[duration_matched, "event_baseline_mae"]
+    merged.loc[duration_matched, "baseline_rmse"] = merged.loc[duration_matched, "event_baseline_rmse"]
+    merged.loc[duration_matched, "delta_mae"] = merged.loc[duration_matched, "mae"] - merged.loc[duration_matched, "event_baseline_mae"]
+    merged.loc[duration_matched, "delta_rmse"] = merged.loc[duration_matched, "rmse"] - merged.loc[duration_matched, "event_baseline_rmse"]
+    merged.loc[gap & ~duration_matched, ["baseline_mae", "baseline_rmse", "delta_mae", "delta_rmse"]] = np.nan
     return merged
 
 
@@ -494,17 +534,6 @@ def plot_gap_transition(raw: pd.DataFrame, aggregate: pd.DataFrame, out: Path) -
     draw_model_bars(axes[1], immediate, "Absolute SOC error", "Error immediately after data resume")
     fig.tight_layout()
     save_figure(fig, out / "Figure_09_Burst_Dropout_Transition.png")
-
-
-def plot_gap_recovery(aggregate: pd.DataFrame, out: Path) -> None:
-    fig, axes = plt.subplots(1, 2, figsize=(10.5, 4.1))
-    recovery = metric_slice(aggregate, "missing_gap_1h", "common_recovery_or_censor_time_h")
-    draw_model_bars(axes[0], recovery, "Recovery/censor time [h]", "Common post-gap criterion; 24 h censoring")
-    censored = metric_slice(aggregate, "missing_gap_1h", "common_recovery_censored_fraction")
-    draw_model_bars(axes[1], censored, "Censored run fraction", "No recovery inside 24 h horizon")
-    axes[1].set_ylim(0.0, 1.05)
-    fig.tight_layout()
-    save_figure(fig, out / "Figure_10_Burst_Dropout_Recovery.png")
 
 
 def plot_spikes(aggregate: pd.DataFrame, out: Path) -> None:
@@ -922,10 +951,8 @@ def main() -> None:
     manifest, raw = load_campaign(args.manifest)
     validate_coverage(manifest, raw, args.allow_incomplete)
     raw = add_baseline_deltas(raw)
-    aggregate = aggregate_metrics(raw, args.bootstrap_samples)
-    paired, ablation = build_soh_ablation(raw, args.bootstrap_samples)
-    cells = pd.DataFrame([characterize_cell(args.data_root, cell) for cell in manifest["cells"]])
     stratified = load_stratified_run_metrics(raw)
+    cells = pd.DataFrame([characterize_cell(args.data_root, cell) for cell in manifest["cells"]])
     if not stratified.empty:
         load_class = {
             str(row.cell).rsplit("_", 1)[-1]: row.cell_load_class
@@ -935,6 +962,11 @@ def main() -> None:
             lambda cell: load_class.get(str(cell).rsplit("_", 1)[-1], "unassigned")
         )
         stratified = add_stratified_baseline_deltas(stratified)
+    raw = raw[~raw["alias"].isin(INTERNAL_REFERENCE_ALIASES)].copy()
+    if not stratified.empty:
+        stratified = stratified[~stratified["alias"].isin(INTERNAL_REFERENCE_ALIASES)].copy()
+    aggregate = aggregate_metrics(raw, args.bootstrap_samples)
+    paired, ablation = build_soh_ablation(raw, args.bootstrap_samples)
     stratified_aggregate = aggregate_stratified_metrics(stratified, args.bootstrap_samples)
     load_soh_aggregate = aggregate_stratified_metrics(stratified, args.bootstrap_samples, include_load_class=True)
     scenario_tests, model_pair_tests = build_paired_statistical_tests(raw, args.bootstrap_samples)
@@ -990,7 +1022,6 @@ def main() -> None:
         )
     if has_aliases(raw, ["missing_gap_1h"]):
         plot_gap_transition(raw, aggregate, args.figures_dir)
-        plot_gap_recovery(aggregate, args.figures_dir)
     if has_aliases(raw, ["voltage_spikes"]):
         plot_spikes(aggregate, args.figures_dir)
     if len(set(raw["alias"]) - {"baseline", "initial_soc_error"}) > 0:

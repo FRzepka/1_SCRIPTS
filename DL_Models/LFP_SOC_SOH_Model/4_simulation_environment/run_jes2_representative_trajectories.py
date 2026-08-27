@@ -21,6 +21,7 @@ def main() -> None:
     parser.add_argument("--out_dir", type=Path, required=True)
     parser.add_argument("--cell", default="C29")
     parser.add_argument("--window_id", default="C29_mid_life")
+    parser.add_argument("--aliases", nargs="+", choices=ALIASES, default=list(ALIASES))
     args = parser.parse_args()
 
     source = json.loads(args.manifest.read_text(encoding="utf-8"))
@@ -33,14 +34,14 @@ def main() -> None:
         if (
             record["cell"] == args.cell
             and record.get("window_id") == args.window_id
-            and record["alias"] in ALIASES
+            and record["alias"] in args.aliases
             and record["model"] in MODELS
             and condition_matches
             and int(record["seed"]) == 42
         ):
             selected[key] = record
 
-    expected = {(alias, model) for alias in ALIASES for model in MODELS}
+    expected = {(alias, model) for alias in args.aliases for model in MODELS}
     missing = expected - set(selected)
     if missing:
         raise ValueError(f"Missing representative records: {sorted(missing)}")

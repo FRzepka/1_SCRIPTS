@@ -137,6 +137,9 @@ def main():
         v_tol=float(args.v_tol),
         cv_seconds=float(args.cv_seconds),
         nominal_capacity_ah=float(args.nominal_capacity_ah),
+        q_c_reset_voltage_v=float(args.q_c_reset_voltage_v),
+        q_c_reset_current_a=float(args.q_c_reset_current_a),
+        q_c_capacity_ah=args.q_c_capacity_ah,
     )
     soh_features = [] if model is None else model.soh_base_features
     req_cols = sorted(set(soh_features + ['Testtime[s]', 'Current[A]', 'Voltage[V]', 'SOC']))
@@ -246,6 +249,12 @@ def main():
         'soc_true': soc_true,
         'soc_cc': soc_cc,
         'soh_pred': soh_pred,
+        'current_a_observed': df['Current[A]'].to_numpy(dtype=np.float64),
+        'voltage_v_observed': df['Voltage[V]'].to_numpy(dtype=np.float64),
+        'q_c_online': df['Q_c'].to_numpy(dtype=np.float64),
+        'efc_online': df['EFC'].to_numpy(dtype=np.float64),
+        'dt_s_online': df['_dt_s_online'].to_numpy(dtype=np.float64),
+        'input_missing': freeze_mask,
         'abs_err': abs_err,
     })
     out_csv = os.path.join(args.out_dir, f"soc_cc_soh_fullcell_{args.cell}.csv")

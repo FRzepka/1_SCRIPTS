@@ -5,6 +5,9 @@ from __future__ import annotations
 # the campaign manifest and paper figures refer to one immutable protocol.
 SCENARIOS = [
     ("baseline", "baseline", []),
+    # Internal duration-matched reference for the 48 h burst-dropout run. It is
+    # excluded from paper scenario panels and is used only for paired deltas.
+    ("missing_gap_baseline_48h", "baseline", []),
     ("current_noise_low", "current_noise", ["--current_noise_std", "0.02"]),
     ("current_noise_high", "current_noise", ["--current_noise_std", "0.10"]),
     ("voltage_noise", "voltage_noise", ["--voltage_noise_std", "0.01"]),
@@ -21,7 +24,16 @@ SCENARIOS = [
     ("irregular_sampling_0p1s", "irregular_sampling", ["--irregular_dt_jitter", "0.1"]),
     ("irregular_sampling_0p5s", "irregular_sampling", ["--irregular_dt_jitter", "0.5"]),
     ("irregular_sampling_0p9s", "irregular_sampling", ["--irregular_dt_jitter", "0.9"]),
-    ("missing_gap_1h", "missing_gap", ["--missing_gap_seconds", "3600"]),
+    (
+        "missing_gap_1h",
+        "missing_gap",
+        [
+            "--missing_gap_seconds", "3600",
+            "--missing_gap_placement", "max_abs_net_charge",
+            "--missing_gap_min_pre_seconds", "43200",
+            "--missing_gap_min_post_seconds", "86400",
+        ],
+    ),
     (
         "voltage_spikes",
         "spikes",
@@ -55,6 +67,7 @@ PRIMARY_STOCHASTIC_ALIASES = {
 # These scenarios isolate the most plausible SOH-error propagation paths.
 DEFAULT_REFERENCE_ALIASES = {
     "baseline",
+    "missing_gap_baseline_48h",
     "current_noise_high",
     "voltage_noise",
     "temperature_noise",
@@ -78,6 +91,7 @@ MODEL_LABELS = {
 
 SCENARIO_LABELS = {
     "baseline": "Baseline",
+    "missing_gap_baseline_48h": "Burst-dropout duration reference (48 h)",
     "current_noise_low": "Current noise (0.02 A)",
     "current_noise_high": "Current noise (0.10 A)",
     "voltage_noise": "Voltage noise (0.01 V)",

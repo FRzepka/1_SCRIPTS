@@ -21,7 +21,6 @@ MAPPING = {
     "robustness_init_recovery.png": "Figure_07_Initial_State_Recovery.png",
     "robustness_signal_integrity.png": "Figure_08_Signal_Integrity.png",
     "robustness_dropout_transition.png": "Figure_09_Burst_Dropout_Transition.png",
-    "robustness_dropout_recovery.png": "Figure_10_Burst_Dropout_Recovery.png",
     "robustness_spike_response.png": "Figure_11_Voltage_Spike_Response.png",
     "robustness_cross_scenario.png": "Figure_12_Cross_Scenario_Heatmap.png",
     "robustness_decision.png": "Figure_13_Decision_Synthesis.png",

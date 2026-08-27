@@ -417,7 +417,7 @@ Initialization performance must be analyzed locally and in an evaluation window 
 \end{figure*}
 
 \subsection{Missing samples and signal integrity}
-Missing samples are the strongest global signal-integrity stressor in the benchmark. In this scenario, every 50th sample is frozen, corresponding to one held sample every \SI{50}{s} on the nominal \SI{1}{s} grid; under this protocol the data-driven model changes only marginally from $0.0100$ to $0.0117$ MAE, whereas DM and HDM degrade much more strongly. The irregular-sampling scenario jitters the sampling intervals uniformly by $\pm\SI{0.1}{s}$ around the nominal \SI{1}{s} grid while preserving the full-run duration. Under this resampled implementation it remains nearly neutral for all models, with only very small signed MAE changes around zero. The burst-dropout scenario consists of one central frozen gap of \SI{3600}{s}. It remains globally moderate, but all models require roughly $27$--$29$~h to return to the baseline error band, making the post-gap recovery behavior more informative than the global MAE alone. The signal-integrity block therefore needs both global and local views: Figure~\ref{fig:signal_integrity} summarizes the global penalties for missing samples, irregular sampling, and burst dropout, Figure~\ref{fig:missing_gap_transition} shows the transition into the gap, and Figure~\ref{fig:missing_gap_recovery} shows the long recovery afterwards. The corresponding global metrics are listed in Appendix Table~\ref{tab:appendix_key_results}, the burst-dropout recovery times in Appendix Table~\ref{tab:appendix_local_metrics}, and the scenario-to-evidence mapping in Appendix Table~\ref{tab:appendix_scenario_overview}.
+Missing samples are the strongest global signal-integrity stressor in the benchmark. In this scenario, every 50th sample is frozen, corresponding to one held sample every \SI{50}{s} on the nominal \SI{1}{s} grid; under this protocol the data-driven model changes only marginally from $0.0100$ to $0.0117$ MAE, whereas DM and HDM degrade much more strongly. The irregular-sampling scenario jitters the sampling intervals uniformly by $\pm\SI{0.1}{s}$ around the nominal \SI{1}{s} grid while preserving the full-run duration. Under this resampled implementation it remains nearly neutral for all models, with only very small signed MAE changes around zero. The burst-dropout scenario consists of one central frozen gap of \SI{3600}{s}. It remains globally moderate, but all models require roughly $27$--$29$~h to return to the baseline error band, making the post-gap recovery behavior more informative than the global MAE alone. Figure~\ref{fig:signal_integrity} summarizes the global signal-integrity penalties, while Figure~\ref{fig:missing_gap_transition} combines the local baseline-versus-dropout transition with the post-resume error and common 2\% threshold. The corresponding global metrics are listed in Appendix Table~\ref{tab:appendix_key_results}, the burst-dropout recovery times in Appendix Table~\ref{tab:appendix_local_metrics}, and the scenario-to-evidence mapping in Appendix Table~\ref{tab:appendix_scenario_overview}.
 
 \begin{figure*}[t]
     \centering
@@ -429,24 +429,17 @@ Missing samples are the strongest global signal-integrity stressor in the benchm
 \begin{figure*}[t]
     \centering
     \benchfig{figures/Results/Figure_09_Burst_Dropout_Transition.png}{Missing-gap transition figure missing.}
-    \caption{Transition through a 1~h burst dropout. (a) Representative C29 mid-life SOC trajectories; the shaded region marks the missing-input interval. (b) Absolute error immediately after measurements resume, aggregated across the six holdout cells with 95\% bootstrap confidence intervals.}
+    \caption{Transition through a 1~h burst dropout on the representative C29 mid-life window. (a) Baseline outputs (dashed) and dropout outputs (solid); the shaded region marks the missing-input interval. (b) Absolute SOC error after measurements resume; the dashed horizontal line marks the common 2\% error threshold.}
     \label{fig:missing_gap_transition}
 \end{figure*}
 
-\begin{figure*}[t]
-    \centering
-    \benchfig{figures/Results/Figure_10_Burst_Dropout_Recovery.png}{Missing-gap recovery figure missing.}
-    \caption{Post-gap recovery. (a) Representative C29 mid-life absolute-error trajectories during the first 6~h after measurements resume. (b) Six-cell recovery or censor time with 95\% bootstrap confidence intervals.}
-    \label{fig:missing_gap_recovery}
-\end{figure*}
-
 \subsection{Spike sensitivity}
-Single voltage spikes have very different local effects across model classes, even when the full-run MAE changes remain small for DM, HDM, and HECM. The spike protocol injects one $\pm\SI{0.20}{V}$ voltage spike every 1000 samples, corresponding to every \SI{1000}{s} on the nominal \SI{1}{s} time base. The data-driven model shows the clearest spike sensitivity, both in the representative SOC window and in the local aligned error response, with a noticeable global increase from $0.0100$ to $0.0144$ MAE in the present spike protocol. Figure~\ref{fig:spike_recovery} summarizes this behavior through a representative local window, a spike-severity summary, and the aligned post-spike error response. To avoid misleading signed full-run averages, the compact spike summary is reported as the $95$th percentile of the post-spike peak excess error rather than as signed $\Delta\mathrm{MAE}$; the numerical spike-related metrics are summarized in Appendix Tables~\ref{tab:appendix_key_results} and \ref{tab:appendix_local_metrics}, and the role of local evidence for spikes is highlighted in Appendix Table~\ref{tab:appendix_scenario_overview}.
+Single voltage spikes have different local effects across model classes even when their full-run MAE changes remain small. The protocol injects one $\pm\SI{0.20}{V}$ voltage spike every 1000 samples, corresponding to every \SI{1000}{s} on the nominal \SI{1}{s} time base. In the representative C15 mid-life event, HECM shows the strongest immediate deviation from its paired undisturbed output. The six-cell paired analysis likewise gives HECM the largest mean increase in output jumps above 5\%, while its broad bootstrap interval demonstrates substantial cell-to-cell heterogeneity; DD shows a smaller mean increase. Figure~\ref{fig:spike_recovery} therefore reports both the local transient and the paired six-cell result rather than inferring spike sensitivity from a single trajectory or from signed full-run $\Delta\mathrm{MAE}$ alone. The numerical spike-related metrics are summarized in Appendix Tables~\ref{tab:appendix_key_results} and \ref{tab:appendix_local_metrics}, and the role of local evidence for spikes is highlighted in Appendix Table~\ref{tab:appendix_scenario_overview}.
 
 \begin{figure*}[t]
     \centering
     \benchfig{figures/Results/Figure_11_Voltage_Spike_Response.png}{Spike-response figure missing.}
-    \caption{Voltage-spike sensitivity. (a) Representative C29 mid-life SOC response around a spike. (b) Absolute deviation of the disturbed output from the corresponding baseline output. (c) Six-cell global MAE penalty. (d) Six-cell frequency of output jumps above 5\%; error bars show 95\% bootstrap confidence intervals.}
+    \caption{Voltage-spike sensitivity. (a) Representative C15 mid-life SOC response around a spike selected from the strongest HECM-response cell. (b) Absolute deviation of the disturbed output from its paired baseline output. (c) Six-cell global MAE penalty. (d) Additional output jumps above 5\% relative to baseline; error bars show 95\% bootstrap confidence intervals.}
     \label{fig:spike_recovery}
 \end{figure*}
 
@@ -637,7 +630,7 @@ Temperature noise & Additive Gaussian noise with $\sigma_T=\SI{1.0}{\celsius}$ &
 Initial SOC error & Additive initial mismatch of $-0.10$ SOC; DD via online $Q_c$ offset & Local recovery to strict and fair baseline bands; global MAE is secondary & Fig.~\ref{fig:init_recovery} \\
 Missing samples & Every 50th sample frozen on the nominal \SI{1}{s} grid & Global $\Delta$MAE & Figs.~\ref{fig:signal_integrity}, \ref{fig:delta_heatmap} \\
 Irregular sampling & Uniform sampling-time jitter of $\pm\SI{0.1}{s}$ around the nominal \SI{1}{s} grid & Global $\Delta$MAE & Figs.~\ref{fig:signal_integrity}, \ref{fig:delta_heatmap} \\
-Burst dropout & One central frozen gap of \SI{3600}{s} & Global $\Delta$MAE plus local transition and long-horizon recovery & Figs.~\ref{fig:signal_integrity}, \ref{fig:missing_gap_transition}, \ref{fig:missing_gap_recovery} \\
+Burst dropout & One central frozen gap of \SI{3600}{s} & Global $\Delta$MAE plus local transition and post-resume error & Figs.~\ref{fig:signal_integrity}, \ref{fig:missing_gap_transition} \\
 Voltage spikes & One $\pm\SI{0.20}{V}$ single-sample spike every 1000 samples & Global $\Delta$MAE plus aligned local excess-error response & Figs.~\ref{fig:spike_recovery}, \ref{fig:delta_heatmap} \\
 \bottomrule
 \end{longtable}

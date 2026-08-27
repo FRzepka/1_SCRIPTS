@@ -350,6 +350,9 @@ def main() -> None:
         # SOH is a shared measurement-derived service and must not inherit a
         # branch-specific SOC initialization perturbation.
         initial_soc_delta=0.0,
+        q_c_reset_voltage_v=args.q_c_reset_voltage_v,
+        q_c_reset_current_a=args.q_c_reset_current_a,
+        q_c_capacity_ah=args.q_c_capacity_ah,
     )
 
     if args.mode == "lstm":

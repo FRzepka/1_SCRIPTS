@@ -28,9 +28,6 @@ FIGURE EXPORT CHECK
 [x] Figure_09_Burst_Dropout_Transition.png
     - Figure 9: burst-dropout transition
     - source: C:\Users\Florian\SynologyDrive\TUB\1_Dissertation\1_Scripts\LATEX\JES\paper_robustness_benchmark\figures\Results\Figure_09_Burst_Dropout_Transition.png
-[x] Figure_10_Burst_Dropout_Recovery.png
-    - Figure 10: burst-dropout recovery
-    - source: C:\Users\Florian\SynologyDrive\TUB\1_Dissertation\1_Scripts\LATEX\JES\paper_robustness_benchmark\figures\Results\Figure_10_Burst_Dropout_Recovery.png
 [x] Figure_11_Voltage_Spike_Response.png
     - Figure 11: voltage-spike response
     - source: C:\Users\Florian\SynologyDrive\TUB\1_Dissertation\1_Scripts\LATEX\JES\paper_robustness_benchmark\figures\Results\Figure_11_Voltage_Spike_Response.png

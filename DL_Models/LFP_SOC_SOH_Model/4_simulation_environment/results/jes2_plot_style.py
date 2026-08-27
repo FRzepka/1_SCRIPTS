@@ -50,7 +50,6 @@ def setup_style() -> None:
 def save_figure(fig, path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(path, dpi=300, bbox_inches="tight", facecolor="white")
-    fig.savefig(path.with_suffix(".pdf"), bbox_inches="tight", facecolor="white")
     plt.close(fig)
 
 

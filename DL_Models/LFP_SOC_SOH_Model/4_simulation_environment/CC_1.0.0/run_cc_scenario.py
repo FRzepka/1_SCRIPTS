@@ -186,6 +186,10 @@ def main():
         'soc_true': soc_true,
         'soc_cc': soc_cc,
         'q_m_new': q_m_new,
+        'current_a_observed': i,
+        'voltage_v_observed': v,
+        'dt_s_online': dt_s,
+        'input_missing': freeze_mask,
         'abs_err': abs_err,
     })
     out_csv = os.path.join(args.out_dir, f"soc_cc_fullcell_{args.cell}.csv")

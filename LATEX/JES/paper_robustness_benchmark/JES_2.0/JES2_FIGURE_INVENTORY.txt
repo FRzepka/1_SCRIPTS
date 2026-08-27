@@ -26,7 +26,6 @@ CURRENT RESULT FIGURES
   Figure 07  Initial mismatch realization and recovery   LEGACY_REPLACE / PILOT_RUNNING
   Figure 08  Signal integrity and timing                  LEGACY_REPLACE / FULL_RUN_REQUIRED
   Figure 09  One-hour dropout transition                  LEGACY_REPLACE / PILOT_RUNNING
-  Figure 10  One-hour dropout recovery/censoring          LEGACY_REPLACE / PILOT_RUNNING
   Figure 11  Voltage-spike response                       LEGACY_REPLACE / FULL_RUN_REQUIRED
   Figure 12  Cross-scenario delta-MAE heatmap             LEGACY_REPLACE / PILOT_RUNNING
   Figure 13  Decision evidence without composite ranking  LEGACY_REPLACE / PILOT_RUNNING

@@ -293,7 +293,11 @@ def main() -> None:
                 )
                 for repeat in range(repeat_count):
                     seed = args.base_seed + repeat
-                    max_rows = int(window["event_rows"] if alias == "missing_gap_1h" else window["primary_rows"])
+                    max_rows = int(
+                        window["event_rows"]
+                        if alias in {"missing_gap_1h", "missing_gap_baseline_48h"}
+                        else window["primary_rows"]
+                    )
                     window_args = ["--start_row", str(int(window["start_row"]))]
                     if max_rows > 0:
                         window_args.extend(["--max_rows", str(max_rows)])

@@ -121,3 +121,26 @@ def test_windows_are_averaged_within_cell_seed_before_bootstrap():
     assert stats["n_cells"] == 2
     assert stats["n_runs"] == 2
     assert stats["mean"] == pytest.approx((0.03 + 0.02) / 2.0)
+
+
+def test_dropout_delta_requires_duration_matched_event_baseline():
+    common = {
+        "cell": "C29", "window_id": "mid_life", "seed": 42,
+        "model": "DM", "soh_condition": "none", "rmse": 0.02,
+    }
+    frame = pd.DataFrame([
+        {**common, "alias": "baseline", "max_rows": 86400, "mae": 0.01},
+        {**common, "alias": "missing_gap_1h", "max_rows": 172800, "mae": 0.08},
+    ])
+    unmatched = add_baseline_deltas(frame)
+    gap = unmatched[unmatched["alias"] == "missing_gap_1h"].iloc[0]
+    assert pd.isna(gap["delta_mae"])
+
+    event = pd.DataFrame([{
+        **common, "alias": "missing_gap_baseline_48h", "max_rows": 172800,
+        "mae": 0.03, "rmse": 0.04,
+    }])
+    matched = add_baseline_deltas(pd.concat([frame, event], ignore_index=True))
+    gap = matched[matched["alias"] == "missing_gap_1h"].iloc[0]
+    assert gap["baseline_mae"] == pytest.approx(0.03)
+    assert gap["delta_mae"] == pytest.approx(0.05)

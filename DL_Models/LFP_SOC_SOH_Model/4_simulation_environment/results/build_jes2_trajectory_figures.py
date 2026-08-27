@@ -110,39 +110,64 @@ def plot_initial(root: Path, aggregate: pd.DataFrame, out: Path) -> None:
     save_figure(fig, out / "Figure_07_Initial_State_Recovery.png")
 
 
-def plot_gap(root: Path, aggregate: pd.DataFrame, out: Path) -> None:
+def plot_gap(root: Path, out: Path) -> None:
     loaded = {model: load_run(root, "missing_gap_1h", model) for model in MODEL_ORDER}
     runs = {model: value[0] for model, value in loaded.items()}
+    baseline = {model: load_run(root, "baseline", model)[0] for model in MODEL_ORDER}
     summary = loaded["DM"][1]
     gap_start, gap_end = float(summary["gap_start_time_s"]), float(summary["gap_end_time_s"])
     fig, axes = plt.subplots(1, 2, figsize=(12.4, 4.4))
-    trajectory_panel(axes[0], runs, gap_start - 3600, gap_end + 2 * 3600, "(a) C29 dropout transition")
-    axes[0].axvspan(1.0, 2.0, color="#999999", alpha=0.18, label="Missing input")
+    start, end = gap_start - 3600, gap_end + 2 * 3600
+    for model in MODEL_ORDER:
+        base = downsample(baseline[model][(baseline[model].time_s >= start) & (baseline[model].time_s <= end)])
+        drop = downsample(runs[model][(runs[model].time_s >= start) & (runs[model].time_s <= end)])
+        axes[0].plot((base.time_s - gap_start) / 3600, base.soc_pred, color=MODEL_COLORS[model],
+                     linestyle="--", linewidth=1.1, alpha=0.75)
+        axes[0].plot((drop.time_s - gap_start) / 3600, drop.soc_pred, color=MODEL_COLORS[model],
+                     linewidth=1.5, label=model)
+    axes[0].axvspan(0.0, 1.0, color="#999999", alpha=0.18, label="Missing input")
+    axes[0].set(xlabel="Time from dropout start [h]", ylabel="SOC",
+                title="(a) C29 baseline (dashed) vs dropout (solid)")
+    clean_axes(axes[0])
     axes[0].legend(ncol=3, frameon=False, fontsize=8)
-    draw_model_bars(axes[1], metric_slice(aggregate, "missing_gap_1h", "common_recovery_initial_abs_err"),
-                    "Absolute SOC error", "(b) Six-cell error after resume")
+    for model in MODEL_ORDER:
+        frame = runs[model]
+        part = downsample(frame[(frame.time_s >= gap_end) & (frame.time_s <= gap_end + 4 * 3600)])
+        axes[1].plot((part.time_s - gap_end) / 3600, part.abs_err, color=MODEL_COLORS[model], label=model)
+    axes[1].axhline(0.02, color="#222222", linestyle="--", linewidth=1.2, label="2% error threshold")
+    axes[1].set(xlabel="Time after measurements resume [h]", ylabel="Absolute SOC error",
+                title="(b) C29 error after resume")
+    axes[1].legend(ncol=3, frameon=False, fontsize=8)
+    clean_axes(axes[1])
     fig.tight_layout()
     save_figure(fig, out / "Figure_09_Burst_Dropout_Transition.png")
 
-    fig, axes = plt.subplots(1, 2, figsize=(12.4, 4.4))
-    for model in MODEL_ORDER:
-        frame = runs[model]
-        part = downsample(frame[(frame.time_s >= gap_end) & (frame.time_s <= gap_end + 6 * 3600)])
-        axes[0].plot((part.time_s - gap_end) / 3600, part.abs_err, color=MODEL_COLORS[model], label=model)
-    axes[0].set(xlabel="Time after data resume [h]", ylabel="Absolute SOC error", title="(a) C29 recovery path")
-    axes[0].legend(ncol=2, frameon=False)
-    clean_axes(axes[0])
-    draw_model_bars(axes[1], metric_slice(aggregate, "missing_gap_1h", "common_recovery_or_censor_time_h"),
-                    "Recovery/censor time [h]", "(b) Six-cell recovery")
-    fig.tight_layout()
-    save_figure(fig, out / "Figure_10_Burst_Dropout_Recovery.png")
+
+def spike_jump_deltas(run_metrics: Path) -> pd.DataFrame:
+    raw = pd.read_csv(run_metrics)
+    raw = raw[((raw.model == "DM") & raw.soh_condition.fillna("none").eq("none")) |
+              ((raw.model != "DM") & raw.soh_condition.eq("lstm_h1"))]
+    rows = []
+    for index, model in enumerate(MODEL_ORDER):
+        baseline = raw[(raw.model == model) & (raw.alias == "baseline")].drop_duplicates(
+            ["cell", "window_id"]
+        ).set_index(["cell", "window_id"])["jump_count_gt_5pct"]
+        spikes = raw[(raw.model == model) & (raw.alias == "voltage_spikes")].groupby(
+            ["cell", "window_id"]
+        ).jump_count_gt_5pct.mean()
+        paired = (spikes - baseline).groupby(level="cell").mean().dropna().to_numpy()
+        rng = np.random.default_rng(1127 + index)
+        draws = rng.choice(paired, size=(10000, len(paired)), replace=True).mean(axis=1)
+        rows.append({"model": model, "mean": paired.mean(), "ci_low": np.percentile(draws, 2.5),
+                     "ci_high": np.percentile(draws, 97.5)})
+    return pd.DataFrame(rows)
 
 
-def plot_spikes(root: Path, aggregate: pd.DataFrame, out: Path) -> None:
+def plot_spikes(root: Path, aggregate: pd.DataFrame, run_metrics: Path, out: Path) -> None:
     baseline = {model: load_run(root, "baseline", model)[0] for model in MODEL_ORDER}
     spikes = {model: load_run(root, "voltage_spikes", model)[0] for model in MODEL_ORDER}
-    dd_delta = np.abs(spikes["DD"].soc_pred.to_numpy() - baseline["DD"].soc_pred.to_numpy())
-    center = float(spikes["DD"].time_s.iloc[int(np.nanargmax(dd_delta))])
+    hecm_delta = np.abs(spikes["HECM"].soc_pred.to_numpy() - baseline["HECM"].soc_pred.to_numpy())
+    center = float(spikes["HECM"].time_s.iloc[int(np.nanargmax(hecm_delta))])
     start, end = center - 60, center + 180
     fig, axes = plt.subplots(2, 2, figsize=(12.8, 7.2), gridspec_kw={"height_ratios": [1.05, 1.0]})
     reference = spikes["DM"]
@@ -153,7 +178,7 @@ def plot_spikes(root: Path, aggregate: pd.DataFrame, out: Path) -> None:
         part = spikes[model]
         part = part[(part.time_s >= start) & (part.time_s <= end)]
         axes[0, 0].plot(part.time_s - center, part.soc_pred, color=MODEL_COLORS[model], label=model)
-    axes[0, 0].set(xlabel="Seconds relative to spike", ylabel="SOC", title="(a) C29 SOC response around spike")
+    axes[0, 0].set(xlabel="Seconds relative to spike", ylabel="SOC", title="(a) C15 SOC response around spike")
     clean_axes(axes[0, 0])
     axes[0, 0].axvline(0, color="#111111", linestyle=":", linewidth=1.0)
     axes[0, 0].legend(ncol=3, frameon=False, fontsize=8)
@@ -167,12 +192,12 @@ def plot_spikes(root: Path, aggregate: pd.DataFrame, out: Path) -> None:
         axes[0, 1].plot((part.time_s - center), output_deviation, color=MODEL_COLORS[model], label=model)
     axes[0, 1].axvline(0, color="#111111", linestyle="--", linewidth=1.0)
     axes[0, 1].set(xlabel="Seconds relative to spike", ylabel="Absolute output deviation from baseline",
-                   title="(b) C29 transient model response")
+                   title="(b) C15 transient model response")
     clean_axes(axes[0, 1])
     draw_model_bars(axes[1, 0], metric_slice(aggregate, "voltage_spikes", "delta_mae"),
                     r"$\Delta$MAE [SOC]", "(c) Six-cell global penalty")
-    draw_model_bars(axes[1, 1], metric_slice(aggregate, "voltage_spikes", "jump_count_gt_5pct"),
-                    "Output jumps >5%", "(d) Six-cell transient susceptibility")
+    draw_model_bars(axes[1, 1], spike_jump_deltas(run_metrics),
+                    "Additional output jumps >5%", "(d) Spike-induced six-cell susceptibility")
     fig.tight_layout()
     save_figure(fig, out / "Figure_11_Voltage_Spike_Response.png")
 
@@ -181,6 +206,8 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Build JES2 trajectory-plus-aggregate figures.")
     parser.add_argument("--trajectory_dir", type=Path, required=True)
     parser.add_argument("--aggregate", type=Path, required=True)
+    parser.add_argument("--run_metrics", type=Path, required=True)
+    parser.add_argument("--spike_trajectory_dir", type=Path, required=True)
     parser.add_argument("--bias_statistics", type=Path, required=True)
     parser.add_argument("--figures_dir", type=Path, required=True)
     args = parser.parse_args()
@@ -188,8 +215,8 @@ def main() -> None:
     aggregate = pd.read_csv(args.aggregate)
     plot_bias(args.trajectory_dir, args.bias_statistics, args.figures_dir)
     plot_initial(args.trajectory_dir, aggregate, args.figures_dir)
-    plot_gap(args.trajectory_dir, aggregate, args.figures_dir)
-    plot_spikes(args.trajectory_dir, aggregate, args.figures_dir)
+    plot_gap(args.trajectory_dir, args.figures_dir)
+    plot_spikes(args.spike_trajectory_dir, aggregate, args.run_metrics, args.figures_dir)
 
 
 if __name__ == "__main__":

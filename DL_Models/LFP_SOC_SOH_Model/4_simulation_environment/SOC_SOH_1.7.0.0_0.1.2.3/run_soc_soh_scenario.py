@@ -505,17 +505,13 @@ def main():
         cv_seconds=float(args.cv_seconds),
         nominal_capacity_ah=float(args.nominal_capacity_ah),
         initial_soc_delta=float(scenario_info.get('soc_init_delta', 0.0)),
+        q_c_reset_voltage_v=float(args.q_c_reset_voltage_v),
+        q_c_reset_current_a=float(args.q_c_reset_current_a),
+        q_c_capacity_ah=args.q_c_capacity_ah,
     )
 
     if "dt_s" in soc_features and "dt_s" not in df.columns:
-        t = df["Testtime[s]"].to_numpy(dtype=np.float32)
-        dt = np.empty_like(t)
-        if len(t) > 1:
-            dt[0] = max(float(t[1] - t[0]), 1e-6)
-            dt[1:] = np.diff(t)
-        elif len(t) == 1:
-            dt[0] = 1.0
-        df["dt_s"] = dt
+        df["dt_s"] = df["_dt_s_online"].to_numpy(dtype=np.float32)
 
     required_features = sorted(set(soc_features + soh_base_features + ['SOC', 'Testtime[s]']))
     miss = [c for c in required_features if c not in df.columns]
@@ -717,6 +713,9 @@ def main():
             'v_tol': float(args.v_tol),
             'cv_seconds': float(args.cv_seconds),
             'nominal_capacity_ah': float(args.nominal_capacity_ah),
+            'q_c_reset_voltage_v': float(args.q_c_reset_voltage_v),
+            'q_c_reset_current_a': float(args.q_c_reset_current_a),
+            'q_c_capacity_ah': float(args.q_c_capacity_ah or args.nominal_capacity_ah),
         },
         'paths': {
             'soc_config': args.soc_config,
@@ -749,6 +748,12 @@ def main():
         'time_s': soc_time_s,
         'soc_true': y_soc_true[soc_start_idx:],
         'soc_pred': soc_pred,
+        'current_a_observed': df_soc['Current[A]'].to_numpy(dtype=np.float64)[soc_start_idx:],
+        'voltage_v_observed': df_soc['Voltage[V]'].to_numpy(dtype=np.float64)[soc_start_idx:],
+        'q_c_online': df_soc['Q_c'].to_numpy(dtype=np.float64)[soc_start_idx:],
+        'efc_online': df_soc['EFC'].to_numpy(dtype=np.float64)[soc_start_idx:],
+        'dt_s_online': df_soc['_dt_s_online'].to_numpy(dtype=np.float64)[soc_start_idx:],
+        'input_missing': freeze_mask[soc_start_idx:],
         'abs_err': soc_abs_err,
     })
     soc_csv = os.path.join(args.out_dir, f"soc_pred_fullcell_{args.cell}.csv")

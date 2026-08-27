@@ -93,6 +93,9 @@ def compute_or_load_weekly_soh(raw_df: pd.DataFrame, cell: str, args):
         cv_seconds=float(args.cv_seconds),
         nominal_capacity_ah=float(args.capacity_ah),
         initial_soc_delta=0.0,
+        q_c_reset_voltage_v=float(args.q_c_reset_voltage_v),
+        q_c_reset_current_a=float(args.q_c_reset_current_a),
+        q_c_capacity_ah=args.q_c_capacity_ah,
     )
     cfg = CCSOHConfig(
         soh_config=args.soh_config,
@@ -367,6 +370,8 @@ def main():
             "soc_true": soc_true,
             "soc_ecm": soc_est,
             "u_ecm": u_est,
+            "dt_s_online": dt_s,
+            "input_missing": freeze_mask,
             "abs_err": abs_err,
         }
     )

@@ -9,6 +9,7 @@ sys.path.insert(0, str(ROOT))
 
 from robustness_common import (
     build_online_aux_features,
+    compute_max_abs_net_charge_window_mask,
     compute_common_recovery_metrics,
     compute_protocol_event_metrics,
     compute_stratified_error_metrics,
@@ -34,7 +35,30 @@ def test_common_recovery_uses_fixed_threshold_and_sustain_time():
     assert metrics["common_recovery_time_s"] == 300.0
     assert metrics["common_recovery_or_censor_time_h"] == 300.0 / 3600.0
     assert metrics["common_recovery_censored"] is False
+    assert metrics["common_recovery_relapsed"] is False
+    assert metrics["common_stable_recovery_time_h"] == 300.0 / 3600.0
     assert metrics["common_recovery_threshold_abs_err"] == 0.02
+
+
+def test_recovery_reports_later_relapse_and_stable_return():
+    time_s = np.arange(0.0, 1801.0, 60.0)
+    error = np.full(len(time_s), 0.01)
+    error[(time_s >= 600.0) & (time_s < 900.0)] = 0.05
+
+    metrics = compute_common_recovery_metrics(
+        time_s,
+        np.zeros(len(time_s)),
+        error,
+        start_index=0,
+        threshold=0.02,
+        sustain_seconds=300.0,
+        horizon_seconds=1800.0,
+    )
+
+    assert metrics["common_recovery_time_h"] == 0.0
+    assert metrics["common_recovery_relapsed"] is True
+    assert metrics["common_recovery_first_relapse_time_h"] == 600.0 / 3600.0
+    assert metrics["common_stable_recovery_time_h"] == 900.0 / 3600.0
 
 
 def test_missing_gap_metrics_explain_unobserved_charge():
@@ -91,6 +115,51 @@ def test_online_features_preserve_physical_gap_current():
 
     assert result["Current[A]"].tolist() == [1.0, 1.0, 1.0, 4.0]
     assert result["_protocol_current_a"].tolist() == [1.0, 2.0, -3.0, 4.0]
+    assert result["_dt_s_online"].tolist() == [0.0, 0.0, 0.0, 1.0]
+    assert result["Q_c"].iloc[1] == result["Q_c"].iloc[2]
+
+
+def test_online_q_c_matches_deployed_reset_and_clamp_semantics():
+    frame = pd.DataFrame({
+        "Testtime[s]": np.arange(7.0),
+        "Current[A]": [-2.0, -2.0, -2.0, 1.0, 1.0, -10.0, -10.0],
+        "Voltage[V]": [3.2, 3.2, 3.2, 3.5, 3.6002, 3.0, 3.0],
+    })
+
+    result = build_online_aux_features(
+        frame,
+        np.zeros(len(frame), dtype=bool),
+        current_sign=1.0,
+        v_max=3.65,
+        v_tol=0.02,
+        cv_seconds=300.0,
+        nominal_capacity_ah=0.003,
+        q_c_reset_voltage_v=3.6002,
+        q_c_reset_current_a=0.1,
+    )
+
+    assert result["Q_c"].iloc[4] == 0.0
+    assert result["Q_c"].iloc[-1] == -0.003
+    assert np.all(result["Q_c"].to_numpy() <= 0.0)
+
+
+def test_charge_severity_gap_uses_measurements_and_respects_context():
+    time_s = np.arange(0.0, 10_001.0, 1.0)
+    current = np.zeros(len(time_s))
+    current[3000:4001] = 1.0
+    current[5000:6001] = -3.0
+
+    mask = compute_max_abs_net_charge_window_mask(
+        time_s,
+        current,
+        gap_seconds=1000.0,
+        min_pre_seconds=2000.0,
+        min_post_seconds=3000.0,
+    )
+
+    indices = np.flatnonzero(mask)
+    assert time_s[indices[0]] == 5000.0
+    assert time_s[indices[-1]] == 6000.0
 
 
 def test_stratified_metrics_cover_fixed_physical_states():

@@ -115,6 +115,19 @@ def add_common_scenario_args(ap) -> None:
                     help="Additive SOC init error in fraction, e.g. 0.1 for +10%.")
     ap.add_argument("--missing_gap_seconds", type=float, default=0.0,
                     help="Length of one central burst-dropout/freeze window in seconds.")
+    ap.add_argument(
+        "--missing_gap_placement",
+        choices=["center", "max_abs_net_charge"],
+        default="center",
+        help=(
+            "Place the burst dropout at the trajectory center or at the measurement-only "
+            "window with the largest absolute unobserved net charge."
+        ),
+    )
+    ap.add_argument("--missing_gap_min_pre_seconds", type=float, default=0.0,
+                    help="Required observed duration before a charge-severity-selected burst dropout.")
+    ap.add_argument("--missing_gap_min_post_seconds", type=float, default=0.0,
+                    help="Required observed duration after a charge-severity-selected burst dropout.")
     ap.add_argument("--missing_samples_every", type=int, default=None,
                     help="Freeze every Nth sample.")
     ap.add_argument("--missing_samples_pct", type=float, default=None,
@@ -132,6 +145,12 @@ def add_common_scenario_args(ap) -> None:
                     help="Post-event horizon for common recovery metrics.")
     ap.add_argument("--summary_only", action="store_true",
                     help="Write summary.json only; omit per-sample CSV and diagnostic plots.")
+    ap.add_argument("--q_c_reset_voltage_v", type=float, default=3.6002,
+                    help="Online Q_c full-charge reset threshold used by training data and firmware.")
+    ap.add_argument("--q_c_reset_current_a", type=float, default=0.1,
+                    help="Minimum charging current required for an online Q_c voltage reset.")
+    ap.add_argument("--q_c_capacity_ah", type=float, default=None,
+                    help="Online Q_c lower-clamp magnitude; defaults to nominal_capacity_ah.")
 
 
 def compute_center_window_mask(t: np.ndarray, gap_seconds: float) -> np.ndarray:
@@ -145,6 +164,51 @@ def compute_center_window_mask(t: np.ndarray, gap_seconds: float) -> np.ndarray:
     start = t0 + (span - gap_seconds) * 0.5
     end = start + gap_seconds
     return (t >= start) & (t <= end)
+
+
+def compute_max_abs_net_charge_window_mask(
+    t: np.ndarray,
+    current_a: np.ndarray,
+    gap_seconds: float,
+    min_pre_seconds: float = 0.0,
+    min_post_seconds: float = 0.0,
+) -> np.ndarray:
+    """Select a fixed-duration gap using measured current only.
+
+    The eligible interval must retain the requested observed context before and
+    after the dropout. Among eligible starts, the earliest window with maximum
+    absolute integrated current is selected. No target or estimator output is
+    used, so selection remains causal-estimator independent and reproducible.
+    """
+    time_s = np.asarray(t, dtype=np.float64)
+    current = np.asarray(current_a, dtype=np.float64)
+    if len(time_s) == 0 or len(time_s) != len(current) or gap_seconds <= 0.0:
+        return np.zeros(len(time_s), dtype=bool)
+    if float(time_s[-1] - time_s[0]) <= float(gap_seconds):
+        return np.zeros(len(time_s), dtype=bool)
+
+    earliest = float(time_s[0]) + max(float(min_pre_seconds), 0.0)
+    latest_start = float(time_s[-1]) - max(float(min_post_seconds), 0.0) - float(gap_seconds)
+    starts = np.flatnonzero((time_s >= earliest) & (time_s <= latest_start))
+    if len(starts) == 0:
+        return compute_center_window_mask(time_s, gap_seconds)
+
+    dt_s = np.diff(time_s, prepend=time_s[0])
+    dt_s[~np.isfinite(dt_s) | (dt_s < 0.0)] = 0.0
+    charge_ah = np.nan_to_num(current, nan=0.0) * dt_s / 3600.0
+    prefix = np.concatenate(([0.0], np.cumsum(charge_ah, dtype=np.float64)))
+    ends = np.searchsorted(time_s, time_s[starts] + float(gap_seconds), side="right") - 1
+    valid = ends >= starts
+    starts = starts[valid]
+    ends = ends[valid]
+    if len(starts) == 0:
+        return compute_center_window_mask(time_s, gap_seconds)
+
+    net_charge = prefix[ends + 1] - prefix[starts]
+    winner = int(np.nanargmax(np.abs(net_charge)))
+    start = float(time_s[starts[winner]])
+    end = start + float(gap_seconds)
+    return (time_s >= start) & (time_s <= end)
 
 
 def _quantize(arr: np.ndarray, step: float) -> np.ndarray:
@@ -372,10 +436,28 @@ def apply_measurement_scenario(df: pd.DataFrame, scenario: str, args) -> Tuple[p
 
     if scenario == "missing_gap":
         t = out["Testtime[s]"].to_numpy(dtype=np.float64)
-        freeze_mask = compute_center_window_mask(t, float(getattr(args, "missing_gap_seconds", 0.0) or 0.0))
+        gap_seconds = float(getattr(args, "missing_gap_seconds", 0.0) or 0.0)
+        placement = str(getattr(args, "missing_gap_placement", "center") or "center")
+        if placement == "max_abs_net_charge":
+            freeze_mask = compute_max_abs_net_charge_window_mask(
+                t,
+                out["Current[A]"].to_numpy(dtype=np.float64),
+                gap_seconds,
+                min_pre_seconds=float(getattr(args, "missing_gap_min_pre_seconds", 0.0) or 0.0),
+                min_post_seconds=float(getattr(args, "missing_gap_min_post_seconds", 0.0) or 0.0),
+            )
+        else:
+            freeze_mask = compute_center_window_mask(t, gap_seconds)
         meta["freeze_mask"] = freeze_mask
         meta["disturbance_mask"] = freeze_mask.copy()
-        meta["missing_gap_seconds"] = float(getattr(args, "missing_gap_seconds", 0.0) or 0.0)
+        meta["missing_gap_seconds"] = gap_seconds
+        meta["missing_gap_placement"] = placement
+        meta["missing_gap_min_pre_seconds"] = float(
+            getattr(args, "missing_gap_min_pre_seconds", 0.0) or 0.0
+        )
+        meta["missing_gap_min_post_seconds"] = float(
+            getattr(args, "missing_gap_min_post_seconds", 0.0) or 0.0
+        )
         if np.any(freeze_mask):
             gap_indices = np.flatnonzero(freeze_mask)
             meta["missing_gap_start_time_s"] = float(t[gap_indices[0]])
@@ -423,6 +505,9 @@ def build_online_aux_features(
     cv_seconds: float,
     nominal_capacity_ah: float,
     initial_soc_delta: float = 0.0,
+    q_c_reset_voltage_v: float = 3.6002,
+    q_c_reset_current_a: float = 0.1,
+    q_c_capacity_ah: Optional[float] = None,
 ) -> pd.DataFrame:
     out = df.copy()
     if "_protocol_current_a" not in out.columns and "Current[A]" in out.columns:
@@ -460,20 +545,15 @@ def build_online_aux_features(
     q_c = np.zeros(len(i), dtype=np.float64)
     efc = np.zeros(len(i), dtype=np.float64)
     cap_ref = max(float(nominal_capacity_ah), 1e-9)
+    q_c_cap = max(float(q_c_capacity_ah if q_c_capacity_ah is not None else cap_ref), 1e-9)
     q_now = float(initial_soc_delta) * cap_ref
-    cv_now = 0.0
     throughput_ah = 0.0
-    v_thr = float(v_max) - float(v_tol)
     for k in range(len(i)):
         dt = float(dt_s[k])
-        if v[k] >= v_thr:
-            cv_now += dt
-        else:
-            cv_now = 0.0
-        if cv_now >= float(cv_seconds):
+        q_now += float(current_sign) * float(i[k]) * dt / 3600.0
+        if v[k] >= float(q_c_reset_voltage_v) and i[k] > float(q_c_reset_current_a):
             q_now = 0.0
-        else:
-            q_now += float(current_sign) * float(i[k]) * dt / 3600.0
+        q_now = min(0.0, max(-q_c_cap, q_now))
         throughput_ah += abs(float(i[k])) * dt / 3600.0
         q_c[k] = q_now
         efc[k] = throughput_ah / cap_ref
@@ -626,6 +706,7 @@ def compute_common_recovery_metrics(
     valid = err_post <= float(threshold)
 
     recovery_time_s = None
+    recovery_index = None
     candidates = np.flatnonzero(valid)
     if len(candidates):
         bad = np.flatnonzero(~valid)
@@ -642,7 +723,22 @@ def compute_common_recovery_metrics(
         recovered = full_window & (next_bad >= sustain_end)
         if np.any(recovered):
             first = int(candidates[np.flatnonzero(recovered)[0]])
+            recovery_index = first
             recovery_time_s = float(t_post[first] - t_post[0])
+
+    relapse_index = None
+    if recovery_index is not None:
+        later_bad = np.flatnonzero(~valid[recovery_index:])
+        if len(later_bad):
+            relapse_index = int(recovery_index + later_bad[0])
+
+    bad = np.flatnonzero(~valid)
+    stable_start = 0 if len(bad) == 0 else int(bad[-1] + 1)
+    stable_recovery_time_s = None
+    if stable_start < len(valid):
+        stable_duration = float(t_post[-1] - t_post[stable_start])
+        if valid[stable_start] and stable_duration >= float(sustain_seconds):
+            stable_recovery_time_s = float(t_post[stable_start] - t_post[0])
 
     elapsed_h = (t_post - t_post[0]) / 3600.0
     observed_horizon_s = float(t_post[-1] - t_post[0])
@@ -651,18 +747,32 @@ def compute_common_recovery_metrics(
         if recovery_time_s is not None
         else min(float(horizon_seconds), observed_horizon_s)
     )
+    stable_capped_time_s = (
+        stable_recovery_time_s
+        if stable_recovery_time_s is not None
+        else min(float(horizon_seconds), observed_horizon_s)
+    )
     excess = np.maximum(err_post - float(threshold), 0.0)
     metrics: Dict[str, float] = {
         "common_recovery_threshold_abs_err": float(threshold),
         "common_recovery_sustain_seconds": float(sustain_seconds),
         "common_recovery_horizon_seconds": float(horizon_seconds),
         "common_recovery_initial_abs_err": float(err_post[0]),
-        "common_recovery_excess_auc_soc_h": float(np.trapezoid(excess, elapsed_h)) if len(excess) > 1 else 0.0,
+        "common_recovery_excess_auc_soc_h": float(np.trapz(excess, elapsed_h)) if len(excess) > 1 else 0.0,
         "common_recovery_time_s": recovery_time_s,
         "common_recovery_time_h": None if recovery_time_s is None else recovery_time_s / 3600.0,
         "common_recovery_or_censor_time_h": capped_time_s / 3600.0,
         "common_recovery_observed_horizon_h": observed_horizon_s / 3600.0,
         "common_recovery_censored": recovery_time_s is None,
+        "common_recovery_relapsed": relapse_index is not None,
+        "common_recovery_first_relapse_time_h": (
+            None if relapse_index is None else float(t_post[relapse_index] - t_post[0]) / 3600.0
+        ),
+        "common_stable_recovery_time_h": (
+            None if stable_recovery_time_s is None else stable_recovery_time_s / 3600.0
+        ),
+        "common_stable_recovery_or_censor_time_h": stable_capped_time_s / 3600.0,
+        "common_stable_recovery_censored": stable_recovery_time_s is None,
     }
     for hours in (1.0, 6.0):
         mask = elapsed_h <= hours
