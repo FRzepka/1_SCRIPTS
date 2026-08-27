@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+from matplotlib.colors import to_rgba
 
 
 # Palette used by the existing dissertation robustness figures in
@@ -13,7 +14,6 @@ MODEL_COLORS = {
     "HECM": "#1f77b4",
     "DD": "#d62728",
 }
-MODEL_HATCHES = {"DM": "//", "HDM": "..", "HECM": "xx", "DD": "\\\\"}
 MODEL_ORDER = ["DM", "HDM", "HECM", "DD"]
 NEUTRAL_DARK = "#434343"
 NEUTRAL_MID = "#777777"
@@ -57,3 +57,7 @@ def save_figure(fig, path: Path) -> None:
 def clean_axes(ax) -> None:
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
+
+
+def model_fill(model: str, alpha: float = 0.38) -> tuple[float, float, float, float]:
+    return to_rgba(MODEL_COLORS[model], alpha)

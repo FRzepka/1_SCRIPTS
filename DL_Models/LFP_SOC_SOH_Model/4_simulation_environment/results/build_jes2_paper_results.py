@@ -27,7 +27,7 @@ from jes2_protocol import (
     STOCHASTIC_ALIASES,
 )
 from characterize_jes2_cells import CELL_LOAD_CLASSES, characterize_cell
-from jes2_plot_style import MODEL_COLORS, MODEL_HATCHES, TU_RED, clean_axes, save_figure, setup_style
+from jes2_plot_style import MODEL_COLORS, TU_RED, clean_axes, model_fill, save_figure, setup_style
 
 
 PRIMARY_CONDITIONS = {"DM": "none", "HDM": "lstm_h1", "HECM": "lstm_h1", "DD": "lstm_h1"}
@@ -378,12 +378,10 @@ def draw_model_bars(ax, rows: pd.DataFrame, ylabel: str, title: str) -> None:
         values,
         yerr=yerr,
         capsize=3,
-        color=[MODEL_COLORS[model] for model in models],
-        edgecolor="#333333",
-        linewidth=0.7,
+        color=[model_fill(model) for model in models],
+        edgecolor=[MODEL_COLORS[model] for model in models],
+        linewidth=1.5,
     )
-    for bar, model in zip(bars, models):
-        bar.set_hatch(MODEL_HATCHES[model])
     ax.set_xticks(np.arange(len(models)), models)
     ax.set_ylabel(ylabel)
     ax.set_title(title)
@@ -448,8 +446,8 @@ def plot_grouped_scenarios(aggregate: pd.DataFrame, aliases: list[str], out_path
         high = part["ci_high"].to_numpy(dtype=float)
         xpos = x + (idx - 1.5) * width
         ax.bar(xpos, mean, width, yerr=np.vstack([mean - low, high - mean]), capsize=2,
-               color=MODEL_COLORS[model], edgecolor="#333333", linewidth=0.6,
-               hatch=MODEL_HATCHES[model], label=model)
+               color=model_fill(model), edgecolor=MODEL_COLORS[model], linewidth=1.5,
+               label=model)
     ax.axhline(0.0, color="#444444", linewidth=0.8)
     ax.set_xticks(x, [SCENARIO_LABELS[a] for a in aliases], rotation=16, ha="right")
     ax.set_ylabel(r"$\Delta$MAE [SOC]")
@@ -487,7 +485,8 @@ def plot_gap_transition(raw: pd.DataFrame, aggregate: pd.DataFrame, out: Path) -
         gap_reference_soc_change=("gap_reference_soc_change", "mean"),
     )
     cells = [cell.split("_")[-1] for cell in cell_context["cell"]]
-    axes[0].bar(cells, cell_context["gap_throughput_ah"], color="#d1887e", edgecolor="#333333")
+    axes[0].bar(cells, cell_context["gap_throughput_ah"], color=(0.84, 0.15, 0.16, 0.38),
+                edgecolor="#d62728", linewidth=1.5)
     axes[0].set_ylabel("Unobserved charge throughput [Ah]")
     axes[0].set_title("Physical gap severity by holdout cell")
     clean_axes(axes[0])
@@ -583,7 +582,7 @@ def plot_soh_ablation(ablation: pd.DataFrame, out: Path) -> None:
         low = part["ci_low"].to_numpy(dtype=float)
         high = part["ci_high"].to_numpy(dtype=float)
         ax.bar(x + (idx - 1) * width, mean, width, yerr=np.vstack([mean - low, high - mean]), capsize=2,
-               color=MODEL_COLORS[model], edgecolor="#333333", hatch=MODEL_HATCHES[model], label=model)
+               color=model_fill(model), edgecolor=MODEL_COLORS[model], linewidth=1.5, label=model)
     ax.axhline(0.0, color="#333333", linewidth=0.8)
     ax.set_xticks(x, [SCENARIO_LABELS[a] for a in aliases], rotation=20, ha="right")
     ax.set_ylabel("Reference-SOH MAE minus LSTM-SOH MAE [SOC]")
@@ -597,14 +596,17 @@ def plot_soh_ablation(ablation: pd.DataFrame, out: Path) -> None:
 def plot_cell_coverage(cells: pd.DataFrame, out: Path) -> None:
     labels = [cell.split("_")[-1] for cell in cells["cell"]]
     fig, axes = plt.subplots(1, 3, figsize=(11.5, 4.0))
-    axes[0].bar(labels, cells["soh_min"], color=TU_RED, edgecolor="#333333")
+    axes[0].bar(labels, cells["soh_min"], color=(0.84, 0.15, 0.16, 0.38),
+                edgecolor=TU_RED, linewidth=1.5)
     axes[0].set_ylim(0.5, 1.01)
     axes[0].set_ylabel("Minimum reference SOH")
     axes[0].set_title("Aging-state coverage")
-    axes[1].bar(labels, cells["temperature_max_c"] - cells["temperature_min_c"], color="#8b6763", edgecolor="#333333")
+    axes[1].bar(labels, cells["temperature_max_c"] - cells["temperature_min_c"],
+                color=(0.58, 0.40, 0.74, 0.38), edgecolor="#9467bd", linewidth=1.5)
     axes[1].set_ylabel("Temperature span [degC]")
     axes[1].set_title("Thermal coverage")
-    axes[2].bar(labels, cells["abs_current_p95_a"], color="#566b78", edgecolor="#333333")
+    axes[2].bar(labels, cells["abs_current_p95_a"], color=(0.12, 0.47, 0.71, 0.38),
+                edgecolor="#1f77b4", linewidth=1.5)
     axes[2].set_ylabel("95th percentile |I| [A]")
     axes[2].set_title("Load-profile coverage")
     for ax in axes:

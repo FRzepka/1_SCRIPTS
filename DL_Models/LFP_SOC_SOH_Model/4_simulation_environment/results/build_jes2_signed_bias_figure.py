@@ -12,7 +12,7 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from jes2_plot_style import MODEL_COLORS, MODEL_HATCHES, clean_axes, save_figure, setup_style
+from jes2_plot_style import MODEL_COLORS, clean_axes, save_figure, setup_style
 
 
 MODELS = ["DM", "HDM", "HECM", "DD"]

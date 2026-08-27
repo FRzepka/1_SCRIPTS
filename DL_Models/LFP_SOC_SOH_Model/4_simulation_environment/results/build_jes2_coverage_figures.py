@@ -9,6 +9,7 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib.colors import to_rgba
 from matplotlib.colors import LinearSegmentedColormap, Normalize
 from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
 import numpy as np
@@ -135,7 +136,10 @@ def plot_holdout_overview(cells: pd.DataFrame, out: Path) -> None:
 
     ax = axes[0, 1]
     values = cells["abs_c_rate_p95"].to_numpy(dtype=float)
-    bars = ax.barh(y, values, color=colors, edgecolor=NEUTRAL_DARK, linewidth=0.7, height=0.62)
+    bars = ax.barh(
+        y, values, color=[to_rgba(color, 0.38) for color in colors],
+        edgecolor=colors, linewidth=1.5, height=0.62,
+    )
     for idx, (bar, load_class) in enumerate(zip(bars, cells["cell_load_class"])):
         ax.text(bar.get_width() + 0.06, bar.get_y() + bar.get_height() / 2,
                 f"{bar.get_width():.2f} C  |  {load_class}", va="center", fontsize=8.5)
@@ -166,7 +170,8 @@ def plot_holdout_overview(cells: pd.DataFrame, out: Path) -> None:
     left = np.zeros(len(cells), dtype=float)
     for state, column in [("fresh", "soh_fresh_fraction"), ("mid_life", "soh_mid_life_fraction"), ("aged", "soh_aged_fraction")]:
         values = 100.0 * cells[column].to_numpy(dtype=float)
-        ax.barh(y, values, left=left, color=STATE_COLORS[state], edgecolor="white", linewidth=0.7,
+        ax.barh(y, values, left=left, color=to_rgba(STATE_COLORS[state], 0.38),
+                edgecolor=STATE_COLORS[state], linewidth=1.2,
                 height=0.62, label=STATE_LABELS[state])
         for idx, (start, value) in enumerate(zip(left, values)):
             if value >= 9.0:
