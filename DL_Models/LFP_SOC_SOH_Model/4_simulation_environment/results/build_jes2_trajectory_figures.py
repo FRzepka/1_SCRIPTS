@@ -164,40 +164,64 @@ def spike_jump_deltas(run_metrics: Path) -> pd.DataFrame:
 
 
 def plot_spikes(root: Path, aggregate: pd.DataFrame, run_metrics: Path, out: Path) -> None:
+    del aggregate, run_metrics
     baseline = {model: load_run(root, "baseline", model)[0] for model in MODEL_ORDER}
     spikes = {model: load_run(root, "voltage_spikes", model)[0] for model in MODEL_ORDER}
-    hecm_delta = np.abs(spikes["HECM"].soc_pred.to_numpy() - baseline["HECM"].soc_pred.to_numpy())
-    center = float(spikes["HECM"].time_s.iloc[int(np.nanargmax(hecm_delta))])
-    start, end = center - 60, center + 180
-    fig, axes = plt.subplots(2, 2, figsize=(12.8, 7.2), gridspec_kw={"height_ratios": [1.05, 1.0]})
-    reference = spikes["DM"]
-    mask = (reference.time_s >= start) & (reference.time_s <= end)
-    axes[0, 0].plot(reference.loc[mask, "time_s"] - center, reference.loc[mask, "soc_true"],
-                    "k--", linewidth=1.4, label="Reference SOC")
-    for model in MODEL_ORDER:
-        part = spikes[model]
-        part = part[(part.time_s >= start) & (part.time_s <= end)]
-        axes[0, 0].plot(part.time_s - center, part.soc_pred, color=MODEL_COLORS[model], label=model)
-    axes[0, 0].set(xlabel="Seconds relative to spike", ylabel="SOC", title="(a) C15 SOC response around spike")
-    clean_axes(axes[0, 0])
-    axes[0, 0].axvline(0, color="#111111", linestyle=":", linewidth=1.0)
-    axes[0, 0].legend(ncol=3, frameon=False, fontsize=8)
+
+    # Locate real injection samples from the measured voltage, then select the
+    # event with the largest immediate causal HECM output change.
+    hecm_voltage = spikes["HECM"]["U"].to_numpy()
+    base_voltage = baseline["HECM"]["U"].to_numpy()
+    event_indices = np.flatnonzero(np.abs(hecm_voltage - base_voltage) > 0.1)
+    event_indices = event_indices[(event_indices > 0) & (event_indices < len(hecm_voltage) - 1)]
+    hecm_delta = spikes["HECM"].soc_pred.to_numpy() - baseline["HECM"].soc_pred.to_numpy()
+    causal_jumps = np.abs(hecm_delta[event_indices] - hecm_delta[event_indices - 1])
+    event_index = int(event_indices[int(np.nanargmax(causal_jumps))])
+    center = float(spikes["HECM"].time_s.iloc[event_index])
+    start, end = center - 12, center + 40
+
+    fig, axes = plt.subplots(1, 3, figsize=(14.2, 4.2))
+    hecm_spike = spikes["HECM"]
+    hecm_base = baseline["HECM"]
+    mask = (hecm_spike.time_s >= start) & (hecm_spike.time_s <= end)
+    time = hecm_spike.loc[mask, "time_s"] - center
+    axes[0].plot(time, hecm_base.loc[mask, "U"], color="#444444", linestyle="--",
+                 linewidth=1.5, label="Baseline voltage")
+    axes[0].plot(time, hecm_spike.loc[mask, "U"], color=MODEL_COLORS["HECM"],
+                 linewidth=1.5, label="Voltage with spike")
+    axes[0].set(xlabel="Seconds relative to spike", ylabel="Measured voltage [V]",
+                title="(a) Injected C15 voltage spike")
+    axes[0].legend(frameon=False, fontsize=8)
+    clean_axes(axes[0])
+
+    axes[1].plot(time, hecm_base.loc[mask, "soc_pred"], color=MODEL_COLORS["HECM"],
+                 linestyle="--", linewidth=1.6, label="HECM baseline")
+    axes[1].plot(time, hecm_spike.loc[mask, "soc_pred"], color=MODEL_COLORS["HECM"],
+                 linewidth=1.6, label="HECM with spike")
+    axes[1].plot(time, hecm_spike.loc[mask, "soc_true"], color="#222222", linewidth=1.1,
+                 alpha=0.75, label="Reference SOC")
+    axes[1].set(xlabel="Seconds relative to spike", ylabel="SOC",
+                title="(b) HECM baseline vs disturbed output")
+    axes[1].legend(frameon=False, fontsize=8)
+    clean_axes(axes[1])
+
     for model in MODEL_ORDER:
         frame = spikes[model]
         base = baseline[model]
         mask = (frame.time_s >= start) & (frame.time_s <= end)
         part = frame.loc[mask]
         indices = part.index
-        output_deviation = np.abs(part.soc_pred.to_numpy() - base.loc[indices, "soc_pred"].to_numpy())
-        axes[0, 1].plot((part.time_s - center), output_deviation, color=MODEL_COLORS[model], label=model)
-    axes[0, 1].axvline(0, color="#111111", linestyle="--", linewidth=1.0)
-    axes[0, 1].set(xlabel="Seconds relative to spike", ylabel="Absolute output deviation from baseline",
-                   title="(b) C15 transient model response")
-    clean_axes(axes[0, 1])
-    draw_model_bars(axes[1, 0], metric_slice(aggregate, "voltage_spikes", "delta_mae"),
-                    r"$\Delta$MAE [SOC]", "(c) Six-cell global penalty")
-    draw_model_bars(axes[1, 1], spike_jump_deltas(run_metrics),
-                    "Additional output jumps >5%", "(d) Spike-induced six-cell susceptibility")
+        deviation = part.soc_pred.to_numpy() - base.loc[indices, "soc_pred"].to_numpy()
+        before = np.flatnonzero(part.time_s.to_numpy() < center)
+        offset = deviation[before[-1]] if len(before) else deviation[0]
+        axes[2].plot(part.time_s - center, deviation - offset,
+                     color=MODEL_COLORS[model], linewidth=1.5, label=model)
+    axes[2].set(xlabel="Seconds relative to spike", ylabel="Output change from pre-spike offset",
+                title="(c) Causal transient response")
+    axes[2].legend(frameon=False, fontsize=8)
+    clean_axes(axes[2])
+    for axis in axes:
+        axis.axvline(0, color="#111111", linestyle=":", linewidth=1.0)
     fig.tight_layout()
     save_figure(fig, out / "Figure_11_Voltage_Spike_Response.png")
 

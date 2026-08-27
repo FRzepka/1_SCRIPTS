@@ -141,46 +141,46 @@ def revised_delta_matrix(aggregate: pd.DataFrame, signed_bias: pd.DataFrame) -> 
 
 
 def figure_11_spike_susceptibility(run_metrics: pd.DataFrame, aggregate: pd.DataFrame) -> None:
-    spikes = primary_rows(run_metrics)
-    spikes = spikes[spikes["alias"] == "voltage_spikes"].copy()
-    cell_values = spikes.groupby(["cell", "model"], as_index=False)["jump_count_gt_5pct"].mean()
-    state_values = spikes.groupby(["cell", "window_soh_state", "model"], as_index=False)["jump_count_gt_5pct"].mean()
+    del aggregate
+    primary = primary_rows(run_metrics)
+    keys = ["cell", "window_id", "window_soh_state", "model"]
+    baseline = primary[primary["alias"] == "baseline"].groupby(keys)["jump_count_gt_5pct"].mean()
+    spikes = primary[primary["alias"] == "voltage_spikes"].groupby(keys)["jump_count_gt_5pct"].mean()
+    paired = (spikes - baseline).rename("additional_jumps").reset_index()
+    cell_values = paired.groupby(["cell", "model"], as_index=False)["additional_jumps"].mean()
+    state_values = paired.groupby(["cell", "window_soh_state", "model"], as_index=False)["additional_jumps"].mean()
     cell_values.to_csv(RESULTS / "jes2_spike_cell_susceptibility.csv", index=False)
     state_values.to_csv(RESULTS / "jes2_spike_state_susceptibility.csv", index=False)
-
-    macro = metric_rows(aggregate, "jump_count_gt_5pct")
-    macro = macro[macro["alias"] == "voltage_spikes"].set_index("model").reindex(MODEL_ORDER)
 
     fig = plt.figure(figsize=(13.6, 4.8))
     grid = fig.add_gridspec(1, 3, width_ratios=(1.15, 1.0, 1.0), wspace=0.32)
     ax = fig.add_subplot(grid[0, 0])
     x = np.arange(len(MODEL_ORDER))
-    means = macro["mean"].to_numpy(float)
-    low = macro["ci_low"].to_numpy(float)
-    high = macro["ci_high"].to_numpy(float)
     for index, model in enumerate(MODEL_ORDER):
-        ax.bar(index, means[index], width=0.62, color=MODEL_COLORS[model], alpha=0.32,
+        values = cell_values[cell_values["model"] == model]["additional_jumps"].to_numpy(float)
+        mean = float(np.mean(values))
+        rng = np.random.default_rng(1127 + index)
+        draws = rng.choice(values, size=(10000, len(values)), replace=True).mean(axis=1)
+        low, high = np.percentile(draws, [2.5, 97.5])
+        ax.bar(index, mean, width=0.62, color=MODEL_COLORS[model], alpha=0.32,
                edgecolor=MODEL_COLORS[model], linewidth=1.8)
-        ax.errorbar(index, means[index], yerr=[[means[index] - low[index]], [high[index] - means[index]]],
+        ax.errorbar(index, mean, yerr=[[mean - low], [high - mean]],
                     color="#111111", capsize=3, linewidth=1.2)
-        values = cell_values[cell_values["model"] == model].set_index("cell").reindex(CELL_ORDER)["jump_count_gt_5pct"]
-        offsets = np.linspace(-0.13, 0.13, len(values))
-        ax.scatter(index + offsets, values, s=30, color=MODEL_COLORS[model], edgecolor="white", linewidth=0.6, zorder=3)
     ax.set_xticks(x, MODEL_ORDER)
-    ax.set_ylabel("Output jumps >5% per 24 h run")
-    ax.set_title("(a) Six-cell transient susceptibility\n(bars: macro 95% CI; dots: cells)")
-    ax.set_ylim(bottom=0)
+    ax.axhline(0, color="#444444", linewidth=0.9)
+    ax.set_ylabel("Additional output jumps >5%")
+    ax.set_title("(a) Paired six-cell scenario effect\n(bars: mean and 95% bootstrap CI)")
     ax.spines[["top", "right"]].set_visible(False)
 
-    maximum = max(1.0, float(state_values["jump_count_gt_5pct"].max()))
-    cmap = LinearSegmentedColormap.from_list("white_blue", ["#ffffff", "#9ecae1", "#1f77b4"])
+    maximum = max(1.0, float(np.nanmax(np.abs(state_values["additional_jumps"]))))
+    cmap = LinearSegmentedColormap.from_list("paired_effect", ["#b2182b", "#ffffff", "#2166ac"])
     for column, model in enumerate(["HECM", "DD"], start=1):
         panel = state_values[state_values["model"] == model].pivot(
-            index="cell", columns="window_soh_state", values="jump_count_gt_5pct"
+            index="cell", columns="window_soh_state", values="additional_jumps"
         ).reindex(index=CELL_ORDER, columns=STATE_ORDER)
         panel.columns = ["Fresh", "Mid-life", "Aged"]
         axis = fig.add_subplot(grid[0, column])
-        image = axis.imshow(panel.to_numpy(float), aspect="auto", cmap=cmap, vmin=0.0, vmax=maximum)
+        image = axis.imshow(panel.to_numpy(float), aspect="auto", cmap=cmap, vmin=-maximum, vmax=maximum)
         axis.grid(False)
         axis.set_xticks(np.arange(3), panel.columns)
         axis.set_yticks(np.arange(len(CELL_ORDER)), CELL_ORDER)
@@ -189,12 +189,12 @@ def figure_11_spike_susceptibility(run_metrics: pd.DataFrame, aggregate: pd.Data
             for col in range(panel.shape[1]):
                 value = panel.iloc[row, col]
                 label = "—" if not np.isfinite(value) else f"{value:.1f}"
-                color = "white" if np.isfinite(value) and value > 0.55 * maximum else "#222222"
+                color = "white" if np.isfinite(value) and abs(value) > 0.55 * maximum else "#222222"
                 axis.text(col, row, label, ha="center", va="center", color=color, fontsize=9)
         axis.spines[:].set_visible(False)
     cbar = fig.colorbar(image, ax=fig.axes[1:3], fraction=0.022, pad=0.035)
-    cbar.set_label("Mean jump count over spike seeds")
-    fig.suptitle("Voltage-spike transients: the aggregate HECM response is concentrated in specific cells and aging states", fontsize=12)
+    cbar.set_label("Additional jumps relative to paired baseline")
+    fig.suptitle("Voltage-spike scenario: paired six-cell and aging-state susceptibility", fontsize=12)
     fig.subplots_adjust(top=0.78, left=0.06, right=0.90, bottom=0.12)
     save(fig, "Figure_11_Voltage_Spike_Response_REVISED")
 
