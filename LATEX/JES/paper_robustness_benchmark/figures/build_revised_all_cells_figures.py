@@ -29,6 +29,10 @@ INITIAL_RUNS = (
     / "DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/campaigns"
     / "jes2_initial_state_paired_sixcell_20260827_cuda/runs"
 )
+CAMPAIGNS = (
+    Path(__file__).resolve().parents[4]
+    / "DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/campaigns"
+)
 
 MODEL_ORDER = ["DM", "HDM", "HECM", "DD"]
 MODEL_COLORS = {"DM": "#2ca02c", "HDM": "#9467bd", "HECM": "#1f77b4", "DD": "#d62728"}
@@ -140,15 +144,35 @@ def revised_delta_matrix(aggregate: pd.DataFrame, signed_bias: pd.DataFrame) -> 
     return pivot
 
 
+def load_spike_event_effects() -> pd.DataFrame:
+    rows = []
+    pattern = "jes2_full_C*_20260825/runs/*/*/voltage_spikes/seed_*/*/*/summary.json"
+    for path in CAMPAIGNS.glob(pattern):
+        summary = json.loads(path.read_text(encoding="utf-8"))
+        model = path.parent.name
+        condition = path.parent.parent.name
+        expected_condition = "no_soh" if model == "DM" else PRIMARY_CONDITION[model]
+        if condition != expected_condition:
+            continue
+        window = next(part for part in path.parts if part[:3] in CELL_ORDER and "_" in part)
+        rows.append({
+            "cell": window[:3],
+            "window_soh_state": window[4:],
+            "model": model,
+            "event_error_penalty": float(summary["disturbed_mae"] - summary["calm_mae"]),
+        })
+    if not rows:
+        raise FileNotFoundError("No voltage-spike summaries found in full-cell campaigns")
+    return pd.DataFrame(rows)
+
+
 def figure_11_spike_susceptibility(run_metrics: pd.DataFrame, aggregate: pd.DataFrame) -> None:
-    del aggregate
-    primary = primary_rows(run_metrics)
-    keys = ["cell", "window_id", "window_soh_state", "model"]
-    baseline = primary[primary["alias"] == "baseline"].groupby(keys)["jump_count_gt_5pct"].mean()
-    spikes = primary[primary["alias"] == "voltage_spikes"].groupby(keys)["jump_count_gt_5pct"].mean()
-    paired = (spikes - baseline).rename("additional_jumps").reset_index()
-    cell_values = paired.groupby(["cell", "model"], as_index=False)["additional_jumps"].mean()
-    state_values = paired.groupby(["cell", "window_soh_state", "model"], as_index=False)["additional_jumps"].mean()
+    del run_metrics, aggregate
+    event_effects = load_spike_event_effects()
+    cell_values = event_effects.groupby(["cell", "model"], as_index=False)["event_error_penalty"].mean()
+    state_values = event_effects.groupby(
+        ["cell", "window_soh_state", "model"], as_index=False
+    )["event_error_penalty"].mean()
     cell_values.to_csv(RESULTS / "jes2_spike_cell_susceptibility.csv", index=False)
     state_values.to_csv(RESULTS / "jes2_spike_state_susceptibility.csv", index=False)
 
@@ -157,7 +181,7 @@ def figure_11_spike_susceptibility(run_metrics: pd.DataFrame, aggregate: pd.Data
     ax = fig.add_subplot(grid[0, 0])
     x = np.arange(len(MODEL_ORDER))
     for index, model in enumerate(MODEL_ORDER):
-        values = cell_values[cell_values["model"] == model]["additional_jumps"].to_numpy(float)
+        values = cell_values[cell_values["model"] == model]["event_error_penalty"].to_numpy(float)
         mean = float(np.mean(values))
         rng = np.random.default_rng(1127 + index)
         draws = rng.choice(values, size=(10000, len(values)), replace=True).mean(axis=1)
@@ -168,15 +192,15 @@ def figure_11_spike_susceptibility(run_metrics: pd.DataFrame, aggregate: pd.Data
                     color="#111111", capsize=3, linewidth=1.2)
     ax.set_xticks(x, MODEL_ORDER)
     ax.axhline(0, color="#444444", linewidth=0.9)
-    ax.set_ylabel("Additional output jumps >5%")
-    ax.set_title("(a) Paired six-cell scenario effect\n(bars: mean and 95% bootstrap CI)")
+    ax.set_ylabel(r"Spike-sample MAE penalty")
+    ax.set_title("(a) Six-cell direct spike effect\n(bars: mean and 95% bootstrap CI)")
     ax.spines[["top", "right"]].set_visible(False)
 
-    maximum = max(1.0, float(np.nanmax(np.abs(state_values["additional_jumps"]))))
+    maximum = max(1e-6, float(np.nanmax(np.abs(state_values["event_error_penalty"]))))
     cmap = LinearSegmentedColormap.from_list("paired_effect", ["#b2182b", "#ffffff", "#2166ac"])
     for column, model in enumerate(["HECM", "DD"], start=1):
         panel = state_values[state_values["model"] == model].pivot(
-            index="cell", columns="window_soh_state", values="additional_jumps"
+            index="cell", columns="window_soh_state", values="event_error_penalty"
         ).reindex(index=CELL_ORDER, columns=STATE_ORDER)
         panel.columns = ["Fresh", "Mid-life", "Aged"]
         axis = fig.add_subplot(grid[0, column])
@@ -184,17 +208,20 @@ def figure_11_spike_susceptibility(run_metrics: pd.DataFrame, aggregate: pd.Data
         axis.grid(False)
         axis.set_xticks(np.arange(3), panel.columns)
         axis.set_yticks(np.arange(len(CELL_ORDER)), CELL_ORDER)
-        axis.set_title(f"({'b' if model == 'HECM' else 'c'}) {model} by cell and SOH state")
+        axis.set_title(
+            f"({'b' if model == 'HECM' else 'c'}) {model} by cell and SOH state\n"
+            r"cell values [$10^{-3}$ SOC]"
+        )
         for row in range(panel.shape[0]):
             for col in range(panel.shape[1]):
                 value = panel.iloc[row, col]
-                label = "—" if not np.isfinite(value) else f"{value:.1f}"
+                label = "—" if not np.isfinite(value) else f"{1000 * value:.1f}"
                 color = "white" if np.isfinite(value) and abs(value) > 0.55 * maximum else "#222222"
                 axis.text(col, row, label, ha="center", va="center", color=color, fontsize=9)
         axis.spines[:].set_visible(False)
     cbar = fig.colorbar(image, ax=fig.axes[1:3], fraction=0.022, pad=0.035)
-    cbar.set_label("Additional jumps relative to paired baseline")
-    fig.suptitle("Voltage-spike scenario: paired six-cell and aging-state susceptibility", fontsize=12)
+    cbar.set_label("Spike-sample MAE penalty [SOC]")
+    fig.suptitle("Voltage-spike response: direct event penalty across cells and aging states", fontsize=12)
     fig.subplots_adjust(top=0.78, left=0.06, right=0.90, bottom=0.12)
     save(fig, "Figure_11_Voltage_Spike_Response_REVISED")
 
