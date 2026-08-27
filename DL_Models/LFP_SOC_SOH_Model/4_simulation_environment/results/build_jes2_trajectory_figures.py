@@ -199,15 +199,17 @@ def plot_spikes(root: Path, aggregate: pd.DataFrame, run_metrics: Path, out: Pat
     base_voltage = baseline["HECM"]["U"].to_numpy()
     event_indices = np.flatnonzero(np.abs(hecm_voltage - base_voltage) > 0.1)
     event_indices = event_indices[(event_indices > 0) & (event_indices < len(hecm_voltage) - 1)]
-    dd_time = spikes["DD"].time_s.to_numpy()
-    dd_delta = spikes["DD"].soc_pred.to_numpy() - baseline["DD"].soc_pred.to_numpy()
-    dd_event_indices = np.searchsorted(dd_time, spikes["HECM"].time_s.iloc[event_indices].to_numpy())
-    valid = (dd_event_indices > 0) & (dd_event_indices < len(dd_delta))
-    event_indices = event_indices[valid]
-    dd_event_indices = dd_event_indices[valid]
-    causal_jumps = np.abs(dd_delta[dd_event_indices] - dd_delta[dd_event_indices - 1])
-    target = np.nanpercentile(causal_jumps, 50)
-    event_index = int(event_indices[int(np.nanargmin(np.abs(causal_jumps - target)))])
+    common_start = max(float(frame.time_s.iloc[0]) for frame in baseline.values()) + 60
+    event_indices = event_indices[spikes["HECM"].time_s.iloc[event_indices].to_numpy() >= common_start]
+    maximum_baseline_errors = []
+    for candidate in event_indices:
+        event_time = float(spikes["HECM"].time_s.iloc[candidate])
+        errors = []
+        for model in MODEL_ORDER:
+            index = int(np.searchsorted(baseline[model].time_s.to_numpy(), event_time))
+            errors.append(abs(float(baseline[model].soc_pred.iloc[index] - baseline[model].soc_true.iloc[index])))
+        maximum_baseline_errors.append(max(errors))
+    event_index = int(event_indices[int(np.nanargmin(maximum_baseline_errors))])
     center = float(spikes["HECM"].time_s.iloc[event_index])
     start, end = center - 60, center + 180
     rel_grid = np.arange(-60, 181, dtype=float)
@@ -226,9 +228,13 @@ def plot_spikes(root: Path, aggregate: pd.DataFrame, run_metrics: Path, out: Pat
         mask = (frame.time_s >= start) & (frame.time_s <= end)
         part = frame.loc[mask]
         indices = part.index
-        ax_soc.plot(part.time_s - center, base.loc[indices, "soc_pred"], color=MODEL_COLORS[model],
+        base_part = base.loc[indices]
+        pre_mask = (part.time_s >= center - 60) & (part.time_s <= center - 10)
+        offset = float((base_part.loc[pre_mask, "soc_pred"] - base_part.loc[pre_mask, "soc_true"]).mean())
+        ax_soc.plot(part.time_s - center, base_part.soc_pred - offset, color=MODEL_COLORS[model],
                     linestyle="--", linewidth=1.3, alpha=0.65)
-        ax_soc.plot(part.time_s - center, part.soc_pred, color=MODEL_COLORS[model], linewidth=1.8, label=model)
+        ax_soc.plot(part.time_s - center, part.soc_pred - offset, color=MODEL_COLORS[model],
+                    linewidth=1.8, label=model)
 
         aligned = []
         model_times = frame.time_s.to_numpy()
@@ -249,8 +255,8 @@ def plot_spikes(root: Path, aggregate: pd.DataFrame, run_metrics: Path, out: Pat
     penalties = spike_event_penalties(root.parent)
     draw_model_bars(ax_bar, penalties, r"Spike-sample $\Delta$MAE [SOC]",
                     "(b) Direct spike effect across six cells")
-    ax_soc.set(xlabel="Seconds relative to representative voltage spike", ylabel="SOC",
-               title="(a) C15 mid-life response: baseline (dashed) vs spike run (solid)")
+    ax_soc.set(xlabel="Seconds relative to representative voltage spike", ylabel="Offset-aligned SOC",
+               title="(a) C15 mid-life response after pre-spike offset alignment")
     ax_local.set(xlabel="Seconds relative to voltage spike", ylabel="Excess absolute error",
                  title="(c) C15 aligned response over 40 spikes")
     for axis in (ax_soc, ax_local):
