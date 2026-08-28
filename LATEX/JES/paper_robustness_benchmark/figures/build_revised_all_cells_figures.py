@@ -403,8 +403,8 @@ def figure_13_decision(
         radar.fill(closed_angles, values, color=MODEL_COLORS[row.Model], alpha=0.12)
     radar.set_rlabel_position(0)
     radar.grid(color="#d8d8d8", linewidth=0.6)
-    radar.spines["polar"].set_color("#777777")
-    radar.spines["polar"].set_linewidth(0.7)
+    radar.spines["polar"].set_color("#d8d8d8")
+    radar.spines["polar"].set_linewidth(0.6)
     radar.set_title("(a) Relative decision dimensions", y=1.22, pad=0)
 
     profile_names = [c for c in profiles.columns if c != "Model"]
