@@ -39,32 +39,29 @@ def main() -> None:
     ):
         copy_file(EAAI / source, target)
 
-    # Figures 05, 06, and 15--17 are generated directly in All Cells by their
+    # Figures 05, 06, and 14--17 are generated directly in All Cells by their
     # dedicated scripts and are intentionally not overwritten here.
     copy_png(RESULTS / "Figure_04_Baseline_Performance", "Figure_04_Baseline_Performance")
 
     # Selected dissertation figures in the current green/purple/blue/red palette.
     copy_file(EAAI / "robustness_noise.png", "Figure_07_Noise_Robustness.png")
-    copy_file(EAAI / "robustness_signal_integrity.png", "Figure_10_Signal_Integrity.png")
     copy_png(
         RESULTS / "Figure_09_Burst_Dropout_Transition_CORR",
-        "Figure_12_Burst_Dropout_Transition",
+        "Figure_11_Burst_Dropout_Transition",
     )
-    copy_file(EAAI / "robustness_adc_quantization.png", "Figure_18_ADC_Quantization.png")
 
     # Current six-cell analyses, numbered in their review order.
     supplements = (
         ("Figure_06_Noise_Robustness", "Figure_08_Noise_Robustness_Six_Cell_Overview"),
         ("Figure_07_Initial_State_Recovery_CORR", "Figure_09_Initial_State_Recovery_Six_Cell"),
-        ("Figure_08_Signal_Integrity", "Figure_11_Signal_Integrity_Six_Cell_Overview"),
-        ("Figure_11_Voltage_Spike_Response_REVISED", "Figure_13_Voltage_Spike_Response_Six_Cell"),
-        ("Figure_11c_Voltage_Spike_Response_JES2", "Figure_14_Voltage_Spike_Response_JES2"),
-        ("Figure_14_ADC_Quantization", "Figure_19_ADC_Quantization_Six_Cell"),
-        ("Figure_16_Holdout_Cell_Coverage", "Figure_20_Holdout_Cell_Coverage"),
-        ("Figure_17_Statistical_Robustness", "Figure_21_Statistical_Robustness"),
-        ("Figure_27_JES2_Test_Matrix", "Figure_22_JES2_Test_Matrix"),
-        ("Figure_28_Statistical_Analysis_Workflow", "Figure_23_Statistical_Analysis_Workflow"),
-        ("Figure_29_Evaluation_Window_Protocol", "Figure_24_Evaluation_Window_Protocol"),
+        ("Figure_08_Signal_Integrity", "Figure_10_Signal_Integrity_Six_Cell_Overview"),
+        ("Figure_11_Voltage_Spike_Response_REVISED", "Figure_12_Voltage_Spike_Response_Six_Cell"),
+        ("Figure_11c_Voltage_Spike_Response_JES2", "Figure_13_Voltage_Spike_Response_JES2"),
+        ("Figure_16_Holdout_Cell_Coverage", "Figure_18_Holdout_Cell_Coverage"),
+        ("Figure_17_Statistical_Robustness", "Figure_19_Statistical_Robustness"),
+        ("Figure_27_JES2_Test_Matrix", "Figure_20_JES2_Test_Matrix"),
+        ("Figure_28_Statistical_Analysis_Workflow", "Figure_21_Statistical_Analysis_Workflow"),
+        ("Figure_29_Evaluation_Window_Protocol", "Figure_22_Evaluation_Window_Protocol"),
     )
     for source, target in supplements:
         copy_png(RESULTS / source, target)

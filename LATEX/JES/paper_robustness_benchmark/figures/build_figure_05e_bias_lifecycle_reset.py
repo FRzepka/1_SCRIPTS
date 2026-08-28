@@ -83,7 +83,7 @@ def main() -> None:
     ax_life.axhline(0.0, color="#555555", linewidth=0.9, linestyle="--")
     ax_life.set_xlabel("Elapsed lifecycle time [h]")
     ax_life.set_ylabel(r"Bias contribution $\Delta$MAE [SOC]")
-    ax_life.set_title("(a) Does the bias penalty grow over the full life?")
+    ax_life.set_title("(a) Bias Penalty over Full Life")
     ax_life.legend(ncol=2, frameon=False, loc="best")
     ax_life.text(
         0.99,
@@ -133,7 +133,7 @@ def main() -> None:
     ax_cycle.set_xticks(error_positions)
     ax_cycle.set_xlabel("Progress between consecutive full-charge events [%]")
     ax_cycle.set_ylabel(r"Bias contribution $\Delta$MAE [SOC]")
-    ax_cycle.set_title("(b) Does bias accumulate between full charges?")
+    ax_cycle.set_title("(b) Bias Accumulation between Full Charges")
     ax_cycle.text(
         0.99,
         0.96,
@@ -170,7 +170,7 @@ def main() -> None:
     ax_reset.axhline(0.0, color="#555555", linewidth=0.9, linestyle="--")
     ax_reset.set_xticks(x, MODELS)
     ax_reset.set_ylabel(r"Bias contribution $\Delta$MAE [SOC]")
-    ax_reset.set_title("(c) Two hours before vs. after full charge")
+    ax_reset.set_title("(c) Bias before and after Full Charge")
     ax_reset.legend(
         handles=[
             Patch(facecolor=to_rgba("#666666", 0.14), edgecolor="#666666", label="Before"),
@@ -219,7 +219,7 @@ def main() -> None:
         )
     ax_rank.set_xticks(x, MODELS)
     ax_rank.set_ylabel("Absolute MAE [SOC]")
-    ax_rank.set_title("(d) Which model remains most accurate?")
+    ax_rank.set_title("(d) Full-Life Accuracy by Model")
     ax_rank.legend(
         handles=[
             Patch(facecolor=to_rgba("#666666", 0.14), edgecolor="#666666", label="Baseline"),
