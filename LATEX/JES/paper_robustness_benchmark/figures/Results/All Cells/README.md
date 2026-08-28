@@ -18,7 +18,7 @@ Farbschema ist durchgängig DM = grün, HDM = lila, HECM = blau und DD = rot.
 | 10 | Original erhalten, aber als `LEGACY_REVIEW` markiert | Verwendet das frühere Dropout-Protokoll; nicht als finales Ergebnis zitieren. Die gültige Übergangsdarstellung ist Fig. 09. |
 | 11 | Dissertation-Abbildung erhalten; 11b zeigt dieselbe >5%-Transientenmetrik als Six-Cell-Makro, Zellpunkte und HECM/DD-Aufschlüsselung nach SOH-Zustand | Der frühere DD-selektierte C29-Ausschnitt wurde entfernt, weil er die globale HECM-Anfälligkeit nicht erklären konnte. |
 | 12 | Dissertation-Abbildung erhalten; 12b verwendet die gepaarte ±Gain-Fehler-Auswertung und die blau-weiß-rote Diss-Heatmap-Palette | Burst dropout bleibt mit dem vorhandenen Six-Cell-Delta-MAE aus den vollständigen Zellkampagnen enthalten. Figure 09 ergänzt dies um den korrigierten C29-Verlauf und die Six-Cell-Recovery. Die frühere rot-graue Variante bleibt als `Figure_12b_Cross_Scenario_Heatmap_Six_Cell_Muted_Red_Gray.png` erhalten. |
-| 13 | Dissertation-Abbildung erhalten; Radar und Prioritätsprofile in 13b neu berechnet | Nutzt aktuelle Six-Cell-Baseline, gepaarte ±Gain-Fehler, korrigierte Initial-State-Kampagne; Dropout bis zum Rerun aus dem Score ausgeschlossen. |
+| 13 | Dissertation-Abbildung erhalten; Radar und Prioritätsprofile in 13b neu berechnet | Nutzt aktuelle Six-Cell-Baseline, gepaarte ±Gain-Fehler und korrigierte Initial-State-Kampagne. Burst-Dropout fließt in Robustheit und Recovery ein; Initial-SOC- und Burst-Recovery werden als zwei gleich gewichtete Tests zusammengeführt. |
 | 14 | Dissertation-Abbildung erhalten; aktuelle Six-Cell-Fassung als 14b ergänzt | Six-Cell-Zahlen sind die bevorzugte quantitative Ebene. |
 | 16, 17, 27–29 | Als besonders hilfreiche Ergänzungen aufgenommen | Dokumentieren Zellabdeckung, statistische Unsicherheit, Testmatrix, Auswertungslogik und gefrorene Evaluationsfenster. |
 
@@ -34,3 +34,6 @@ Erzeugung: `python figures/build_all_cells_collection.py`
 
 Nur Figure 12b neu erzeugen:
 `python figures/build_revised_all_cells_figures.py --figure-12-only --figure-12-output "figures/Results/All Cells/Figure_12b_Cross_Scenario_Heatmap_Six_Cell.png"`
+
+Nur Figure 13b neu erzeugen:
+`python figures/build_revised_all_cells_figures.py --figure-13-only --figure-13-output "figures/Results/All Cells/Figure_13b_Decision_Synthesis_Six_Cell.png"`

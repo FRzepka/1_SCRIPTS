@@ -4,7 +4,7 @@
 The script deliberately keeps the detailed dissertation figures untouched.  It
 creates complementary views whose local and aggregate statements use the same
 metric and replaces the current-bias heatmap entries with the signed paired
-sweep. The available six-cell burst-dropout macro remains part of the heatmap.
+sweep. The available six-cell burst-dropout macro remains part of the analysis.
 """
 
 from __future__ import annotations
@@ -308,6 +308,7 @@ def decision_scores(aggregate: pd.DataFrame, revised_matrix: pd.DataFrame) -> tu
         "current_bias_3p0pct",
         "missing_samples_random",
         "irregular_sampling_0p9s",
+        "missing_gap_1h",
         "voltage_spikes",
         "adc_quantization",
     ]
@@ -319,8 +320,33 @@ def decision_scores(aggregate: pd.DataFrame, revised_matrix: pd.DataFrame) -> tu
     robustness = pd.concat(robust_parts, axis=1).mean(axis=1)
 
     recovery_cells = initial_recovery_cell_means()
-    recovery_raw = recovery_cells.groupby("model")["stable_recovery_time_h"].mean().reindex(MODEL_ORDER)
-    recovery = lower_better(recovery_raw)
+    initial_recovery_raw = (
+        recovery_cells.groupby("model")["stable_recovery_time_h"]
+        .mean()
+        .reindex(MODEL_ORDER)
+    )
+    initial_recovery = lower_better(initial_recovery_raw)
+
+    burst_parts = []
+    burst_raw = None
+    for metric in [
+        "common_recovery_or_censor_time_h",
+        "common_recovery_censored_fraction",
+        "common_recovery_excess_auc_soc_h",
+    ]:
+        rows = metric_rows(aggregate, metric)
+        values = (
+            rows[rows["alias"] == "missing_gap_1h"]
+            .set_index("model")["mean"]
+            .reindex(MODEL_ORDER)
+        )
+        if metric == "common_recovery_or_censor_time_h":
+            burst_raw = values
+        burst_parts.append(lower_better(values))
+    if burst_raw is None or burst_raw.isna().any():
+        raise ValueError("Complete six-cell burst-dropout recovery data are required for Figure 13.")
+    burst_recovery = pd.concat(burst_parts, axis=1).mean(axis=1)
+    recovery = pd.concat([initial_recovery, burst_recovery], axis=1).mean(axis=1)
 
     scores = pd.DataFrame(
         {
@@ -328,7 +354,9 @@ def decision_scores(aggregate: pd.DataFrame, revised_matrix: pd.DataFrame) -> tu
             "Accuracy": accuracy.reindex(MODEL_ORDER).to_numpy(float),
             "Robustness": robustness.reindex(MODEL_ORDER).to_numpy(float),
             "Recovery": recovery.reindex(MODEL_ORDER).to_numpy(float),
-            "Stable recovery time [h]": recovery_raw.to_numpy(float),
+            "Initial stable recovery time [h]": initial_recovery_raw.to_numpy(float),
+            "Burst recovery/censor time [h]": burst_raw.to_numpy(float),
+            "Burst recovery score": burst_recovery.reindex(MODEL_ORDER).to_numpy(float),
         }
     )
     weights = {
@@ -344,7 +372,11 @@ def decision_scores(aggregate: pd.DataFrame, revised_matrix: pd.DataFrame) -> tu
     return scores, profiles
 
 
-def figure_13_decision(scores: pd.DataFrame, profiles: pd.DataFrame) -> None:
+def figure_13_decision(
+    scores: pd.DataFrame,
+    profiles: pd.DataFrame,
+    output_path: Path | None = None,
+) -> None:
     labels = ["Accuracy", "Robustness", "Recovery"]
     angles = np.linspace(0, 2 * np.pi, len(labels), endpoint=False)
     closed_angles = np.r_[angles, angles[0]]
@@ -362,36 +394,50 @@ def figure_13_decision(scores: pd.DataFrame, profiles: pd.DataFrame) -> None:
     for row in scores.itertuples(index=False):
         values = np.array([row.Accuracy, row.Robustness, row.Recovery], dtype=float)
         values = np.r_[values, values[0]]
-        radar.plot(closed_angles, values, color=MODEL_COLORS[row.Model], lw=2.0, label=row.Model)
-        radar.fill(closed_angles, values, color=MODEL_COLORS[row.Model], alpha=0.09)
-    radar.set_title("(a) Updated relative decision dimensions", pad=24)
+        radar.plot(
+            closed_angles, values, color=MODEL_COLORS[row.Model], lw=2.0,
+            marker="o", markersize=5.0, markerfacecolor=MODEL_COLORS[row.Model],
+            markeredgecolor=MODEL_COLORS[row.Model], markeredgewidth=0.8, label=row.Model,
+        )
+        radar.fill(closed_angles, values, color=MODEL_COLORS[row.Model], alpha=0.12)
+    radar.set_rlabel_position(0)
+    radar.grid(color="#d8d8d8", linewidth=0.8)
+    radar.spines["polar"].set_color("#555555")
+    radar.set_title("(a) Relative decision dimensions", pad=24)
 
     profile_names = [c for c in profiles.columns if c != "Model"]
-    x = np.arange(len(profile_names))
-    width = 0.18
-    offsets = np.linspace(-1.5 * width, 1.5 * width, len(MODEL_ORDER))
+    x = np.arange(len(profile_names), dtype=float) * 1.18
+    width = 0.14
+    offsets = np.linspace(-0.285, 0.285, len(MODEL_ORDER))
     for index, row in profiles.iterrows():
         model = row["Model"]
         bars.bar(x + offsets[index], row[profile_names].to_numpy(float), width=width,
-                 color=MODEL_COLORS[model], alpha=0.72, edgecolor=MODEL_COLORS[model], label=model)
-    bars.set_xticks(x, [name.replace("-weighted", "\nweighted") for name in profile_names])
+                 color=MODEL_COLORS[model], alpha=0.42, edgecolor=MODEL_COLORS[model],
+                 linewidth=1.5, label=model, zorder=3)
+    bars.set_xticks(x, profile_names)
     bars.set_ylim(0.0, 1.02)
-    bars.set_ylabel("Relative composite score")
+    bars.set_yticks(np.linspace(0.0, 1.0, 6))
+    bars.set_ylabel("Composite score")
     bars.set_title("(b) Priority-weighted composite scores")
+    bars.grid(axis="y", color="#d8d8d8", linewidth=0.8, zorder=0)
+    bars.grid(axis="x", visible=False)
     bars.spines[["top", "right"]].set_visible(False)
     bars.legend(ncol=4, frameon=False, loc="upper center", bbox_to_anchor=(0.5, 1.13))
-    fig.suptitle("Decision synthesis updated with signed gain-error and paired Six-Cell recovery", fontsize=12)
-    fig.text(0.5, 0.015,
-             "Higher is better. Burst dropout is shown in the cross-scenario heatmap but is not weighted in this composite score; weights are explicit decision profiles, not a universal ranking.",
-             ha="center", fontsize=8.5, color="#555555")
-    fig.subplots_adjust(left=0.05, right=0.98, bottom=0.13, top=0.84)
-    save(fig, "Figure_13_Decision_Synthesis_REVISED")
+    fig.subplots_adjust(left=0.05, right=0.98, bottom=0.10, top=0.86)
+    if output_path is None:
+        save(fig, "Figure_13_Decision_Synthesis_REVISED")
+    else:
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        fig.savefig(output_path, dpi=300, bbox_inches="tight", facecolor="white")
+        plt.close(fig)
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Build revised six-cell JES figures.")
     parser.add_argument("--figure-12-only", action="store_true")
     parser.add_argument("--figure-12-output", type=Path, default=None)
+    parser.add_argument("--figure-13-only", action="store_true")
+    parser.add_argument("--figure-13-output", type=Path, default=None)
     args = parser.parse_args()
 
     setup_style()
@@ -400,6 +446,12 @@ def main() -> None:
     matrix = revised_delta_matrix(aggregate, signed_bias)
     if args.figure_12_only:
         figure_12_heatmap(matrix, args.figure_12_output)
+        return
+    if args.figure_13_only:
+        scores, profiles = decision_scores(aggregate, matrix)
+        figure_13_decision(scores, profiles, args.figure_13_output)
+        print(scores.round(4).to_string(index=False))
+        print(profiles.round(4).to_string(index=False))
         return
 
     run_metrics = pd.read_csv(RESULTS / "jes2_run_metrics.csv")
