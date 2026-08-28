@@ -1,8 +1,10 @@
 # All Cells – kuratierte Abbildungsübersicht
 
-Die 27 ausgewählten PNG-Dateien sind lückenlos als `Figure_01` bis `Figure_27`
-nummeriert. Quelldateien außerhalb dieses Ordners bleiben unverändert. Das
-Farbschema ist durchgängig DM = grün, HDM = lila, HECM = blau und DD = rot.
+Die 24 ausgewählten PNG-Dateien sind lückenlos als `Figure_01` bis `Figure_24`
+nummeriert. Figures 01–20 gehören in den Hauptteil; Figures 21–24 sind zusätzlich
+mit `APPENDIX` gekennzeichnet und gehören in den Anhang. Quelldateien außerhalb
+dieses Ordners bleiben unverändert. Das Farbschema ist durchgängig DM = grün,
+HDM = lila, HECM = blau und DD = rot.
 
 ## Umgesetzte Auswahl
 
@@ -16,11 +18,11 @@ Farbschema ist durchgängig DM = grün, HDM = lila, HECM = blau und DD = rot.
 | 10 | Signal integrity | Aktuelle Six-Cell-Übersicht; die redundante historische Detailabbildung wurde entfernt. |
 | 11 | Burst dropout | Korrigierter Übergang mit eingefrorenen Online-Zuständen während des Gaps. |
 | 12–13 | Voltage spikes | Six-Cell-Zusammenfassung und JES2-Verlaufsdarstellung. |
-| 14–15 | Cross-scenario heatmap | Aktuelle starke Palette sowie erhaltene gedämpfte Vergleichsversion. |
-| 16 | Decision synthesis | Aktuelle Six-Cell-Scores einschließlich Burst-Dropout und Recovery. |
-| 17 | ADC quantization | Strom- und Spannungsdetail kombiniert mit Six-Cell-Mittel, hierarchischem 95%-KI sowie ΔMAE- und MAE-Werten. |
-| 18–22 | Methodische Ergänzungen | Zellabdeckung, Statistik, Testmatrix, Workflow und Evaluationsfenster. |
-| 23–27 | STM32-Hardwarebenchmark | Hardware-/Software-Äquivalenz, On-Device-Latenzen, Speicherbedarf sowie DD-Inferenzmodi und deren Latenzverteilungen. |
+| 14 | Cross-scenario heatmap | Aktuelle Six-Cell-Fassung mit der starken Dissertation-Palette. |
+| 15 | Decision synthesis | Aktuelle Six-Cell-Scores einschließlich Burst-Dropout und Recovery. |
+| 16 | ADC quantization | Strom- und Spannungsdetail kombiniert mit Six-Cell-Mittel, hierarchischem 95%-KI sowie ΔMAE- und MAE-Werten. |
+| 17–20 | STM32-Hardwarebenchmark, Hauptteil | Hardware-/Software-Äquivalenz, On-Device-Latenzen, Speicherbedarf und DD-Inferenzmodi. |
+| 21–24 | Anhang (`APPENDIX`) | Holdout-Abdeckung, JES2-Testmatrix, Evaluationsfenster und detaillierte DD-Latenzverteilungen. |
 
 ## Wichtiger Rechenstatus
 
@@ -35,8 +37,8 @@ Erzeugung: `python figures/build_all_cells_collection.py`
 Nur Figure 14 neu erzeugen:
 `python figures/build_revised_all_cells_figures.py --figure-12-only --figure-12-output "figures/Results/All Cells/Figure_14_Cross_Scenario_Heatmap_Six_Cell.png"`
 
-Nur Figure 16 neu erzeugen:
-`python figures/build_revised_all_cells_figures.py --figure-13-only --figure-13-output "figures/Results/All Cells/Figure_16_Decision_Synthesis_Six_Cell.png"`
+Nur Figure 15 neu erzeugen:
+`python figures/build_revised_all_cells_figures.py --figure-13-only --figure-13-output "figures/Results/All Cells/Figure_15_Decision_Synthesis_Six_Cell.png"`
 
-Nur Figure 17 neu erzeugen:
-`python figures/build_figure_17_adc_quantization.py`
+Nur Figure 16 neu erzeugen:
+`python figures/build_figure_16_adc_quantization.py`

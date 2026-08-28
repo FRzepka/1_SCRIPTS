@@ -20,7 +20,7 @@ ROOT = Path(__file__).resolve().parents[4]
 PAPER = Path(__file__).resolve().parents[1]
 SIMULATION = ROOT / "DL_Models/LFP_SOC_SOH_Model/4_simulation_environment"
 RESULTS = PAPER / "JES_2.0/results"
-OUTPUT = PAPER / "figures/Results/All Cells/Figure_17_ADC_Quantization.png"
+OUTPUT = PAPER / "figures/Results/All Cells/Figure_16_ADC_Quantization.png"
 DATA_ROOT = Path("/home/florianr/MG_Farm/0_Data/MGFarm_18650_FE")
 CELL = "MGFarm_18650_C07"
 

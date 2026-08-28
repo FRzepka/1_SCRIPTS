@@ -39,8 +39,8 @@ def main() -> None:
     ):
         copy_file(EAAI / source, target)
 
-    # Figures 05, 06, and 14--17 are generated directly in All Cells by their
-    # dedicated scripts and are intentionally not overwritten here.
+    # Figures 05, 06, 14--20, and Appendix Figure 24 are generated directly in
+    # All Cells by dedicated scripts and are intentionally not overwritten here.
     copy_png(RESULTS / "Figure_04_Baseline_Performance", "Figure_04_Baseline_Performance")
 
     # Selected dissertation figures in the current green/purple/blue/red palette.
@@ -57,11 +57,9 @@ def main() -> None:
         ("Figure_08_Signal_Integrity", "Figure_10_Signal_Integrity_Six_Cell_Overview"),
         ("Figure_11_Voltage_Spike_Response_REVISED", "Figure_12_Voltage_Spike_Response_Six_Cell"),
         ("Figure_11c_Voltage_Spike_Response_JES2", "Figure_13_Voltage_Spike_Response_JES2"),
-        ("Figure_16_Holdout_Cell_Coverage", "Figure_18_Holdout_Cell_Coverage"),
-        ("Figure_17_Statistical_Robustness", "Figure_19_Statistical_Robustness"),
-        ("Figure_27_JES2_Test_Matrix", "Figure_20_JES2_Test_Matrix"),
-        ("Figure_28_Statistical_Analysis_Workflow", "Figure_21_Statistical_Analysis_Workflow"),
-        ("Figure_29_Evaluation_Window_Protocol", "Figure_22_Evaluation_Window_Protocol"),
+        ("Figure_16_Holdout_Cell_Coverage", "Figure_21_APPENDIX_Holdout_Cell_Coverage"),
+        ("Figure_27_JES2_Test_Matrix", "Figure_22_APPENDIX_JES2_Test_Matrix"),
+        ("Figure_29_Evaluation_Window_Protocol", "Figure_23_APPENDIX_Evaluation_Window_Protocol"),
     )
     for source, target in supplements:
         copy_png(RESULTS / source, target)
