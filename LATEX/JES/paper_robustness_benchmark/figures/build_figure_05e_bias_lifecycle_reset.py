@@ -52,7 +52,7 @@ def main() -> None:
         type=Path,
         default=(
             paper
-            / "figures/Results/All Cells/Figure_05e_Current_Bias_Lifecycle_Reset.png"
+            / "figures/Results/All Cells/Figure_06_Current_Bias_Lifecycle_Reset.png"
         ),
     )
     args = parser.parse_args()
