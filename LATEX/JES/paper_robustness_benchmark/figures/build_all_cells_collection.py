@@ -10,7 +10,6 @@ PAPER = Path(__file__).resolve().parents[1]
 FIGURES = PAPER / "figures"
 RESULTS = FIGURES / "Results"
 OUT = RESULTS / "All Cells"
-UPLOAD = PAPER / "JES_Upload" / "Figures"
 EAAI = Path(
     "/home/florianr/MG_Farm/1_Scripts/LATEX/DISS/"
     "Florian_Rzepka_Dissertation/pictures/eaai_palette"
@@ -32,14 +31,13 @@ def copy_png(source_stem: Path, target_stem: str) -> None:
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
 
-    # Original conceptual figures: no model-color remapping is needed.
-    for number, filename in (
-        (1, "Figure_01_Requirements_Overview.png"),
-        (2, "Figure_02_Methodology_Overview.png"),
-        (3, "Figure_03_Disturbance_Taxonomy.png"),
+    # Conceptual figures use the final dissertation EAAI palette.
+    for source, target in (
+        ("bms_requirements.png", "Figure_01_Requirements_Overview.png"),
+        ("robustness_methodology.png", "Figure_02_Methodology_Overview.png"),
+        ("robustness_disturbance_taxonomy.png", "Figure_03_Disturbance_Taxonomy.png"),
     ):
-        del number
-        copy_file(UPLOAD / filename)
+        copy_file(EAAI / source, target)
 
     # Figures 05, 06, and 15--17 are generated directly in All Cells by their
     # dedicated scripts and are intentionally not overwritten here.

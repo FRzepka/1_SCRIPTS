@@ -8,7 +8,7 @@ Farbschema ist durchgängig DM = grün, HDM = lila, HECM = blau und DD = rot.
 
 | Abbildung | Umsetzung | Prüfstatus |
 |---|---|---|
-| 01–03 | Originale unverändert übernommen | Anforderungs-, Methoden- und Taxonomieübersichten. |
+| 01–03 | Dissertation-Fassungen aus der EAAI-Palette übernommen | Anforderungs-, Methoden- und Taxonomieübersichten in den finalen Dissertation-Farben. |
 | 04 | Aktuelle Six-Cell-Baseline übernommen | Gewünschter Ersatz; zeigt Zellen als Punkte und Cell-Macro-Mittel mit 95%-KI. |
 | 05–06 | Current-bias sensitivity und Lifecycle-Reset | Gepaarte Gain-Fehler sowie zeitliche Akkumulation und Recovery. |
 | 07–08 | Noise robustness | Dissertation-Detail und Six-Cell-Übersicht. |
