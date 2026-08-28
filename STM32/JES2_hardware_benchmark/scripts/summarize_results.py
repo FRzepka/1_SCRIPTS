@@ -35,6 +35,7 @@ def main() -> None:
             continue
         timing = load_json(summary_path)
         memory = memory_rows.get(model, {})
+        dataset = timing.get("dataset_difference", {})
         rows.append({
             "model": model,
             "n_inferences": timing.get("rows_ok"),
@@ -44,6 +45,9 @@ def main() -> None:
             "reference_mae": timing.get("reference_difference", {}).get("mae"),
             "reference_rmse": timing.get("reference_difference", {}).get("rmse"),
             "reference_max_abs_error": timing.get("reference_difference", {}).get("maximum_absolute_error"),
+            "dataset_mae": dataset.get("mae"),
+            "dataset_rmse": dataset.get("rmse"),
+            "dataset_max_abs_error": dataset.get("maximum_absolute_error"),
             "flash_load_bytes": memory.get("flash_load_bytes"),
             "static_ram_bytes": memory.get("static_ram_bytes"),
             "peak_stack_bytes": None,

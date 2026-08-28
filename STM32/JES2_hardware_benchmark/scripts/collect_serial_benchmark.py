@@ -38,8 +38,11 @@ RESULT_COLUMNS = (
     "status",
     "soc_device",
     "soc_reference",
+    "soc_dataset",
     "error",
     "abs_error",
+    "dataset_error",
+    "dataset_abs_error",
     "cycles",
     "device_time_us",
     "host_rtt_ms",
@@ -193,8 +196,11 @@ def run(args: argparse.Namespace) -> dict[str, object]:
 
                     reference_text = row[expected_column].strip()
                     reference = float(reference_text) if reference_text else None
+                    dataset_text = row.get("soc_dataset", "").strip()
+                    dataset_soc = float(dataset_text) if dataset_text else None
                     prediction = parsed["soc"]
                     error = prediction - reference if prediction is not None and reference is not None else None
+                    dataset_error = prediction - dataset_soc if prediction is not None and dataset_soc is not None else None
                     cycles = int(parsed["cycles"])
                     clock_hz = int(device["clock_hz"])
                     record = {
@@ -205,8 +211,11 @@ def run(args: argparse.Namespace) -> dict[str, object]:
                         "status": parsed["status"],
                         "soc_device": prediction,
                         "soc_reference": reference,
+                        "soc_dataset": dataset_soc,
                         "error": error,
                         "abs_error": abs(error) if error is not None else None,
+                        "dataset_error": dataset_error,
+                        "dataset_abs_error": abs(dataset_error) if dataset_error is not None else None,
                         "cycles": cycles,
                         "device_time_us": cycles * 1e6 / clock_hz if cycles else None,
                         "host_rtt_ms": (t1 - t0) / 1e6,
@@ -217,6 +226,7 @@ def run(args: argparse.Namespace) -> dict[str, object]:
 
     valid = [row for row in measurements if row["status"] == "OK"]
     errors = [float(row["error"]) for row in valid if row["error"] is not None]
+    dataset_errors = [float(row["dataset_error"]) for row in valid if row["dataset_error"] is not None]
     summary = {
         "schema_version": 1,
         "started_utc": started,
@@ -239,6 +249,12 @@ def run(args: argparse.Namespace) -> dict[str, object]:
             "mae": statistics.fmean(abs(value) for value in errors) if errors else None,
             "rmse": math.sqrt(statistics.fmean(value * value for value in errors)) if errors else None,
             "maximum_absolute_error": max((abs(value) for value in errors), default=None),
+        },
+        "dataset_difference": {
+            "n": len(dataset_errors),
+            "mae": statistics.fmean(abs(value) for value in dataset_errors) if dataset_errors else None,
+            "rmse": math.sqrt(statistics.fmean(value * value for value in dataset_errors)) if dataset_errors else None,
+            "maximum_absolute_error": max((abs(value) for value in dataset_errors), default=None),
         },
     }
     (args.out_dir / "summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")

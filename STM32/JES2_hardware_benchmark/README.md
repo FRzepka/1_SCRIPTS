@@ -41,6 +41,18 @@ Die versionierte nominale Sequenz enthaelt 4096 geordnete C27-Samples. Sie wurde
 aus dem eingefrorenen frischen Baselinefenster erzeugt und enthaelt die
 Software-Referenzausgaben aller vier Estimatoren.
 
+Fuer die Paper-Auswertung sind zusaetzlich sechs getrennte Zellsequenzen unter
+`test_vectors/multicell/` versioniert. Nach dem Flashen eines Modells fuehrt
+folgender Befehl alle sechs Sequenzen aus:
+
+```powershell
+./STM32/JES2_hardware_benchmark/scripts/run_multicell_benchmark.ps1 `
+  -Model DD -Port COM7 -Rounds 3
+```
+
+Der Vorgang wird nach dem Flashen fuer `DM`, `HDM`, `HECM` und `DD` wiederholt.
+Die Ergebnisse landen unter `results/<CELL>/<MODEL>/`.
+
 ## DD-Export auf dem HPC
 
 ```bash
@@ -71,3 +83,18 @@ python STM32/JES2_hardware_benchmark/scripts/summarize_results.py \
   --results-root STM32/JES2_hardware_benchmark/results \
   --out STM32/JES2_hardware_benchmark/results/hardware_summary.csv
 ```
+
+Die Mehrzelltabellen werden anschliessend erzeugt mit:
+
+```powershell
+python STM32/JES2_hardware_benchmark/scripts/summarize_multicell_results.py `
+  --results-root STM32/JES2_hardware_benchmark/results `
+  --vectors-manifest STM32/JES2_hardware_benchmark/test_vectors/multicell/jes2_multicell_manifest.json `
+  --memory STM32/JES2_hardware_benchmark/results/memory.json `
+  --out-dir STM32/JES2_hardware_benchmark/results/tables
+```
+
+`hardware_results_by_cell.csv` enthaelt MAE, RMSE, Maximalfehler und Laufzeit je
+Zelle und Modell. `hardware_results_by_load_class.csv` aggregiert Mittelwert,
+Minimum und Maximum fuer Low, Medium und High. Fuer High existiert mit C29 nur
+eine Zelle; dort ist keine Zwischenzellstreuung schaetzbar.

@@ -45,6 +45,11 @@ class SerialBenchmarkTests(unittest.TestCase):
             rows = serial_benchmark.load_vectors(path)
             self.assertEqual(len(rows), 1)
 
+    def test_result_schema_contains_dataset_comparison(self):
+        self.assertIn("soc_dataset", serial_benchmark.RESULT_COLUMNS)
+        self.assertIn("dataset_error", serial_benchmark.RESULT_COLUMNS)
+        self.assertIn("dataset_abs_error", serial_benchmark.RESULT_COLUMNS)
+
 
 class MemoryReportTests(unittest.TestCase):
     def test_parse_sections(self):

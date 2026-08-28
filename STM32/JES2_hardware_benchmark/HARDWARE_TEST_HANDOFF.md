@@ -91,6 +91,12 @@ gegen die Rolling-Window-Referenz zu quantifizieren.
 - Eine nominale 4096-Sample-Sequenz aus dem eingefrorenen C27-Fresh-Fenster mit
   gemeinsamer SOH-Spur und Referenzausgaben aller vier Estimatoren liegt unter
   `test_vectors/jes2_nominal_vectors.csv`.
+- Sechs getrennte nominale 4096-Sample-Sequenzen fuer C09, C13, C15, C25, C27
+  und C29 liegen unter `test_vectors/multicell/`. Das Manifest dokumentiert die
+  Klassen Low (C25/C27), Medium (C09/C13/C15) und High (C29).
+- Der Collector berichtet sowohl MCU-gegen-Software als auch MCU-gegen-Dataset-
+  SOC. `summarize_multicell_results.py` erzeugt Tabellen je Zelle und nach
+  Lastklasse mit Mittelwert und Min-Max-Range.
 
 ## Finale Softwareauswertung
 
@@ -112,12 +118,12 @@ Upload ausgeschlossen; Paper-Tabellen und Diagramme werden versioniert.
 2. Boardbezeichnung, MCU, Takt, CubeIDE- und X-CUBE-AI-Version dokumentieren.
 3. Fuer DM, HDM, HECM und DD reproduzierbare Release-Firmware bauen.
 4. Das in `SERIAL_PROTOCOL.md` definierte Protokoll implementieren.
-5. Jedes Image flashen und `scripts/collect_serial_benchmark.py` ausfuehren.
+5. Jedes Image flashen und `scripts/run_multicell_benchmark.ps1` ausfuehren.
 6. ELF/Map-Dateien mit `scripts/extract_memory_report.py` auswerten.
 7. Peak-Stack per Stack-Painting/Linker-Unterstuetzung messen; statisches RAM
    allein reicht fuer die Reviewer-Antwort nicht.
 8. Optional Trigger-Pin und externe Leistungsmessung ausfuehren.
-9. Alle Resultate mit `scripts/summarize_results.py` zusammenfassen.
+9. Alle Resultate mit `scripts/summarize_multicell_results.py` zusammenfassen.
 10. Rohresultate, Build-Metadaten und Firmware-Commit nach Git pushen.
 
 ## Lokaler Hardwarestatus 2026-08-26
