@@ -191,6 +191,10 @@ fp-info-cache
 **/result_*.json
 **/*results*.json
 **/*manifest.json
+
+# Small, reviewable JES2 STM32 handoff vectors and their provenance manifest.
+!STM32/JES2_hardware_benchmark/test_vectors/multicell/*.csv
+!STM32/JES2_hardware_benchmark/test_vectors/multicell/jes2_multicell_manifest.json
 **/*meta.json
 **/trials.json
 **/hpo_summary.json
