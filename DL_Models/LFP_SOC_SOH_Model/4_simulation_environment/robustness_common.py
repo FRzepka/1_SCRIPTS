@@ -145,12 +145,92 @@ def add_common_scenario_args(ap) -> None:
                     help="Post-event horizon for common recovery metrics.")
     ap.add_argument("--summary_only", action="store_true",
                     help="Write summary.json only; omit per-sample CSV and diagnostic plots.")
+    ap.add_argument(
+        "--temporal_metrics_seconds", type=float, default=0.0,
+        help="Write compact time-binned prediction/error metrics even in summary-only mode.",
+    )
     ap.add_argument("--q_c_reset_voltage_v", type=float, default=3.6002,
                     help="Online Q_c full-charge reset threshold used by training data and firmware.")
     ap.add_argument("--q_c_reset_current_a", type=float, default=0.1,
                     help="Minimum charging current required for an online Q_c voltage reset.")
     ap.add_argument("--q_c_capacity_ah", type=float, default=None,
                     help="Online Q_c lower-clamp magnitude; defaults to nominal_capacity_ah.")
+
+
+def write_temporal_error_metrics(
+    out_dir: str,
+    cell: str,
+    time_s: np.ndarray,
+    y_true: np.ndarray,
+    y_pred: np.ndarray,
+    voltage_v: np.ndarray,
+    interval_seconds: float,
+    reference_soh: Optional[np.ndarray] = None,
+    reset_voltage_v: float = 3.63,
+    reset_sustain_seconds: float = 300.0,
+) -> tuple[str, str]:
+    """Write exact binned MAE and model-independent full-charge events."""
+    interval = float(interval_seconds)
+    if interval <= 0:
+        raise ValueError("temporal_metrics_seconds must be positive")
+    t = np.asarray(time_s, dtype=np.float64)
+    truth = np.asarray(y_true, dtype=np.float64)
+    pred = np.asarray(y_pred, dtype=np.float64)
+    voltage = np.asarray(voltage_v, dtype=np.float64)
+    if not (len(t) == len(truth) == len(pred) == len(voltage)):
+        raise ValueError("Temporal metric inputs must have identical lengths")
+    valid = np.isfinite(t) & np.isfinite(truth) & np.isfinite(pred) & np.isfinite(voltage)
+    if not np.any(valid):
+        raise ValueError("No finite samples available for temporal metrics")
+    t, truth, pred, voltage = t[valid], truth[valid], pred[valid], voltage[valid]
+    soh = None if reference_soh is None else np.asarray(reference_soh, dtype=np.float64)[valid]
+
+    bin_id = np.floor((t - t[0]) / interval).astype(np.int64)
+    count = np.bincount(bin_id)
+
+    def bin_mean(values: np.ndarray) -> np.ndarray:
+        return np.bincount(bin_id, weights=values, minlength=len(count)) / count
+
+    signed_error = pred - truth
+    frame = pd.DataFrame({
+        "bin": np.arange(len(count), dtype=np.int64),
+        "time_s": t[0] + (np.arange(len(count)) + 0.5) * interval,
+        "elapsed_h": (np.arange(len(count)) + 0.5) * interval / 3600.0,
+        "n_samples": count,
+        "soc_true_mean": bin_mean(truth),
+        "soc_pred_mean": bin_mean(pred),
+        "mae": bin_mean(np.abs(signed_error)),
+        "rmse": np.sqrt(bin_mean(np.square(signed_error))),
+        "signed_error": bin_mean(signed_error),
+        "voltage_mean": bin_mean(voltage),
+    })
+    if soh is not None:
+        frame["soh_mean"] = bin_mean(soh)
+
+    high = voltage >= float(reset_voltage_v)
+    starts = np.flatnonzero(high & np.r_[True, ~high[:-1]])
+    stops = np.flatnonzero(high & np.r_[~high[1:], True])
+    durations = t[stops] - t[starts]
+    eligible = durations >= float(reset_sustain_seconds)
+    reset_times = t[starts[eligible]] + float(reset_sustain_seconds)
+    reset_indices = np.searchsorted(t, reset_times, side="left")
+    reset_indices = np.clip(reset_indices, 0, len(t) - 1)
+    events = pd.DataFrame({
+        "event": np.arange(1, len(reset_times) + 1, dtype=np.int64),
+        "time_s": reset_times,
+        "elapsed_h": (reset_times - t[0]) / 3600.0,
+        "source_index": reset_indices,
+        "voltage_v": voltage[reset_indices],
+    })
+    if soh is not None:
+        events["soh"] = soh[reset_indices]
+
+    os.makedirs(out_dir, exist_ok=True)
+    metrics_path = os.path.join(out_dir, f"temporal_metrics_{cell}.csv")
+    events_path = os.path.join(out_dir, f"full_charge_events_{cell}.csv")
+    frame.to_csv(metrics_path, index=False)
+    events.to_csv(events_path, index=False)
+    return metrics_path, events_path
 
 
 def compute_center_window_mask(t: np.ndarray, gap_seconds: float) -> np.ndarray:

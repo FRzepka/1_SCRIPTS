@@ -14,8 +14,9 @@ COMPLETED TESTS
   4. Identical C29 mid-life trace replayed at SOH 0.962, 0.897, and 0.831
      for HDM, HECM, and DD (27 runs).
   5. Continuous 1,344 h C29 trajectory with baseline, +3%, and -3% for all
-     four estimators (12 entries; four baseline summaries reused from the
-     identical full-C29 pilot protocol).
+     four estimators (12 entries).
+  6. Exact time-resolved matched rerun of all 12 entries with fresh baselines,
+     5 min MAE bins, 45 full-charge events, and 44 inter-charge intervals.
 
 MAIN RESULTS
   Natural five-cell state means show a mid-life maximum, not a monotonic aging
@@ -39,23 +40,48 @@ MAIN RESULTS
   The selected 24 h C29 windows contain no qualifying 300 s CV event. Natural
   and disabled-reset results are consequently identical in those windows.
 
-  The continuous C29 trajectory contains 45 qualifying CV-reset episodes with
-  a median inter-reset interval of 29.14 h. Its aged/fresh ratios are:
-    DM    1.085
-    HDM   1.264
-    HECM  1.354
-    DD    not defined because both signed perturbations remain below baseline
-  For DD, the larger signed-pair Delta-MAE remains negative in fresh, mid-life,
-  aged, and full-trajectory summaries. This is reported as a baseline-dependent
-  model response, not relabelled as degradation.
+  Full-lifecycle results under the adverse -3% direction are:
+                    Baseline MAE   Biased MAE   Delta-MAE
+    DM                  0.083717     0.093948    0.010230
+    HDM                 0.031535     0.038710    0.007175
+    HECM                0.027332     0.031000    0.003667
+    DD                  0.031570     0.036334    0.004764
+
+  Bias contribution in the first versus last 10% of the lifecycle:
+    DM      0.005682 -> 0.009537   change +0.003855
+    HDM    -0.007644 -> 0.013053   change +0.020697
+    HECM   -0.005668 -> 0.011347   change +0.017015
+    DD      0.000454 -> 0.007562   change +0.007108
+  The adverse current bias therefore becomes more damaging later in the C29
+  life for every model, but the trajectory is not locally monotonic.
+
+  Mean bias contribution from the first to last 20% of each interval:
+    DM      0.007236 -> 0.008730   accumulation +0.001495
+    HDM     0.006093 -> 0.007942   accumulation +0.001849
+    HECM    0.007537 -> 0.006151   accumulation -0.001386
+    DD      0.004009 -> 0.005303   accumulation +0.001294
+
+  Mean bias contribution two hours before versus after full charge:
+    DM      0.009632 -> 0.007734   correction -0.001898
+    HDM     0.007630 -> 0.005046   correction -0.002584
+    HECM    0.005565 -> 0.009763   response   +0.004199
+    DD      0.004277 -> 0.001564   correction -0.002714
+  Full charge therefore partially corrects DM, HDM, and DD. It is not a common
+  hard reset for all architectures: HECM becomes temporarily worse directly
+  after this operating point, then decreases across the next mean interval.
+
+  The prior statement that both DD signs remain below baseline came from a
+  reused pilot baseline rather than a fresh temporal baseline. It is superseded
+  by the matched rerun above. Existing Figure 05d is superseded by Figure 05e.
 
 INTERPRETATION
   A multiplicative current error integrates with signed charge history between
-  correction/reset events. Elapsed time, absolute throughput, and lower SOH do
-  not by themselves guarantee a monotonic MAE increase. The primary Figure 05
-  can retain the monotonic error-magnitude sweep because it uses the adverse
-  direction per cell and magnitude. Figures 05c and 05d provide the mechanism
-  and lifecycle evidence needed to prevent an overgeneralized aging claim.
+  correction events. DM, HDM, and DD show modest mean within-interval
+  accumulation followed by partial full-charge correction. Across the complete
+  cell life, all four estimators become more bias-sensitive in the final 10%,
+  but repeated corrections and changing drive profiles prevent a monotonic
+  point-by-point increase. HECM has the smallest full-life Delta-MAE and absolute
+  biased MAE; it is the best overall estimator in this C29 mechanism test.
 
 LIMITATIONS
   The controlled and continuous lifecycle tests use C29 as a mechanism study,

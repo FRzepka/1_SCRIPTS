@@ -26,6 +26,7 @@ from robustness_common import (
     compute_robustness_metrics,
     compute_stratified_error_metrics,
     load_cell_dataframe,
+    write_temporal_error_metrics,
 )
 from shared_soh_trace import load_soh_trace
 
@@ -208,6 +209,15 @@ def main():
     )
 
     os.makedirs(args.out_dir, exist_ok=True)
+    temporal_paths = None
+    if float(args.temporal_metrics_seconds) > 0:
+        temporal_paths = write_temporal_error_metrics(
+            out_dir=args.out_dir, cell=args.cell, time_s=t, y_true=soc_true, y_pred=soc_cc,
+            voltage_v=df['Voltage[V]'].to_numpy(dtype=np.float64),
+            interval_seconds=args.temporal_metrics_seconds,
+            reference_soh=(df['_reference_soh'].to_numpy(dtype=np.float64) if '_reference_soh' in df else None),
+            reset_voltage_v=float(args.v_max - args.v_tol), reset_sustain_seconds=float(args.cv_seconds),
+        )
 
     summary = {
         'model': 'CC_SOH_1.0.0',
@@ -232,6 +242,7 @@ def main():
         'start_row': int(args.start_row),
         'max_rows': int(args.max_rows),
         'output_policy': 'summary_only' if args.summary_only else 'full_run_artifacts',
+        'temporal_metrics': temporal_paths,
         'scenario_meta': {k: v for k, v in scenario_info.items() if k not in ('freeze_mask', 'disturbance_mask')},
         'stratified_metrics': stratified_metrics,
     }

@@ -27,6 +27,7 @@ from robustness_common import (
     compute_robustness_metrics,
     compute_stratified_error_metrics,
     load_cell_dataframe,
+    write_temporal_error_metrics,
 )
 from shared_soh_trace import load_soh_trace
 
@@ -679,6 +680,19 @@ def main():
             if '_reference_c_rate' in df_soc else None
         ),
     )
+    temporal_paths = None
+    if float(args.temporal_metrics_seconds) > 0:
+        temporal_paths = write_temporal_error_metrics(
+            out_dir=args.out_dir, cell=args.cell, time_s=soc_time_s,
+            y_true=y_soc_true[soc_start_idx:], y_pred=soc_pred,
+            voltage_v=df_soc['Voltage[V]'].to_numpy(dtype=np.float64)[soc_start_idx:],
+            interval_seconds=args.temporal_metrics_seconds,
+            reference_soh=(
+                df_soc['_reference_soh'].to_numpy(dtype=np.float64)[soc_start_idx:]
+                if '_reference_soh' in df_soc else None
+            ),
+            reset_voltage_v=float(args.v_max - args.v_tol), reset_sustain_seconds=float(args.cv_seconds),
+        )
     summary = {
         'model': 'SOC_SOH_1.7.0.0_0.1.2.3',
         'cell': args.cell,
@@ -706,6 +720,7 @@ def main():
         'start_row': int(args.start_row),
         'max_rows': int(args.max_rows),
         'output_policy': 'summary_only' if args.summary_only else 'full_run_artifacts',
+        'temporal_metrics': temporal_paths,
         'missing_gap_seconds': float(args.missing_gap_seconds),
         'online_feature_build': {
             'current_sign': float(args.current_sign),

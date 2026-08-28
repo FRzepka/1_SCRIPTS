@@ -44,6 +44,9 @@ def main() -> None:
     parser.add_argument("--tag", default="jes2_c29_lifecycle_bias_20260828")
     parser.add_argument("--skip-existing", action="store_true")
     parser.add_argument("--jobs", type=int, default=3)
+    parser.add_argument("--aliases", nargs="+", choices=tuple(ALIASES), default=tuple(ALIASES))
+    parser.add_argument("--force-rerun-baseline", action="store_true")
+    parser.add_argument("--temporal-metrics-seconds", type=float, default=0.0)
     args = parser.parse_args()
 
     source = json.loads(args.source_manifest.read_text(encoding="utf-8"))["runs"]
@@ -79,13 +82,14 @@ def main() -> None:
             "bias_directions": ALIASES, "soh_trace": str(args.soh_trace),
             "soh_role": "shared frozen LSTM trace; isolates SOC-estimator response",
         },
-        "expected_runs": len(MODELS) * len(ALIASES),
+        "expected_runs": len(MODELS) * len(args.aliases),
         "runs": [],
     }
     write_json(manifest_path, manifest)
 
     tasks = []
-    for alias, offset in ALIASES.items():
+    for alias in args.aliases:
+        offset = ALIASES[alias]
         for model in MODELS:
             out_dir = campaign / "runs" / alias / model
             summary = out_dir / "summary.json"
@@ -93,6 +97,10 @@ def main() -> None:
             replace_option(command, "--out_dir", str(out_dir))
             replace_option(command, "--start_row", "0")
             replace_option(command, "--max_rows", "0")
+            if args.temporal_metrics_seconds > 0:
+                replace_option(
+                    command, "--temporal_metrics_seconds", str(args.temporal_metrics_seconds)
+                )
             if model != "DM":
                 replace_option(command, "--soh_trace", str(args.soh_trace))
             if alias == "baseline":
@@ -115,7 +123,7 @@ def main() -> None:
         row, summary, out_dir, command, alias, model = task
         if args.skip_existing and summary.is_file():
             return row, "skipped_existing"
-        if alias == "baseline":
+        if alias == "baseline" and not args.force_rerun_baseline:
             out_dir.mkdir(parents=True, exist_ok=True)
             shutil.copy2(baseline_summaries[model], summary)
             return row, "reused_pilot_baseline"

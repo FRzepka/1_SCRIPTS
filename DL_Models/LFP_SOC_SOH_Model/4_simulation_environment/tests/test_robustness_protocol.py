@@ -14,7 +14,28 @@ from robustness_common import (
     compute_protocol_event_metrics,
     compute_stratified_error_metrics,
     load_cell_dataframe,
+    write_temporal_error_metrics,
 )
+
+
+def test_temporal_metrics_preserve_binned_mae_and_full_charge_events(tmp_path):
+    time_s = np.arange(0.0, 901.0, 60.0)
+    y_true = np.zeros(len(time_s))
+    y_pred = time_s / 10000.0
+    voltage = np.full(len(time_s), 3.3)
+    voltage[(time_s >= 300.0) & (time_s <= 660.0)] = 3.65
+
+    metrics_path, events_path = write_temporal_error_metrics(
+        out_dir=str(tmp_path), cell="C00", time_s=time_s, y_true=y_true,
+        y_pred=y_pred, voltage_v=voltage, interval_seconds=300.0,
+        reset_voltage_v=3.63, reset_sustain_seconds=300.0,
+    )
+
+    metrics = pd.read_csv(metrics_path)
+    events = pd.read_csv(events_path)
+    assert np.isclose(metrics.loc[0, "mae"], np.mean(y_pred[:5]))
+    assert len(events) == 1
+    assert events.loc[0, "time_s"] == 600.0
 
 
 def test_common_recovery_uses_fixed_threshold_and_sustain_time():

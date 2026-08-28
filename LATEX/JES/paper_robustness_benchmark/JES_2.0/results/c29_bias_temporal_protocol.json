@@ -1,0 +1,43 @@
+{
+  "cell": "C29",
+  "temporal_bin_seconds": 300,
+  "event_window_hours": 2.0,
+  "full_charge_events": 45,
+  "inter_reset_cycles": 44,
+  "adverse_bias_selection": "For each model, select the sign with the larger full-life paired delta MAE.",
+  "selected_aliases": {
+    "DM": {
+      "alias": "negative_3pct",
+      "bias_percent": -3.0,
+      "delta_mae_by_alias": {
+        "positive_3pct": -0.00844977386191771,
+        "negative_3pct": 0.010230395005999884
+      }
+    },
+    "HDM": {
+      "alias": "negative_3pct",
+      "bias_percent": -3.0,
+      "delta_mae_by_alias": {
+        "positive_3pct": -0.00208334587871849,
+        "negative_3pct": 0.0071751702155216255
+      }
+    },
+    "HECM": {
+      "alias": "negative_3pct",
+      "bias_percent": -3.0,
+      "delta_mae_by_alias": {
+        "positive_3pct": -0.0010760914926448014,
+        "negative_3pct": 0.003667214040669536
+      }
+    },
+    "DD": {
+      "alias": "negative_3pct",
+      "bias_percent": -3.0,
+      "delta_mae_by_alias": {
+        "positive_3pct": -0.0018830758581716957,
+        "negative_3pct": 0.004764270161602655
+      }
+    }
+  },
+  "interpretation": "Delta MAE controls for the baseline drive-profile error. Absolute biased MAE determines the best practical model under current bias."
+}
