@@ -381,7 +381,7 @@ def figure_13_decision(
     angles = np.linspace(0, 2 * np.pi, len(labels), endpoint=False)
     closed_angles = np.r_[angles, angles[0]]
     fig = plt.figure(figsize=(13.6, 6.2))
-    grid = fig.add_gridspec(1, 2, width_ratios=(1.0, 1.45), wspace=0.12)
+    grid = fig.add_gridspec(1, 2, width_ratios=(1.1, 1.3), wspace=0.12)
     radar = fig.add_subplot(grid[0, 0], projection="polar")
     bars = fig.add_subplot(grid[0, 1])
 
@@ -405,7 +405,7 @@ def figure_13_decision(
     radar.grid(color="#d8d8d8", linewidth=0.6)
     radar.spines["polar"].set_color("#d8d8d8")
     radar.spines["polar"].set_linewidth(0.6)
-    radar.set_title("(a) Relative decision dimensions", y=1.22, pad=0)
+    radar.set_title("(a) Relative decision dimensions", y=1.14, pad=0)
 
     profile_names = [c for c in profiles.columns if c != "Model"]
     x = np.arange(len(profile_names), dtype=float) * 1.18
@@ -425,7 +425,9 @@ def figure_13_decision(
     bars.grid(axis="x", visible=False)
     bars.spines[["top", "right"]].set_visible(False)
     bars.legend(ncol=4, frameon=False, loc="upper center", bbox_to_anchor=(0.5, 1.19))
-    fig.subplots_adjust(left=0.03, right=0.98, bottom=0.22, top=0.78)
+    fig.subplots_adjust(left=0.03, right=0.98, bottom=0.18, top=0.82)
+    bars_box = bars.get_position()
+    bars.set_position([bars_box.x0, 0.22, bars_box.width, 0.56])
     if output_path is None:
         save(fig, "Figure_13_Decision_Synthesis_REVISED")
     else:
