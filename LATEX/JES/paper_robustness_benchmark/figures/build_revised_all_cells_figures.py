@@ -3,12 +3,13 @@
 
 The script deliberately keeps the detailed dissertation figures untouched.  It
 creates complementary views whose local and aggregate statements use the same
-metric, replaces the current-bias heatmap entries with the signed paired sweep,
-and withholds burst-dropout scores until the corrected six-cell rerun exists.
+metric and replaces the current-bias heatmap entries with the signed paired
+sweep. Burst dropout is omitted because no corrected six-cell result exists.
 """
 
 from __future__ import annotations
 
+import argparse
 import json
 from pathlib import Path
 
@@ -56,7 +57,6 @@ ALIAS_ORDER = [
     "irregular_sampling_0p1s",
     "irregular_sampling_0p5s",
     "irregular_sampling_0p9s",
-    "missing_gap_1h",
     "voltage_spikes",
 ]
 
@@ -138,9 +138,6 @@ def revised_delta_matrix(aggregate: pd.DataFrame, signed_bias: pd.DataFrame) -> 
         replacement = signed_bias[np.isclose(signed_bias["bias_magnitude_pct"], magnitude)].set_index("model")["mean"]
         pivot.loc[:, alias] = replacement.reindex(MODEL_ORDER)
 
-    # The central-gap placement and online Q_c semantics changed.  Publishing
-    # the previous campaign value would imply a precision the data no longer has.
-    pivot.loc[:, "missing_gap_1h"] = np.nan
     return pivot
 
 
@@ -226,11 +223,13 @@ def figure_11_spike_susceptibility(run_metrics: pd.DataFrame, aggregate: pd.Data
     save(fig, "Figure_11_Voltage_Spike_Response_REVISED")
 
 
-def figure_12_heatmap(matrix: pd.DataFrame) -> None:
+def figure_12_heatmap(matrix: pd.DataFrame, output_path: Path | None = None) -> None:
     matrix.to_csv(RESULTS / "jes2_revised_delta_mae_matrix.csv")
     values = matrix.to_numpy(float)
     finite_limit = max(float(np.nanmax(np.abs(values))), 1e-6)
-    cmap = LinearSegmentedColormap.from_list("diss_diverging", ["#566b78", "#f7f7f7", "#b6302d"])
+    cmap = LinearSegmentedColormap.from_list(
+        "diss_diverging", ["#a1c6e0", "#f7f7f7", "#eea4a5"]
+    )
     cmap.set_bad("#dedede")
 
     fig, ax = plt.subplots(figsize=(13.8, 4.4))
@@ -245,11 +244,16 @@ def figure_12_heatmap(matrix: pd.DataFrame) -> None:
                 ax.text(col, row, f"{value:+.3f}", ha="center", va="center", fontsize=7,
                         color="white" if abs(value) > 0.55 * finite_limit else "#222222")
             else:
-                ax.text(col, row, "rerun\npending", ha="center", va="center", fontsize=6.5, color="#555555")
+                ax.text(col, row, "n/a", ha="center", va="center", fontsize=6.5, color="#555555")
     fig.colorbar(image, ax=ax, label=r"Cell-macro $\Delta$MAE [SOC]", shrink=0.82)
-    ax.set_title("Cross-scenario robustness: signed gain-error update; corrected burst-dropout result withheld")
+    ax.set_title("Cross-scenario robustness across six holdout cells")
     fig.subplots_adjust(left=0.055, right=0.96, bottom=0.30, top=0.86)
-    save(fig, "Figure_12_Cross_Scenario_Heatmap_REVISED")
+    if output_path is None:
+        save(fig, "Figure_12_Cross_Scenario_Heatmap_REVISED")
+    else:
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        fig.savefig(output_path, dpi=300, bbox_inches="tight", facecolor="white")
+        plt.close(fig)
 
 
 def initial_recovery_cell_means() -> pd.DataFrame:
@@ -377,18 +381,27 @@ def figure_13_decision(scores: pd.DataFrame, profiles: pd.DataFrame) -> None:
     bars.legend(ncol=4, frameon=False, loc="upper center", bbox_to_anchor=(0.5, 1.13))
     fig.suptitle("Decision synthesis updated with signed gain-error and paired Six-Cell recovery", fontsize=12)
     fig.text(0.5, 0.015,
-             "Higher is better. Burst dropout is excluded until the corrected Six-Cell rerun; weights are explicit decision profiles, not a universal ranking.",
+             "Higher is better. Burst dropout is excluded because no corrected Six-Cell result is available; weights are explicit decision profiles, not a universal ranking.",
              ha="center", fontsize=8.5, color="#555555")
     fig.subplots_adjust(left=0.05, right=0.98, bottom=0.13, top=0.84)
     save(fig, "Figure_13_Decision_Synthesis_REVISED")
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description="Build revised six-cell JES figures.")
+    parser.add_argument("--figure-12-only", action="store_true")
+    parser.add_argument("--figure-12-output", type=Path, default=None)
+    args = parser.parse_args()
+
     setup_style()
     aggregate = pd.read_csv(RESULTS / "jes2_macro_statistics.csv")
-    run_metrics = pd.read_csv(RESULTS / "jes2_run_metrics.csv")
     signed_bias = pd.read_csv(RESULTS / "jes2_signed_current_bias_statistics.csv")
     matrix = revised_delta_matrix(aggregate, signed_bias)
+    if args.figure_12_only:
+        figure_12_heatmap(matrix, args.figure_12_output)
+        return
+
+    run_metrics = pd.read_csv(RESULTS / "jes2_run_metrics.csv")
     figure_11_spike_susceptibility(run_metrics, aggregate)
     figure_12_heatmap(matrix)
     scores, profiles = decision_scores(aggregate, matrix)
