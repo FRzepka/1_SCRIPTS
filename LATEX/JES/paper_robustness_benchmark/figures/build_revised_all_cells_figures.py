@@ -380,16 +380,17 @@ def figure_13_decision(
     labels = ["Accuracy", "Robustness", "Recovery"]
     angles = np.linspace(0, 2 * np.pi, len(labels), endpoint=False)
     closed_angles = np.r_[angles, angles[0]]
-    fig = plt.figure(figsize=(13.6, 5.2))
-    grid = fig.add_gridspec(1, 2, width_ratios=(1.0, 1.45), wspace=0.32)
+    fig = plt.figure(figsize=(13.6, 6.2))
+    grid = fig.add_gridspec(1, 2, width_ratios=(1.0, 1.45), wspace=0.12)
     radar = fig.add_subplot(grid[0, 0], projection="polar")
     bars = fig.add_subplot(grid[0, 1])
 
     radar.set_theta_offset(np.pi / 2)
     radar.set_theta_direction(-1)
     radar.set_xticks(angles, labels)
-    radar.tick_params(axis="x", pad=10)
+    radar.tick_params(axis="x", pad=18)
     radar.set_yticks([0.25, 0.50, 0.75, 1.0], ["0.25", "0.50", "0.75", "1.00"])
+    radar.tick_params(axis="y", labelsize=8, colors="#666666")
     radar.set_ylim(0.0, 1.0)
     for row in scores.itertuples(index=False):
         values = np.array([row.Accuracy, row.Robustness, row.Recovery], dtype=float)
@@ -401,9 +402,10 @@ def figure_13_decision(
         )
         radar.fill(closed_angles, values, color=MODEL_COLORS[row.Model], alpha=0.12)
     radar.set_rlabel_position(0)
-    radar.grid(color="#d8d8d8", linewidth=0.8)
-    radar.spines["polar"].set_color("#555555")
-    radar.set_title("(a) Relative decision dimensions", pad=24)
+    radar.grid(color="#d8d8d8", linewidth=0.6)
+    radar.spines["polar"].set_color("#777777")
+    radar.spines["polar"].set_linewidth(0.7)
+    radar.set_title("(a) Relative decision dimensions", y=1.22, pad=0)
 
     profile_names = [c for c in profiles.columns if c != "Model"]
     x = np.arange(len(profile_names), dtype=float) * 1.18
@@ -418,17 +420,17 @@ def figure_13_decision(
     bars.set_ylim(0.0, 1.02)
     bars.set_yticks(np.linspace(0.0, 1.0, 6))
     bars.set_ylabel("Composite score")
-    bars.set_title("(b) Priority-weighted composite scores")
+    bars.set_title("(b) Priority-weighted composite scores", y=1.22, pad=0)
     bars.grid(axis="y", color="#d8d8d8", linewidth=0.8, zorder=0)
     bars.grid(axis="x", visible=False)
     bars.spines[["top", "right"]].set_visible(False)
-    bars.legend(ncol=4, frameon=False, loc="upper center", bbox_to_anchor=(0.5, 1.13))
-    fig.subplots_adjust(left=0.05, right=0.98, bottom=0.10, top=0.86)
+    bars.legend(ncol=4, frameon=False, loc="upper center", bbox_to_anchor=(0.5, 1.19))
+    fig.subplots_adjust(left=0.03, right=0.98, bottom=0.22, top=0.78)
     if output_path is None:
         save(fig, "Figure_13_Decision_Synthesis_REVISED")
     else:
         output_path.parent.mkdir(parents=True, exist_ok=True)
-        fig.savefig(output_path, dpi=300, bbox_inches="tight", facecolor="white")
+        fig.savefig(output_path, dpi=300, facecolor="white")
         plt.close(fig)
 
 
