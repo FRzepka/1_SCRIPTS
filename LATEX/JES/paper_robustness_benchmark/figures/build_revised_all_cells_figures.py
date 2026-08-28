@@ -4,7 +4,7 @@
 The script deliberately keeps the detailed dissertation figures untouched.  It
 creates complementary views whose local and aggregate statements use the same
 metric and replaces the current-bias heatmap entries with the signed paired
-sweep. Burst dropout is omitted because no corrected six-cell result exists.
+sweep. The available six-cell burst-dropout macro remains part of the heatmap.
 """
 
 from __future__ import annotations
@@ -57,6 +57,7 @@ ALIAS_ORDER = [
     "irregular_sampling_0p1s",
     "irregular_sampling_0p5s",
     "irregular_sampling_0p9s",
+    "missing_gap_1h",
     "voltage_spikes",
 ]
 
@@ -381,7 +382,7 @@ def figure_13_decision(scores: pd.DataFrame, profiles: pd.DataFrame) -> None:
     bars.legend(ncol=4, frameon=False, loc="upper center", bbox_to_anchor=(0.5, 1.13))
     fig.suptitle("Decision synthesis updated with signed gain-error and paired Six-Cell recovery", fontsize=12)
     fig.text(0.5, 0.015,
-             "Higher is better. Burst dropout is excluded because no corrected Six-Cell result is available; weights are explicit decision profiles, not a universal ranking.",
+             "Higher is better. Burst dropout is shown in the cross-scenario heatmap but is not weighted in this composite score; weights are explicit decision profiles, not a universal ranking.",
              ha="center", fontsize=8.5, color="#555555")
     fig.subplots_adjust(left=0.05, right=0.98, bottom=0.13, top=0.84)
     save(fig, "Figure_13_Decision_Synthesis_REVISED")
