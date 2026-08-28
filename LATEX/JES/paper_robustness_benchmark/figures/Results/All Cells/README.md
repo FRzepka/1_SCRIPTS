@@ -1,6 +1,6 @@
 # All Cells – kuratierte Abbildungsübersicht
 
-Die 22 ausgewählten PNG-Dateien sind lückenlos als `Figure_01` bis `Figure_22`
+Die 27 ausgewählten PNG-Dateien sind lückenlos als `Figure_01` bis `Figure_27`
 nummeriert. Quelldateien außerhalb dieses Ordners bleiben unverändert. Das
 Farbschema ist durchgängig DM = grün, HDM = lila, HECM = blau und DD = rot.
 
@@ -20,6 +20,7 @@ Farbschema ist durchgängig DM = grün, HDM = lila, HECM = blau und DD = rot.
 | 16 | Decision synthesis | Aktuelle Six-Cell-Scores einschließlich Burst-Dropout und Recovery. |
 | 17 | ADC quantization | Strom- und Spannungsdetail kombiniert mit Six-Cell-Mittel, hierarchischem 95%-KI sowie ΔMAE- und MAE-Werten. |
 | 18–22 | Methodische Ergänzungen | Zellabdeckung, Statistik, Testmatrix, Workflow und Evaluationsfenster. |
+| 23–27 | STM32-Hardwarebenchmark | Hardware-/Software-Äquivalenz, On-Device-Latenzen, Speicherbedarf sowie DD-Inferenzmodi und deren Latenzverteilungen. |
 
 ## Wichtiger Rechenstatus
 
