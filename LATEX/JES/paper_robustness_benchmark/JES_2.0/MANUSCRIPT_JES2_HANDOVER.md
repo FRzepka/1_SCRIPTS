@@ -15,8 +15,8 @@ All revision work is confined to this `JES_2.0` directory.
 
 - Editable source: `Robustness_Benchmark_Manuscript_JES2_Updated.tex`
 - Compiled manuscript: `Robustness_Benchmark_Manuscript_JES2_Updated.pdf`
-- Source SHA-256: `96fe492b28ef6a47be2f8e35ec1985cd678619ae9e460b23700aa0e80959d74d`
-- PDF SHA-256: `749e174efd10fb1455bf4968a8fbf862e09a17294b6858fd58459b20b05076f6`
+- Source SHA-256: `0d4d09f91415599d9d2eb514bfe9a396082a9c9c3f7c2579e4e936c8f633f0e5`
+- PDF SHA-256: `2e508c3a3d8d739d1f7cb730cb9bb5263a0265713d27cc2400c16bc90198b7d1`
 - Compiled length: 45 pages
 
 ## Build
@@ -42,6 +42,7 @@ tables.
 - Added current-bias lifecycle/reset, initial-state recovery, missing-sample, jitter, burst-dropout, voltage-spike, ADC-quantization, and cross-scenario interpretations.
 - Added isolated STM32H753ZI SOC-core hardware results, including numerical equivalence, latency, memory, and DD inference-mode tradeoffs.
 - Moved coverage, test-matrix, evaluation-window, and detailed DD-latency material into Appendix A.
+- Added a compact reviewer audit in `REVIEWER_COVERAGE_JES2.md`; the older `REVIEWER_TODO_STATUS.txt` is retained only as a historical implementation log.
 
 ## Interpretation boundaries retained in the manuscript
 

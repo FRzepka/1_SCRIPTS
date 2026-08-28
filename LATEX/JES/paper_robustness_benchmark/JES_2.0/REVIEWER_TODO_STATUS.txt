@@ -1,3 +1,9 @@
+HISTORICAL PLANNING LOG - SUPERSEDED BY REVIEWER_COVERAGE_JES2.md
+
+The statuses below document the implementation path and include obsolete
+READY_FOR_RUN/OPEN entries from before the final campaign. Use
+REVIEWER_COVERAGE_JES2.md for the current manuscript audit.
+
 JES 2.0 - REVIEWER TODO AND IMPLEMENTATION STATUS
 Updated: 2026-08-28
 
