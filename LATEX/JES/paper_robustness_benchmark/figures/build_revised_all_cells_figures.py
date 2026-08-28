@@ -229,7 +229,7 @@ def figure_12_heatmap(matrix: pd.DataFrame, output_path: Path | None = None) -> 
     values = matrix.to_numpy(float)
     finite_limit = max(float(np.nanmax(np.abs(values))), 1e-6)
     cmap = LinearSegmentedColormap.from_list(
-        "diss_diverging", ["#a1c6e0", "#f7f7f7", "#eea4a5"]
+        "diss_diverging", ["#1f77b4", "#f7f7f7", "#d62728"]
     )
     cmap.set_bad("#dedede")
 
