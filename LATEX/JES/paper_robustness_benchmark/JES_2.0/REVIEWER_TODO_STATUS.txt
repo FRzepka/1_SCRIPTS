@@ -1,5 +1,5 @@
 JES 2.0 - REVIEWER TODO AND IMPLEMENTATION STATUS
-Updated: 2026-08-25
+Updated: 2026-08-28
 
 Status legend
   DONE                 Implemented and locally verified.
@@ -233,18 +233,28 @@ FIGURE STATUS
   repetitions per metric group. It produced 62901 stratified records, 72 paired
   scenario tests, 60 paired model tests, and Figures 04-18 plus 20-23.
 
-RESULT VALIDATION TODO (2026-08-26)
-  OPEN: Revalidate the complete JES2 result campaign before using the current
-  figures or numerical conclusions in the manuscript. The current Figure 05
-  shows a systematic decrease of global Delta-MAE under increasing current bias
-  for several models, which is physically unexpected and requires investigation.
-  First verify that the implemented current-bias protocol matches the declared
-  protocol: a fixed additive offset of 0.5%, 1.5%, and 3.0% of |I|max, rather
-  than multiplying each instantaneous current sample by (1 + percentage).
-  Then rerun the affected bias scenarios and compare absolute MAE/RMSE, Delta-
-  MAE, signed bias, local SOC drift, and per-window/per-cell results against the
-  matched baseline. Do not interpret a negative Delta-MAE as improved robustness
-  until this check is complete.
+RESULT VALIDATION TODO (updated 2026-08-28)
+  PARTIAL: The current-gain concern is resolved and independently rerun; the
+  broader cross-scenario plausibility audit below remains open. The implemented
+  and manuscript-declared protocol is a signed multiplicative sensor-gain error,
+  I_meas=I(1+b), not a fixed additive current offset. Both signs were executed at
+  0.5%, 1.5%, and 3.0%. Figure 05 reports the larger paired Delta-MAE for each
+  cell and magnitude because one direction can compensate a directed baseline
+  error. The opposite direction must not be interpreted as improved robustness.
+  Focused 3% mechanism tests now include natural windows, a controlled identical-
+  trace replay at SOH 0.962/0.897/0.831, natural versus disabled CV reset, and a
+  continuous 1,344 h C29 lifecycle replay with 45 active CV-reset episodes.
+  Disabling resets changed no 24 h C29 result because those selected windows
+  contained no qualifying CV event. Across 15 common cell-state windows, Delta-
+  MAE correlates with mean absolute cumulative signed charge at r=0.995 (DM),
+  0.966 (HDM), 0.698 (HECM), and 0.151 (DD). The controlled replay shows only a
+  small SOH amplification for HDM, none for HECM, and decreasing DD sensitivity.
+  In the continuous C29 run, aged/fresh sensitivity ratios are 1.085 (DM), 1.264
+  (HDM), and 1.354 (HECM); both DD bias directions remain below its baseline MAE.
+  Therefore charge history explains the DM/HDM mid-life peak and part of HECM's
+  response, whereas DD remains architecture- and baseline-dependent; SOH alone
+  does not explain the common pattern. This single-cell lifecycle mechanism test
+  is explanatory evidence, not independent-cell population proof.
   Apply the same plausibility review to every JES2 scenario before regenerating
   publication figures and tables: verify disturbance magnitude and direction,
   affected input channels, unchanged target/reference signals, identical frozen

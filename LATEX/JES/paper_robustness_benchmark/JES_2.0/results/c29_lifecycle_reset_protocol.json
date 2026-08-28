@@ -1,0 +1,9 @@
+{
+  "cell": "C29",
+  "voltage_threshold_v": 3.63,
+  "sustain_seconds": 300.0,
+  "eligible_cv_episodes": 45,
+  "median_inter_reset_h": 29.14343055555571,
+  "max_inter_reset_h": 61.2152222222223,
+  "lifecycle_duration_h": 1344.2053333333486
+}

@@ -84,6 +84,11 @@ IMPORTANT DISTINCTION
   Paired LSTM-SOH versus reference-SOH error propagation by cell and scenario.
   SOH publication cadence at 1 h, 6 h, and 24 h under baseline conditions.
   Separate HECM resistance/tau/OCV lookup-table sensitivity.
+  Current-gain mechanism supplement: adverse signed pair across five common
+  three-state cells; identical C29 trace replayed at SOH 0.962, 0.897, and 0.831;
+  natural versus disabled full-charge reset; and one continuous 1,344 h C29
+  trajectory with active CV resets. These tests separate SOH effects from signed
+  charge history and from independent-window initialization.
 
 5. STATISTICAL ANALYSIS
   Independent statistical unit: holdout cell, not individual time sample.

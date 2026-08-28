@@ -1,0 +1,63 @@
+JES 2.0 - CURRENT-GAIN MECHANISM STUDY
+Updated: 2026-08-28
+
+PROTOCOL
+  Sensor gain error: I_meas = I * (1 + b).
+  Main sweep: b = +/-0.5%, +/-1.5%, and +/-3.0%.
+  Reported robustness value: larger Delta-MAE from the matched sign pair.
+  Reason: one sign can compensate an estimator's directed baseline error.
+
+COMPLETED TESTS
+  1. Natural +/-3% response in all available 24 h cell-state windows.
+  2. Five-cell fresh/mid-life/aged comparison (C09, C13, C15, C25, C29).
+  3. C29 natural versus disabled full-charge reset (72 runs).
+  4. Identical C29 mid-life trace replayed at SOH 0.962, 0.897, and 0.831
+     for HDM, HECM, and DD (27 runs).
+  5. Continuous 1,344 h C29 trajectory with baseline, +3%, and -3% for all
+     four estimators (12 entries; four baseline summaries reused from the
+     identical full-C29 pilot protocol).
+
+MAIN RESULTS
+  Natural five-cell state means show a mid-life maximum, not a monotonic aging
+  increase. The mean absolute cumulative signed charge is also highest in the
+  selected mid-life windows.
+
+  Correlation between window Delta-MAE and mean absolute cumulative signed
+  charge over 15 cell-state windows:
+    DM    r = 0.995
+    HDM   r = 0.966
+    HECM  r = 0.698
+    DD    r = 0.151
+
+  Controlled identical-trace aged/fresh sensitivity ratios:
+    HDM   1.103
+    HECM  0.971
+    DD    0.432
+  SOH alone therefore produces only a small amplification for HDM and does not
+  explain the natural mid-life peak across all estimators.
+
+  The selected 24 h C29 windows contain no qualifying 300 s CV event. Natural
+  and disabled-reset results are consequently identical in those windows.
+
+  The continuous C29 trajectory contains 45 qualifying CV-reset episodes with
+  a median inter-reset interval of 29.14 h. Its aged/fresh ratios are:
+    DM    1.085
+    HDM   1.264
+    HECM  1.354
+    DD    not defined because both signed perturbations remain below baseline
+  For DD, the larger signed-pair Delta-MAE remains negative in fresh, mid-life,
+  aged, and full-trajectory summaries. This is reported as a baseline-dependent
+  model response, not relabelled as degradation.
+
+INTERPRETATION
+  A multiplicative current error integrates with signed charge history between
+  correction/reset events. Elapsed time, absolute throughput, and lower SOH do
+  not by themselves guarantee a monotonic MAE increase. The primary Figure 05
+  can retain the monotonic error-magnitude sweep because it uses the adverse
+  direction per cell and magnitude. Figures 05c and 05d provide the mechanism
+  and lifecycle evidence needed to prevent an overgeneralized aging claim.
+
+LIMITATIONS
+  The controlled and continuous lifecycle tests use C29 as a mechanism study,
+  not as six-cell population inference. The five-cell aging comparison excludes
+  C27 because C27 has no frozen mid-life or aged window.
