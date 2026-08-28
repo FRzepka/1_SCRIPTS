@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 
 
 PROTOCOL = "JES2_HW_V1"
-MODELS = ("DM", "HDM", "HECM", "DD")
+MODELS = ("DM", "HDM", "HECM", "DD", "DDS", "DDP")
 INPUT_COLUMNS = (
     "voltage_v",
     "current_a",
@@ -159,7 +159,11 @@ def run(args: argparse.Namespace) -> dict[str, object]:
         raise SystemExit("pyserial is required; install requirements.txt") from exc
 
     rows = load_vectors(args.vectors)
-    expected_column = f"expected_{args.model.lower()}"
+    if args.max_rows is not None:
+        if args.max_rows <= 0:
+            raise ValueError("--max-rows must be positive")
+        rows = rows[:args.max_rows]
+    expected_column = "expected_dd" if args.model in {"DDS", "DDP"} else f"expected_{args.model.lower()}"
     if expected_column not in rows[0]:
         raise ValueError(f"Missing software-reference column: {expected_column}")
 
@@ -235,6 +239,7 @@ def run(args: argparse.Namespace) -> dict[str, object]:
         "port": args.port,
         "baud": args.baud,
         "rounds": args.rounds,
+        "rows_per_round": len(rows),
         "vectors": str(args.vectors.resolve()),
         "vectors_sha256": file_sha256(args.vectors),
         "device": device,
@@ -270,6 +275,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--out-dir", type=Path, required=True)
     parser.add_argument("--baud", type=int, default=115200)
     parser.add_argument("--rounds", type=int, default=3)
+    parser.add_argument("--max-rows", type=int, help="Process only the first N vector rows per round")
     parser.add_argument("--timeout-s", type=float, default=10.0)
     parser.add_argument("--reset-wait-s", type=float, default=2.0)
     return parser.parse_args()

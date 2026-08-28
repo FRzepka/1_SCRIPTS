@@ -67,7 +67,7 @@ def parse_image(value: str) -> tuple[str, Path]:
         raise argparse.ArgumentTypeError("Use MODEL=path/to/image.elf")
     model, path = value.split("=", 1)
     model = model.upper()
-    if model not in {"DM", "HDM", "HECM", "DD"}:
+    if model not in {"DM", "HDM", "HECM", "DD", "DDS", "DDP"}:
         raise argparse.ArgumentTypeError(f"Unknown model: {model}")
     return model, Path(path)
 

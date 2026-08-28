@@ -9,7 +9,7 @@ import json
 from pathlib import Path
 
 
-MODELS = ("DM", "HDM", "HECM", "DD")
+MODELS = ("DM", "HDM", "HECM", "DD", "DDS", "DDP")
 METRICS = (
     "dataset_mae", "dataset_rmse", "dataset_max_abs_error",
     "latency_median_us", "latency_p95_us", "latency_max_us",

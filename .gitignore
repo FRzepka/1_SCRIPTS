@@ -16,6 +16,7 @@ dist/
 build/
 *.whl
 .venv/
+.plot_venv/
 venv/
 env/
 

@@ -50,8 +50,12 @@ folgender Befehl alle sechs Sequenzen aus:
   -Model DD -Port COM7 -Rounds 3
 ```
 
-Der Vorgang wird nach dem Flashen fuer `DM`, `HDM`, `HECM` und `DD` wiederholt.
-Die Ergebnisse landen unter `results/<CELL>/<MODEL>/`.
+Der Vorgang wird nach dem Flashen fuer `DM`, `HDM`, `HECM`, `DDS` und `DDP`
+wiederholt. Der vollstaendige Rolling-Window-Lauf von `DD` ist wegen der etwa
+724 ms langen Inferenz deutlich zeitaufwendiger. Seine zellweise Genauigkeit
+kann aus den versionierten Rolling-Window-Referenzen bestimmt werden, nachdem
+die C-Implementierung auf dem Board numerisch gegen diese Referenz validiert
+wurde. Die Ergebnisse landen unter `results/<CELL>/<MODEL>/`.
 
 ## DD-Export auf dem HPC
 
@@ -98,3 +102,27 @@ python STM32/JES2_hardware_benchmark/scripts/summarize_multicell_results.py `
 Zelle und Modell. `hardware_results_by_load_class.csv` aggregiert Mittelwert,
 Minimum und Maximum fuer Low, Medium und High. Fuer High existiert mit C29 nur
 eine Zelle; dort ist keine Zwischenzellstreuung schaetzbar.
+
+Die publikationsfertigen Mehrzelltabellen und Diagramme einschliesslich des
+fairen Vergleichs der drei DD-Inferenzvarianten ab Sample 2023 entstehen mit:
+
+```powershell
+python STM32/JES2_hardware_benchmark/scripts/plot_multicell_hardware_results.py
+```
+
+Die drei Replay-Runden quantifizieren die Wiederholbarkeit auf der Hardware.
+Die Min-Max-Bereiche der Lastklassen werden dagegen ausschliesslich aus den
+unterschiedlichen Zellen der jeweiligen Klasse bestimmt.
+
+Die vier konsolidierten Hardware-Abbildungen und ihre vollstaendigen
+Quelltabellen werden mit folgendem Befehl neu erzeugt:
+
+```powershell
+python STM32/JES2_hardware_benchmark/scripts/build_four_hardware_benchmark_figures.py
+```
+
+Die Ausgabe unter `results/four_figure_summary/` trennt Dataset-Genauigkeit,
+Hardware-Software-Uebereinstimmung, Laufzeit und Wiederholbarkeit, statische
+Speicherbelegung sowie die drei DD-Inferenzmodi. Statisches RAM ist kein
+gemessener Peak-Stack. Flash und RAM sind firmwareabhaengig und werden daher
+nicht als kuenstliche zellabhaengige Verteilungen dargestellt.
