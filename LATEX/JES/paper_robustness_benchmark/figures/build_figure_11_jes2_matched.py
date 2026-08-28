@@ -23,7 +23,9 @@ TRAJECTORIES = (
 )
 OUTPUT = Path(__file__).resolve().parent / "Results/Figure_11c_Voltage_Spike_Response_JES2.png"
 MODEL_ORDER = ["DM", "HDM", "HECM", "DD"]
-COLORS = {"DM": "#6e2fc4", "HDM": "#08bdba", "HECM": "#d4bbff", "DD": "#4589ff"}
+# Match the established dissertation/JES robustness palette used throughout
+# the All Cells collection: green DM, purple HDM, blue HECM, and red DD.
+COLORS = {"DM": "#2ca02c", "HDM": "#9467bd", "HECM": "#1f77b4", "DD": "#d62728"}
 REPRESENTATIVE_HECM_INDEX = 22000
 RELATIVE_SECONDS = np.arange(-60, 181)
 
