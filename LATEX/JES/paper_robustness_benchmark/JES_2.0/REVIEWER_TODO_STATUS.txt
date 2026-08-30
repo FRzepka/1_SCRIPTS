@@ -174,7 +174,7 @@ R3.9 Risks of estimator-specific recovery thresholds
 R3.10 Runtime memory estimates are lower bounds
   Status: OPEN_HARDWARE. Same action as R2.5.
 
-R3.11 HECM current-bias result may depend on ECM lookup-table quality
+R3.11 HECM current-gain result may depend on ECM lookup-table quality
   Status: READY_FOR_RUN; identification provenance remains OPEN.
   Change: a separate HECM-only sweep perturbs resistance surfaces by +/-10%, time
   constants by +/-20%, and OCV by +/-10 mV. It is explicitly excluded from the
@@ -323,7 +323,7 @@ LOCAL SOFTWARE VERIFICATION (2026-08-25)
     active pilot cells after their original jobs finish, then rebuilds the merged
     pilot tables and Figure 07 with all four models.
   - The frozen protocol contains 16 representative full-charge windows. Primary
-    scenarios use 86,400 rows; the central one-hour gap uses 172,800 rows. SOH
+    scenarios use 86,400 rows; the charge-maximizing one-hour gap uses 172,800 rows. SOH
     receives 691,200 undisturbed context rows matching its 192 h training length.
   - Direct Parquet row-group loading is bit-identical to the former full-file slice.
     C27 DD/LSTM baseline fell from 31.48 s to 21.97 s without metric changes.

@@ -22,6 +22,7 @@ sys.path.append(SIM_ENV_DIR)
 from robustness_common import (
     add_common_scenario_args,
     apply_measurement_scenario,
+    build_common_evaluation_mask,
     build_online_aux_features,
     compute_protocol_event_metrics,
     compute_robustness_metrics,
@@ -643,12 +644,18 @@ def main():
     soc_idx = np.arange(soc_start_idx, len(df_soc))
     soc_time_s = df_soc['Testtime[s]'].to_numpy(dtype=np.float64)[soc_start_idx:]
     soc_abs_err = np.abs(y_soc_true[soc_start_idx:] - soc_pred)
+    evaluation_mask = build_common_evaluation_mask(
+        len(soc_pred),
+        args.evaluation_start_sample,
+        source_start_sample=soc_start_idx,
+    )
     metrics = compute_robustness_metrics(
         time_s=soc_time_s,
         y_true=y_soc_true[soc_start_idx:],
         y_pred=soc_pred,
         warmup_seconds=float(args.warmup_seconds),
         disturbance_mask=np.asarray(scenario_info.get('disturbance_mask', freeze_mask), dtype=bool)[soc_start_idx:],
+        evaluation_mask=evaluation_mask,
     )
     metrics.update(compute_protocol_event_metrics(
         scenario=args.scenario,
@@ -661,9 +668,7 @@ def main():
         sustain_seconds=args.recovery_sustain_seconds,
         horizon_seconds=args.recovery_horizon_seconds,
     ))
-    stratified_mask = soc_time_s >= float(args.warmup_seconds)
-    if not np.any(stratified_mask):
-        stratified_mask = np.ones(len(soc_time_s), dtype=bool)
+    stratified_mask = evaluation_mask
     stratified_metrics = compute_stratified_error_metrics(
         y_true=y_soc_true[soc_start_idx:][stratified_mask],
         y_pred=soc_pred[stratified_mask],
@@ -717,6 +722,9 @@ def main():
         'soh_init': float(args.soh_init),
         'soh_hours': int(len(soh_hourly)),
         'warmup_seconds': float(args.warmup_seconds),
+        'evaluation_start_sample': int(args.evaluation_start_sample),
+        'evaluation_source_start_sample': int(soc_start_idx),
+        'evaluation_samples': int(evaluation_mask.sum()),
         'start_row': int(args.start_row),
         'max_rows': int(args.max_rows),
         'output_policy': 'summary_only' if args.summary_only else 'full_run_artifacts',

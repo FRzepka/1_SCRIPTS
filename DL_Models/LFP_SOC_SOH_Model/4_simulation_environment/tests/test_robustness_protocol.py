@@ -8,6 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from robustness_common import (
+    build_common_evaluation_mask,
     build_online_aux_features,
     compute_max_abs_net_charge_window_mask,
     compute_common_recovery_metrics,
@@ -16,6 +17,16 @@ from robustness_common import (
     load_cell_dataframe,
     write_temporal_error_metrics,
 )
+
+
+def test_common_evaluation_mask_aligns_full_and_windowed_outputs():
+    full = build_common_evaluation_mask(86_400, 2023)
+    rolling = build_common_evaluation_mask(84_377, 2023, source_start_sample=2023)
+
+    assert int(full.sum()) == 84_377
+    assert int(rolling.sum()) == 84_377
+    assert np.flatnonzero(full)[0] == 2023
+    assert np.flatnonzero(rolling)[0] == 0
 
 
 def test_temporal_metrics_preserve_binned_mae_and_full_charge_events(tmp_path):
@@ -104,7 +115,7 @@ def test_missing_gap_metrics_explain_unobserved_charge():
     assert np.isclose(metrics["gap_net_charge_ah"], 6.0 / 60.0)
     assert np.isclose(metrics["gap_throughput_ah"], 6.0 / 60.0)
     assert metrics["gap_reference_soc_change"] < 0.0
-    assert metrics["common_recovery_time_s"] == 0.0
+    assert not any(key.startswith("common_recovery") for key in metrics)
 
 
 def test_censored_recovery_reports_observed_censor_time():
@@ -122,6 +133,23 @@ def test_censored_recovery_reports_observed_censor_time():
     assert metrics["common_recovery_time_h"] is None
     assert metrics["common_recovery_censored"] is True
     assert metrics["common_recovery_or_censor_time_h"] == 600.0 / 3600.0
+
+
+def test_recovery_clock_can_precede_the_common_scored_interval():
+    time_s = np.arange(2023.0, 2601.0)
+    metrics = compute_common_recovery_metrics(
+        time_s,
+        np.zeros(len(time_s)),
+        np.zeros(len(time_s)),
+        start_index=0,
+        threshold=0.02,
+        sustain_seconds=300.0,
+        horizon_seconds=86400.0,
+        event_time_s=0.0,
+    )
+
+    assert metrics["common_recovery_time_s"] == 2023.0
+    assert metrics["common_recovery_observed_horizon_h"] == 2600.0 / 3600.0
 
 
 def test_online_features_preserve_physical_gap_current():

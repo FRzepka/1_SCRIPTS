@@ -21,6 +21,7 @@ from cc_model import CCModel, CCModelConfig
 from robustness_common import (
     add_common_scenario_args,
     apply_measurement_scenario,
+    build_common_evaluation_mask,
     build_online_aux_features,
     compute_protocol_event_metrics,
     compute_robustness_metrics,
@@ -170,12 +171,16 @@ def main():
     soc_true = df['SOC'].to_numpy(dtype=np.float32)
     t = df['Testtime[s]'].to_numpy(dtype=np.float64)
     abs_err = np.abs(soc_true - soc_cc)
+    evaluation_mask = build_common_evaluation_mask(
+        len(soc_cc), args.evaluation_start_sample
+    )
     metrics = compute_robustness_metrics(
         time_s=t,
         y_true=soc_true,
         y_pred=soc_cc,
         warmup_seconds=float(args.warmup_seconds),
         disturbance_mask=np.asarray(scenario_info.get('disturbance_mask', freeze_mask), dtype=bool),
+        evaluation_mask=evaluation_mask,
     )
     metrics.update(compute_protocol_event_metrics(
         scenario=args.scenario,
@@ -188,9 +193,7 @@ def main():
         sustain_seconds=args.recovery_sustain_seconds,
         horizon_seconds=args.recovery_horizon_seconds,
     ))
-    stratified_mask = t >= float(args.warmup_seconds)
-    if not np.any(stratified_mask):
-        stratified_mask = np.ones(len(t), dtype=bool)
+    stratified_mask = evaluation_mask
     stratified_metrics = compute_stratified_error_metrics(
         y_true=soc_true[stratified_mask],
         y_pred=soc_cc[stratified_mask],
@@ -242,6 +245,8 @@ def main():
         'start_row': int(args.start_row),
         'max_rows': int(args.max_rows),
         'output_policy': 'summary_only' if args.summary_only else 'full_run_artifacts',
+        'evaluation_start_sample': int(args.evaluation_start_sample),
+        'evaluation_samples': int(evaluation_mask.sum()),
         'temporal_metrics': temporal_paths,
         'scenario_meta': {k: v for k, v in scenario_info.items() if k not in ('freeze_mask', 'disturbance_mask')},
         'stratified_metrics': stratified_metrics,

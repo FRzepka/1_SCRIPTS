@@ -15,16 +15,16 @@ All revision work is confined to this `JES_2.0` directory.
 
 - Editable source: `Robustness_Benchmark_Manuscript_JES2_Updated.tex`
 - Compiled manuscript: `Robustness_Benchmark_Manuscript_JES2_Updated.pdf`
-- Source SHA-256: `94a405ef0cd64f12fc9a7ecb83cf95d2834b1eb4b698641e43863842ccd2465f`
-- PDF SHA-256: `b8c893a75ce4566b842f2bc16b63cf2ed5361984217326a89df04b523269d1f2`
-- Compiled length: 47 pages
+- Source SHA-256: `c8c250343ad17e2404811d20c01ec7d7fed2c216aec035f503433de07e082df1`
+- PDF SHA-256: `72da9f2fd1d69d566b883182b45e9e07ea81c3fa102d1b4daedf900f8abad39c`
+- Compiled length: 50 pages
 
 ## Build
 
 Run from this directory:
 
 ```bash
-/home/florianr/anaconda3/envs/ml/bin/tectonic \
+/home/florianr/.local/bin/tectonic \
   --keep-logs --keep-intermediates \
   Robustness_Benchmark_Manuscript_JES2_Updated.tex
 ```
@@ -39,9 +39,13 @@ tables.
 - Reframed the title, abstract, introduction, methods, discussion, limitations, and conclusion around the central deployment question: why nominal accuracy alone is insufficient and how robustness, recovery, and microcontroller cost change estimator selection.
 - Defined DM, HDM, HECM, and DD as four concrete representatives rather than universal proxies for complete estimator families, including their minimum class-defining mechanisms, optional broader extensions, and exact implementations used here.
 - Kept run counts, seed schedules, window selection, and bootstrap details out of the abstract and in the reproducibility-focused methods and appendix.
-- Documented 16 predeclared 24-hour windows, 19 cases, six holdout cells, 20 repeated seeds where applicable, 6,720 canonical runs, and 10,000 hierarchical bootstrap repetitions.
+- Documented 16 predeclared 24-hour windows, 19 cases, six holdout cells, 10 sensor-noise seeds, 5 seeds for the other stochastic cases, 6,720 canonical runs, and 10,000 hierarchical bootstrap repetitions.
 - Treated cells as the independent units and seeds/windows as nested observations.
-- Added current-bias lifecycle/reset, initial-state recovery, missing-sample, jitter, burst-dropout, voltage-spike, ADC-quantization, and cross-scenario interpretations.
+- Recomputed every global result on the common DD-valid source-sample interval beginning at sample 2023. Each model now contributes 84,377 matched samples per 24-hour window.
+- Replaced the inconsistent recovery outputs with one canonical paired trajectory endpoint, including recovery-or-censoring time, excess-error area, censoring, and later relapse.
+- Included all eight declared disturbance families in the illustrative robustness score and added two alternative weighting analyses.
+- Added current-gain lifecycle/reset, initial-state recovery, missing-sample, jitter, burst-dropout, voltage-spike, ADC-quantization, sensor-offset, and cross-scenario interpretations.
+- Recomputed burst-dropout penalties against an undisturbed 48-hour reference and documented the maximum-absolute-net-charge placement rule.
 - Separated the robustness benchmark from the embedded performance benchmark and added isolated STM32H753ZI SOC-core results for numerical equivalence, latency, compiled flash occupancy, measured peak runtime RAM, and DD inference-mode tradeoffs.
 - Moved coverage, test-matrix, evaluation-window, and detailed DD-latency material into Appendix A.
 - Added a compact reviewer audit in `REVIEWER_COVERAGE_JES2.md`; the older `REVIEWER_TODO_STATUS.txt` is retained only as a historical implementation log.
@@ -56,8 +60,10 @@ tables.
 
 ## Validation performed
 
-- Visually inspected the rendered manuscript, including the main results and appendices.
+- Recompiled the 50-page manuscript and inspected the revised core result figures, hardware figures, and Appendix protocol figure.
 - Confirmed all 24 finalized PNG figures are referenced exactly once.
 - Confirmed that no missing-figure placeholders remain.
 - Confirmed that all active labels and references resolve.
+- Ran the complete simulation-environment test suite: 32 tests passed.
+- Confirmed 6,832 merged execution records with no failures, comprising 6,720 public benchmark runs and 112 internal duration-matched dropout-reference runs.
 - Rechecked the protected original PDF hash after compilation.

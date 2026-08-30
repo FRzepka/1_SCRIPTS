@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import re
 import gc
 import sys
 from pathlib import Path
@@ -306,11 +307,12 @@ def scenario_axes(alias: str) -> set[str]:
 
 
 def plot_scenario_matrix(out: Path) -> None:
+    paper_scenarios = [row for row in SCENARIOS if row[0] != "missing_gap_baseline_48h"]
     columns = ["Baseline", "Current", "Voltage", "Temperature", "Timing", "Availability", "Initialization", "Repeated", "Ref. SOH"]
     keys = ["baseline", "current", "voltage", "temperature", "timing", "availability", "initialization", "stochastic", "reference"]
-    matrix = np.zeros((len(SCENARIOS), len(columns)), dtype=int)
+    matrix = np.zeros((len(paper_scenarios), len(columns)), dtype=int)
     row_labels = []
-    for row, (alias, _scenario, _args) in enumerate(SCENARIOS):
+    for row, (alias, _scenario, _args) in enumerate(paper_scenarios):
         active = scenario_axes(alias)
         if alias in STOCHASTIC_ALIASES:
             active.add("stochastic")
@@ -322,8 +324,8 @@ def plot_scenario_matrix(out: Path) -> None:
 
     fig, ax = plt.subplots(figsize=(11.8, 8.6))
     ax.set_xlim(-0.6, len(columns) - 0.4)
-    ax.set_ylim(len(SCENARIOS) - 0.4, -0.6)
-    for row in range(len(SCENARIOS)):
+    ax.set_ylim(len(paper_scenarios) - 0.4, -0.6)
+    for row in range(len(paper_scenarios)):
         if row % 2 == 0:
             ax.axhspan(row - 0.5, row + 0.5, color="#f3f3f3", zorder=0)
         for col in range(len(columns)):
@@ -435,9 +437,12 @@ def plot_evaluation_windows(windows: pd.DataFrame, out: Path) -> None:
     ax.set_ylim(0.0, 1.0)
     ax.axis("off")
     boxes = [
-        (0.02, 0.58, 0.27, 0.22, "SOH context", "192 h, causal\nnot scored", "#e8edf0"),
-        (0.35, 0.58, 0.25, 0.22, "Primary tests", "24 h\n86,400 rows", "#f3e9e7"),
-        (0.66, 0.58, 0.31, 0.22, "Dropout test", "48 h; central 1 h gap\n~24 h recovery", "#f5e3df"),
+        (0.02, 0.53, 0.27, 0.31, "SOH context", "192 h, causal\nnot scored", "#e8edf0"),
+        (0.35, 0.53, 0.25, 0.31, "Primary tests", "24 h: 86,400 input\nCommon scoring:\n84,377 samples", "#f3e9e7"),
+        (
+            0.66, 0.53, 0.31, 0.31, "Dropout test",
+            "48 h: 172,800 input\n170,777 common scored\n1 h max-|net charge| gap\n12 h pre, 24 h post", "#f5e3df",
+        ),
     ]
     for x, y, width, height, title, body, color in boxes:
         draw_flow_box(ax, (x, y), (width, height), title, body, color)
@@ -458,9 +463,13 @@ def plot_evaluation_windows(windows: pd.DataFrame, out: Path) -> None:
 
 
 def plot_figure_overview(figures_dir: Path, out_path: Path) -> None:
+    def figure_number(path: Path) -> tuple[int, str]:
+        match = re.match(r"Figure_(\d+)", path.stem)
+        return (int(match.group(1)) if match else 10_000, path.stem)
+
     files = sorted(
         figures_dir.glob("Figure_*.png"),
-        key=lambda path: int(path.stem.split("_")[1]),
+        key=figure_number,
     )
     columns = 3
     rows = int(np.ceil(len(files) / columns))
@@ -476,8 +485,7 @@ def plot_figure_overview(figures_dir: Path, out_path: Path) -> None:
     fig.text(
         0.5,
         0.002,
-        "Figures 04-14: legacy single-cell results pending JES2 replacement | "
-        "Figures 16 and 24-28: real six-cell coverage/design evidence",
+        "Review inventory only | The manuscript uses the curated, consecutively numbered All Cells collection",
         ha="center",
         fontsize=9,
         color="#8c2725",

@@ -57,3 +57,19 @@ def test_merge_preserves_distinct_window_runs_and_definitions(tmp_path):
     assert len(merged["runs"]) == 2
     assert {row["window_id"] for row in merged["runs"]} == {"C09_fresh", "C13_aged"}
     assert len(merged["window"]["definitions"]) == 2
+
+
+def test_merge_unions_lstm_publish_intervals_for_disjoint_shards(tmp_path):
+    first = _manifest("C09", "C09_fresh", "/runs/fresh")
+    first["lstm_publish_intervals"] = [1, 6, 24]
+    second = _manifest("C13", "C13_aged", "/runs/aged")
+    second["lstm_publish_intervals"] = [1]
+    paths = []
+    for index, manifest in enumerate([first, second]):
+        path = tmp_path / f"manifest_{index}.json"
+        path.write_text(json.dumps(manifest), encoding="utf-8")
+        paths.append(path)
+
+    merged = merge_manifests(paths, "merged")
+
+    assert merged["lstm_publish_intervals"] == [1, 6, 24]

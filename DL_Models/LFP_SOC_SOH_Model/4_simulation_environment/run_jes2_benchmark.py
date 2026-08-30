@@ -21,6 +21,7 @@ from jes2_protocol import (
     STOCHASTIC_ALIASES,
 )
 from robustness_common import STRATIFICATION_PROTOCOL
+from robustness_common import COMMON_EVALUATION_START_SAMPLE
 
 
 ROOT = Path(__file__).resolve().parent
@@ -146,6 +147,12 @@ def main() -> None:
                         help="Repeat count for Gaussian sensor-noise scenarios.")
     parser.add_argument("--secondary_stochastic_repeats", type=int, default=5,
                         help="Repeat count for random missing, jitter, and spike scenarios.")
+    parser.add_argument(
+        "--evaluation_start_sample",
+        type=int,
+        default=COMMON_EVALUATION_START_SAMPLE,
+        help="Common source-sample cutoff used by every estimator class.",
+    )
     parser.add_argument("--trace_device", default=None)
     parser.add_argument("--model_device", default="cpu")
     parser.add_argument("--skip_existing", action="store_true")
@@ -264,6 +271,7 @@ def main() -> None:
         },
         "protocol": {
             "statistical_unit": "cell (windows averaged within cell before inference)",
+            "common_evaluation_start_sample": int(args.evaluation_start_sample),
             "initial_state_comparison_models": sorted(INITIAL_STATE_APPLICABLE_MODELS),
             "initial_state_dd_policy": "equivalent_soc_offset_applied_to_q_c_report_realized_output_error",
             "initial_state_realization": {
@@ -303,6 +311,7 @@ def main() -> None:
                         window_args.extend(["--max_rows", str(max_rows)])
                     common = [
                         "--cell", cell, "--scenario", scenario, "--seed", str(seed),
+                        "--evaluation_start_sample", str(args.evaluation_start_sample),
                         *window_args, *scenario_args,
                     ]
                     artifact_args = [] if args.keep_run_artifacts else ["--summary_only"]

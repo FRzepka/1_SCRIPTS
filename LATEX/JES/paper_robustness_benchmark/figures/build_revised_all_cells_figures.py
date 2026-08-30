@@ -3,7 +3,7 @@
 
 The script deliberately keeps the detailed dissertation figures untouched.  It
 creates complementary views whose local and aggregate statements use the same
-metric and replaces the current-bias heatmap entries with the signed paired
+metric and replaces the current-gain heatmap entries with the signed paired
 sweep. The available six-cell burst-dropout macro remains part of the analysis.
 """
 
@@ -25,15 +25,11 @@ from matplotlib.colors import LinearSegmentedColormap
 PAPER = Path(__file__).resolve().parents[1]
 RESULTS = PAPER / "JES_2.0" / "results"
 FIGURES = Path(__file__).resolve().parent / "Results"
-INITIAL_RUNS = (
-    Path(__file__).resolve().parents[4]
-    / "DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/campaigns"
-    / "jes2_initial_state_paired_sixcell_20260827_cuda/runs"
-)
 CAMPAIGNS = (
     Path(__file__).resolve().parents[4]
     / "DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/campaigns"
 )
+COMMON_MASK_MANIFEST = CAMPAIGNS / "jes2_common_mask_20260830/jes2_manifest.json"
 
 MODEL_ORDER = ["DM", "HDM", "HECM", "DD"]
 MODEL_COLORS = {"DM": "#2ca02c", "HDM": "#9467bd", "HECM": "#1f77b4", "DD": "#d62728"}
@@ -144,23 +140,25 @@ def revised_delta_matrix(aggregate: pd.DataFrame, signed_bias: pd.DataFrame) -> 
 
 def load_spike_event_effects() -> pd.DataFrame:
     rows = []
-    pattern = "jes2_full_C*_20260825/runs/*/*/voltage_spikes/seed_*/*/*/summary.json"
-    for path in CAMPAIGNS.glob(pattern):
-        summary = json.loads(path.read_text(encoding="utf-8"))
-        model = path.parent.name
-        condition = path.parent.parent.name
-        expected_condition = "no_soh" if model == "DM" else PRIMARY_CONDITION[model]
+    manifest = json.loads(COMMON_MASK_MANIFEST.read_text(encoding="utf-8"))
+    for record in manifest.get("runs", manifest.get("records", [])):
+        if record.get("alias") != "voltage_spikes":
+            continue
+        model = record["model"]
+        condition = record.get("soh_condition", record.get("soh_mode", "none"))
+        expected_condition = PRIMARY_CONDITION[model]
         if condition != expected_condition:
             continue
-        window = next(part for part in path.parts if part[:3] in CELL_ORDER and "_" in part)
+        path = Path(record.get("source_summary") or Path(record["out_dir"]) / "summary.json")
+        summary = json.loads(path.read_text(encoding="utf-8"))
         rows.append({
-            "cell": window[:3],
-            "window_soh_state": window[4:],
+            "cell": record["cell"],
+            "window_soh_state": record.get("soh_state", record.get("window_soh_state")),
             "model": model,
             "event_error_penalty": float(summary["disturbed_mae"] - summary["calm_mae"]),
         })
     if not rows:
-        raise FileNotFoundError("No voltage-spike summaries found in full-cell campaigns")
+        raise FileNotFoundError(f"No voltage-spike summaries found in {COMMON_MASK_MANIFEST}")
     return pd.DataFrame(rows)
 
 
@@ -242,7 +240,8 @@ def figure_12_heatmap(matrix: pd.DataFrame, output_path: Path | None = None) -> 
         for col in range(matrix.shape[1]):
             value = matrix.iloc[row, col]
             if np.isfinite(value):
-                ax.text(col, row, f"{value:+.3f}", ha="center", va="center", fontsize=7,
+                display_value = 0.0 if abs(value) < 5e-4 else value
+                ax.text(col, row, f"{display_value:+.3f}", ha="center", va="center", fontsize=7,
                         color="white" if abs(value) > 0.55 * finite_limit else "#222222")
             else:
                 ax.text(col, row, "n/a", ha="center", va="center", fontsize=6.5, color="#555555")
@@ -257,40 +256,64 @@ def figure_12_heatmap(matrix: pd.DataFrame, output_path: Path | None = None) -> 
         plt.close(fig)
 
 
-def initial_recovery_cell_means() -> pd.DataFrame:
-    rows = []
-    files = {
-        "DM": ("no_soh", "soc_cc_fullcell_*.csv", "soc_cc"),
-        "HDM": ("lstm_h1", "soc_cc_soh_fullcell_*.csv", "soc_cc"),
-        "HECM": ("lstm_h1", "ecm_soc_fullcell_*.csv", "soc_ecm"),
-        "DD": ("lstm_h1", "soc_pred_fullcell_*.csv", "soc_pred"),
-    }
-    for cell_dir in sorted(INITIAL_RUNS.glob("*")):
-        if not cell_dir.is_dir():
-            continue
-        for window in sorted(cell_dir.glob("*")):
-            if not window.is_dir():
-                continue
-            for model, (mode, pattern, prediction) in files.items():
-                baseline_path = next((window / "baseline" / "seed_42" / mode / model).glob(pattern))
-                shifted_path = next((window / "initial_soc_error" / "seed_42" / mode / model).glob(pattern))
-                baseline = pd.read_csv(baseline_path, usecols=["time_s", prediction]).rename(columns={prediction: "correct"})
-                shifted = pd.read_csv(shifted_path, usecols=["time_s", prediction]).rename(columns={prediction: "shifted"})
-                paired = baseline.merge(shifted, on="time_s", how="inner")
-                error = (paired["shifted"] - paired["correct"]).abs().to_numpy(float)
-                elapsed_h = (paired["time_s"].to_numpy(float) - float(paired["time_s"].iloc[0])) / 3600.0
-                violations = np.flatnonzero(error > 0.02)
-                if len(violations) == 0:
-                    stable_time_h = 0.0
-                elif violations[-1] + 1 < len(error):
-                    stable_time_h = float(elapsed_h[violations[-1] + 1])
-                else:
-                    stable_time_h = float(elapsed_h[-1])
-                rows.append({"cell": cell_dir.name, "model": model, "stable_recovery_time_h": stable_time_h})
-    frame = pd.DataFrame(rows)
-    cell_means = frame.groupby(["cell", "model"], as_index=False)["stable_recovery_time_h"].mean()
-    cell_means.to_csv(RESULTS / "jes2_initial_state_stable_recovery_cell_means.csv", index=False)
-    return cell_means
+ROBUSTNESS_FAMILIES = {
+    "Sensor noise": ["current_noise_low", "current_noise_high", "voltage_noise", "temperature_noise"],
+    "Current-gain error": ["current_bias_0p5pct", "current_bias_1p5pct", "current_bias_3p0pct"],
+    "Sensor offsets": ["voltage_offset", "temperature_offset"],
+    "ADC quantization": ["adc_quantization"],
+    "Missing samples": ["missing_samples_periodic", "missing_samples_random"],
+    "Timing jitter": ["irregular_sampling_0p1s", "irregular_sampling_0p5s", "irregular_sampling_0p9s"],
+    "Burst dropout": ["missing_gap_1h"],
+    "Voltage spikes": ["voltage_spikes"],
+}
+
+
+def recovery_dimension() -> tuple[pd.Series, pd.DataFrame]:
+    statistics = pd.read_csv(RESULTS / "jes2_paired_initial_recovery_statistics.csv")
+    components = []
+    raw = {}
+    for metric in [
+        "recovery_or_censor_time_h",
+        "recovery_excess_auc_soc_h",
+        "recovery_censored",
+        "recovery_relapsed_after_first_hold",
+    ]:
+        values = (
+            statistics[statistics["metric"] == metric]
+            .set_index("model")["mean"]
+            .reindex(MODEL_ORDER)
+        )
+        raw[metric] = values
+        components.append(lower_better(values))
+    return pd.concat(components, axis=1).mean(axis=1), pd.DataFrame(raw)
+
+
+def robustness_dimension(revised_matrix: pd.DataFrame) -> tuple[pd.Series, pd.DataFrame]:
+    family_penalties = pd.DataFrame(index=MODEL_ORDER)
+    family_scores = pd.DataFrame(index=MODEL_ORDER)
+    for family, aliases in ROBUSTNESS_FAMILIES.items():
+        penalty = revised_matrix[aliases].clip(lower=0.0).mean(axis=1).reindex(MODEL_ORDER)
+        family_penalties[family] = penalty
+        family_scores[family] = lower_better(penalty)
+
+    family_penalties.to_csv(RESULTS / "jes2_robustness_family_penalties.csv")
+    family_scores.to_csv(RESULTS / "jes2_robustness_family_scores.csv")
+
+    sensitivity = pd.DataFrame(index=MODEL_ORDER)
+    sensitivity["Family-balanced all declared families"] = family_scores.mean(axis=1)
+    sensitivity["Equal weight per declared scenario"] = pd.concat(
+        [lower_better(revised_matrix[alias].clip(lower=0.0)) for alias in ALIAS_ORDER], axis=1
+    ).mean(axis=1)
+    high_severity = [
+        "current_noise_high", "voltage_noise", "temperature_noise", "current_bias_3p0pct",
+        "voltage_offset", "temperature_offset", "adc_quantization", "missing_samples_random",
+        "irregular_sampling_0p9s", "missing_gap_1h", "voltage_spikes",
+    ]
+    sensitivity["Highest-level cases plus offsets"] = pd.concat(
+        [lower_better(revised_matrix[alias].clip(lower=0.0)) for alias in high_severity], axis=1
+    ).mean(axis=1)
+    sensitivity.to_csv(RESULTS / "jes2_robustness_score_sensitivity.csv")
+    return sensitivity.iloc[:, 0], sensitivity
 
 
 def decision_scores(aggregate: pd.DataFrame, revised_matrix: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
@@ -301,52 +324,8 @@ def decision_scores(aggregate: pd.DataFrame, revised_matrix: pd.DataFrame) -> tu
         accuracy_parts.append(lower_better(values))
     accuracy = pd.concat(accuracy_parts, axis=1).mean(axis=1)
 
-    robust_aliases = [
-        "current_noise_high",
-        "voltage_noise",
-        "temperature_noise",
-        "current_bias_3p0pct",
-        "missing_samples_random",
-        "irregular_sampling_0p9s",
-        "missing_gap_1h",
-        "voltage_spikes",
-        "adc_quantization",
-    ]
-    robust_parts = []
-    for alias in robust_aliases:
-        # Tiny negative deltas are stochastic variation, not a robustness bonus.
-        penalty = revised_matrix[alias].clip(lower=0.0)
-        robust_parts.append(lower_better(penalty))
-    robustness = pd.concat(robust_parts, axis=1).mean(axis=1)
-
-    recovery_cells = initial_recovery_cell_means()
-    initial_recovery_raw = (
-        recovery_cells.groupby("model")["stable_recovery_time_h"]
-        .mean()
-        .reindex(MODEL_ORDER)
-    )
-    initial_recovery = lower_better(initial_recovery_raw)
-
-    burst_parts = []
-    burst_raw = None
-    for metric in [
-        "common_recovery_or_censor_time_h",
-        "common_recovery_censored_fraction",
-        "common_recovery_excess_auc_soc_h",
-    ]:
-        rows = metric_rows(aggregate, metric)
-        values = (
-            rows[rows["alias"] == "missing_gap_1h"]
-            .set_index("model")["mean"]
-            .reindex(MODEL_ORDER)
-        )
-        if metric == "common_recovery_or_censor_time_h":
-            burst_raw = values
-        burst_parts.append(lower_better(values))
-    if burst_raw is None or burst_raw.isna().any():
-        raise ValueError("Complete six-cell burst-dropout recovery data are required for Figure 13.")
-    burst_recovery = pd.concat(burst_parts, axis=1).mean(axis=1)
-    recovery = pd.concat([initial_recovery, burst_recovery], axis=1).mean(axis=1)
+    robustness, sensitivity = robustness_dimension(revised_matrix)
+    recovery, recovery_raw = recovery_dimension()
 
     scores = pd.DataFrame(
         {
@@ -354,9 +333,16 @@ def decision_scores(aggregate: pd.DataFrame, revised_matrix: pd.DataFrame) -> tu
             "Accuracy": accuracy.reindex(MODEL_ORDER).to_numpy(float),
             "Robustness": robustness.reindex(MODEL_ORDER).to_numpy(float),
             "Recovery": recovery.reindex(MODEL_ORDER).to_numpy(float),
-            "Initial stable recovery time [h]": initial_recovery_raw.to_numpy(float),
-            "Burst recovery/censor time [h]": burst_raw.to_numpy(float),
-            "Burst recovery score": burst_recovery.reindex(MODEL_ORDER).to_numpy(float),
+            "Paired initial recovery/censor time [h]": recovery_raw[
+                "recovery_or_censor_time_h"
+            ].to_numpy(float),
+            "Paired recovery excess-error AUC [SOC h]": recovery_raw[
+                "recovery_excess_auc_soc_h"
+            ].to_numpy(float),
+            "Paired censored fraction": recovery_raw["recovery_censored"].to_numpy(float),
+            "Paired relapse fraction": recovery_raw[
+                "recovery_relapsed_after_first_hold"
+            ].to_numpy(float),
         }
     )
     weights = {
@@ -369,6 +355,7 @@ def decision_scores(aggregate: pd.DataFrame, revised_matrix: pd.DataFrame) -> tu
         profiles[name] = wa * scores["Accuracy"] + wr * scores["Robustness"] + wc * scores["Recovery"]
     scores.to_csv(RESULTS / "jes2_revised_decision_dimensions.csv", index=False)
     profiles.to_csv(RESULTS / "jes2_revised_decision_profiles.csv", index=False)
+    sensitivity.to_csv(RESULTS / "jes2_robustness_score_sensitivity.csv")
     return scores, profiles
 
 
@@ -405,7 +392,7 @@ def figure_13_decision(
     radar.grid(color="#d8d8d8", linewidth=0.6)
     radar.spines["polar"].set_color("#d8d8d8")
     radar.spines["polar"].set_linewidth(0.6)
-    radar.set_title("(a) Relative decision dimensions", y=1.14, pad=0)
+    radar.set_title("(a) Illustrative relative dimensions", y=1.14, pad=0)
 
     profile_names = [c for c in profiles.columns if c != "Model"]
     x = np.arange(len(profile_names), dtype=float) * 1.18
@@ -420,7 +407,7 @@ def figure_13_decision(
     bars.set_ylim(0.0, 1.02)
     bars.set_yticks(np.linspace(0.0, 1.0, 6))
     bars.set_ylabel("Composite score")
-    bars.set_title("(b) Priority-weighted composite scores", y=1.22, pad=0)
+    bars.set_title("(b) Illustrative priority profiles", y=1.22, pad=0)
     bars.grid(axis="y", color="#d8d8d8", linewidth=0.8, zorder=0)
     bars.grid(axis="x", visible=False)
     bars.spines[["top", "right"]].set_visible(False)

@@ -10,7 +10,6 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[4] / "DL_Models" / "LFP_SOC_SOH_Model" / "4_simulation_environment"
 RESULTS = Path(__file__).resolve().parent / "Results"
 CAMPAIGN = ROOT / "campaigns" / "jes2_dropout_corrected_preview_20260827"
-CELLS = ("C09", "C13", "C15", "C25", "C27", "C29")
 MODEL_ORDER = ("DM", "HDM", "HECM", "DD")
 MODEL_COLORS = {"DM": "#2ca02c", "HDM": "#9467bd", "HECM": "#1f77b4", "DD": "#d62728"}
 OUTPUT = RESULTS / "Figure_09_Burst_Dropout_Transition_CORR"
@@ -33,22 +32,17 @@ def load_source_run(condition: str, model: str) -> pd.DataFrame:
     return frame.rename(columns={prediction: "soc_pred"})
 
 
-def recovery_statistics() -> pd.DataFrame:
-    rows = []
-    for cell in CELLS:
-        campaign = ROOT / "campaigns" / f"jes2_full_{cell}_20260825"
-        for path in campaign.glob(f"runs/{cell}/**/missing_gap_1h/seed_42/*/*/summary.json"):
-            mode = path.parent.parent.name
-            model = path.parent.name
-            if model not in MODEL_ORDER or mode not in {"lstm_h1", "no_soh"}:
-                continue
-            summary = json.loads(path.read_text())
-            value = summary.get("common_recovery_or_censor_time_h")
-            if value is not None:
-                rows.append({"cell": cell, "model": model, "value": float(value)})
-    values = pd.DataFrame(rows)
-    by_cell = values.groupby(["cell", "model"], as_index=False)["value"].mean()
-    return by_cell.groupby("model")["value"].agg(["mean", "std"]).reindex(MODEL_ORDER)
+def dropout_statistics() -> pd.DataFrame:
+    paper = Path(__file__).resolve().parents[1]
+    aggregate = pd.read_csv(paper / "JES_2.0" / "results" / "jes2_macro_statistics.csv")
+    expected = {"DM": "none", "HDM": "lstm_h1", "HECM": "lstm_h1", "DD": "lstm_h1"}
+    rows = aggregate[
+        (aggregate["alias"] == "missing_gap_1h") & (aggregate["metric"] == "delta_mae")
+    ].copy()
+    rows = rows[
+        [condition == expected[model] for model, condition in zip(rows["model"], rows["soh_condition"])]
+    ]
+    return rows.set_index("model").reindex(MODEL_ORDER)
 
 
 def main() -> None:
@@ -78,7 +72,7 @@ def main() -> None:
                   color=MODEL_COLORS[model], lw=1.3, label=model)
     shade_gap(ax_a, gap_start, gap_end)
     ax_a.set(xlabel="Time from dropout start [h]", ylabel="SOC",
-             title="(a) Corrected C29 burst-dropout transition")
+             title="(a) C29 burst-dropout transition")
     ax_a.legend(ncol=5, frameon=False, fontsize=8)
 
     for model in MODEL_ORDER:
@@ -89,23 +83,31 @@ def main() -> None:
     ax_c.set(xlabel="Time after measurements resume [h]",
              ylabel="Absolute deviation from no-dropout output",
              title="(b) Dropout-induced estimator deviation")
+    ax_c.axhline(0.02, color="#222222", linestyle="--", linewidth=1.2,
+                 label="2% trajectory-difference threshold")
     ax_c.legend(ncol=2, frameon=False, fontsize=8)
 
-    stats = recovery_statistics()
+    stats = dropout_statistics()
     positions = np.arange(len(MODEL_ORDER))
     for index, model in enumerate(MODEL_ORDER):
         value = float(stats.loc[model, "mean"])
-        error = float(stats.loc[model, "std"] or 0.0)
-        ax_b.bar(positions[index], value, 0.62, yerr=error, capsize=4,
-                 ecolor="#111111", error_kw={"elinewidth": 1.4, "capthick": 1.4},
+        low = float(stats.loc[model, "ci_low"])
+        high = float(stats.loc[model, "ci_high"])
+        ax_b.bar(positions[index], value, 0.62,
                  color=MODEL_COLORS[model], alpha=0.42,
                  edgecolor=MODEL_COLORS[model], linewidth=2.2)
+        ax_b.errorbar(index, value, yerr=[[value - low], [high - value]],
+                      color="#111111", capsize=4, linewidth=1.4)
     ax_b.set_xticks(positions, MODEL_ORDER)
-    ax_b.set(xlabel="Estimator class", ylabel="Recovery/censor time [h]",
-             title="(c) Six-cell recovery after burst dropout")
-    ax_b.set_ylim(bottom=0)
+    ax_b.axhline(0.0, color="#444444", linewidth=0.9)
+    ax_b.set(xlabel="Estimator class", ylabel=r"Dropout $\Delta$MAE [SOC]",
+             title="(c) Six-cell global dropout effect and 95% CI")
+    lower = min(0.0, float(stats["ci_low"].min()))
+    upper = max(0.0, float(stats["ci_high"].max()))
+    span = upper - lower
+    ax_b.set_ylim(lower - 0.08 * span, upper + 0.08 * span)
 
-    fig.suptitle("One-hour burst dropout: transition, estimator deviation, and six-cell recovery", fontsize=12)
+    fig.suptitle("One-hour burst dropout: paired local deviation and six-cell error effect", fontsize=12)
     fig.subplots_adjust(left=0.075, right=0.985, bottom=0.08, top=0.88)
     fig.savefig(OUTPUT.with_suffix(".png"), dpi=300, bbox_inches="tight")
     print(OUTPUT.with_suffix(".png"))

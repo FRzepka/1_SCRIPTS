@@ -21,6 +21,7 @@ from cc_model import CCModel, CCModelConfig
 from robustness_common import (
     add_common_scenario_args,
     apply_measurement_scenario,
+    build_common_evaluation_mask,
     compute_protocol_event_metrics,
     compute_robustness_metrics,
     compute_stratified_error_metrics,
@@ -110,12 +111,16 @@ def main():
         q_m_new[k] = model.q_m_new
 
     abs_err = np.abs(soc_true - soc_cc)
+    evaluation_mask = build_common_evaluation_mask(
+        len(soc_cc), args.evaluation_start_sample
+    )
     metrics = compute_robustness_metrics(
         time_s=t,
         y_true=soc_true,
         y_pred=soc_cc,
         warmup_seconds=float(args.warmup_seconds),
         disturbance_mask=np.asarray(scenario_info.get('disturbance_mask', freeze_mask), dtype=bool),
+        evaluation_mask=evaluation_mask,
     )
     metrics.update(compute_protocol_event_metrics(
         scenario=args.scenario,
@@ -128,9 +133,7 @@ def main():
         sustain_seconds=args.recovery_sustain_seconds,
         horizon_seconds=args.recovery_horizon_seconds,
     ))
-    stratified_mask = t >= float(args.warmup_seconds)
-    if not np.any(stratified_mask):
-        stratified_mask = np.ones(len(t), dtype=bool)
+    stratified_mask = evaluation_mask
     stratified_metrics = compute_stratified_error_metrics(
         y_true=soc_true[stratified_mask],
         y_pred=soc_cc[stratified_mask],
@@ -170,6 +173,8 @@ def main():
         'v_tol': float(args.v_tol),
         'cv_seconds': float(args.cv_seconds),
         'warmup_seconds': float(args.warmup_seconds),
+        'evaluation_start_sample': int(args.evaluation_start_sample),
+        'evaluation_samples': int(evaluation_mask.sum()),
         'rmse': metrics['rmse'],
         'mae': metrics['mae'],
         'bias': metrics['bias'],

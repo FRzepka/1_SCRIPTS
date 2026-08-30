@@ -39,19 +39,10 @@ METRICS = [
     "max_error",
     "bias",
     "jump_count_gt_5pct",
-    "common_recovery_time_h",
-    "common_recovery_or_censor_time_h",
-    "common_recovery_observed_horizon_h",
-    "common_recovery_excess_auc_soc_h",
-    "common_recovery_initial_abs_err",
-    "common_recovery_mae_1h",
-    "common_recovery_mae_6h",
-    "common_recovery_first_relapse_time_h",
-    "common_stable_recovery_time_h",
-    "common_stable_recovery_or_censor_time_h",
     "gap_net_charge_ah",
     "gap_throughput_ah",
     "gap_reference_soc_change",
+    "evaluation_samples",
 ]
 
 
@@ -59,9 +50,13 @@ def load_campaign(manifest_path: Path) -> tuple[dict, pd.DataFrame]:
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     rows: list[dict] = []
     for record in manifest.get("runs", []):
-        if record.get("status") not in {"completed", "skipped_existing"}:
+        if record.get("status") not in {
+            "completed", "skipped_existing", "reused_common_interval"
+        }:
             continue
-        summary_path = Path(record["out_dir"]) / "summary.json"
+        summary_path = Path(
+            record.get("source_summary", Path(record["out_dir"]) / "summary.json")
+        )
         if not summary_path.is_file():
             continue
         summary = json.loads(summary_path.read_text(encoding="utf-8"))
@@ -76,15 +71,24 @@ def load_campaign(manifest_path: Path) -> tuple[dict, pd.DataFrame]:
             "soh_publish_intervals": int(record.get("soh_publish_intervals", 0)),
             "out_dir": record["out_dir"],
             "summary_path": str(summary_path),
-            "common_recovery_censored": summary.get("common_recovery_censored"),
             "window_id": record.get("window_id", "single_window"),
             "window_soh_state": record.get("soh_state", "all"),
             "cell_load_class": record.get("cell_load_class", "unassigned"),
             "start_row": int(record.get("start_row", summary.get("start_row", 0))),
             "max_rows": int(record.get("max_rows", summary.get("max_rows", 0))),
+            "evaluation_start_sample": int(
+                summary.get(
+                    "evaluation_start_sample",
+                    manifest.get("protocol", {}).get("common_evaluation_start_sample", 0),
+                )
+            ),
         }
         for metric in METRICS:
             row[metric] = summary.get(metric)
+        if row["evaluation_samples"] is None and record["model"] == "DD":
+            row["evaluation_samples"] = max(
+                0, row["max_rows"] - row["evaluation_start_sample"]
+            )
         rows.append(row)
     frame = pd.DataFrame(rows)
     if frame.empty:
@@ -209,15 +213,23 @@ def hierarchical_stats(group: pd.DataFrame, value: str, bootstrap_samples: int, 
         }
 
     rng = np.random.default_rng(seed)
-    draws = np.empty(bootstrap_samples, dtype=np.float64)
-    values_by_cell = {cell: valid.loc[valid["cell"] == cell, value].to_numpy(dtype=float) for cell in cells}
-    for idx in range(bootstrap_samples):
-        sampled_cells = rng.choice(cells, size=len(cells), replace=True)
-        nested_means = []
-        for cell in sampled_cells:
-            values = values_by_cell[cell]
-            nested_means.append(float(np.mean(rng.choice(values, size=len(values), replace=True))))
-        draws[idx] = float(np.mean(nested_means))
+    # Draw cells first, then independently resample the nested seed values for
+    # every occurrence of a source cell. This is the vectorized equivalent of
+    # the original nested loop and keeps 10,000-draw analyses practical.
+    sampled_cell_indices = rng.integers(
+        0, len(cells), size=(bootstrap_samples, len(cells))
+    )
+    nested_means = np.empty_like(sampled_cell_indices, dtype=np.float64)
+    for cell_idx, cell in enumerate(cells):
+        selected = sampled_cell_indices == cell_idx
+        occurrence_count = int(selected.sum())
+        if occurrence_count == 0:
+            continue
+        values = valid.loc[valid["cell"] == cell, value].to_numpy(dtype=float)
+        nested_means[selected] = rng.choice(
+            values, size=(occurrence_count, len(values)), replace=True
+        ).mean(axis=1)
+    draws = nested_means.mean(axis=1)
     return {
         "mean": point,
         "ci_low": float(np.percentile(draws, 2.5)),
@@ -236,19 +248,6 @@ def aggregate_metrics(frame: pd.DataFrame, bootstrap_samples: int) -> pd.DataFra
             stats = hierarchical_stats(group, metric, bootstrap_samples, seed=1905 + len(rows))
             if stats["n_runs"]:
                 rows.append({**base, "metric": metric, **stats})
-        censored = group["common_recovery_censored"].dropna()
-        if len(censored):
-            rows.append(
-                {
-                    **base,
-                    "metric": "common_recovery_censored_fraction",
-                    "mean": float(censored.astype(bool).mean()),
-                    "ci_low": np.nan,
-                    "ci_high": np.nan,
-                    "n_cells": int(group["cell"].nunique()),
-                    "n_runs": int(len(censored)),
-                }
-            )
     return pd.DataFrame(rows)
 
 
@@ -295,18 +294,19 @@ def paired_bootstrap_ci(values: np.ndarray, samples: int, seed: int) -> tuple[fl
     return float(np.percentile(draws, 2.5)), float(np.percentile(draws, 97.5))
 
 
-def add_holm_adjustment(frame: pd.DataFrame) -> pd.DataFrame:
+def add_holm_adjustment(frame: pd.DataFrame, group_columns: list[str]) -> pd.DataFrame:
     if frame.empty:
         return frame
     result = frame.copy()
     result["p_holm"] = np.nan
-    valid = result["p_exact"].dropna().sort_values()
-    running = 0.0
-    total = len(valid)
-    for rank, (index, p_value) in enumerate(valid.items()):
-        adjusted = min(1.0, float(p_value) * (total - rank))
-        running = max(running, adjusted)
-        result.loc[index, "p_holm"] = running
+    for _, family in result.groupby(group_columns, dropna=False, sort=False):
+        valid = family["p_exact"].dropna().sort_values()
+        running = 0.0
+        total = len(valid)
+        for rank, (index, p_value) in enumerate(valid.items()):
+            adjusted = min(1.0, float(p_value) * (total - rank))
+            running = max(running, adjusted)
+            result.loc[index, "p_holm"] = running
     return result
 
 
@@ -347,7 +347,9 @@ def build_paired_statistical_tests(frame: pd.DataFrame, bootstrap_samples: int) 
             "seeds_per_cell_max": int(seed_counts.max()),
             **paired_effect_summary(cell_values, bootstrap_samples, 4905 + len(scenario_rows)),
         })
-    scenario_tests = add_holm_adjustment(pd.DataFrame(scenario_rows))
+    scenario_tests = add_holm_adjustment(
+        pd.DataFrame(scenario_rows), ["test_family", "alias"]
+    )
 
     pair_rows = []
     aliases = ["baseline", *sorted(set(primary["alias"]) & STOCHASTIC_ALIASES)]
@@ -370,7 +372,9 @@ def build_paired_statistical_tests(frame: pd.DataFrame, bootstrap_samples: int) 
                 "difference_definition": "model_b_minus_model_a",
                 **paired_effect_summary(difference, bootstrap_samples, 5905 + len(pair_rows)),
             })
-    pair_tests = add_holm_adjustment(pd.DataFrame(pair_rows))
+    pair_tests = add_holm_adjustment(
+        pd.DataFrame(pair_rows), ["test_family", "alias"]
+    )
     return scenario_tests, pair_tests
 
 
@@ -446,7 +450,10 @@ def plot_baseline(raw: pd.DataFrame, aggregate: pd.DataFrame, out: Path) -> None
                 linewidth=0.7,
                 zorder=4,
             )
-    fig.suptitle("Independent holdout-cell baseline (dots: cells; bars: cell-macro mean with 95% CI)")
+    fig.suptitle(
+        "Independent holdout-cell baseline "
+        "(dots: cell/SOH windows; bars: cell-macro mean with 95% CI)"
+    )
     fig.tight_layout()
     save_figure(fig, out / "Figure_04_Baseline_Performance.png")
 
@@ -498,44 +505,6 @@ def plot_grouped_scenarios(aggregate: pd.DataFrame, aliases: list[str], out_path
     save_figure(fig, out_path)
 
 
-def plot_initial_recovery(aggregate: pd.DataFrame, out: Path) -> None:
-    fig, axes = plt.subplots(1, 3, figsize=(14.2, 4.1))
-    initial = metric_slice(aggregate, "initial_soc_error", "common_recovery_initial_abs_err")
-    draw_model_bars(
-        axes[0],
-        initial,
-        "Initial absolute error [SOC]",
-        "Realized estimator-output mismatch",
-    )
-    recovery = metric_slice(aggregate, "initial_soc_error", "common_recovery_or_censor_time_h")
-    draw_model_bars(axes[1], recovery, "Recovery/censor time [h]", "Common 2% SOC band; 24 h censoring")
-    auc = metric_slice(aggregate, "initial_soc_error", "common_recovery_excess_auc_soc_h")
-    draw_model_bars(axes[2], auc, "Excess-error AUC [SOC h]", "Error burden during recovery")
-    fig.suptitle("-10% initialization mismatch mapped to estimator state (DD: equivalent $Q_c$ offset)")
-    fig.tight_layout()
-    save_figure(fig, out / "Figure_07_Initial_State_Recovery.png")
-
-
-def plot_gap_transition(raw: pd.DataFrame, aggregate: pd.DataFrame, out: Path) -> None:
-    primary = primary_rows(raw)
-    gap = primary[primary["alias"] == "missing_gap_1h"].copy()
-    fig, axes = plt.subplots(1, 2, figsize=(10.8, 4.1))
-    cell_context = gap[gap["model"] == "DM"].groupby("cell", as_index=False).agg(
-        gap_throughput_ah=("gap_throughput_ah", "mean"),
-        gap_reference_soc_change=("gap_reference_soc_change", "mean"),
-    )
-    cells = [cell.split("_")[-1] for cell in cell_context["cell"]]
-    axes[0].bar(cells, cell_context["gap_throughput_ah"], color=(0.84, 0.15, 0.16, 0.38),
-                edgecolor="#d62728", linewidth=1.5)
-    axes[0].set_ylabel("Unobserved charge throughput [Ah]")
-    axes[0].set_title("Physical gap severity by holdout cell")
-    clean_axes(axes[0])
-    immediate = metric_slice(aggregate, "missing_gap_1h", "common_recovery_initial_abs_err")
-    draw_model_bars(axes[1], immediate, "Absolute SOC error", "Error immediately after data resume")
-    fig.tight_layout()
-    save_figure(fig, out / "Figure_09_Burst_Dropout_Transition.png")
-
-
 def plot_spikes(aggregate: pd.DataFrame, out: Path) -> None:
     fig, axes = plt.subplots(1, 2, figsize=(10.5, 4.1))
     draw_model_bars(axes[0], metric_slice(aggregate, "voltage_spikes", "delta_mae"),
@@ -576,22 +545,6 @@ def primary_rows_from_aggregate(aggregate: pd.DataFrame, metric: str) -> pd.Data
     for model, condition in PRIMARY_CONDITIONS.items():
         keep |= (rows["model"] == model) & (rows["soh_condition"] == condition)
     return rows.loc[keep]
-
-
-def plot_decision_evidence(aggregate: pd.DataFrame, out: Path) -> None:
-    fig, axes = plt.subplots(1, 3, figsize=(12.2, 4.0))
-    draw_model_bars(axes[0], metric_slice(aggregate, "baseline", "mae"), "MAE [SOC]", "Nominal accuracy")
-    robustness = primary_rows_from_aggregate(aggregate, "delta_mae")
-    robustness = robustness[~robustness["alias"].isin(["baseline", "initial_soc_error"])]
-    worst = robustness.groupby("model", as_index=False)["mean"].max()
-    worst["ci_low"] = worst["mean"]
-    worst["ci_high"] = worst["mean"]
-    draw_model_bars(axes[1], worst, r"Worst $\Delta$MAE [SOC]", "Worst observed disturbance")
-    recovery = metric_slice(aggregate, "initial_soc_error", "common_recovery_excess_auc_soc_h")
-    draw_model_bars(axes[2], recovery, "Excess-error AUC [SOC h]", "Explicit-state recovery")
-    fig.suptitle("Decision evidence shown separately; no arbitrary cross-dimension composite score")
-    fig.tight_layout()
-    save_figure(fig, out / "Figure_13_Decision_Synthesis.png")
 
 
 def plot_soh_ablation(ablation: pd.DataFrame, out: Path) -> None:
@@ -860,6 +813,28 @@ def validate_coverage(manifest: dict, frame: pd.DataFrame, allow_incomplete: boo
     if not requested.issubset(expected):
         raise ValueError("Campaign contains cells outside the declared holdout split")
 
+    protocol = manifest.get("protocol", {})
+    expected_start = int(
+        protocol.get(
+            "common_evaluation_start_sample",
+            manifest.get("correction", {}).get("evaluation_start_sample", 0),
+        )
+    )
+    if expected_start > 0:
+        wrong_start = frame[frame["evaluation_start_sample"] != expected_start]
+        if not wrong_start.empty:
+            raise ValueError(
+                f"Common evaluation mask violation: {len(wrong_start)} runs do not start "
+                f"at source sample {expected_start}"
+            )
+        expected_samples = (frame["max_rows"] - expected_start).clip(lower=0)
+        wrong_count = frame[frame["evaluation_samples"] != expected_samples]
+        if not wrong_count.empty:
+            raise ValueError(
+                f"Common evaluation mask violation: {len(wrong_count)} runs have an "
+                "unexpected evaluation-sample count"
+            )
+
     base_seed = int(manifest.get("base_seed", 42))
     repeats = int(manifest.get("stochastic_repeats", 1))
     secondary_repeats = int(manifest.get("secondary_stochastic_repeats", repeats))
@@ -985,8 +960,9 @@ def main() -> None:
     (args.out_dir / "jes2_statistical_method.txt").write_text(
         "Statistical unit: independent holdout cell. Predeclared SOH windows are averaged within each cell and "
         "random seed before inference.\nPoint estimates: equal-weight cell macro means. Uncertainty: hierarchical "
-        "bootstrap with seeds nested within cells.\nHypothesis tests: exact two-sided paired sign-flip tests on cell-level differences; "
-        "Holm correction controls family-wise error across reported comparisons.\n"
+        f"bootstrap with seeds nested within cells ({args.bootstrap_samples} repetitions).\nHypothesis tests: "
+        "exact two-sided paired sign-flip tests on cell-level differences. Holm correction controls family-wise "
+        "error within each scenario across the four model effects or six model-pair comparisons.\n"
         "Effect size: paired standardized mean difference dz. Per-sample observations are never treated as "
         "independent replicates.\n",
         encoding="utf-8",
@@ -999,7 +975,7 @@ def main() -> None:
             aggregate,
             bias_aliases,
             args.figures_dir / "Figure_05_Current_Bias.png",
-            "Current-bias sensitivity across independent holdout cells",
+            "Current-gain sensitivity across independent holdout cells",
         )
     noise_aliases = ["current_noise_low", "current_noise_high", "voltage_noise", "temperature_noise"]
     if has_aliases(raw, noise_aliases):
@@ -1009,8 +985,6 @@ def main() -> None:
             args.figures_dir / "Figure_06_Noise_Robustness.png",
             "Repeated noise robustness (cell-macro mean and hierarchical 95% CI)",
         )
-    if has_aliases(raw, ["initial_soc_error"]):
-        plot_initial_recovery(aggregate, args.figures_dir)
     signal_aliases = ["missing_samples_periodic", "missing_samples_random", "irregular_sampling_0p1s",
                       "irregular_sampling_0p5s", "irregular_sampling_0p9s"]
     if has_aliases(raw, signal_aliases):
@@ -1020,13 +994,10 @@ def main() -> None:
             args.figures_dir / "Figure_08_Signal_Integrity.png",
             "Signal-integrity and timing stress",
         )
-    if has_aliases(raw, ["missing_gap_1h"]):
-        plot_gap_transition(raw, aggregate, args.figures_dir)
     if has_aliases(raw, ["voltage_spikes"]):
         plot_spikes(aggregate, args.figures_dir)
     if len(set(raw["alias"]) - {"baseline", "initial_soc_error"}) > 0:
         plot_heatmap(aggregate, args.figures_dir)
-        plot_decision_evidence(aggregate, args.figures_dir)
     draw_adc = metric_slice(aggregate, "adc_quantization", "delta_mae")
     if not draw_adc.empty:
         fig, ax = plt.subplots(figsize=(6.8, 4.0))
@@ -1049,6 +1020,9 @@ def main() -> None:
         "completed_run_records": int(len(raw)),
         "bootstrap_samples": args.bootstrap_samples,
         "aggregation": "windows averaged within cell/seed; equal-weight cell macro; hierarchical bootstrap",
+        "common_evaluation_start_sample": manifest.get("protocol", {}).get(
+            "common_evaluation_start_sample"
+        ),
         "primary_soh_condition": "lstm_h1",
         "reference_soh_role": "paired explanatory ablation",
         "stratified_run_records": int(len(stratified)),

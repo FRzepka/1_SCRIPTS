@@ -44,7 +44,7 @@ def main() -> None:
     paper = Path(__file__).resolve().parents[1]
     default_results = paper / "JES_2.0/results"
     parser = argparse.ArgumentParser(
-        description="Build the time-resolved lifecycle current-bias and recovery figure."
+        description="Build the time-resolved lifecycle current-gain and recovery figure."
     )
     parser.add_argument("--results-dir", type=Path, default=default_results)
     parser.add_argument(
@@ -82,8 +82,8 @@ def main() -> None:
         )
     ax_life.axhline(0.0, color="#555555", linewidth=0.9, linestyle="--")
     ax_life.set_xlabel("Elapsed lifecycle time [h]")
-    ax_life.set_ylabel(r"Bias contribution $\Delta$MAE [SOC]")
-    ax_life.set_title("(a) Bias Penalty over Full Life")
+    ax_life.set_ylabel(r"Gain-error contribution $\Delta$MAE [SOC]")
+    ax_life.set_title("(a) Current-Gain Penalty over Full Life")
     ax_life.legend(ncol=2, frameon=False, loc="best")
     ax_life.text(
         0.99,
@@ -132,8 +132,8 @@ def main() -> None:
     ax_cycle.set_xlim(-2.0, 102.0)
     ax_cycle.set_xticks(error_positions)
     ax_cycle.set_xlabel("Progress between consecutive full-charge events [%]")
-    ax_cycle.set_ylabel(r"Bias contribution $\Delta$MAE [SOC]")
-    ax_cycle.set_title("(b) Bias Accumulation between Full Charges")
+    ax_cycle.set_ylabel(r"Gain-error contribution $\Delta$MAE [SOC]")
+    ax_cycle.set_title("(b) Gain-Error Accumulation between Full Charges")
     ax_cycle.text(
         0.99,
         0.96,
@@ -169,8 +169,8 @@ def main() -> None:
             )
     ax_reset.axhline(0.0, color="#555555", linewidth=0.9, linestyle="--")
     ax_reset.set_xticks(x, MODELS)
-    ax_reset.set_ylabel(r"Bias contribution $\Delta$MAE [SOC]")
-    ax_reset.set_title("(c) Bias before and after Full Charge")
+    ax_reset.set_ylabel(r"Gain-error contribution $\Delta$MAE [SOC]")
+    ax_reset.set_title("(c) Gain Error before and after Full Charge")
     ax_reset.legend(
         handles=[
             Patch(facecolor=to_rgba("#666666", 0.14), edgecolor="#666666", label="Before"),
@@ -186,7 +186,7 @@ def main() -> None:
         model_cycles = cycles[cycles.model == model]
         for offset, column, label, alpha in (
             (-width / 2, "baseline_mae", "Baseline", 0.14),
-            (width / 2, "biased_mae", "Worst ±3% bias", 0.38),
+            (width / 2, "biased_mae", "Worst ±3% gain error", 0.38),
         ):
             values = model_cycles[column]
             summary_column = (
@@ -226,7 +226,7 @@ def main() -> None:
             Patch(
                 facecolor=to_rgba("#666666", 0.38),
                 edgecolor="#666666",
-                label="Worst ±3% bias",
+                label="Worst ±3% gain error",
             ),
         ],
         frameon=False,
@@ -234,7 +234,7 @@ def main() -> None:
     )
     clean_axes(ax_rank)
 
-    fig.suptitle("Current-bias accumulation, full-charge response, and lifetime accuracy", y=0.995)
+    fig.suptitle("Current-gain error, full-charge response, and lifetime accuracy", y=0.995)
     save_figure(fig, args.out)
     print(args.out)
 

@@ -1,10 +1,9 @@
 JES 2.0 - NEW TEST MATRIX AND STATISTICAL ANALYSIS
-Updated: 2026-08-25
+Updated: 2026-08-30
 
 IMPORTANT DISTINCTION
-  The software now contains the tests and analysis paths below. Publication
-  numbers do not exist until the complete six-cell HPC campaign has finished.
-  Smoke and synthetic tests validate code only and must not enter the paper.
+  The complete six-cell campaign and the common-mask correction are finished.
+  Smoke and synthetic tests validate code only and do not enter the paper.
 
 1. INDEPENDENT HOLDOUT CELLS AND FIXED LOAD CLASSES
   Cell load group is frozen before looking at estimator errors. The classification
@@ -66,7 +65,8 @@ IMPORTANT DISTINCTION
   Periodic missing samples: every 50th sample.
   Random missing samples: 2%.
   Timing jitter: +/-0.1 s, +/-0.5 s, and +/-0.9 s.
-  Burst dropout: one central 1 h gap.
+  Burst dropout: the eligible 1 h interval with maximum absolute net charge,
+  selected with at least 12 h of pre-gap and 24 h of post-gap context.
   Voltage spikes: +/-0.20 V every 1000 samples with randomized sign.
 
   Gaussian sensor-noise scenarios use 10 deterministic seeds per window. Random
@@ -92,6 +92,8 @@ IMPORTANT DISTINCTION
 
 5. STATISTICAL ANALYSIS
   Independent statistical unit: holdout cell, not individual time sample.
+  Common evaluation mask: source samples 2023 onward for every estimator. This
+  gives 84,377 matched points per 24 h run and 170,777 per 48 h dropout run.
   Frozen SOH windows are averaged inside each cell/seed before inferential
   comparison; random seeds are then nested inside each cell.
   Point estimate: equal-weight cell-macro mean, so C27's longer trajectory does
@@ -142,9 +144,14 @@ IMPORTANT DISTINCTION
   304/304 runs completed successfully.
   COMPLETE: full four-estimator 10/5-seed campaign; 6720/6720 runs completed
   successfully across C09, C13, C15, C25, C27, and C29.
-  COMPLETE: final publication result build with 10000 hierarchical bootstrap
-  repetitions per metric group; strict result manifest reports 6720 completed
-  runs, 62901 stratified records, 72 scenario tests, and 60 model-pair tests.
-  PREPARED: isolated target-hardware SOC benchmark handoff and host-side tools;
-  physical STM32 latency, peak RAM, flash, and optional energy measurements must
-  be executed on the local PC with the board attached.
+  COMPLETE: the common-mask campaign contains 6720 successful records. Non-DD
+  runs were repeated from source sample 2023, and DD summaries were reused only
+  where the rolling-window output already began at that same source sample.
+  COMPLETE: final publication result build uses 10000 hierarchical bootstrap
+  repetitions per metric group and reports 72 scenario tests and 60 model-pair
+  tests after excluding the internal duration-matched dropout reference.
+  COMPLETE: the canonical paired initialization-recovery analysis drives the
+  recovery text, figure, table, and illustrative decision score.
+  COMPLETE WITH EXPLICIT BOUNDARY: isolated target-hardware SOC tests report
+  numerical equivalence, latency, linker-reported flash, and statically allocated
+  RAM. Peak runtime RAM, energy, and complete BMS scheduling remain unmeasured.

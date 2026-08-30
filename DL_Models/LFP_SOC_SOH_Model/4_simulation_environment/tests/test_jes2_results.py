@@ -58,6 +58,22 @@ def test_coverage_allows_incomplete_diagnostic_campaign():
     validate_coverage(_manifest(), _complete_frame().head(1), allow_incomplete=True)
 
 
+def test_coverage_enforces_declared_common_evaluation_mask():
+    manifest = _manifest()
+    manifest["protocol"]["common_evaluation_start_sample"] = 2023
+    frame = _complete_frame().assign(
+        evaluation_start_sample=2023,
+        evaluation_samples=84377,
+        max_rows=86400,
+    )
+    validate_coverage(manifest, frame, allow_incomplete=False)
+
+    wrong = frame.copy()
+    wrong.loc[wrong["model"] == "DM", "evaluation_samples"] = 86400
+    with pytest.raises(ValueError, match="unexpected evaluation-sample count"):
+        validate_coverage(manifest, wrong, allow_incomplete=False)
+
+
 def test_dd_is_required_for_new_initialization_campaigns():
     manifest = _manifest()
     manifest["protocol"] = {

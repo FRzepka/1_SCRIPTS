@@ -52,7 +52,7 @@ MAIN RESULTS
     HDM    -0.007644 -> 0.013053   change +0.020697
     HECM   -0.005668 -> 0.011347   change +0.017015
     DD      0.000454 -> 0.007562   change +0.007108
-  The adverse current bias therefore becomes more damaging later in the C29
+  The adverse current-gain error therefore becomes more damaging later in the C29
   life for every model, but the trajectory is not locally monotonic.
 
   Mean bias contribution from the first to last 20% of each interval:

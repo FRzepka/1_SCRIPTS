@@ -48,6 +48,11 @@ STRATIFICATION_PROTOCOL = {
     },
 }
 
+# The rolling DD estimator emits its first prediction after the 2024-sample
+# input sequence. All estimator classes must therefore be scored from the same
+# source sample onward.
+COMMON_EVALUATION_START_SAMPLE = 2023
+
 
 def load_cell_dataframe(
     data_root: str,
@@ -114,7 +119,7 @@ def add_common_scenario_args(ap) -> None:
     ap.add_argument("--soc_init_error", type=float, default=0.0,
                     help="Additive SOC init error in fraction, e.g. 0.1 for +10%.")
     ap.add_argument("--missing_gap_seconds", type=float, default=0.0,
-                    help="Length of one central burst-dropout/freeze window in seconds.")
+                    help="Length of one burst-dropout/freeze window in seconds.")
     ap.add_argument(
         "--missing_gap_placement",
         choices=["center", "max_abs_net_charge"],
@@ -143,6 +148,15 @@ def add_common_scenario_args(ap) -> None:
                     help="Required continuous time inside the common recovery band.")
     ap.add_argument("--recovery_horizon_seconds", type=float, default=86400.0,
                     help="Post-event horizon for common recovery metrics.")
+    ap.add_argument(
+        "--evaluation_start_sample",
+        type=int,
+        default=0,
+        help=(
+            "First source-sample index included in accuracy and robustness metrics. "
+            "JES2 uses 2023 so every estimator is scored on the DD-valid interval."
+        ),
+    )
     ap.add_argument("--summary_only", action="store_true",
                     help="Write summary.json only; omit per-sample CSV and diagnostic plots.")
     ap.add_argument(
@@ -646,6 +660,21 @@ def build_online_aux_features(
     return out
 
 
+def build_common_evaluation_mask(
+    output_length: int,
+    evaluation_start_sample: int,
+    source_start_sample: int = 0,
+) -> np.ndarray:
+    """Map a common source-sample cutoff onto an estimator output array."""
+    if output_length < 0:
+        raise ValueError("output_length must not be negative")
+    source_indices = np.arange(output_length, dtype=np.int64) + int(source_start_sample)
+    mask = source_indices >= int(evaluation_start_sample)
+    if output_length and not np.any(mask):
+        raise ValueError("The common evaluation cutoff excludes every prediction")
+    return mask
+
+
 def compute_robustness_metrics(
     time_s: np.ndarray,
     y_true: np.ndarray,
@@ -653,6 +682,7 @@ def compute_robustness_metrics(
     warmup_seconds: float = 0.0,
     disturbance_mask: np.ndarray = None,
     jump_threshold: float = 0.05,
+    evaluation_mask: np.ndarray = None,
 ) -> Dict[str, float]:
     t = np.asarray(time_s, dtype=np.float64)
     yt = np.asarray(y_true, dtype=np.float64)
@@ -661,7 +691,15 @@ def compute_robustness_metrics(
     err = yp - yt
     metrics: Dict[str, float] = {}
 
-    warm_mask = t >= float(warmup_seconds)
+    if evaluation_mask is not None:
+        warm_mask = np.asarray(evaluation_mask, dtype=bool)
+        if len(warm_mask) != len(t):
+            raise ValueError("evaluation_mask must align with predictions")
+    else:
+        # Treat warmup as elapsed time. Testtime is absolute in the source data,
+        # so comparing it directly with warmup_seconds silently retained the
+        # nominal warmup in the historical campaign.
+        warm_mask = (t - t[0]) >= float(warmup_seconds)
     if not np.any(warm_mask):
         warm_mask = np.ones(len(t), dtype=bool)
 
@@ -681,6 +719,7 @@ def compute_robustness_metrics(
     metrics["abs_error_variance"] = float(np.var(abs_w))
     metrics["drift_rate_soc_per_h"] = _fit_slope_per_hour(t_w, yp_w)
     metrics["drift_rate_abs_err_per_h"] = _fit_slope_per_hour(t_w, abs_w)
+    metrics["evaluation_samples"] = int(np.sum(warm_mask))
 
     if disturbance_mask is not None and len(disturbance_mask) == len(t):
         dm = np.asarray(disturbance_mask, dtype=bool)
@@ -770,15 +809,24 @@ def compute_common_recovery_metrics(
     threshold: float = 0.02,
     sustain_seconds: float = 300.0,
     horizon_seconds: float = 86400.0,
+    event_time_s: Optional[float] = None,
 ) -> Dict[str, float]:
-    """Measure recovery with one estimator-independent absolute error band."""
+    """Measure convergence between two aligned trajectories.
+
+    For the JES2 recovery endpoint, ``y_true`` is the paired correctly
+    initialized estimator trajectory and ``y_pred`` is its perturbed counterpart.
+    The function deliberately does not use the dataset SOC target.
+    """
     t = np.asarray(time_s, dtype=np.float64)
     abs_err = np.abs(np.asarray(y_pred, dtype=np.float64) - np.asarray(y_true, dtype=np.float64))
     if len(t) == 0 or len(t) != len(abs_err):
         return {}
 
     start_index = int(np.clip(start_index, 0, len(t) - 1))
-    horizon_end = float(t[start_index]) + float(horizon_seconds)
+    event_time = float(t[start_index]) if event_time_s is None else float(event_time_s)
+    if event_time > float(t[start_index]):
+        raise ValueError("event_time_s must not be later than the first evaluated sample")
+    horizon_end = event_time + float(horizon_seconds)
     stop_index = int(np.searchsorted(t, horizon_end, side="right"))
     stop_index = max(start_index + 1, min(stop_index, len(t)))
     t_post = t[start_index:stop_index]
@@ -800,11 +848,11 @@ def compute_common_recovery_metrics(
             side="left",
         )
         full_window = (t_post[candidates] + float(sustain_seconds)) <= t_post[-1]
-        recovered = full_window & (next_bad >= sustain_end)
+        recovered = full_window & (next_bad > sustain_end)
         if np.any(recovered):
             first = int(candidates[np.flatnonzero(recovered)[0]])
             recovery_index = first
-            recovery_time_s = float(t_post[first] - t_post[0])
+            recovery_time_s = float(t_post[first] - event_time)
 
     relapse_index = None
     if recovery_index is not None:
@@ -818,10 +866,10 @@ def compute_common_recovery_metrics(
     if stable_start < len(valid):
         stable_duration = float(t_post[-1] - t_post[stable_start])
         if valid[stable_start] and stable_duration >= float(sustain_seconds):
-            stable_recovery_time_s = float(t_post[stable_start] - t_post[0])
+            stable_recovery_time_s = float(t_post[stable_start] - event_time)
 
-    elapsed_h = (t_post - t_post[0]) / 3600.0
-    observed_horizon_s = float(t_post[-1] - t_post[0])
+    elapsed_h = (t_post - event_time) / 3600.0
+    observed_horizon_s = float(t_post[-1] - event_time)
     capped_time_s = (
         recovery_time_s
         if recovery_time_s is not None
@@ -838,7 +886,7 @@ def compute_common_recovery_metrics(
         "common_recovery_sustain_seconds": float(sustain_seconds),
         "common_recovery_horizon_seconds": float(horizon_seconds),
         "common_recovery_initial_abs_err": float(err_post[0]),
-        "common_recovery_excess_auc_soc_h": float(np.trapz(excess, elapsed_h)) if len(excess) > 1 else 0.0,
+        "common_recovery_excess_auc_soc_h": float(np.trapezoid(excess, elapsed_h)) if len(excess) > 1 else 0.0,
         "common_recovery_time_s": recovery_time_s,
         "common_recovery_time_h": None if recovery_time_s is None else recovery_time_s / 3600.0,
         "common_recovery_or_censor_time_h": capped_time_s / 3600.0,
@@ -846,7 +894,7 @@ def compute_common_recovery_metrics(
         "common_recovery_censored": recovery_time_s is None,
         "common_recovery_relapsed": relapse_index is not None,
         "common_recovery_first_relapse_time_h": (
-            None if relapse_index is None else float(t_post[relapse_index] - t_post[0]) / 3600.0
+            None if relapse_index is None else float(t_post[relapse_index] - event_time) / 3600.0
         ),
         "common_stable_recovery_time_h": (
             None if stable_recovery_time_s is None else stable_recovery_time_s / 3600.0
@@ -872,21 +920,23 @@ def compute_protocol_event_metrics(
     sustain_seconds: float,
     horizon_seconds: float,
 ) -> Dict[str, float]:
-    """Return fair recovery and physical gap metrics for JES2 event scenarios."""
+    """Return physical event metrics that do not require a paired trajectory.
+
+    Recovery is intentionally absent here. The canonical JES2 endpoint needs a
+    model-matched correctly initialized trajectory and is computed separately
+    instead of against dataset SOC.
+    """
     t = np.asarray(time_s, dtype=np.float64)
     current = np.asarray(current_a, dtype=np.float64)
     freeze = np.asarray(freeze_mask, dtype=bool)
     if scenario == "initial_soc_error":
-        return compute_common_recovery_metrics(
-            t, y_true, y_pred, 0, threshold, sustain_seconds, horizon_seconds
-        )
+        return {}
     if scenario != "missing_gap" or not np.any(freeze):
         return {}
 
     gap_indices = np.flatnonzero(freeze)
     first_gap = int(gap_indices[0])
     last_gap = int(gap_indices[-1])
-    recovery_start = min(last_gap + 1, len(t) - 1)
     dt_s = np.diff(t, prepend=t[0])
     dt_s[dt_s < 0.0] = 0.0
     gap_dt = dt_s[freeze]
@@ -899,17 +949,6 @@ def compute_protocol_event_metrics(
         "gap_start_time_s": float(t[first_gap]),
         "gap_end_time_s": float(t[last_gap]),
     }
-    event.update(
-        compute_common_recovery_metrics(
-            t,
-            y_true,
-            y_pred,
-            recovery_start,
-            threshold,
-            sustain_seconds,
-            horizon_seconds,
-        )
-    )
     return event
 
 

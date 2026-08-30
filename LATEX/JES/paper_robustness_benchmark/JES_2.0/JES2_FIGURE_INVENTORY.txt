@@ -1,65 +1,56 @@
-JES 2.0 - FIGURE INVENTORY AND DATA STATUS
-Updated: 2026-08-25
+JES 2.0 - FINAL FIGURE INVENTORY
+Updated: 2026-08-30
 
-OUTPUT LOCATIONS
-  Main figure directory:
-    LATEX/JES/paper_robustness_benchmark/figures/Results
-  Current visual overview:
-    LATEX/JES/paper_robustness_benchmark/JES_2.0/JES2_Figure_Overview.png
-  Automatically generated pilot figures after the running campaign completes:
-    LATEX/JES/paper_robustness_benchmark/figures/Results/JES2_Pilot
-  Compiled JES2 method/coverage preview PDFs:
-    LATEX/JES/paper_robustness_benchmark/JES_2.0/
-    Robustness_Benchmark_Manuscript_JES2.pdf
-    Robustness_Benchmark_Manuscript_Anonymized_JES2.pdf
+AUTHORITATIVE FIGURE DIRECTORY
+  LATEX/JES/paper_robustness_benchmark/figures/Results/All Cells
 
-STATUS LEGEND
-  REAL_DATA_READY      Complete real-data coverage/design figure; safe to inspect now.
-  LEGACY_REPLACE       Existing C07 result graphic; must be replaced by JES2 results.
-  PILOT_RUNNING        Layout and calculation path exist; real six-cell pilot is running.
-  FULL_RUN_REQUIRED    Requires scenarios/cadences from the complete campaign.
+COMPILED OVERVIEW
+  LATEX/JES/paper_robustness_benchmark/JES_2.0/JES2_Figure_Overview.png
 
-CURRENT RESULT FIGURES
-  Figure 04  Baseline performance                         LEGACY_REPLACE / PILOT_RUNNING
-  Figure 05  Current-bias sensitivity                     LEGACY_REPLACE / FULL_RUN_REQUIRED
-  Figure 06  Repeated noise robustness                    LEGACY_REPLACE / FULL_RUN_REQUIRED
-  Figure 07  Initial mismatch realization and recovery   LEGACY_REPLACE / PILOT_RUNNING
-  Figure 08  Signal integrity and timing                  LEGACY_REPLACE / FULL_RUN_REQUIRED
-  Figure 09  One-hour dropout transition                  LEGACY_REPLACE / PILOT_RUNNING
-  Figure 11  Voltage-spike response                       LEGACY_REPLACE / FULL_RUN_REQUIRED
-  Figure 12  Cross-scenario delta-MAE heatmap             LEGACY_REPLACE / PILOT_RUNNING
-  Figure 13  Decision evidence without composite ranking  LEGACY_REPLACE / PILOT_RUNNING
-  Figure 14  ADC quantization                             LEGACY_REPLACE / FULL_RUN_REQUIRED
-  Figure 15  LSTM-SOH versus reference-SOH ablation       PILOT_RUNNING
+STATUS
+  All 24 PNG files below are final real-data or protocol figures and are included
+  exactly once in Robustness_Benchmark_Manuscript_JES2_Updated.tex. Legacy and
+  pilot output directories are not referenced by the JES 2.0 manuscript.
 
-REAL SIX-CELL COVERAGE AND DESIGN FIGURES
-  Figure 16  Aging/load/thermal/SOH coverage              REAL_DATA_READY
-  Figure 24  Aging trajectories over EFC                  REAL_DATA_READY
-  Figure 25  SOH/temperature/load/SOC coverage matrix     REAL_DATA_READY
-  Figure 26  Joint load-temperature-SOH envelope          REAL_DATA_READY
-  Figure 27  Complete 19-case JES2 test matrix            REAL_DATA_READY
-  Figure 28  Cell-based statistical-analysis workflow     REAL_DATA_READY
-  Figure 29  Frozen evaluation-window protocol            REAL_DATA_READY
+MAIN MANUSCRIPT
+  Figure 01  Requirements overview
+  Figure 02  Methodology overview
+  Figure 03  Disturbance taxonomy
+  Figure 04  Common-mask baseline performance
+  Figure 05  Signed current-gain sensitivity
+  Figure 06  Current-gain lifecycle and full-charge reset
+  Figure 07  Noise robustness
+  Figure 08  Six-cell noise overview
+  Figure 09  Canonical paired initialization recovery
+  Figure 10  Six-cell signal-integrity overview
+  Figure 11  One-hour burst-dropout transition and duration-matched effect
+  Figure 12  Six-cell voltage-spike response
+  Figure 13  Event-aligned voltage-spike example
+  Figure 14  Cross-scenario six-cell delta-MAE heatmap
+  Figure 15  Illustrative accuracy/robustness/recovery decision synthesis
+  Figure 16  ADC quantization signal detail and six-cell effect
+  Figure 17  Hardware/software numerical equivalence
+  Figure 18  On-device latency distributions
+  Figure 19  Compiled flash and measured peak runtime RAM
+  Figure 20  DD inference-mode comparison
 
-NEW STRATIFIED RESULT FIGURES
-  Figure 17  Repeated-noise effects with hierarchical CI  FINAL_REAL_DATA_READY
-  Figure 18  SOH publication cadence 1/6/24 h             FINAL_REAL_DATA_READY
-  Figure 19  HECM lookup-table parameter sensitivity      FULL_RUN_REQUIRED
-  Figure 20  Baseline MAE across SOH states               FINAL_REAL_DATA_READY
-  Figure 21  Cell-load class x SOH-state interaction      FINAL_REAL_DATA_READY
-  Figure 22  Disturbance delta-MAE across SOH states      FINAL_REAL_DATA_READY
-  Figure 23  Accuracy across load/temperature states      FINAL_REAL_DATA_READY
-
-RUNNING JOBS
-  None. Pilot, smoke test, all six full cell shards, manifest merge, and final
-  10000-repeat publication result build completed successfully.
+APPENDIX
+  Figure 21  Holdout-cell coverage
+  Figure 22  Complete 19-case JES2 test matrix
+  Figure 23  Common-mask evaluation-window and dropout protocol
+  Figure 24  DD inference-mode latency distributions
 
 SCIENTIFIC DATA BOUNDARY
-  No synthetic layout-test value is copied into a manuscript figure directory.
-  Figures 16 and 24-28 use the full measured holdout trajectories; Figure 29 uses
-  the frozen measured window manifest. The aging and
-  operating-envelope plots use evenly spaced samples only for rendering density;
-  all reported state fractions are calculated from every sample in every cell.
-  Pilot figures are diagnostic evidence. The complete six-cell campaign with 10
-  Gaussian-noise seeds and 5 seeds for secondary stochastic integrity scenarios
-  and its strict final result build are complete.
+  Figures 04-16 are generated from the corrected six-cell common-mask results.
+  Figure 09 is generated from the canonical paired initialization trajectories.
+  Figure 11 compares the 48-hour dropout runs with duration-matched undisturbed
+  references. Figures 14 and 15 include all eight declared disturbance families,
+  including voltage and temperature offsets. Figures 17-20 and 24 use measured
+  STM32 SOC-core results. Figures 21-23 visualize measured coverage and the frozen
+  protocol. No synthetic pilot value is used in the manuscript.
+
+EXECUTION STATUS
+  Public benchmark: 6720/6720 runs complete.
+  Internal duration-matched dropout references: 112/112 runs complete.
+  Statistical build: 10000 hierarchical bootstrap repetitions complete.
+  Tests: 32/32 passed in the ML environment.

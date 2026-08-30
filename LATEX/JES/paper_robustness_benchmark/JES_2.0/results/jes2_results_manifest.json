@@ -1,6 +1,6 @@
 {
-  "source_manifest": "/home/florianr/MG_Farm/1_Scripts/DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/campaigns/jes2_full_holdout_merged_20260825.json",
-  "source_tag": "jes2_full_holdout_20260825",
+  "source_manifest": "/home/florianr/MG_Farm/1_Scripts/DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/campaigns/jes2_common_mask_with_gap_reference_20260830/jes2_manifest.json",
+  "source_tag": "jes2_common_mask_with_gap_reference_20260830",
   "cells": [
     "C09",
     "C13",
@@ -12,9 +12,10 @@
   "completed_run_records": 6720,
   "bootstrap_samples": 10000,
   "aggregation": "windows averaged within cell/seed; equal-weight cell macro; hierarchical bootstrap",
+  "common_evaluation_start_sample": 2023,
   "primary_soh_condition": "lstm_h1",
   "reference_soh_role": "paired explanatory ablation",
-  "stratified_run_records": 62901,
+  "stratified_run_records": 62601,
   "paired_scenario_tests": 72,
   "paired_model_tests": 60,
   "stratification_dimensions": [

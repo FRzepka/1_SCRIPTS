@@ -17,7 +17,6 @@ COMPATIBILITY_FIELDS = [
     "secondary_stochastic_repeats",
     "models",
     "soh_modes",
-    "lstm_publish_intervals",
     "reference_publish_intervals",
     "output_policy",
 ]
@@ -75,6 +74,13 @@ def merge_manifests(paths: list[Path], tag: str) -> dict[str, Any]:
     )
     merged["reference_aliases"] = sorted(
         {alias for manifest in manifests for alias in manifest.get("reference_aliases", [])}
+    )
+    merged["lstm_publish_intervals"] = sorted(
+        {
+            int(interval)
+            for manifest in manifests
+            for interval in manifest.get("lstm_publish_intervals", [1])
+        }
     )
     merged["cadence_aliases"] = sorted(
         {alias for manifest in manifests for alias in manifest.get("cadence_aliases", ["baseline"])}
