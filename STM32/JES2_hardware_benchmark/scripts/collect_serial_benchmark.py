@@ -135,6 +135,40 @@ def reset_device(port: serial.Serial, timeout_s: float) -> None:
         raise RuntimeError(f"Unexpected RESET response: {line}")
 
 
+def read_memory_profile(
+    port: serial.Serial, expected_model: str, timeout_s: float
+) -> dict[str, int]:
+    port.write(b"MEMORY\n")
+    port.flush()
+    line = read_nonempty_line(port, time.monotonic() + timeout_s)
+    fields = line.split(",")
+    if len(fields) != 8 or fields[0] != "MEMORY":
+        raise RuntimeError(f"Malformed MEMORY response: {line}")
+    if fields[1] != expected_model:
+        raise RuntimeError(
+            f"MEMORY response is for {fields[1]}, expected {expected_model}"
+        )
+    names = (
+        "data_bytes",
+        "bss_bytes",
+        "static_bytes",
+        "heap_peak_bytes",
+        "stack_peak_bytes",
+        "total_peak_bytes",
+    )
+    profile = {name: int(value) for name, value in zip(names, fields[2:])}
+    expected_total = (
+        profile["static_bytes"]
+        + profile["heap_peak_bytes"]
+        + profile["stack_peak_bytes"]
+    )
+    if profile["static_bytes"] != profile["data_bytes"] + profile["bss_bytes"]:
+        raise RuntimeError(f"Inconsistent runtime-memory response: {line}")
+    if profile["total_peak_bytes"] != expected_total:
+        raise RuntimeError(f"Inconsistent total RAM response: {line}")
+    return profile
+
+
 def parse_result(line: str, expected_id: str, expected_model: str) -> dict[str, object]:
     if line.startswith("ERROR,"):
         raise RuntimeError(f"STM32 reported {line}")
@@ -171,6 +205,7 @@ def run(args: argparse.Namespace) -> dict[str, object]:
     result_path = args.out_dir / "measurements.csv"
     started = utc_now()
     measurements: list[dict[str, object]] = []
+    runtime_memory: dict[str, int] | None = None
 
     with serial.Serial(args.port, args.baud, timeout=0.1) as port:
         time.sleep(args.reset_wait_s)
@@ -228,6 +263,8 @@ def run(args: argparse.Namespace) -> dict[str, object]:
                     writer.writerow(record)
                     output.flush()
 
+        runtime_memory = read_memory_profile(port, args.model, args.timeout_s)
+
     valid = [row for row in measurements if row["status"] == "OK"]
     errors = [float(row["error"]) for row in valid if row["error"] is not None]
     dataset_errors = [float(row["dataset_error"]) for row in valid if row["dataset_error"] is not None]
@@ -249,6 +286,7 @@ def run(args: argparse.Namespace) -> dict[str, object]:
         "device_time_us": numeric_summary(row["device_time_us"] for row in valid if row["device_time_us"] is not None),
         "cycles": numeric_summary(row["cycles"] for row in valid),
         "host_rtt_ms_diagnostic": numeric_summary(row["host_rtt_ms"] for row in valid),
+        "runtime_memory": runtime_memory,
         "reference_difference": {
             "n": len(errors),
             "mae": statistics.fmean(abs(value) for value in errors) if errors else None,

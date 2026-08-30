@@ -22,7 +22,7 @@ remains concise. `REVIEWER_TODO_STATUS.txt` is the historical implementation log
 | Independence of development and benchmark | Neural training, validation, tuning, scaling, pruning, and checkpoint selection exclude all six holdout cells. The imported HPPC-derived HECM surfaces predate the campaign and are not fitted or retuned with scored trajectories. Splits and hashes are stored in manifests. | Addressed; retain exact HPPC provenance in response letter |
 | Unfair DD initialization proxy | All models receive a requested 10% SOC-equivalent intervention, realized output shifts are reported, and the text explicitly states that the interventions are not identical latent-state perturbations. The revised result no longer claims DD is the fastest; HECM is. | Addressed transparently, structural limitation retained |
 | Estimator-specific recovery bands | One common 2% absolute-error threshold, 300-s hold time, and 24-h censor horizon are used. | Addressed |
-| Embedded-deployment evidence | Six-cell STM32H753ZI tests report numerical equivalence, latency distributions, flash, static RAM, and one-second deadline occupation. Peak runtime RAM, energy, and concurrent total-BMS CPU load are explicitly excluded. | Substantially addressed; peak/system measurements remain open |
+| Embedded-deployment evidence | Six-cell STM32H753ZI tests report numerical equivalence, latency distributions, flash, measured peak runtime RAM, and one-second deadline occupation. Energy and concurrent total-BMS CPU load are explicitly excluded. | Substantially addressed; energy and system-level measurements remain open |
 | Missing statistical validation | Repeated seeds, equal-weight cell macro statistics, 10,000 hierarchical bootstrap repetitions, paired sign-flip tests, effect sizes, and Holm correction are reported. | Addressed |
 | Shared SOH confounder | Selected scenarios are rerun with paired reference SOH. Results distinguish absolute SOH calibration effects from incremental disturbance effects. | Addressed |
 
@@ -39,7 +39,7 @@ remains concise. `REVIEWER_TODO_STATUS.txt` is the historical implementation log
 | Larger timing jitter | The campaign includes +/-0.1, +/-0.5, and +/-0.9 s with repeated seeds. | Addressed |
 | DD voltage-spike mechanism | Event alignment supports the voltage-plus-derivative/recurrent-context explanation; the manuscript labels it as an interpretation because no channel-removal ablation was run. | Addressed without overclaiming |
 | Estimator-specific recovery thresholds | Replaced by the common recovery criterion. | Addressed |
-| Runtime-memory lower bounds | Measured static firmware allocation replaces analytical persistent-state estimates, but peak stack/dynamic memory remains unmeasured and is stated as such. | Partly open hardware boundary |
+| Runtime-memory lower bounds | Statically allocated variable storage is combined with on-device measurements of maximum call-stack and dynamic-memory use. The values cover the SOC firmware execution but exclude the shared SOH-LSTM and concurrent BMS tasks. | Addressed for the isolated SOC-core boundary |
 | HECM dependence on lookup-table quality | The main result is explicitly conditional on the fixed HPPC tables. No full six-cell parameter-mismatch sensitivity campaign is included. | Open optional software extension |
 | Temperature response through SOH LSTM | Paired reference-SOH temperature-noise runs show that the incremental substitution effect differs from baseline by 0.0015 SOC for HDM and less than 0.0001 for HECM/DD. | Addressed |
 | Measurement-only exclusions | Parameter mismatch, hysteresis, gradients, pack imbalance, balancing/contactor/protocol/numerical/deadline faults are listed in limitations. | Addressed |
@@ -51,9 +51,8 @@ remains concise. `REVIEWER_TODO_STATUS.txt` is the historical implementation log
    manifests, summaries, and rebuild command as a versioned release.
 2. Confirm the originating HPPC experiment/cell provenance of the imported HECM
    lookup surfaces in the response letter.
-3. Decide whether the existing measured static RAM is sufficient for the revised,
-   explicitly limited SOC-core claim or whether peak-stack instrumentation should
-   be added later.
+3. Retain the explicit distinction between the measured SOC-core peak RAM and the
+   still-open memory requirement of a concurrent SOC--SOH BMS implementation.
 4. Treat a full HECM parameter-mismatch sweep as optional additional evidence,
    not as part of the measurement-only primary ranking.
 

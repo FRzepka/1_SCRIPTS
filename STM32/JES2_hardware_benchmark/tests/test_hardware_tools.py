@@ -50,6 +50,26 @@ class SerialBenchmarkTests(unittest.TestCase):
         self.assertIn("dataset_error", serial_benchmark.RESULT_COLUMNS)
         self.assertIn("dataset_abs_error", serial_benchmark.RESULT_COLUMNS)
 
+    def test_parse_runtime_memory_response(self):
+        class FakePort:
+            def __init__(self):
+                self.command = b""
+
+            def write(self, value):
+                self.command = value
+
+            def flush(self):
+                pass
+
+            def readline(self):
+                return b"MEMORY,DD,472,66888,67360,320,1248,68928\r\n"
+
+        port = FakePort()
+        profile = serial_benchmark.read_memory_profile(port, "DD", 1.0)
+        self.assertEqual(port.command, b"MEMORY\n")
+        self.assertEqual(profile["static_bytes"], 67360)
+        self.assertEqual(profile["total_peak_bytes"], 68928)
+
 
 class MemoryReportTests(unittest.TestCase):
     def test_parse_sections(self):

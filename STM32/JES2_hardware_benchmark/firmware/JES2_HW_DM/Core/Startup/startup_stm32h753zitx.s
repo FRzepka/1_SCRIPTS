@@ -60,6 +60,19 @@ defined in linker script */
 Reset_Handler:
   ldr   sp, =_estack      /* set stack pointer */
 
+/* Paint all RAM_D1 memory between static data and the stack top. The stack
+   grows downward and overwrites this pattern, allowing an on-device
+   high-water-mark measurement after the benchmark. */
+  ldr   r0, =_ebss
+  ldr   r1, =_estack
+  ldr   r2, =0xA5A5A5A5
+StackPaintLoop:
+  cmp   r0, r1
+  bhs   StackPaintDone
+  str   r2, [r0], #4
+  b     StackPaintLoop
+StackPaintDone:
+
 /* Call the ExitRun0Mode function to configure the power supply */
   bl  ExitRun0Mode
 /* Call the clock system initialization function.*/

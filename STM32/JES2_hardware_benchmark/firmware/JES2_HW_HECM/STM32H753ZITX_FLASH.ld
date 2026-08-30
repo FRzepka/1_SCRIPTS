@@ -51,6 +51,9 @@ MEMORY
   ITCMRAM (xrw)  : ORIGIN = 0x00000000, LENGTH = 64K
 }
 
+/* The newlib heap is kept entirely inside DTCMRAM. */
+_heap_end = ORIGIN(DTCMRAM) + LENGTH(DTCMRAM);
+
 /* Define output sections */
 SECTIONS
 {
@@ -165,6 +168,8 @@ SECTIONS
     . = . + _Min_Stack_Size;
     . = ALIGN(8);
   } >DTCMRAM
+
+  ASSERT((_estack - _ebss) >= _Min_Stack_Size, "RAM_D1 stack reservation overlaps static data")
 
   /* Remove information from the standard libraries */
   /DISCARD/ :

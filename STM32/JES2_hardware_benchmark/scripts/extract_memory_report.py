@@ -14,7 +14,7 @@ from pathlib import Path
 
 
 FLASH_PREFIXES = (".isr_vector", ".text", ".rodata", ".ARM", ".init_array", ".fini_array", ".data")
-RAM_PREFIXES = (".data", ".bss", ".noinit", "._user_heap_stack")
+RAM_PREFIXES = (".data", ".bss", ".noinit")
 
 
 def sha256(path: Path) -> str:
@@ -81,10 +81,10 @@ def main() -> None:
 
     models = [inspect_image(model, elf, args.size_tool) for model, elf in args.image]
     payload = {
-        "schema_version": 1,
+        "schema_version": 2,
         "created_utc": datetime.now(timezone.utc).isoformat(),
         "size_tool": args.size_tool,
-        "notes": "Static section sizes only; add measured peak stack and activation buffers separately.",
+        "notes": "Static .data/.bss/.noinit only. The linker reservation is reported separately and is not treated as consumed RAM; combine static bytes with measured peak heap and stack.",
         "models": models,
     }
     args.out.parent.mkdir(parents=True, exist_ok=True)

@@ -25,6 +25,7 @@ VARIANT_LABELS = {"DD": "Rolling window", "DDS": "Continuous state", "DDP": "Per
 COLORS = {"DM": "#2ca02c", "HDM": "#9467bd", "HECM": "#1f77b4", "DD": "#d62728"}
 VARIANT_COLORS = {"DD": "#d62728", "DDS": "#2ca02c", "DDP": "#1f77b4"}
 LOAD_CLASSES = {"Low": ("C25", "C27"), "Medium": ("C09", "C13", "C15"), "High": ("C29",)}
+CROSS_MODEL_MEMORY_KEYS = {"DM": "DM", "HDM": "HDM", "HECM": "HECM", "DD": "DDS"}
 
 
 def read_csv(path: Path) -> list[dict[str, str]]:
@@ -61,6 +62,11 @@ def load_memory(root: Path) -> dict[str, dict]:
     for name in ("memory.json", "dd_mode_memory.json"):
         payload = json.loads((root / "results" / name).read_text(encoding="utf-8"))
         data.update({row["model"]: row for row in payload["models"]})
+    runtime_path = root / "results" / "runtime_memory" / "runtime_memory_measurements.json"
+    if runtime_path.is_file():
+        payload = json.loads(runtime_path.read_text(encoding="utf-8"))
+        for row in payload["models"]:
+            data[row["model"]].update(row)
     return data
 
 
@@ -427,14 +433,20 @@ def plot_dd_variant_latency_distributions(
 def plot_memory(memory: dict[str, dict], out: Path) -> None:
     fig, axes = plt.subplots(1, 2, figsize=(9.0, 3.8))
     x = np.arange(len(MODELS)); colors = [COLORS[model] for model in MODELS]
-    flash = [memory[model]["flash_load_bytes"] / 1024 for model in MODELS]
-    ram = [memory[model]["static_ram_bytes"] / 1024 for model in MODELS]
+    display_labels = ("DM", "HDM", "HECM", "DD\ncontinuous")
+    flash = [memory[CROSS_MODEL_MEMORY_KEYS[model]]["flash_load_bytes"] / 1024
+             for model in MODELS]
+    ram = [memory[CROSS_MODEL_MEMORY_KEYS[model]].get(
+        "total_peak_bytes",
+        memory[CROSS_MODEL_MEMORY_KEYS[model]]["static_ram_bytes"],
+    ) / 1024 for model in MODELS]
     for ax, values, title, ylabel in ((axes[0], flash, "(a) Flash footprint", "Flash [KiB]"),
-                                      (axes[1], ram, "(b) Static RAM footprint", "Static RAM [KiB]")):
+                                      (axes[1], ram, "(b) Peak runtime RAM", "Peak RAM [KiB]")):
         bars = ax.bar(x, values, facecolor=[to_rgba(color, 0.28) for color in colors],
                       edgecolor=colors, linewidth=1.35, width=0.62)
-        ax.set_xticks(x, MODELS); ax.set_ylabel(ylabel); ax.set_title(title)
+        ax.set_xticks(x, display_labels); ax.set_ylabel(ylabel); ax.set_title(title)
         ax.bar_label(bars, labels=[f"{value:.1f}" for value in values], padding=3, fontsize=8)
+        ax.set_ylim(0, 1.16 * max(values))
     fig.tight_layout()
     fig.savefig(out / "figure_03_flash_and_ram.png", bbox_inches="tight")
     plt.close(fig)
@@ -468,7 +480,8 @@ def plot_variants(rows: list[dict], memory: dict[str, dict], out: Path) -> None:
 
     width = 0.35; xv = np.arange(len(VARIANTS))
     flash = [memory[variant]["flash_load_bytes"] / 1024 for variant in VARIANTS]
-    ram = [memory[variant]["static_ram_bytes"] / 1024 for variant in VARIANTS]
+    ram = [memory[variant].get("total_peak_bytes", memory[variant]["static_ram_bytes"]) / 1024
+           for variant in VARIANTS]
     variant_edges = [VARIANT_COLORS[variant] for variant in VARIANTS]
     flash_bars = axes[2].bar(xv - width / 2, flash, width,
                              facecolor=[to_rgba(color, 0.20) for color in variant_edges],
@@ -477,7 +490,7 @@ def plot_variants(rows: list[dict], memory: dict[str, dict], out: Path) -> None:
     ram_bars = axes[2].bar(xv + width / 2, ram, width,
                            facecolor=[to_rgba(color, 0.20) for color in variant_edges],
                            edgecolor=variant_edges,
-                           linewidth=1.25, hatch="//", label="Static RAM")
+                           linewidth=1.25, hatch="//", label="Peak RAM")
     axes[2].set_xticks(xv, ["Rolling\nwindow", "Continuous\nstate", "Periodic\nreset"])
     axes[2].set_ylabel("Memory [KiB]"); axes[2].set_title("(c) Memory footprint")
     axes[2].set_ylim(0, 1.18 * max(flash + ram))
@@ -491,7 +504,7 @@ def plot_variants(rows: list[dict], memory: dict[str, dict], out: Path) -> None:
     ]
     resource_handles = [
         Patch(facecolor="#e5e5e5", edgecolor="#555555", hatch="..", label="Flash"),
-        Patch(facecolor="#e5e5e5", edgecolor="#555555", hatch="//", label="Static RAM"),
+        Patch(facecolor="#e5e5e5", edgecolor="#555555", hatch="//", label="Peak RAM"),
     ]
     fig.legend(handles=mode_handles + resource_handles, frameon=False, ncol=5,
                fontsize=9.5, handlelength=2.0, columnspacing=1.8,
@@ -535,7 +548,7 @@ def main() -> None:
               dd_latency_statistics)
     write_csv(args.out_dir / "memory_footprints.csv", [
         {"model": model, "flash_kib": memory[model]["flash_load_bytes"] / 1024,
-         "static_ram_kib": memory[model]["static_ram_bytes"] / 1024}
+         "peak_runtime_ram_kib": memory[model].get("total_peak_bytes", memory[model]["static_ram_bytes"]) / 1024}
         for model in ("DM", "HDM", "HECM", "DD", "DDS", "DDP")
     ])
     plot_accuracy(accuracy, args.out_dir)

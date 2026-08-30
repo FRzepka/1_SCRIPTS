@@ -46,6 +46,7 @@ $Common = @(
 
 $Sources = @(
     "$ProjectRoot/Core/Src/main.c",
+    "$ProjectRoot/Core/Src/ram_profiler.c",
     "$ProjectRoot/Core/Src/dd_model.c",
     "$ProjectRoot/Core/Src/dd_weights.c",
     "$ProjectRoot/Core/Src/stm32h7xx_it.c",

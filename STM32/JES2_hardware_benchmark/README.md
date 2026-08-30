@@ -77,8 +77,21 @@ python STM32/JES2_hardware_benchmark/scripts/extract_memory_report.py \
   --out STM32/JES2_hardware_benchmark/results/memory.json
 ```
 
-Das Skript verwendet standardmaessig `arm-none-eabi-size -A`. Die resultierenden
-statischen Werte ersetzen keine Peak-Stack-Messung auf dem Board.
+Das Skript verwendet standardmaessig `arm-none-eabi-size -A`. Es berichtet
+`.data`, `.bss` und `.noinit` als statische Belegung. Die Linker-Reserve fuer
+Heap und Stack wird separat ausgewiesen und nicht als verbrauchter RAM addiert.
+
+Die direkte Peak-RAM-Messung fuer alle sechs Firmwarevarianten wird mit dem
+angeschlossenen Board ausgefuehrt:
+
+```powershell
+./STM32/JES2_hardware_benchmark/scripts/run_runtime_memory_benchmark.ps1 `
+  -Port COM7 -Cell C09 -MaxRows 2025
+```
+
+Dabei werden Stack-Watermark, Heap-High-Water-Mark sowie `.data` und `.bss`
+zusammengefuehrt. Die Rohzusammenfassung liegt unter
+`results/runtime_memory/runtime_memory_measurements.json`.
 
 ## Zusammenfassung
 

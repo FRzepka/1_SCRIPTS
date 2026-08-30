@@ -120,13 +120,13 @@ Upload ausgeschlossen; Paper-Tabellen und Diagramme werden versioniert.
 4. Das in `SERIAL_PROTOCOL.md` definierte Protokoll implementieren.
 5. Jedes Image flashen und `scripts/run_multicell_benchmark.ps1` ausfuehren.
 6. ELF/Map-Dateien mit `scripts/extract_memory_report.py` auswerten.
-7. Peak-Stack per Stack-Painting/Linker-Unterstuetzung messen; statisches RAM
-   allein reicht fuer die Reviewer-Antwort nicht.
+7. Die implementierte Peak-RAM-Instrumentierung bei Aenderungen erneut mit
+   `scripts/run_runtime_memory_benchmark.ps1` ausfuehren.
 8. Optional Trigger-Pin und externe Leistungsmessung ausfuehren.
 9. Alle Resultate mit `scripts/summarize_multicell_results.py` zusammenfassen.
 10. Rohresultate, Build-Metadaten und Firmware-Commit nach Git pushen.
 
-## Lokaler Hardwarestatus 2026-08-26
+## Lokaler Hardwarestatus 2026-08-30
 
 - Das angeschlossene Board wurde als `NUCLEO-H753ZI` mit STM32H753, 2 MB Flash,
   Cortex-M7 und ST-Link V3 erkannt. Der virtuelle serielle Port ist `COM7`.
@@ -138,8 +138,9 @@ Upload ausgeschlossen; Paper-Tabellen und Diagramme werden versioniert.
   Zyklen, das Maximum bei 155 Zyklen.
 - Die Abweichung der float32-MCU-Ausgabe zur Software-Referenz betrug im DM-Lauf
   MAE `5.11e-6` und maximal `2.99e-5` SOC.
-- Das DM-Image belegt statisch 27650 B Flash und 4964 B RAM einschliesslich der
-  im Linkerskript reservierten 4096 B fuer Heap und Stack.
+- Die direkte Laufzeitmessung vom 2026-08-30 ergibt fuer DM und HDM jeweils
+  2432 B Peak-RAM. HECM benoetigt 2528 B. Diese Werte kombinieren `.data` und
+  `.bss` mit 320 B gemessenem Peak-Heap und 1240 B gemessenem Peak-Stack.
 - Eine eigenstaendige DD-Firmware liegt unter `firmware/JES2_HW_DD`. GRU,
   MLP, RobustScaler und das 2024-Sample-Rolling-Window sind direkt in float32-C
   implementiert. Auf dem Board werden weder ONNX noch X-CUBE-AI ausgefuehrt.
@@ -147,10 +148,11 @@ Upload ausgeschlossen; Paper-Tabellen und Diagramme werden versioniert.
   aus. Gegenueber der DD-Software-Referenz betrugen der MAE `2.98e-8` und die
   maximale absolute Abweichung `1.24e-7` SOC. Der Laufzeitmedian lag bei
   347034659 Zyklen beziehungsweise 722.99 ms bei 480 MHz.
-- Das DD-Image belegt statisch 118910 B Flash und 71452 B RAM einschliesslich
-  der im Linkerskript reservierten 4096 B fuer Heap und Stack. Die vorgegebene
-  kausale SOH-Spur wird als Eingangsmerkmal verwendet. Das SOH-LSTM laeuft nicht
-  auf dem Board.
+- Das Rolling-Window-DD benoetigt 68928 B Peak-RAM. Continuous State und
+  Periodic Reset benoetigen 4156 B beziehungsweise 4180 B. Die alte pauschale
+  4096-B-Linker-Reserve wird nicht mehr als gemessener Verbrauch behandelt.
+- Die vorgegebene kausale SOH-Spur wird als Eingangsmerkmal verwendet. Das
+  SOH-LSTM laeuft nicht auf dem Board.
 
 ## Akzeptanzkriterien
 
@@ -161,7 +163,7 @@ Upload ausgeschlossen; Paper-Tabellen und Diagramme werden versioniert.
 - Numerische Abweichung gegen die Software-Referenz berichtet, nicht nur gegen
   den Dataset-SOC.
 - Compilerflags, MCU-Takt, Firmware-Hash und Toolversionen im Ergebnis enthalten.
-- Flash, statisches RAM, Peak-Stack und Aktivierungspuffer getrennt ausgewiesen.
+- Flash, statisches RAM, Peak-Heap und Peak-Stack getrennt ausgewiesen.
 - Keine Robustheitsstoerungen im Hardwaredatensatz.
 
 ## Git-Regel

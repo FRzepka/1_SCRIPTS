@@ -63,6 +63,23 @@ Error response:
 ERROR,sample_id,error_code
 ```
 
+Read the accumulated on-device runtime-memory profile:
+
+```text
+MEMORY
+```
+
+Response fields are `.data`, `.bss`, static RAM, peak heap, peak stack, and
+their combined peak in bytes:
+
+```text
+MEMORY,model,data_bytes,bss_bytes,static_bytes,heap_peak_bytes,stack_peak_bytes,total_peak_bytes
+```
+
+The stack watermark starts in `Reset_Handler` and therefore covers startup,
+protocol handling, and estimator execution. Heap growth is recorded in
+`_sbrk()`. The `MEMORY` command does not reset either high-water mark.
+
 ## Timing boundary
 
 The DWT cycle counter starts immediately before estimator execution and stops

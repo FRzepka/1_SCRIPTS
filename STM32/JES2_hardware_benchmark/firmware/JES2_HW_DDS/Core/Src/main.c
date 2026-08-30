@@ -1,5 +1,6 @@
 #include "main.h"
 #include "dd_model.h"
+#include "ram_profiler.h"
 
 #include <errno.h>
 #include <stdio.h>
@@ -80,6 +81,22 @@ static void Process_Command(char *line)
 {
   if (strcmp(line, "HELLO") == 0) {
     UART3_Send(ready_line);
+    return;
+  }
+
+  if (strcmp(line, "MEMORY") == 0) {
+    ram_profile_t profile;
+    char response[128];
+    RAM_ProfilerRead(&profile);
+    snprintf(response, sizeof(response),
+             "MEMORY,DDS,%lu,%lu,%lu,%lu,%lu,%lu\r\n",
+             (unsigned long)profile.data_bytes,
+             (unsigned long)profile.bss_bytes,
+             (unsigned long)profile.static_bytes,
+             (unsigned long)profile.heap_peak_bytes,
+             (unsigned long)profile.stack_peak_bytes,
+             (unsigned long)profile.total_peak_bytes);
+    UART3_Send(response);
     return;
   }
 

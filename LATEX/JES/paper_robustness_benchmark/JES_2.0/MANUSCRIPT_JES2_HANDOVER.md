@@ -15,9 +15,9 @@ All revision work is confined to this `JES_2.0` directory.
 
 - Editable source: `Robustness_Benchmark_Manuscript_JES2_Updated.tex`
 - Compiled manuscript: `Robustness_Benchmark_Manuscript_JES2_Updated.pdf`
-- Source SHA-256: `12f087bfae1cedf3ae87bde8487e55a15d8f134c51cfa4e1289f8c10d6caf7cf`
-- PDF SHA-256: `153dfc099d0bd53f2205544dc2d7e548d90741003ab795a793ced415652999d6`
-- Compiled length: 46 pages
+- Source SHA-256: `94a405ef0cd64f12fc9a7ecb83cf95d2834b1eb4b698641e43863842ccd2465f`
+- PDF SHA-256: `b8c893a75ce4566b842f2bc16b63cf2ed5361984217326a89df04b523269d1f2`
+- Compiled length: 47 pages
 
 ## Build
 
@@ -42,7 +42,7 @@ tables.
 - Documented 16 predeclared 24-hour windows, 19 cases, six holdout cells, 20 repeated seeds where applicable, 6,720 canonical runs, and 10,000 hierarchical bootstrap repetitions.
 - Treated cells as the independent units and seeds/windows as nested observations.
 - Added current-bias lifecycle/reset, initial-state recovery, missing-sample, jitter, burst-dropout, voltage-spike, ADC-quantization, and cross-scenario interpretations.
-- Added isolated STM32H753ZI SOC-core hardware results, including numerical equivalence, latency, memory, and DD inference-mode tradeoffs.
+- Separated the robustness benchmark from the embedded performance benchmark and added isolated STM32H753ZI SOC-core results for numerical equivalence, latency, compiled flash occupancy, measured peak runtime RAM, and DD inference-mode tradeoffs.
 - Moved coverage, test-matrix, evaluation-window, and detailed DD-latency material into Appendix A.
 - Added a compact reviewer audit in `REVIEWER_COVERAGE_JES2.md`; the older `REVIEWER_TODO_STATUS.txt` is retained only as a historical implementation log.
 
@@ -51,12 +51,12 @@ tables.
 - The conclusions apply to the tested LFP cells, operating envelope, estimator implementations, and measurement-only disturbance protocol.
 - The high-load class contains only C29 and is not interpreted as a population-level high-load estimate.
 - Hardware measurements cover the SOC inference cores; the shared SOH LSTM and complete BMS scheduling are outside the on-device timing boundary.
-- Static ELF RAM is reported rather than peak stack usage, and board-level energy was not measured.
+- Peak runtime RAM combines statically allocated variable storage with on-device measurements of maximum call-stack and dynamic-memory use. The shared SOH-LSTM, concurrent BMS tasks, and board-level energy remain outside the measured hardware boundary.
 - The causal LSTM-SOH trace remains the primary common input; the reference-SOH substitution is reported only as an ablation.
 
 ## Validation performed
 
-- Visually inspected all 45 rendered pages, including the main results and appendices.
+- Visually inspected the rendered manuscript, including the main results and appendices.
 - Confirmed all 24 finalized PNG figures are referenced exactly once.
 - Confirmed that no missing-figure placeholders remain.
 - Confirmed that all active labels and references resolve.
