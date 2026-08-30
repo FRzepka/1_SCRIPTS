@@ -153,5 +153,6 @@ IMPORTANT DISTINCTION
   COMPLETE: the canonical paired initialization-recovery analysis drives the
   recovery text, figure, table, and illustrative decision score.
   COMPLETE WITH EXPLICIT BOUNDARY: isolated target-hardware SOC tests report
-  numerical equivalence, latency, linker-reported flash, and statically allocated
-  RAM. Peak runtime RAM, energy, and complete BMS scheduling remain unmeasured.
+  numerical equivalence, latency, compiled flash occupancy, and measured peak
+  runtime RAM from static storage, the heap high-water mark, and stack watermark.
+  Energy, the shared SOH service, and complete BMS scheduling remain unmeasured.

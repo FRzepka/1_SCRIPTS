@@ -83,12 +83,11 @@ R2.4 Estimator-specific recovery bands bias recovery times
   separately, so non-recovered runs are not silently dropped from the comparison.
 
 R2.5 Embedded deployment claims lack measured runtime/peak memory/CPU load
-  Status: OPEN_HARDWARE.
-  Software-paper action now: remove "embedded-ready" proof claims and describe
-  flash/persistent-state estimates as analytical lower bounds only. Hardware phase
-  must measure wall-clock latency distribution, peak runtime RAM including buffers
-  and stack, flash image size, and CPU load on the named STM32 target. The common
-  SOH service must be measured once and reported separately from each SOC core.
+  Status: DONE for the isolated SOC-core boundary; system-level load remains open.
+  Hardware tests now measure inference-latency distributions, compiled flash
+  occupancy, static variable storage, the heap high-water mark, and the maximum
+  call-stack watermark on the named STM32 target. The shared SOH service, energy,
+  and CPU load under concurrent BMS tasks remain outside the measured boundary.
 
 R2.6 Gaussian-noise robustness has no statistical validation
   Status: READY_FOR_RUN.
@@ -172,7 +171,9 @@ R3.9 Risks of estimator-specific recovery thresholds
   Status: DONE. Replaced by the common criterion described under R2.4.
 
 R3.10 Runtime memory estimates are lower bounds
-  Status: OPEN_HARDWARE. Same action as R2.5.
+  Status: DONE for the isolated SOC-core boundary. Static storage, heap high-water
+  mark, and stack watermark are combined into measured peak runtime RAM. The
+  shared SOH service and concurrent BMS tasks remain outside scope.
 
 R3.11 HECM current-gain result may depend on ECM lookup-table quality
   Status: READY_FOR_RUN; identification provenance remains OPEN.
