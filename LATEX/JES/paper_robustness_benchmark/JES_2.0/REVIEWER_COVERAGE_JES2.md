@@ -59,7 +59,7 @@ remains concise. `REVIEWER_TODO_STATUS.txt` is the historical implementation log
 
 ## Scope and length decision
 
-No additional result figures were added in this audit. The revised PDF remains 45
+No additional result figures were added in this audit. The revised PDF is 46
 pages in review layout. One compact scope table distinguishes estimator families
 from the exact benchmark representatives; the surrounding prose was tightened so
 that this clarification does not expand the paper overall. Detailed reviewer

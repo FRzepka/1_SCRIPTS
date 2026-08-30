@@ -15,9 +15,9 @@ All revision work is confined to this `JES_2.0` directory.
 
 - Editable source: `Robustness_Benchmark_Manuscript_JES2_Updated.tex`
 - Compiled manuscript: `Robustness_Benchmark_Manuscript_JES2_Updated.pdf`
-- Source SHA-256: `f905a89cc2bb9c26f28a44f44f52e46c84486a124941dbef5a64af2b08f8cadd`
-- PDF SHA-256: `5be2977edea0eba40578420023a6e6ea83cdfe098633a1719f34e0afa54edd65`
-- Compiled length: 45 pages
+- Source SHA-256: `12f087bfae1cedf3ae87bde8487e55a15d8f134c51cfa4e1289f8c10d6caf7cf`
+- PDF SHA-256: `153dfc099d0bd53f2205544dc2d7e548d90741003ab795a793ced415652999d6`
+- Compiled length: 46 pages
 
 ## Build
 
