@@ -1,6 +1,6 @@
 # JES 2.0 manuscript handover
 
-Date: 2026-08-28
+Date: 2026-08-30
 
 ## Protected original
 
@@ -15,8 +15,8 @@ All revision work is confined to this `JES_2.0` directory.
 
 - Editable source: `Robustness_Benchmark_Manuscript_JES2_Updated.tex`
 - Compiled manuscript: `Robustness_Benchmark_Manuscript_JES2_Updated.pdf`
-- Source SHA-256: `0d4d09f91415599d9d2eb514bfe9a396082a9c9c3f7c2579e4e936c8f633f0e5`
-- PDF SHA-256: `2e508c3a3d8d739d1f7cb730cb9bb5263a0265713d27cc2400c16bc90198b7d1`
+- Source SHA-256: `76d3d5ce43fb264259dcef86f8dd6a1315ff9a26896fdb6fc5d662a2ea699dd7`
+- PDF SHA-256: `2049c35e26ce0fec118da8462c9cfcf42bb00674fc10a94d8e968329f6318ad2`
 - Compiled length: 45 pages
 
 ## Build
@@ -36,7 +36,9 @@ tables.
 ## Main revision scope
 
 - Replaced the original illustrative results with the finalized six-cell JES2 figures.
-- Updated the abstract, methods, results, discussion, limitations, and conclusion to the finalized campaign.
+- Reframed the title, abstract, introduction, methods, discussion, limitations, and conclusion around the central deployment question: why nominal accuracy alone is insufficient and how robustness, recovery, and microcontroller cost change estimator selection.
+- Defined DM, HDM, HECM, and DD as four concrete representatives rather than universal proxies for complete estimator families, including their minimum class-defining mechanisms, optional broader extensions, and exact implementations used here.
+- Kept run counts, seed schedules, window selection, and bootstrap details out of the abstract and in the reproducibility-focused methods and appendix.
 - Documented 16 predeclared 24-hour windows, 19 cases, six holdout cells, 20 repeated seeds where applicable, 6,720 canonical runs, and 10,000 hierarchical bootstrap repetitions.
 - Treated cells as the independent units and seeds/windows as nested observations.
 - Added current-bias lifecycle/reset, initial-state recovery, missing-sample, jitter, burst-dropout, voltage-spike, ADC-quantization, and cross-scenario interpretations.

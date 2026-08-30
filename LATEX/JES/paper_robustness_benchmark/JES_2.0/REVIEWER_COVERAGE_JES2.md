@@ -1,6 +1,6 @@
 # JES 2.0 reviewer coverage audit
 
-Updated: 2026-08-28
+Updated: 2026-08-30
 
 This file maps the editor and reviewer comments to the current revised
 manuscript. It is intentionally separate from the paper so that the manuscript
@@ -30,7 +30,7 @@ remains concise. `REVIEWER_TODO_STATUS.txt` is the historical implementation log
 
 | Comment | Current response | Status |
 |---|---|---|
-| Representativeness of one trajectory | Six cells span different aging, load, thermal, and duration envelopes; load classes and missing strata are reported descriptively. | Addressed within available dataset |
+| Representativeness of one trajectory and estimator classes | Six cells span different aging, load, thermal, and duration envelopes; load classes and missing strata are reported descriptively. A dedicated methods table defines each class envelope and the exact tested representative, and the abstract, discussion, limitations, and conclusion avoid family-wide claims. | Addressed within available dataset and implementation scope |
 | Why LFP and NMC/NCA limits | Dataset suitability and LFP-specific flat-OCV/aging limitations are now explicit. No cross-chemistry claim is made. | Addressed |
 | Shared SOH bottleneck | Same paired reference-SOH ablation as Reviewer 2.7. | Addressed |
 | Hourly SOH cadence | The cadence is justified for gradual capacity fade; abrupt capacity-loss events are absent and explicitly outside scope. | Addressed with limitation |
@@ -59,7 +59,9 @@ remains concise. `REVIEWER_TODO_STATUS.txt` is the historical implementation log
 
 ## Scope and length decision
 
-No additional manuscript figures or tables were added in this audit. The revised
-PDF remains 45 pages in review layout. Detailed reviewer mapping belongs in the
-response letter; the paper retains only information required to understand or
-qualify the methods and results.
+No additional result figures were added in this audit. The revised PDF remains 45
+pages in review layout. One compact scope table distinguishes estimator families
+from the exact benchmark representatives; the surrounding prose was tightened so
+that this clarification does not expand the paper overall. Detailed reviewer
+mapping belongs in the response letter; the paper retains only information required
+to understand or qualify the methods and results.
