@@ -11,6 +11,8 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pyarrow.parquet as pq
+from matplotlib import font_manager
+from PIL import Image, ImageDraw, ImageFont
 
 from jes2_plot_style import NEUTRAL_DARK, clean_axes, save_figure, setup_style
 
@@ -38,6 +40,46 @@ HOLDOUT_LOAD_CLASS = {
     "C27": "Low",
     "C29": "High*",
 }
+
+
+def copy_soh_figure_with_normalized_axis_label(source: Path, output: Path) -> None:
+    shutil.copy2(source, output)
+    with Image.open(output) as source_image:
+        image = source_image.convert("RGB")
+
+    width, height = image.size
+    draw = ImageDraw.Draw(image)
+    draw.rectangle(
+        (
+            round(0.003 * width),
+            round(0.28 * height),
+            round(0.039 * width),
+            round(0.73 * height),
+        ),
+        fill="white",
+    )
+
+    font_path = font_manager.findfont("DejaVu Sans")
+    font = ImageFont.truetype(font_path, round(0.038 * height))
+    label = "SOH [-]"
+    bounds = font.getbbox(label)
+    label_image = Image.new(
+        "RGBA",
+        (bounds[2] - bounds[0] + 20, bounds[3] - bounds[1] + 20),
+        (255, 255, 255, 0),
+    )
+    label_draw = ImageDraw.Draw(label_image)
+    label_draw.text((10 - bounds[0], 10 - bounds[1]), label, font=font, fill="black")
+    label_image = label_image.rotate(90, expand=True, resample=Image.Resampling.BICUBIC)
+    image.paste(
+        label_image,
+        (
+            round(0.021 * width - label_image.width / 2),
+            round(0.505 * height - label_image.height / 2),
+        ),
+        label_image,
+    )
+    image.save(output)
 
 
 def extract_cell(path: Path, cell: str, split: str, stride: int) -> tuple[dict, np.ndarray, np.ndarray]:
@@ -264,7 +306,7 @@ def main() -> None:
     if not args.source_figure.is_file():
         raise FileNotFoundError(args.source_figure)
     args.figure_path.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(args.source_figure, args.figure_path)
+    copy_soh_figure_with_normalized_axis_label(args.source_figure, args.figure_path)
     print(json.dumps({"cells": len(rows), "figure": str(args.figure_path), "table": str(args.table_path)}, indent=2))
 
 
