@@ -39,5 +39,5 @@
       }
     }
   },
-  "interpretation": "Delta MAE controls for the baseline drive-profile error. Absolute biased MAE determines the best practical model under current bias."
+  "interpretation": "Delta MAE controls for the baseline drive-profile error. Absolute disturbed MAE determines the best practical model under current-gain error."
 }

@@ -958,7 +958,7 @@ def main() -> None:
     scenario_tests.to_csv(args.out_dir / "jes2_paired_scenario_tests.csv", index=False)
     model_pair_tests.to_csv(args.out_dir / "jes2_paired_model_tests.csv", index=False)
     (args.out_dir / "jes2_statistical_method.txt").write_text(
-        "Statistical unit: independent holdout cell. Predeclared SOH windows are averaged within each cell and "
+        "Statistical unit: independent holdout cell. Protocol-defined SOH windows are averaged within each cell and "
         "random seed before inference.\nPoint estimates: equal-weight cell macro means. Uncertainty: hierarchical "
         f"bootstrap with seeds nested within cells ({args.bootstrap_samples} repetitions).\nHypothesis tests: "
         "exact two-sided paired sign-flip tests on cell-level differences. Holm correction controls family-wise "

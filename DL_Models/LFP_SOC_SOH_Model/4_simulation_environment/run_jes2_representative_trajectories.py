@@ -6,7 +6,15 @@ import subprocess
 from pathlib import Path
 
 
-ALIASES = ("baseline", "current_bias_3p0pct", "initial_soc_error", "missing_gap_1h", "voltage_spikes")
+ALIASES = (
+    "baseline",
+    "current_bias_3p0pct",
+    "current_noise_low",
+    "current_noise_high",
+    "initial_soc_error",
+    "missing_gap_1h",
+    "voltage_spikes",
+)
 MODELS = ("DM", "HDM", "HECM", "DD")
 
 

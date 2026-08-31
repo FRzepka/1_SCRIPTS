@@ -1,5 +1,5 @@
 JES 2.0 - FINAL FIGURE INVENTORY
-Updated: 2026-08-30
+Updated: 2026-08-31
 
 AUTHORITATIVE FIGURE DIRECTORY
   LATEX/JES/paper_robustness_benchmark/figures/Results/All Cells
@@ -8,20 +8,21 @@ COMPILED OVERVIEW
   LATEX/JES/paper_robustness_benchmark/JES_2.0/JES2_Figure_Overview.png
 
 STATUS
-  All 24 PNG files below are final real-data or protocol figures and are included
-  exactly once in Robustness_Benchmark_Manuscript_JES2_Updated.tex. Legacy and
-  pilot output directories are not referenced by the JES 2.0 manuscript.
+  All 24 PNG files below contain the final real-data or protocol evidence and are
+  included exactly once in Robustness_Benchmark_Manuscript_JES2_Updated.tex.
+  Figure 20 still awaits a style-only rebuild on the hardware PC. Legacy and pilot
+  output directories are not referenced by the JES 2.0 manuscript.
 
 MAIN MANUSCRIPT
   Figure 01  Requirements overview
   Figure 02  Methodology overview
   Figure 03  Disturbance taxonomy
   Figure 04  Common-mask baseline performance
-  Figure 05  Signed current-gain sensitivity
-  Figure 06  Current-gain lifecycle and full-charge reset
+  Figure 05  Matched signed current-gain sensitivity in the final benchmark build
+  Figure 06  C29 current-gain lifecycle and full-charge reset diagnostic
   Figure 07  Noise robustness
   Figure 08  Six-cell noise overview
-  Figure 09  Canonical paired initialization recovery
+  Figure 09  Canonical paired initialization recovery with left-censored common start
   Figure 10  Six-cell signal-integrity overview
   Figure 11  One-hour burst-dropout transition and duration-matched effect
   Figure 12  Six-cell voltage-spike response
@@ -44,7 +45,7 @@ SCIENTIFIC DATA BOUNDARY
   Figures 04-16 are generated from the corrected six-cell common-mask results.
   Figure 09 is generated from the canonical paired initialization trajectories.
   Figure 11 compares the 48-hour dropout runs with duration-matched undisturbed
-  references. Figures 14 and 15 include all eight declared disturbance families,
+  references. Figures 14 and 15 include all eight evaluated disturbance families,
   including voltage and temperature offsets. Figures 17-20 and 24 use measured
   STM32 SOC-core results. Figures 21-23 visualize measured coverage and the frozen
   protocol. No synthetic pilot value is used in the manuscript.

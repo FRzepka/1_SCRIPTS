@@ -1,14 +1,14 @@
 JES 2.0 - NEW TEST MATRIX AND STATISTICAL ANALYSIS
-Updated: 2026-08-30
+Updated: 2026-08-31
 
 IMPORTANT DISTINCTION
   The complete six-cell campaign and the common-mask correction are finished.
   Smoke and synthetic tests validate code only and do not enter the paper.
 
 1. INDEPENDENT HOLDOUT CELLS AND FIXED LOAD CLASSES
-  Cell load group is frozen before looking at estimator errors. The classification
-  uses only visible separation in each holdout cell's 95th-percentile absolute
-  C-rate; groups are not forced to have equal size.
+  Cell load groups use only visible separation in each holdout cell's
+  95th-percentile absolute C-rate. Estimator outputs and errors are not inputs to
+  the classification, and groups are not forced to have equal size.
 
   LOW LOAD
     C27: p95 |C-rate| = 0.696; mild-aging control, SOH never below 0.930.
@@ -24,7 +24,7 @@ IMPORTANT DISTINCTION
 
 2. FIXED WITHIN-TRAJECTORY STATE TESTS
   Every model run reports MAE, RMSE, bias, P95 error, sample count, and coverage
-  fraction separately for the following predeclared states. The strata use the
+  fraction separately for the following protocol-defined states. The strata use the
   uncorrupted reference operating state, not the disturbed sensor value.
 
   SOH STATE
@@ -52,16 +52,18 @@ IMPORTANT DISTINCTION
   Current noise: sigma = 0.02 A and 0.10 A.
   Voltage noise: sigma = 0.01 V.
   Temperature noise: sigma = 1.0 degC.
-  Current gain error: symmetric supplemental sweep with I_meas = I * (1 + b)
-  at b = +/-0.5%, +/-1.5%, and +/-3.0%. Figure 05 reports the adverse direction
-  of each matched sign pair because the other sign can compensate an
-  estimator's pre-existing baseline error.
+  Current gain error: the final benchmark build uses matched +/-0.5%, +/-1.5%,
+  and +/-3.0% sign pairs. Figure 05 reports the adverse direction of each matched
+  pair so signed compensation with baseline error is not interpreted as
+  robustness.
   Voltage offset: +0.02 V.
   Temperature offset: +3 degC.
   ADC quantization.
   Initial SOC-equivalent mismatch: -10% for DM/HDM coulomb-counting state,
   HECM EKF SOC state, and DD via Q_c offset of -0.10 times nominal capacity.
-  The realized initial estimator-output error is reported for every model.
+  The estimator difference at the first commonly scored sample is reported for
+  every model. Observation starts 0.562 h after intervention. Endpoints already
+  satisfied there are left-censored and recorded as conservative upper bounds.
   Periodic missing samples: every 50th sample.
   Random missing samples: 2%.
   Timing jitter: +/-0.1 s, +/-0.5 s, and +/-0.9 s.
@@ -83,8 +85,9 @@ IMPORTANT DISTINCTION
   one-hour dropout.
   Paired LSTM-SOH versus reference-SOH error propagation by cell and scenario.
   SOH publication cadence at 1 h, 6 h, and 24 h under baseline conditions.
-  Separate HECM resistance/tau/OCV lookup-table sensitivity.
-  Current-gain mechanism supplement: adverse signed pair across five common
+  Optional HECM resistance/tau/OCV lookup-table sensitivity. This is not part of
+  the current final campaign or paper results.
+  Current-gain mechanism diagnostics: adverse signed pair across five common
   three-state cells; identical C29 trace replayed at SOH 0.962, 0.897, and 0.831;
   natural versus disabled full-charge reset; and one continuous 1,344 h C29
   trajectory with active CV resets. These tests separate SOH effects from signed
@@ -131,6 +134,12 @@ IMPORTANT DISTINCTION
   The same trajectory contributes to several within-cell states; time samples are
   not treated as independent replicates.
   Results remain limited to the available LFP dataset and its operating envelope.
+  The offline reconstructed SOC target is the common dataset ground truth used
+  for every reported SOC error.
+  The HECM table's originating HPPC-cell metadata is absent from the current
+  archive, so table independence from the holdout set is not yet verifiable.
+  Raw six-cell hardware summaries and a clean tagged firmware rebuild must be
+  archived before resubmission.
 
 8. EXECUTION STATUS
   IMPLEMENTED: fixed strata, all four model summaries, cell classification,
@@ -151,8 +160,11 @@ IMPORTANT DISTINCTION
   repetitions per metric group and reports 72 scenario tests and 60 model-pair
   tests after excluding the internal duration-matched dropout reference.
   COMPLETE: the canonical paired initialization-recovery analysis drives the
-  recovery text, figure, table, and illustrative decision score.
-  COMPLETE WITH EXPLICIT BOUNDARY: isolated target-hardware SOC tests report
+  recovery text, figure, table, and illustrative decision score. Left-censored
+  endpoints at the common observation boundary are explicitly flagged.
+  COMPLETE WITH RELEASE BLOCKER: isolated target-hardware SOC tests report
   numerical equivalence, latency, compiled flash occupancy, and measured peak
   runtime RAM from static storage, the heap high-water mark, and stack watermark.
   Energy, the shared SOH service, and complete BMS scheduling remain unmeasured.
+  The hardware PC still must export raw per-cell summaries and timing records and
+  rebuild the firmware from a clean tagged source state.

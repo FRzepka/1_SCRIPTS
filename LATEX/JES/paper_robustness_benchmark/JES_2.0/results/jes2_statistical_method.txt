@@ -1,4 +1,4 @@
-Statistical unit: independent holdout cell. Predeclared SOH windows are averaged within each cell and random seed before inference.
+Statistical unit: independent holdout cell. Protocol-defined SOH windows are averaged within each cell and random seed before inference.
 Point estimates: equal-weight cell macro means. Uncertainty: hierarchical bootstrap with seeds nested within cells (10000 repetitions).
 Hypothesis tests: exact two-sided paired sign-flip tests on cell-level differences. Holm correction controls family-wise error within each scenario across the four model effects or six model-pair comparisons.
 Effect size: paired standardized mean difference dz. Per-sample observations are never treated as independent replicates.

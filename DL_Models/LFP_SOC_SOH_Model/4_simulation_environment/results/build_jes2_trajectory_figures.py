@@ -11,7 +11,6 @@ import pandas as pd
 
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from build_jes2_paper_results import draw_model_bars, metric_slice
 from jes2_plot_style import MODEL_COLORS, MODEL_ORDER, clean_axes, save_figure, setup_style
 
 
@@ -94,20 +93,6 @@ def plot_bias(root: Path, statistics: Path, out: Path) -> None:
     axes[2].legend(ncol=2, frameon=False, fontsize=8)
     fig.tight_layout()
     save_figure(fig, out / "Figure_05_Current_Bias.png")
-
-
-def plot_initial(root: Path, aggregate: pd.DataFrame, out: Path) -> None:
-    runs = {model: load_run(root, "initial_soc_error", model)[0] for model in MODEL_ORDER}
-    start = float(runs["DM"].time_s.iloc[0])
-    fig, axes = plt.subplots(1, 3, figsize=(14.3, 4.2))
-    trajectory_panel(axes[0], runs, start, start + 6 * 3600, "(a) C29 recovery trajectory")
-    axes[0].legend(ncol=2, frameon=False, fontsize=8)
-    draw_model_bars(axes[1], metric_slice(aggregate, "initial_soc_error", "common_recovery_or_censor_time_h"),
-                    "Recovery/censor time [h]", "(b) Six-cell recovery")
-    draw_model_bars(axes[2], metric_slice(aggregate, "initial_soc_error", "common_recovery_excess_auc_soc_h"),
-                    "Excess-error AUC [SOC h]", "(c) Six-cell recovery burden")
-    fig.tight_layout()
-    save_figure(fig, out / "Figure_07_Initial_State_Recovery.png")
 
 
 def plot_gap(root: Path, out: Path) -> None:
@@ -238,7 +223,13 @@ def main() -> None:
     setup_style()
     aggregate = pd.read_csv(args.aggregate)
     plot_bias(args.trajectory_dir, args.bias_statistics, args.figures_dir)
-    plot_initial(args.trajectory_dir, aggregate, args.figures_dir)
+    print(
+        "Initial-state recovery is intentionally not generated here. Use "
+        "analyze_jes2_paired_recovery.py followed by "
+        "build_figure_07_initial_recovery_corr.py so that the paired persistent "
+        "endpoint and hierarchical confidence intervals remain canonical.",
+        file=sys.stderr,
+    )
     plot_gap(args.trajectory_dir, args.figures_dir)
     plot_spikes(args.spike_trajectory_dir, aggregate, args.run_metrics, args.figures_dir)
 

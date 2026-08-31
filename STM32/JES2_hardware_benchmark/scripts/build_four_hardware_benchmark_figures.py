@@ -484,13 +484,13 @@ def plot_variants(rows: list[dict], memory: dict[str, dict], out: Path) -> None:
            for variant in VARIANTS]
     variant_edges = [VARIANT_COLORS[variant] for variant in VARIANTS]
     flash_bars = axes[2].bar(xv - width / 2, flash, width,
-                             facecolor=[to_rgba(color, 0.20) for color in variant_edges],
+                             facecolor=[to_rgba(color, 0.42) for color in variant_edges],
                              edgecolor=variant_edges,
-                             linewidth=1.25, hatch="..", label="Flash")
+                             linewidth=1.4, label="Flash")
     ram_bars = axes[2].bar(xv + width / 2, ram, width,
-                           facecolor=[to_rgba(color, 0.20) for color in variant_edges],
+                           facecolor=[to_rgba(color, 0.12) for color in variant_edges],
                            edgecolor=variant_edges,
-                           linewidth=1.25, hatch="//", label="Peak RAM")
+                           linewidth=1.4, label="Peak RAM")
     axes[2].set_xticks(xv, ["Rolling\nwindow", "Continuous\nstate", "Periodic\nreset"])
     axes[2].set_ylabel("Memory [KiB]"); axes[2].set_title("(c) Memory footprint")
     axes[2].set_ylim(0, 1.18 * max(flash + ram))
@@ -503,8 +503,8 @@ def plot_variants(rows: list[dict], memory: dict[str, dict], out: Path) -> None:
         for variant in VARIANTS
     ]
     resource_handles = [
-        Patch(facecolor="#e5e5e5", edgecolor="#555555", hatch="..", label="Flash"),
-        Patch(facecolor="#e5e5e5", edgecolor="#555555", hatch="//", label="Peak RAM"),
+        Patch(facecolor=to_rgba("#777777", 0.42), edgecolor="#555555", label="Flash"),
+        Patch(facecolor=to_rgba("#777777", 0.12), edgecolor="#555555", label="Peak RAM"),
     ]
     fig.legend(handles=mode_handles + resource_handles, frameon=False, ncol=5,
                fontsize=9.5, handlelength=2.0, columnspacing=1.8,

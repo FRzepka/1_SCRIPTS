@@ -133,6 +133,8 @@ def test_censored_recovery_reports_observed_censor_time():
     assert metrics["common_recovery_time_h"] is None
     assert metrics["common_recovery_censored"] is True
     assert metrics["common_recovery_or_censor_time_h"] == 600.0 / 3600.0
+    assert metrics["common_stable_recovery_censored"] is True
+    assert metrics["common_stable_recovery_or_censor_time_h"] == 600.0 / 3600.0
 
 
 def test_recovery_clock_can_precede_the_common_scored_interval():

@@ -320,7 +320,10 @@ def plot_scenario_matrix(out: Path) -> None:
             active.add("reference")
         for col, key in enumerate(keys):
             matrix[row, col] = int(key in active)
-        row_labels.append(SCENARIO_LABELS[alias])
+        label = SCENARIO_LABELS[alias]
+        if alias.startswith("current_bias_"):
+            label = label.replace("(", "(±", 1)
+        row_labels.append(label)
 
     fig, ax = plt.subplots(figsize=(11.8, 8.6))
     ax.set_xlim(-0.6, len(columns) - 0.4)
@@ -343,9 +346,9 @@ def plot_scenario_matrix(out: Path) -> None:
     ax.grid(axis="y", visible=False)
     for spine in ax.spines.values():
         spine.set_visible(False)
-    fig.suptitle("JES 2.0 measurement-only disturbance matrix", fontsize=14, fontweight="bold", y=0.985)
+    fig.suptitle("JES 2.0 final benchmark matrix", fontsize=14, fontweight="bold", y=0.985)
     fig.text(0.61, 0.025,
-             "Red: manipulated signal/state   |   Blue-gray: 10/5 seeded repetitions   |   Rose: paired reference-SOH ablation",
+             "Current-gain magnitudes contain matched ± sign pairs   |   Blue-gray: 10/5 seeded repetitions   |   Rose: reference-SOH ablation",
              ha="center", fontsize=9, color=NEUTRAL_DARK)
     fig.subplots_adjust(left=0.255, right=0.98, top=0.87, bottom=0.07)
     save_figure(fig, out / "Figure_27_JES2_Test_Matrix.png")

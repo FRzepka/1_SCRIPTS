@@ -39,12 +39,11 @@ def main() -> None:
     ):
         copy_file(EAAI / source, target)
 
-    # Figures 05, 06, 14--20, and Appendix Figure 24 are generated directly in
+    # Figures 05--07, 14--20, and Appendix Figure 24 are generated directly in
     # All Cells by dedicated scripts and are intentionally not overwritten here.
     copy_png(RESULTS / "Figure_04_Baseline_Performance", "Figure_04_Baseline_Performance")
 
-    # Selected dissertation figures in the current green/purple/blue/red palette.
-    copy_file(EAAI / "robustness_noise.png", "Figure_07_Noise_Robustness.png")
+    # Selected dissertation figure in the current green/purple/blue/red palette.
     copy_png(
         RESULTS / "Figure_09_Burst_Dropout_Transition_CORR",
         "Figure_11_Burst_Dropout_Transition",

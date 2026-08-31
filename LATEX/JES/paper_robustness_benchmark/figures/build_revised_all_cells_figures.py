@@ -273,9 +273,9 @@ def recovery_dimension() -> tuple[pd.Series, pd.DataFrame]:
     components = []
     raw = {}
     for metric in [
-        "recovery_or_censor_time_h",
+        "persistent_recovery_or_censor_time_h",
         "recovery_excess_auc_soc_h",
-        "recovery_censored",
+        "persistent_recovery_censored",
         "recovery_relapsed_after_first_hold",
     ]:
         values = (
@@ -284,7 +284,8 @@ def recovery_dimension() -> tuple[pd.Series, pd.DataFrame]:
             .reindex(MODEL_ORDER)
         )
         raw[metric] = values
-        components.append(lower_better(values))
+        if metric != "recovery_relapsed_after_first_hold":
+            components.append(lower_better(values))
     return pd.concat(components, axis=1).mean(axis=1), pd.DataFrame(raw)
 
 
@@ -333,13 +334,15 @@ def decision_scores(aggregate: pd.DataFrame, revised_matrix: pd.DataFrame) -> tu
             "Accuracy": accuracy.reindex(MODEL_ORDER).to_numpy(float),
             "Robustness": robustness.reindex(MODEL_ORDER).to_numpy(float),
             "Recovery": recovery.reindex(MODEL_ORDER).to_numpy(float),
-            "Paired initial recovery/censor time [h]": recovery_raw[
-                "recovery_or_censor_time_h"
+            "Paired persistent recovery/censor time [h]": recovery_raw[
+                "persistent_recovery_or_censor_time_h"
             ].to_numpy(float),
             "Paired recovery excess-error AUC [SOC h]": recovery_raw[
                 "recovery_excess_auc_soc_h"
             ].to_numpy(float),
-            "Paired censored fraction": recovery_raw["recovery_censored"].to_numpy(float),
+            "Paired persistent censored fraction": recovery_raw[
+                "persistent_recovery_censored"
+            ].to_numpy(float),
             "Paired relapse fraction": recovery_raw[
                 "recovery_relapsed_after_first_hold"
             ].to_numpy(float),

@@ -266,7 +266,7 @@ def summarize_model(
 def main() -> None:
     simulation = Path(__file__).resolve().parents[1]
     parser = argparse.ArgumentParser(
-        description="Analyze time-resolved current-bias accumulation and full-charge recovery."
+        description="Analyze time-resolved current-gain-error accumulation and full-charge recovery."
     )
     parser.add_argument(
         "--campaign",
@@ -358,7 +358,7 @@ def main() -> None:
         "selected_aliases": selected_aliases,
         "interpretation": (
             "Delta MAE controls for the baseline drive-profile error. Absolute biased MAE "
-            "determines the best practical model under current bias."
+            "determines the best practical model under current-gain error."
         ),
     }
     (out / "c29_bias_temporal_protocol.json").write_text(

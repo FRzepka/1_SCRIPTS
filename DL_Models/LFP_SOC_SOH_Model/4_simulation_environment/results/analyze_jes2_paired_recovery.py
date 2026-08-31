@@ -91,18 +91,47 @@ def main() -> None:
                     horizon_seconds=args.horizon_seconds,
                     event_time_s=event_time_s,
                 )
+                observation_start_time_h = float(
+                    (paired["time_s"].iloc[0] - event_time_s) / 3600.0
+                )
+                first_entry_left_censored = bool(
+                    not metrics["common_recovery_censored"]
+                    and np.isclose(
+                        metrics["common_recovery_time_h"],
+                        observation_start_time_h,
+                        atol=1.0 / 3600.0,
+                    )
+                )
+                persistent_left_censored = bool(
+                    not metrics["common_stable_recovery_censored"]
+                    and np.isclose(
+                        metrics["common_stable_recovery_time_h"],
+                        observation_start_time_h,
+                        atol=1.0 / 3600.0,
+                    )
+                )
                 rows.append({
                     "cell": cell,
                     "window_id": window_dir.name,
                     "model": model,
                     "paired_samples": int(len(paired)),
                     "evaluation_start_sample": int(args.evaluation_start_sample),
+                    "observation_start_time_h": observation_start_time_h,
+                    "first_common_sample_difference": metrics["common_recovery_initial_abs_err"],
                     "initial_trajectory_difference": metrics["common_recovery_initial_abs_err"],
                     "recovery_time_h": metrics["common_recovery_time_h"],
                     "recovery_or_censor_time_h": metrics["common_recovery_or_censor_time_h"],
                     "recovery_censored": metrics["common_recovery_censored"],
+                    "first_entry_left_censored": first_entry_left_censored,
                     "recovery_excess_auc_soc_h": metrics["common_recovery_excess_auc_soc_h"],
                     "recovery_relapsed_after_first_hold": metrics["common_recovery_relapsed"],
+                    "first_relapse_time_h": metrics["common_recovery_first_relapse_time_h"],
+                    "persistent_recovery_time_h": metrics["common_stable_recovery_time_h"],
+                    "persistent_recovery_or_censor_time_h": metrics[
+                        "common_stable_recovery_or_censor_time_h"
+                    ],
+                    "persistent_recovery_censored": metrics["common_stable_recovery_censored"],
+                    "persistent_recovery_left_censored": persistent_left_censored,
                 })
 
     runs = pd.DataFrame(rows)
@@ -114,7 +143,11 @@ def main() -> None:
             "recovery_or_censor_time_h",
             "recovery_excess_auc_soc_h",
             "recovery_censored",
+            "first_entry_left_censored",
             "recovery_relapsed_after_first_hold",
+            "persistent_recovery_or_censor_time_h",
+            "persistent_recovery_censored",
+            "persistent_recovery_left_censored",
         ]:
             aggregate_rows.append({
                 "model": model,
@@ -129,12 +162,16 @@ def main() -> None:
     )
     (args.out_dir / "jes2_paired_initial_recovery_method.txt").write_text(
         "Endpoint: absolute difference between a perturbed estimator trajectory and its cell-, window-, "
-        "model-, SOH-, and seed-matched correctly initialized trajectory. Recovery is the first entry into "
-        "a 0.02 SOC band that remains inside for at least 300 seconds. Runs without recovery within 24 hours "
-        "are right-censored at 24 hours. A later departure from the band is retained as a separate relapse "
-        "endpoint. All estimators use source samples 2023 onward, while reported recovery time remains "
-        "referenced to the initialization intervention at source sample 0. Windows are averaged within "
-        "cells before the cell bootstrap.\n",
+        "model-, SOH-, and seed-matched correctly initialized trajectory. First threshold entry is the first "
+        "entry into a 0.02 SOC band that remains inside for at least 300 seconds. Persistent recovery is the "
+        "first entry after which the trajectory remains inside the band for the rest of the 24-hour horizon. "
+        "Runs without the respective endpoint are right-censored at 24 hours. A departure after first entry "
+        "is retained as a relapse endpoint. All estimators use source samples 2023 onward, while reported time remains "
+        "referenced to the initialization intervention at source sample 0. Observation therefore starts about 0.562 hours "
+        "after the intervention. If a trajectory already satisfies an endpoint at the first common sample, the endpoint is "
+        "left-censored and the recorded 0.562-hour value is a conservative upper bound rather than an exact recovery time. "
+        "The realized difference column refers to the first commonly scored sample, not the unobserved intervention instant. "
+        "Windows are averaged within cells before the cell bootstrap.\n",
         encoding="utf-8",
     )
     print(runs.groupby("model")["recovery_or_censor_time_h"].mean().to_string())

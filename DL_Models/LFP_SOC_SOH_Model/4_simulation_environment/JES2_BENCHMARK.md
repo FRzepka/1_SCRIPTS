@@ -30,14 +30,21 @@ validation exposure.
 - The -0.10 initialization mismatch is mapped into every estimator's available
   online state: the coulomb-counting SOC state for DM/HDM, the EKF SOC state for
   HECM, and the capacity-equivalent `Q_c` feature offset for DD. All four use one
-  common 0.02 SOC error band held for 300 s. The realized initial output error is
-  reported explicitly so the DD mapping is not assumed to be identical silently.
-- Paper aggregation first averages predeclared windows inside each cell/seed,
+  common 0.02 SOC error band held for 300 s. Persistent recovery additionally
+  requires remaining in the band through the 24 h horizon. Observation starts at
+  source sample 2023, about 0.562 h after the intervention. Endpoints already
+  satisfied there are left-censored and recorded at 0.562 h as conservative upper
+  bounds. The difference at the first commonly scored sample is reported so the
+  DD mapping is not assumed to be identical silently.
+- Paper aggregation first averages protocol-defined windows inside each cell/seed,
   then gives every cell equal weight and calculates hierarchical bootstrap
   confidence intervals with seeds nested inside cells.
 - Paired scenario effects and model-to-model differences are evaluated on
   cell-level means with exact two-sided sign-flip tests, paired `dz` effect
   sizes, bootstrap confidence intervals, and Holm-adjusted p-values.
+- All global, stratified, and paired comparisons score every estimator on the
+  common source-sample mask beginning at sample 2023. A 24 h window therefore
+  contributes 84,377 matched points per model.
 - Individual time samples are never treated as independent replicates.
 
 ## State-stratified tests
@@ -51,10 +58,10 @@ coverage fraction for fixed reference-state strata, even in the default
 - Temperature: `<=30 degC`, `30-35 degC`, `>35 degC`.
 - SOC: `<0.20`, `0.20-0.80`, `>0.80`.
 
-The six cells are also assigned to frozen, balanced load tertiles based only on
-their measured 95th-percentile absolute C-rate: low C25/C27, middle C09/C13,
-and high C15/C29. These labels are descriptive strata and are never selected
-from estimator results.
+The six cells are also assigned to descriptive load groups based only on their
+measured 95th-percentile absolute C-rate: low C25/C27, middle C09/C13/C15, and
+high C29. These labels are not balanced treatment groups. High-load evidence has
+one cell and is exploratory.
 
 ## Frozen evaluation windows
 
@@ -67,8 +74,11 @@ selector uses the medoid of measured SOH, temperature, C-rate, throughput, and S
 coverage; it never sees estimator predictions or errors. C27 correctly contributes
 only Fresh because its measured SOH never falls below 0.90.
 
-The one-hour dropout scenario uses 48 h from the same anchor, leaving about 24 h
-after the central gap for the common recovery analysis. The shared SOH LSTM is
+The one-hour dropout scenario uses 48 h from the same anchor. The eligible gap
+with maximum absolute integrated net charge is selected from measured current
+only, with at least 12 h before and 24 h after the gap. Dropout is summarized as
+a paired robustness penalty and is not mixed into the canonical initialization-
+recovery score. The shared SOH LSTM is
 initialized with the preceding 192 h of undisturbed causal measurements, matching
 its trained sequence length. These context rows initialize SOH only and are not
 included in SOC metrics. Window definitions are frozen in
@@ -139,6 +149,14 @@ Gaussian sensor-noise scenarios use 10 seeds, secondary stochastic integrity
 scenarios use 5, and deterministic scenarios run once. Every run, window, trace,
 and artifact path is recorded under
 `campaigns/<tag>/jes2_manifest.json`.
+
+The final benchmark build contains 19 scenario definitions. The 6,720-row main
+manifest is combined with 192 matched negative-sign evaluations for the three
+current-gain magnitudes. Each of these magnitudes therefore contains positive
+and negative sign sublevels. Figures that report an adverse current-gain
+direction take the larger paired delta MAE from each matched sign pair. This
+prevents sign-dependent compensation with baseline error from being interpreted
+as robustness.
 
 Campaign runs write `summary.json` only by default. This avoids multi-gigabyte
 per-run CSV/PNG output when full trajectories are repeated across cells and
