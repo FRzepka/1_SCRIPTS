@@ -17,9 +17,9 @@ existing project directories.
 
 - Editable source: `Robustness_Benchmark_Manuscript_JES2_Updated.tex`
 - Compiled manuscript: `Robustness_Benchmark_Manuscript_JES2_Updated.pdf`
-- Source SHA-256: `f90e215079328ab214ddc6ccac79bdaa6d858c80a84edd6beea835174ce8e796`
-- PDF SHA-256: `afb5dc21146fb934bdf0a2ee98298240d555a009b03669972bfd2b6a3f0edbdd`
-- Compiled length: 56 pages
+- Source SHA-256: `f3244b3b187bca548a04c6ae2946908193d5660357fa03c30aaa3c2308e0f524`
+- PDF SHA-256: `fdf254a1611fdf44b2394354660db3f241d602ef492b68ea5d23c60c7bf27075`
+- Compiled length: 57 pages
 
 ## Build
 
@@ -38,16 +38,19 @@ tables.
 ## Main revision scope
 
 - Replaced the original illustrative results with the finalized six-cell JES2 figures.
+- Structured the abstract, introduction, methodology, results, discussion, and conclusion around two complementary branches. The robustness benchmark reports accuracy, robustness, and recovery. The embedded performance benchmark reports numerical equivalence, inference time, flash occupancy, and peak runtime RAM.
+- Restricted abstract numbers to the four nominal-accuracy MAE values. Robustness and recovery are summarized there only through the strongest observed representatives, DD and HECM, respectively.
 - Reframed the title, abstract, introduction, methods, discussion, limitations, and conclusion around the central deployment question: why nominal accuracy alone is insufficient and how robustness, recovery, and microcontroller cost change estimator selection.
 - Defined DM, HDM, HECM, and DD as four concrete representatives rather than universal proxies for complete estimator families, including their minimum class-defining mechanisms, optional broader extensions, and exact implementations used here.
 - Kept run counts, seed schedules, window selection, and bootstrap details out of the abstract and in the reproducibility-focused methods and appendix.
 - Documented 16 protocol-defined 24-hour windows, 19 final scenario definitions, six holdout cells, 10 sensor-noise seeds, 5 seeds for the other stochastic cases, 6,912 public model-window evaluations, and 10,000 hierarchical bootstrap repetitions.
+- Retained the six-cell holdout summary and added the Dissertation SOH-aging overview as Figure 26. Its accompanying 15-cell table identifies every training, validation, and holdout cell and reports measured duration, SOH, temperature, and P95 absolute C-rate coverage.
 - Defined each of the three current-gain magnitudes through matched positive and negative sign sublevels in the final benchmark build. The continuous C29 lifecycle replay remains a complementary single-cell mechanism analysis.
 - Treated cells as the independent units and seeds/windows as nested observations.
 - Recomputed every global result on the common DD-valid source-sample interval beginning at sample 2023. Each model now contributes 84,377 matched samples per 24-hour window.
 - Rebuilt the initialization figure exclusively from the corrected dedicated paired campaign. The primary endpoint is persistent recovery through the remaining 24-hour horizon. First 300-second entry and later relapse are retained as separate diagnostics. Observation begins about 0.562 hours after intervention, and boundary endpoints are flagged as left-censored upper bounds.
 - Removed relapse from the composite recovery score because it is undefined when a run never enters the recovery band and would otherwise reward non-recovery.
-- Audited all 25 finalized PNG files against their manuscript captions and dependencies. Only Figures 09 and 15 depend on the corrected recovery analysis. Figure 14 deliberately excludes initialization mismatch because it is a measurement-disturbance heatmap.
+- Audited all 26 finalized PNG files against their manuscript captions and dependencies. Only Figures 09 and 15 depend on the corrected recovery analysis. Figure 14 deliberately excludes initialization mismatch because it is a measurement-disturbance heatmap.
 - Included all eight evaluated disturbance families in the illustrative robustness score and added two alternative weighting analyses. The current-gain family uses the adverse direction from the matched signed sweep.
 - Added current-gain lifecycle/reset, initial-state recovery, missing-sample, jitter, burst-dropout, voltage-spike, ADC-quantization, sensor-offset, and cross-scenario interpretations.
 - Added a separate 240-run HECM lookup-table sensitivity over all 16 windows. The tested resistance and OCV perturbations alter baseline accuracy more than the incremental current-gain penalty and remain outside the cross-model score.
@@ -70,9 +73,9 @@ tables.
 
 ## Validation performed
 
-- Recompiled the 56-page manuscript and inspected the revised recovery figure, core result figures, hardware figures, Appendix protocol figure, HECM lookup-sensitivity figure, and conclusion pages.
+- Recompiled the manuscript and inspected the revised recovery figure, core result figures, hardware figures, retained holdout summary, SOH-aging figure and 15-cell table, Appendix protocol figure, HECM lookup-sensitivity figure, and conclusion pages.
 - The hardware PC must still export the raw per-cell STM32 summaries and timing records and rebuild the firmware from a clean tagged state. The current RAM record identifies `c3307581-dirty`.
-- Confirmed all 25 finalized PNG figures are referenced exactly once.
+- Confirmed all 26 finalized PNG figures are referenced exactly once.
 - Confirmed that no missing-figure placeholders remain.
 - Confirmed that all active labels and references resolve.
 - Ran the complete simulation-environment test suite: 32 tests passed.

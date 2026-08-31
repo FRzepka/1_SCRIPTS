@@ -1,0 +1,167 @@
+[
+  {
+    "cell": "C01",
+    "split": "Training",
+    "duration_days": 198.5597453703718,
+    "soh_min": 0.9224596496272055,
+    "soh_max": 1.0,
+    "temperature_min_c": 24.3,
+    "temperature_max_c": 29.4,
+    "abs_c_rate_p95": 1.008961796760559,
+    "holdout_load_class": "Not applicable"
+  },
+  {
+    "cell": "C03",
+    "split": "Training",
+    "duration_days": 153.2997754629641,
+    "soh_min": 0.9205664802048241,
+    "soh_max": 1.0,
+    "temperature_min_c": 25.9,
+    "temperature_max_c": 30.7,
+    "abs_c_rate_p95": 0.9951978921890259,
+    "holdout_load_class": "Not applicable"
+  },
+  {
+    "cell": "C05",
+    "split": "Training",
+    "duration_days": 166.09706134259434,
+    "soh_min": 0.9171651286383165,
+    "soh_max": 1.0,
+    "temperature_min_c": 25.2,
+    "temperature_max_c": 30.6,
+    "abs_c_rate_p95": 1.000145673751831,
+    "holdout_load_class": "Not applicable"
+  },
+  {
+    "cell": "C11",
+    "split": "Training",
+    "duration_days": 113.16245949074171,
+    "soh_min": 0.6555184006508912,
+    "soh_max": 1.0,
+    "temperature_min_c": 25.6,
+    "temperature_max_c": 42.8,
+    "abs_c_rate_p95": 2.4767215251922607,
+    "holdout_load_class": "Not applicable"
+  },
+  {
+    "cell": "C17",
+    "split": "Training",
+    "duration_days": 158.69542592592757,
+    "soh_min": 0.7191164547956911,
+    "soh_max": 1.0,
+    "temperature_min_c": 25.8,
+    "temperature_max_c": 34.9,
+    "abs_c_rate_p95": 1.7524441480636597,
+    "holdout_load_class": "Not applicable"
+  },
+  {
+    "cell": "C23",
+    "split": "Training",
+    "duration_days": 167.80521296296467,
+    "soh_min": 0.8366995736652282,
+    "soh_max": 1.0,
+    "temperature_min_c": 26.1,
+    "temperature_max_c": 37.2,
+    "abs_c_rate_p95": 1.7446743249893188,
+    "holdout_load_class": "Not applicable"
+  },
+  {
+    "cell": "C07",
+    "split": "Validation",
+    "duration_days": 167.63748726852026,
+    "soh_min": 0.8743585461111404,
+    "soh_max": 1.0,
+    "temperature_min_c": 25.2,
+    "temperature_max_c": 32.0,
+    "abs_c_rate_p95": 1.0054326057434082,
+    "holdout_load_class": "Not applicable"
+  },
+  {
+    "cell": "C19",
+    "split": "Validation",
+    "duration_days": 160.38122106481654,
+    "soh_min": 0.8395294579349021,
+    "soh_max": 1.0,
+    "temperature_min_c": 26.3,
+    "temperature_max_c": 33.9,
+    "abs_c_rate_p95": 1.7474076747894287,
+    "holdout_load_class": "Not applicable"
+  },
+  {
+    "cell": "C21",
+    "split": "Validation",
+    "duration_days": 160.7944062500014,
+    "soh_min": 0.8235347545164116,
+    "soh_max": 1.0,
+    "temperature_min_c": 26.2,
+    "temperature_max_c": 37.6,
+    "abs_c_rate_p95": 1.7455805540084839,
+    "holdout_load_class": "Not applicable"
+  },
+  {
+    "cell": "C09",
+    "split": "Holdout",
+    "duration_days": 102.59865393518606,
+    "soh_min": 0.6815007098620711,
+    "soh_max": 1.0,
+    "temperature_min_c": 25.0,
+    "temperature_max_c": 41.1,
+    "abs_c_rate_p95": 2.508258819580078,
+    "holdout_load_class": "Middle"
+  },
+  {
+    "cell": "C13",
+    "split": "Holdout",
+    "duration_days": 44.73793981481531,
+    "soh_min": 0.6226782878028071,
+    "soh_max": 1.0,
+    "temperature_min_c": 24.9,
+    "temperature_max_c": 42.0,
+    "abs_c_rate_p95": 2.4954774379730225,
+    "holdout_load_class": "Middle"
+  },
+  {
+    "cell": "C15",
+    "split": "Holdout",
+    "duration_days": 60.6633611111117,
+    "soh_min": 0.6270643251607386,
+    "soh_max": 1.0,
+    "temperature_min_c": 25.1,
+    "temperature_max_c": 43.6,
+    "abs_c_rate_p95": 2.526784658432007,
+    "holdout_load_class": "Middle"
+  },
+  {
+    "cell": "C25",
+    "split": "Holdout",
+    "duration_days": 127.14054166666834,
+    "soh_min": 0.654508636298149,
+    "soh_max": 1.0,
+    "temperature_min_c": 25.8,
+    "temperature_max_c": 37.1,
+    "abs_c_rate_p95": 1.761177659034729,
+    "holdout_load_class": "Low"
+  },
+  {
+    "cell": "C27",
+    "split": "Holdout",
+    "duration_days": 151.99370833333438,
+    "soh_min": 0.9296595218775773,
+    "soh_max": 1.0,
+    "temperature_min_c": 26.0,
+    "temperature_max_c": 31.9,
+    "abs_c_rate_p95": 0.6962035894393921,
+    "holdout_load_class": "Low"
+  },
+  {
+    "cell": "C29",
+    "split": "Holdout",
+    "duration_days": 56.00855555555619,
+    "soh_min": 0.604296330825807,
+    "soh_max": 1.0,
+    "temperature_min_c": 25.5,
+    "temperature_max_c": 49.4,
+    "abs_c_rate_p95": 3.003462791442871,
+    "holdout_load_class": "High*"
+  }
+]

@@ -10,6 +10,7 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parent
 RESULTS = ROOT / "results"
+TABLES = ROOT / "tables"
 MANUSCRIPT = ROOT / "Robustness_Benchmark_Manuscript_JES2_Updated.tex"
 FIGURES = ROOT.parent / "figures" / "Results" / "All Cells"
 WORKSPACE = ROOT.parents[3]
@@ -26,6 +27,12 @@ FAMILIES = [
     "Burst dropout",
     "Voltage spikes",
 ]
+
+EXPECTED_CELL_SPLITS = {
+    "Training": {"C01", "C03", "C05", "C11", "C17", "C23"},
+    "Validation": {"C07", "C19", "C21"},
+    "Holdout": {"C09", "C13", "C15", "C25", "C27", "C29"},
+}
 
 
 def require(condition: bool, message: str) -> None:
@@ -266,9 +273,60 @@ def check_build_boundaries() -> str:
     return "6912 public evaluations, signed gain pairs, C29 lifecycle, dataset ground truth, and hardware boundaries are traceable"
 
 
+def check_dataset_split_coverage() -> str:
+    rows = json.loads((TABLES / "jes2_dataset_cell_split_coverage.json").read_text(encoding="utf-8"))
+    require(len(rows) == 15, f"Expected 15 dataset cells, found {len(rows)}")
+    cells = {row["cell"] for row in rows}
+    expected_cells = set().union(*EXPECTED_CELL_SPLITS.values())
+    require(cells == expected_cells, "Dataset coverage omits or adds cells")
+    for split, expected in EXPECTED_CELL_SPLITS.items():
+        observed = {row["cell"] for row in rows if row["split"] == split}
+        require(observed == expected, f"{split} cell split changed")
+    require(all(row["duration_days"] > 40 for row in rows), "A cell duration is implausibly short")
+    require(all(0.60 <= row["soh_min"] <= row["soh_max"] <= 1.001 for row in rows), "SOH coverage is invalid")
+    holdout = {row["cell"]: row for row in rows if row["split"] == "Holdout"}
+    require(holdout["C29"]["holdout_load_class"] == "High*", "C29 high-load marker changed")
+    require(holdout["C29"]["abs_c_rate_p95"] > 3.0, "C29 no longer has the highest P95 C-rate")
+    require(holdout["C27"]["abs_c_rate_p95"] < 0.71, "C27 low-load evidence changed")
+    require(
+        (FIGURES / "Figure_21_APPENDIX_Holdout_Cell_Coverage.png").is_file(),
+        "Holdout coverage figure is missing",
+    )
+    require(
+        (FIGURES / "Figure_26_APPENDIX_SOH_Aging_Conditions.png").is_file(),
+        "SOH aging-condition figure is missing",
+    )
+    require((TABLES / "jes2_dataset_cell_split_coverage.tex").is_file(), "Dataset split table is missing")
+    return "15 cell-disjoint trajectories reproduce the fixed training, validation, and holdout split"
+
+
 def check_manuscript() -> str:
     text = MANUSCRIPT.read_text(encoding="utf-8")
     lower = text.lower()
+    abstract_match = re.search(r"\\begin\{abstract\}(.*?)\\end\{abstract\}", text, re.DOTALL)
+    require(abstract_match is not None, "Manuscript abstract is missing")
+    abstract = abstract_match.group(1).lower()
+    abstract_required = [
+        "two complementary test branches",
+        "accuracy under nominal inputs",
+        "robustness to corrupted or unavailable measurements",
+        "recovery after initialization mismatch",
+        "nominal mae is $0.0690$ for dm, $0.0412$ for hdm, $0.0337$ for hecm, and $0.0258$ for dd",
+        "dd provides the strongest aggregate robustness",
+        "hecm provides the strongest observed recovery",
+        "inference time, flash occupancy, and peak runtime ram",
+    ]
+    for phrase in abstract_required:
+        require(phrase in abstract, f"Required abstract statement is missing: {phrase}")
+    abstract_forbidden = [
+        "six-cell macro",
+        "persistent-recovery",
+        "voltage spike",
+        "burst dropout",
+        "current-gain",
+    ]
+    for phrase in abstract_forbidden:
+        require(phrase not in abstract, f"Over-specific abstract wording remains: {phrase}")
     required = [
         "common source-sample mask $k\\geq2023$",
         "persistent recovery is the primary time endpoint",
@@ -286,6 +344,7 @@ def check_manuscript() -> str:
         "largest absolute macro interaction is $0.00026$ mae",
         "representative c09 replay",
         "not complete bms feasibility or schedulability",
+        "identifies every cell and its split",
     ]
     for phrase in required:
         require(phrase in lower, f"Required manuscript statement is missing: {phrase}")
@@ -306,11 +365,11 @@ def check_manuscript() -> str:
     require(";" not in text, "Manuscript still contains a semicolon")
 
     references = re.findall(r"\\finalfigpath/([^}]+\.png)", text)
-    require(len(references) == 25, f"Expected 25 figure references, found {len(references)}")
-    require(len(set(references)) == 25, "A final figure is referenced more than once")
+    require(len(references) == 26, f"Expected 26 figure references, found {len(references)}")
+    require(len(set(references)) == 26, "A final figure is referenced more than once")
     missing = [name for name in references if not (FIGURES / name).is_file()]
     require(not missing, f"Referenced figures are missing: {missing}")
-    return "required claims are present, obsolete wording is absent, and 25 unique figures resolve"
+    return "two-branch abstract and required claims are present, obsolete wording is absent, and 26 unique figures resolve"
 
 
 def main() -> None:
@@ -321,6 +380,7 @@ def main() -> None:
         ("Offsets and paired tests", check_protocol_and_statistics),
         ("HECM lookup sensitivity", check_hecm_lookup_sensitivity),
         ("Final-build boundaries", check_build_boundaries),
+        ("Dataset split coverage", check_dataset_split_coverage),
         ("Manuscript consistency", check_manuscript),
     ]
     for label, check in checks:

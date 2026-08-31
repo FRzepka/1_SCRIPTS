@@ -1,7 +1,7 @@
 # All Cells – kuratierte Abbildungsübersicht
 
-Die 25 ausgewählten PNG-Dateien sind lückenlos als `Figure_01` bis `Figure_25`
-nummeriert. Figures 01–20 gehören in den Hauptteil; Figures 21–25 sind zusätzlich
+Die 26 ausgewählten PNG-Dateien sind lückenlos als `Figure_01` bis `Figure_26`
+nummeriert. Figures 01–20 gehören in den Hauptteil; Figures 21–26 sind zusätzlich
 mit `APPENDIX` gekennzeichnet und gehören in den Anhang. Quelldateien außerhalb
 dieses Ordners bleiben unverändert. Das Farbschema ist durchgängig DM = grün,
 HDM = lila, HECM = blau und DD = rot.
@@ -22,8 +22,9 @@ HDM = lila, HECM = blau und DD = rot.
 | 15 | Decision synthesis | Illustrative Six-Cell-Scores einschließlich Burst-Dropout, gepaartem Gain-Sweep und beobachteter persistenter Recovery. Relapse bleibt ein separates Diagnostikum. |
 | 16 | ADC quantization | Strom- und Spannungsdetail kombiniert mit Six-Cell-Mittel, hierarchischem 95%-KI sowie ΔMAE- und MAE-Werten. |
 | 17–20 | STM32-Hardwarebenchmark, Hauptteil | Hardware-/Software-Äquivalenz, On-Device-Latenzen, Speicherbedarf und DD-Inferenzmodi. Figure 20 benötigt noch den unten dokumentierten Style-Rebuild. |
-| 21–24 | Anhang (`APPENDIX`) | Holdout-Abdeckung, JES2-Testmatrix, Evaluationsfenster und detaillierte DD-Latenzverteilungen. |
+| 21–24 | Anhang (`APPENDIX`) | Bestehende Holdout-Abdeckung, JES2-Testmatrix, Evaluationsfenster und detaillierte DD-Latenzverteilungen. |
 | 25 | HECM Lookup-Sensitivität (`APPENDIX`) | 240 HECM-Läufe über 16 Fenster zeigen Baseline-Accuracy, adverse Current-Gain-Penalty und den Lookup-×-Gain-Interaktionseffekt für Widerstand ±10 % und OCV ±10 mV. |
+| 26 | SOH-Verläufe und Beanspruchung (`APPENDIX`) | Unveränderte Dissertation-Abbildung mit vollständigen SOH-Verläufen sowie Charge-C-Rate, Discharge-C-Rate und DOD. Die Zell-Splits und Messbereiche stehen in der zugehörigen Tabelle. |
 
 ## Wichtiger Rechenstatus
 
@@ -43,6 +44,9 @@ ausgeführt und `figure_04_dd_inference_modes.png` anschließend als Figure 20
 übernommen werden. Die Messwerte selbst ändern sich dadurch nicht.
 
 Erzeugung: `python figures/build_all_cells_collection.py`
+
+Die Zelltabelle neu erzeugen:
+`python DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/results/build_jes2_dataset_split_coverage.py --figure_path "LATEX/JES/paper_robustness_benchmark/figures/Results/All Cells/Figure_26_APPENDIX_SOH_Aging_Conditions.png" --metadata_path LATEX/JES/paper_robustness_benchmark/JES_2.0/tables/jes2_dataset_cell_split_coverage.json --table_path LATEX/JES/paper_robustness_benchmark/JES_2.0/tables/jes2_dataset_cell_split_coverage.tex`
 
 Nur Figure 14 neu erzeugen:
 `python figures/build_revised_all_cells_figures.py --figure-12-only --figure-12-output "figures/Results/All Cells/Figure_14_Cross_Scenario_Heatmap_Six_Cell.png"`
