@@ -162,6 +162,53 @@ def check_protocol_and_statistics() -> str:
     return "both offsets and all six exact baseline pair tests with Holm correction are present"
 
 
+def check_hecm_lookup_sensitivity() -> str:
+    runs = pd.read_csv(RESULTS / "hecm_lookup_sensitivity_runs.csv")
+    cells = pd.read_csv(RESULTS / "hecm_lookup_sensitivity_cells.csv")
+    stats = pd.read_csv(RESULTS / "hecm_lookup_sensitivity_statistics.csv")
+    protocol = json.loads(
+        (RESULTS / "hecm_lookup_sensitivity_protocol.json").read_text(encoding="utf-8")
+    )
+    table_conditions = {
+        "nominal_lookup",
+        "resistance_minus_10pct",
+        "resistance_plus_10pct",
+        "ocv_minus_10mV",
+        "ocv_plus_10mV",
+    }
+    gain_conditions = {"gain_minus_3pct", "gain_nominal", "gain_plus_3pct"}
+    require(len(runs) == 240, f"Expected 240 HECM sensitivity runs, found {len(runs)}")
+    require(runs["window_id"].nunique() == 16, "HECM sensitivity does not use 16 windows")
+    require(runs["cell"].nunique() == 6, "HECM sensitivity does not use six cells")
+    require(set(runs["table_condition"]) == table_conditions, "Lookup conditions changed")
+    require(set(runs["gain_condition"]) == gain_conditions, "Gain conditions changed")
+    require(set(runs["evaluation_start_sample"].astype(int)) == {2023}, "HECM mask changed")
+    require(set(runs["evaluation_samples"].astype(int)) == {84377}, "HECM sample count changed")
+    require(len(cells) == 30, "Expected five lookup conditions for each of six cells")
+    require(len(stats) == 15, "Expected three statistics for each lookup condition")
+    gain = stats[stats["metric"] == "adverse_gain_delta_mae"].set_index("table_condition")
+    interaction = stats[stats["metric"] == "gain_interaction_delta_delta_mae"]
+    require(
+        np.isclose(gain.loc["nominal_lookup", "mean"], 0.006016930222536569),
+        "Nominal HECM current-gain penalty changed",
+    )
+    require(
+        float(interaction["mean"].abs().max()) <= 0.000261,
+        "Lookup x current-gain interaction exceeds the recorded result",
+    )
+    non_nominal = interaction[interaction["table_condition"] != "nominal_lookup"]
+    require(
+        ((non_nominal["ci_low"] <= 0.0) & (non_nominal["ci_high"] >= 0.0)).all(),
+        "A reported lookup x gain interaction interval no longer includes zero",
+    )
+    require(protocol["evaluation_start_sample"] == 2023, "Sensitivity protocol mask changed")
+    require(
+        (FIGURES / "Figure_25_APPENDIX_HECM_Lookup_Table_Sensitivity.png").is_file(),
+        "HECM lookup-sensitivity figure is missing",
+    )
+    return "240 common-mask HECM runs bound the macro lookup x gain interaction to 0.000260 MAE"
+
+
 def check_build_boundaries() -> str:
     main_path = SIMULATION / "campaigns" / "jes2_full_holdout_merged_20260825.json"
     signed_path = (
@@ -234,7 +281,9 @@ def check_manuscript() -> str:
         "final benchmark build",
         "dataset soc ground truth",
         "left-censored",
-        "originating hppc cells",
+        "training and validation development pool",
+        "a separate hecm-only analysis",
+        "largest absolute macro interaction is $0.00026$ mae",
         "representative c09 replay",
         "not complete bms feasibility or schedulability",
     ]
@@ -257,11 +306,11 @@ def check_manuscript() -> str:
     require(";" not in text, "Manuscript still contains a semicolon")
 
     references = re.findall(r"\\finalfigpath/([^}]+\.png)", text)
-    require(len(references) == 24, f"Expected 24 figure references, found {len(references)}")
-    require(len(set(references)) == 24, "A final figure is referenced more than once")
+    require(len(references) == 25, f"Expected 25 figure references, found {len(references)}")
+    require(len(set(references)) == 25, "A final figure is referenced more than once")
     missing = [name for name in references if not (FIGURES / name).is_file()]
     require(not missing, f"Referenced figures are missing: {missing}")
-    return "required claims are present, obsolete wording is absent, and 24 unique figures resolve"
+    return "required claims are present, obsolete wording is absent, and 25 unique figures resolve"
 
 
 def main() -> None:
@@ -270,6 +319,7 @@ def main() -> None:
         ("Canonical recovery", check_recovery),
         ("Robustness synthesis", check_robustness_score),
         ("Offsets and paired tests", check_protocol_and_statistics),
+        ("HECM lookup sensitivity", check_hecm_lookup_sensitivity),
         ("Final-build boundaries", check_build_boundaries),
         ("Manuscript consistency", check_manuscript),
     ]

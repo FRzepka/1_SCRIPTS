@@ -19,7 +19,7 @@ remains concise. `REVIEWER_TODO_STATUS.txt` is the historical implementation log
 | Comment | Current response | Status |
 |---|---|---|
 | Single validation trajectory | Six independent holdout cells and 16 protocol-defined Fresh/Mid-Life/Aged windows replace the single-trajectory comparison. External validity remains limited to the measured LFP envelope. | Addressed within available dataset |
-| Independence of development and benchmark | Neural training, validation, tuning, scaling, pruning, and checkpoint selection exclude all six holdout cells. The imported HECM surfaces were not retuned during the campaign, but their originating HPPC-cell metadata is absent from the current archive. | Neural split addressed; HECM provenance remains a blocker |
+| Independence of development and benchmark | Neural training, validation, tuning, scaling, pruning, and checkpoint selection exclude all six holdout cells. The HPPC-derived HECM surfaces originate from the training/validation development pool, exclude the six holdout cells, and remain fixed during evaluation. | Addressed, with identification artifacts retained for release packaging |
 | Unfair DD initialization proxy | All models receive a requested 10% SOC-equivalent intervention, realized output shifts are reported, and the text explicitly states that the interventions are not identical latent-state perturbations. The revised result no longer claims DD is the fastest; HECM is. | Addressed transparently, structural limitation retained |
 | Estimator-specific recovery bands | One common 2% paired trajectory-difference threshold and 24-h censor horizon are used. First entry requires a continuous 300-s hold. The primary persistent endpoint additionally requires the trajectory to remain inside the band for the rest of the horizon. Both compare perturbed and correctly initialized runs, not prediction error against dataset SOC. Observation starts 0.562 h after intervention and earlier endpoints are now identified as left-censored. | Addressed with explicit observation limit |
 | Embedded-deployment evidence | Six-cell STM32H753ZI tests report numerical equivalence, latency distributions, compiled flash occupancy, measured peak runtime RAM, and one-second deadline occupation. RAM is tied to a representative C09 replay. Energy and concurrent total-BMS CPU load are explicitly excluded. | Results addressed; raw per-cell records and clean firmware release remain open |
@@ -40,9 +40,9 @@ remains concise. `REVIEWER_TODO_STATUS.txt` is the historical implementation log
 | DD voltage-spike mechanism | Event alignment supports the voltage-plus-derivative/recurrent-context explanation; the manuscript labels it as an interpretation because no channel-removal ablation was run. | Addressed without overclaiming |
 | Estimator-specific recovery thresholds | Replaced by the common recovery criterion. | Addressed |
 | Runtime-memory lower bounds | Statically allocated variable storage is combined with on-device measurements of maximum call-stack and dynamic-memory use. The watermark comes from C09, and rolling DD has two valid post-warm-up calls in that replay. The values exclude the shared SOH-LSTM and concurrent BMS tasks. | Addressed for the stated isolated SOC-core replay boundary |
-| HECM dependence on lookup-table quality | The main result is explicitly conditional on the fixed HPPC tables. No full six-cell parameter-mismatch sensitivity campaign is included. | Open optional software extension |
+| HECM dependence on lookup-table quality | A separate 240-run, six-cell analysis combines nominal, resistance +/-10%, and OCV +/-10 mV lookups with baseline and matched +/-3% current gain. The adverse gain penalty remains 0.00580--0.00628 MAE versus 0.00602 nominal. All lookup--gain interaction intervals include zero. | Addressed by Figure 25 and machine-readable result tables |
 | Temperature response through SOH LSTM | Paired reference-SOH temperature-noise runs show that the incremental substitution effect differs from baseline by 0.0015 SOC for HDM and less than 0.0001 for HECM/DD. | Addressed |
-| Measurement-only exclusions | Parameter mismatch, hysteresis, gradients, pack imbalance, balancing/contactor/protocol/numerical/deadline faults are listed in limitations. | Addressed |
+| Measurement-only exclusions | The primary cross-model ranking remains measurement-only. A separate local HECM lookup sensitivity is reported, while larger and combined parameter mismatch, hysteresis, gradients, pack imbalance, balancing/contactor/protocol/numerical/deadline faults remain listed in limitations. | Addressed |
 | Reproducibility artefacts | Public dataset DOI and repository are named; the minimum contents of the versioned release are listed. | Release packaging still required before resubmission |
 
 ## Independent audit corrections
@@ -69,14 +69,14 @@ evidence record is `INDEPENDENT_AUDIT_VERIFICATION.md`.
 
 1. Package and archive the exact frozen weights/scalers, ECM tables, environment,
    manifests, summaries, and rebuild command as a versioned release.
-2. Document the originating HPPC experiment and cell provenance of the imported
-   HECM lookup surfaces. Until then, lookup-table independence is not verified.
+2. Archive the HPPC identification records and fitted HECM lookup surfaces from
+   the training/validation development pool in the versioned release.
 3. Export the raw six-cell hardware summaries and timing records from the hardware
    PC, rebuild from a clean tagged firmware state, and archive the ELF hashes.
 4. Retain the explicit distinction between the measured C09 SOC-core peak RAM and
    the still-open memory requirement of a concurrent SOC--SOH BMS implementation.
-5. Treat a full HECM parameter-mismatch sweep as optional additional evidence,
-   not as part of the primary measurement-disturbance ranking.
+5. Keep the completed HECM lookup sensitivity separate from the primary
+   measurement-disturbance ranking and its normalized robustness score.
 
 ## Scope and length decision
 

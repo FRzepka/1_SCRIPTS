@@ -85,8 +85,10 @@ IMPORTANT DISTINCTION
   one-hour dropout.
   Paired LSTM-SOH versus reference-SOH error propagation by cell and scenario.
   SOH publication cadence at 1 h, 6 h, and 24 h under baseline conditions.
-  Optional HECM resistance/tau/OCV lookup-table sensitivity. This is not part of
-  the current final campaign or paper results.
+  HECM lookup-table sensitivity: nominal lookup, joint resistance scaling by
+  +/-10%, and OCV shifts by +/-10 mV, each combined with baseline and matched
+  +/-3% current-gain inputs over all 16 frozen windows. The 240-run analysis is
+  reported separately and does not enter the cross-model robustness score.
   Current-gain mechanism diagnostics: adverse signed pair across five common
   three-state cells; identical C29 trace replayed at SOH 0.962, 0.897, and 0.831;
   natural versus disabled full-charge reset; and one continuous 1,344 h C29
@@ -136,8 +138,9 @@ IMPORTANT DISTINCTION
   Results remain limited to the available LFP dataset and its operating envelope.
   The offline reconstructed SOC target is the common dataset ground truth used
   for every reported SOC error.
-  The HECM table's originating HPPC-cell metadata is absent from the current
-  archive, so table independence from the holdout set is not yet verifiable.
+  The HECM surfaces originate from the training/validation development pool and
+  exclude the six holdout cells. The HPPC identification records and fitted
+  surfaces remain required release artifacts.
   Raw six-cell hardware summaries and a clean tagged firmware rebuild must be
   archived before resubmission.
 

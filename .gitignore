@@ -22,6 +22,9 @@ env/
 
 # ── Große Daten- und Ergebnisdateien ──
 *.csv
+!LATEX/JES/paper_robustness_benchmark/JES_2.0/results/hecm_lookup_sensitivity_cells.csv
+!LATEX/JES/paper_robustness_benchmark/JES_2.0/results/hecm_lookup_sensitivity_runs.csv
+!LATEX/JES/paper_robustness_benchmark/JES_2.0/results/hecm_lookup_sensitivity_statistics.csv
 *.log
 **/training.log
 **/screenlog_*.txt

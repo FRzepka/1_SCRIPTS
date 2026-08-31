@@ -1,7 +1,7 @@
 # All Cells – kuratierte Abbildungsübersicht
 
-Die 24 ausgewählten PNG-Dateien sind lückenlos als `Figure_01` bis `Figure_24`
-nummeriert. Figures 01–20 gehören in den Hauptteil; Figures 21–24 sind zusätzlich
+Die 25 ausgewählten PNG-Dateien sind lückenlos als `Figure_01` bis `Figure_25`
+nummeriert. Figures 01–20 gehören in den Hauptteil; Figures 21–25 sind zusätzlich
 mit `APPENDIX` gekennzeichnet und gehören in den Anhang. Quelldateien außerhalb
 dieses Ordners bleiben unverändert. Das Farbschema ist durchgängig DM = grün,
 HDM = lila, HECM = blau und DD = rot.
@@ -23,6 +23,7 @@ HDM = lila, HECM = blau und DD = rot.
 | 16 | ADC quantization | Strom- und Spannungsdetail kombiniert mit Six-Cell-Mittel, hierarchischem 95%-KI sowie ΔMAE- und MAE-Werten. |
 | 17–20 | STM32-Hardwarebenchmark, Hauptteil | Hardware-/Software-Äquivalenz, On-Device-Latenzen, Speicherbedarf und DD-Inferenzmodi. Figure 20 benötigt noch den unten dokumentierten Style-Rebuild. |
 | 21–24 | Anhang (`APPENDIX`) | Holdout-Abdeckung, JES2-Testmatrix, Evaluationsfenster und detaillierte DD-Latenzverteilungen. |
+| 25 | HECM Lookup-Sensitivität (`APPENDIX`) | 240 HECM-Läufe über 16 Fenster zeigen Baseline-Accuracy, adverse Current-Gain-Penalty und den Lookup-×-Gain-Interaktionseffekt für Widerstand ±10 % und OCV ±10 mV. |
 
 ## Wichtiger Rechenstatus
 

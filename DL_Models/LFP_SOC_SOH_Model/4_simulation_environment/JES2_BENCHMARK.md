@@ -190,14 +190,20 @@ watch -n 10 '/home/florianr/anaconda3/bin/python \
 
 Run the separate HECM lookup-table sensitivity after the primary campaign. It
 is explanatory model-parameter analysis and is not included in the
-measurement-only robustness ranking:
+measurement-only robustness ranking. The final design combines five lookup
+conditions with baseline and matched +/-3% current-gain inputs over all 16 frozen
+windows, yielding 240 HECM runs:
 
 ```bash
 /home/florianr/anaconda3/envs/ml1/bin/python \
   DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/run_jes2_hecm_parameter_sensitivity.py \
-  --campaign_manifest DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/campaigns/jes2_full_holdout_merged.json \
-  --device cuda \
-  --figures_dir LATEX/JES/paper_robustness_benchmark/figures/Results \
+  --campaign_manifest DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/campaigns/jes2_full_holdout_merged_20260825.json \
+  --signed_manifest DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/campaigns/jes2_signed_gain_common_mask_20260830/jes2_manifest.json \
+  --out_root DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/campaigns/jes2_hecm_lookup_sensitivity_20260831 \
+  --workers 6 \
+  --bootstrap_samples 10000 \
+  --evaluation_start_sample 2023 \
+  --figure_path "LATEX/JES/paper_robustness_benchmark/figures/Results/All Cells/Figure_25_APPENDIX_HECM_Lookup_Table_Sensitivity.png" \
   --skip_existing
 ```
 

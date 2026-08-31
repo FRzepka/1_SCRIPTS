@@ -39,7 +39,7 @@ def main() -> None:
     ):
         copy_file(EAAI / source, target)
 
-    # Figures 05--07, 14--20, and Appendix Figure 24 are generated directly in
+    # Figures 05--07, 14--20, and Appendix Figures 24--25 are generated directly in
     # All Cells by dedicated scripts and are intentionally not overwritten here.
     copy_png(RESULTS / "Figure_04_Baseline_Performance", "Figure_04_Baseline_Performance")
 

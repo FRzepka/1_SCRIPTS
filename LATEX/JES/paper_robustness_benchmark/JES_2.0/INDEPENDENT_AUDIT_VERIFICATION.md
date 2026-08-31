@@ -21,15 +21,16 @@ is checked by `python verify_independent_audit.py`.
 | Recovery starts after the intervention | Observation begins at source sample 2023, about 0.562 h after intervention. Runs already satisfying an endpoint there are flagged as left-censored, and the boundary value is described as a conservative upper bound. | `results/jes2_paired_initial_recovery_runs.csv`, recovery method note, Figure 09, manuscript Methods and Limitations |
 | C29 lifecycle interpretation contradicted its data | The text now reports HECM, not DD, as the smallest full-life adverse gain-error contribution on C29 and explicitly avoids a six-cell lifecycle claim. | `results/c29_bias_temporal_model_summary.csv`, Figure 06 and current-gain Results |
 | Dataset ground-truth construction unclear | The manuscript consistently calls the reconstructed SOC the dataset ground truth and states its offline Coulomb-counting and voltage-anchor construction. | Ground-truth Methods, Baseline Results, Limitations and Conclusion |
-| Hardware and HECM provenance overstated | Runtime RAM is tied to the C09 replay, exact rolling-DD stack use to two valid calls, and SOC-core results are not called full-BMS feasibility. Missing raw hardware records, clean firmware state, and originating HPPC-cell metadata remain release blockers. | Hardware Methods and Limitations, Data availability, release actions below |
+| HECM lookup-table dependence unquantified | A separate 240-run analysis perturbs resistance by +/-10% and OCV by +/-10 mV under baseline and matched +/-3% current gain. All 240 runs use the common mask. The largest absolute macro lookup--gain interaction is 0.000260 MAE and all interaction intervals include zero. | `results/hecm_lookup_sensitivity_*.csv`, Figure 25, HECM Methods, Results and Discussion |
+| Hardware and HECM provenance overstated | Runtime RAM is tied to the C09 replay, exact rolling-DD stack use to two valid calls, and SOC-core results are not called full-BMS feasibility. The HECM lookup surfaces originate from the development pool and exclude holdout cells. Raw HPPC identification artifacts, raw hardware records, and a clean firmware state remain release-packaging actions. | Model preparation, Hardware Methods and Limitations, Data availability, release actions below |
 
 The original submitted PDF remains protected. Before resubmission, the hardware
 PC must export the per-cell source summaries and timing records used for Figures
 17, 18, 20, and 24, and the firmware must be rebuilt from a clean tagged source
-state. The current RAM record identifies `c3307581-dirty`, and the imported HECM
-table has no originating-cell metadata in the repository. These are provenance
-and release-packaging blockers, not reasons to alter the already recorded result
-values. The currently used HECM MAT file has SHA-256
+state. The current RAM record identifies `c3307581-dirty`. The HPPC identification
+records and fitted HECM surfaces from the training/validation development pool
+must be included in the versioned release. These are release-packaging actions,
+not reasons to alter the already recorded result values. The currently used HECM MAT file has SHA-256
 `bba8bfb6d5946eb6e1fca965cbb6b2daa98af71b200c6b6585c4cb0f6ef56b08`,
 and the runtime-memory record has SHA-256
 `e5c9d8a7db770e5dee8df5ba6c5fd30a48385aa0f9b28659b43787cb086e2db6`.

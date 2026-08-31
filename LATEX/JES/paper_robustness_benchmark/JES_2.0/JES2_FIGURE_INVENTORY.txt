@@ -8,7 +8,7 @@ COMPILED OVERVIEW
   LATEX/JES/paper_robustness_benchmark/JES_2.0/JES2_Figure_Overview.png
 
 STATUS
-  All 24 PNG files below contain the final real-data or protocol evidence and are
+  All 25 PNG files below contain the final real-data or protocol evidence and are
   included exactly once in Robustness_Benchmark_Manuscript_JES2_Updated.tex.
   Figure 20 still awaits a style-only rebuild on the hardware PC. Legacy and pilot
   output directories are not referenced by the JES 2.0 manuscript.
@@ -37,9 +37,10 @@ MAIN MANUSCRIPT
 
 APPENDIX
   Figure 21  Holdout-cell coverage
-  Figure 22  Complete 19-case JES2 test matrix
+  Figure 22  Complete 19-scenario JES2 test matrix
   Figure 23  Common-mask evaluation-window and dropout protocol
   Figure 24  DD inference-mode latency distributions
+  Figure 25  HECM lookup-table x current-gain sensitivity
 
 SCIENTIFIC DATA BOUNDARY
   Figures 04-16 are generated from the corrected six-cell common-mask results.
@@ -48,10 +49,12 @@ SCIENTIFIC DATA BOUNDARY
   references. Figures 14 and 15 include all eight evaluated disturbance families,
   including voltage and temperature offsets. Figures 17-20 and 24 use measured
   STM32 SOC-core results. Figures 21-23 visualize measured coverage and the frozen
-  protocol. No synthetic pilot value is used in the manuscript.
+  protocol. Figure 25 uses the separate 240-run HECM lookup-sensitivity analysis.
+  No synthetic pilot value is used in the manuscript.
 
 EXECUTION STATUS
   Public benchmark: 6720/6720 runs complete.
   Internal duration-matched dropout references: 112/112 runs complete.
   Statistical build: 10000 hierarchical bootstrap repetitions complete.
+  HECM lookup sensitivity: 240/240 runs complete.
   Tests: 32/32 passed in the ML environment.
