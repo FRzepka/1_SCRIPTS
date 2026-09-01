@@ -190,22 +190,38 @@ watch -n 10 '/home/florianr/anaconda3/bin/python \
 
 Run the separate HECM lookup-table sensitivity after the primary campaign. It
 is explanatory model-parameter analysis and is not included in the
-measurement-only robustness ranking. The final design combines five lookup
-conditions with baseline and matched +/-3% current-gain inputs over all 16 frozen
-windows, yielding 240 HECM runs:
+measurement-only robustness ranking. The final design combines the nominal
+lookup with resistance +/-10%, time-constant +/-10%, and OCV +/-10 mV
+conditions. Every lookup condition is evaluated across all 20 measurement and
+signal-integrity subcases, the paired initialization intervention, the original
+scenario seeds, the 16 frozen windows, lookup-matched
+main-campaign baselines, duration-matched dropout baselines, and separate paired
+initialization-recovery baselines. This yields 8,960
+HECM runs:
 
 ```bash
 /home/florianr/anaconda3/envs/ml1/bin/python \
-  DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/run_jes2_hecm_parameter_sensitivity.py \
+  DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/run_jes2_hecm_full_lookup_sensitivity.py \
   --campaign_manifest DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/campaigns/jes2_full_holdout_merged_20260825.json \
   --signed_manifest DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/campaigns/jes2_signed_gain_common_mask_20260830/jes2_manifest.json \
-  --out_root DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/campaigns/jes2_hecm_lookup_sensitivity_20260831 \
-  --workers 6 \
+  --gap_manifest DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/campaigns/jes2_gap_baseline_common_mask_20260830/jes2_manifest.json \
+  --recovery_manifest DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/campaigns/jes2_initial_state_paired_sixcell_20260827_cuda/jes2_manifest.json \
+  --out_root DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/campaigns/jes2_hecm_full_lookup_sensitivity_20260901 \
+  --workers 24 \
   --bootstrap_samples 10000 \
   --evaluation_start_sample 2023 \
   --figure_path "LATEX/JES/paper_robustness_benchmark/figures/Results/All Cells/Figure_25_APPENDIX_HECM_Lookup_Table_Sensitivity.png" \
+  --table_path LATEX/JES/paper_robustness_benchmark/JES_2.0/tables/jes2_hecm_lookup_sensitivity_compact.tex \
   --skip_existing
 ```
+
+The publication output is intentionally compact. Figure 25 reports the largest
+lookup interaction within each of nine disturbance families and the paired
+initialization-recovery response. Its seven-row table retains baseline MAE, the
+largest absolute interaction among all 21 subcases, the responsible subcase,
+the number of non-zero interaction intervals, and recovery-or-censor time. The
+scope is the fixed HECM under local one-at-a-time lookup perturbations. Combined
+parameter errors and alternative HECM structures are not covered.
 
 `--start_row` and `--max_rows` remain intended for smoke tests. Publication runs
 must use the frozen window manifest so late windows receive the declared 192 h

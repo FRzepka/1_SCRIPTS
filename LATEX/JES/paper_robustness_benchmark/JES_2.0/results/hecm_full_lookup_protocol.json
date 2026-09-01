@@ -1,0 +1,119 @@
+{
+  "analysis": "HECM lookup sensitivity across the complete JES2 disturbance benchmark",
+  "scope": "HECM-only lookup sensitivity outside the cross-model score",
+  "lookup_conditions": {
+    "nominal_lookup": {},
+    "resistance_minus_10pct": {
+      "--ecm_resistance_scale": "0.90"
+    },
+    "resistance_plus_10pct": {
+      "--ecm_resistance_scale": "1.10"
+    },
+    "tau_minus_10pct": {
+      "--ecm_tau_scale": "0.90"
+    },
+    "tau_plus_10pct": {
+      "--ecm_tau_scale": "1.10"
+    },
+    "ocv_minus_10mV": {
+      "--ecm_ocv_offset_v": "-0.010"
+    },
+    "ocv_plus_10mV": {
+      "--ecm_ocv_offset_v": "0.010"
+    }
+  },
+  "disturbance_aliases": [
+    "adc_quantization",
+    "current_bias_0p5pct",
+    "current_bias_1p5pct",
+    "current_bias_3p0pct",
+    "current_bias_neg_0p5pct",
+    "current_bias_neg_1p5pct",
+    "current_bias_neg_3p0pct",
+    "current_noise_high",
+    "current_noise_low",
+    "initial_soc_error",
+    "irregular_sampling_0p1s",
+    "irregular_sampling_0p5s",
+    "irregular_sampling_0p9s",
+    "missing_gap_1h",
+    "missing_samples_periodic",
+    "missing_samples_random",
+    "temperature_noise",
+    "temperature_offset",
+    "voltage_noise",
+    "voltage_offset",
+    "voltage_spikes"
+  ],
+  "robustness_families": {
+    "Current gain": [
+      "current_bias_0p5pct",
+      "current_bias_1p5pct",
+      "current_bias_3p0pct",
+      "current_bias_neg_0p5pct",
+      "current_bias_neg_1p5pct",
+      "current_bias_neg_3p0pct"
+    ],
+    "Sensor noise": [
+      "current_noise_high",
+      "current_noise_low",
+      "temperature_noise",
+      "voltage_noise"
+    ],
+    "Sensor offsets": [
+      "temperature_offset",
+      "voltage_offset"
+    ],
+    "ADC quantization": [
+      "adc_quantization"
+    ],
+    "Missing samples": [
+      "missing_samples_periodic",
+      "missing_samples_random"
+    ],
+    "Timing jitter": [
+      "irregular_sampling_0p1s",
+      "irregular_sampling_0p5s",
+      "irregular_sampling_0p9s"
+    ],
+    "Burst dropout": [
+      "missing_gap_1h"
+    ],
+    "Voltage spikes": [
+      "voltage_spikes"
+    ]
+  },
+  "initialization_recovery_alias": "initial_soc_error",
+  "runs": 8960,
+  "cells": [
+    "C09",
+    "C13",
+    "C15",
+    "C25",
+    "C27",
+    "C29"
+  ],
+  "windows": [
+    "C09_aged",
+    "C09_fresh",
+    "C09_mid_life",
+    "C13_aged",
+    "C13_fresh",
+    "C13_mid_life",
+    "C15_aged",
+    "C15_fresh",
+    "C15_mid_life",
+    "C25_aged",
+    "C25_fresh",
+    "C25_mid_life",
+    "C27_fresh",
+    "C29_aged",
+    "C29_fresh",
+    "C29_mid_life"
+  ],
+  "evaluation_start_sample": 2023,
+  "aggregation": "seeds and windows averaged within each cell; equal-weight cell macro; 10000-draw cell bootstrap",
+  "interaction_definition": "scenario delta MAE under the perturbed lookup minus scenario delta MAE under the nominal lookup, each relative to its lookup-matched baseline",
+  "recovery_definition": "canonical paired baseline-versus-initialization recovery with 0.02 SOC threshold, 300 s qualification, 24 h horizon, and persistent recovery-or-censor endpoint",
+  "interpretation_boundary": "The analysis covers every declared JES2 disturbance subcase for the fixed HECM implementation under local one-at-a-time lookup perturbations. It does not cover combined lookup errors or other HECM structures."
+}

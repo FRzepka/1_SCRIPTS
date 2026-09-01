@@ -8,6 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from robustness_common import (
+    apply_measurement_scenario,
     build_common_evaluation_mask,
     build_online_aux_features,
     compute_max_abs_net_charge_window_mask,
@@ -17,6 +18,32 @@ from robustness_common import (
     load_cell_dataframe,
     write_temporal_error_metrics,
 )
+from jes2_protocol import SCENARIOS
+
+
+class OffsetArgs:
+    current_offset_a = 0.05
+    current_offset_pct = None
+
+
+def test_additive_current_offset_is_distinct_from_current_gain():
+    frame = pd.DataFrame({
+        "Current[A]": [-2.0, 0.0, 3.0],
+        "Voltage[V]": [3.2, 3.3, 3.4],
+    })
+
+    disturbed, metadata = apply_measurement_scenario(frame, "current_offset", OffsetArgs())
+
+    np.testing.assert_allclose(disturbed["Current[A]"], [-1.95, 0.05, 3.05])
+    assert metadata["current_offset_a"] == 0.05
+    assert "current_offset_pct" not in metadata
+
+
+def test_jes2_declares_matched_additive_current_offset_signs():
+    definitions = {alias: arguments for alias, _, arguments in SCENARIOS}
+
+    assert definitions["current_offset_neg_50mA"] == ["--current_offset_a", "-0.050"]
+    assert definitions["current_offset_pos_50mA"] == ["--current_offset_a", "0.050"]
 
 
 def test_common_evaluation_mask_aligns_full_and_windowed_outputs():

@@ -1,6 +1,6 @@
 # Independent audit verification
 
-Verified: 2026-08-31
+Verified: 2026-09-01
 
 This record addresses the independent audit supplied after the JES 2.0 revision.
 The paper remains concise. Detailed implementation evidence is retained here and
@@ -21,7 +21,7 @@ is checked by `python verify_independent_audit.py`.
 | Recovery starts after the intervention | Observation begins at source sample 2023, about 0.562 h after intervention. Runs already satisfying an endpoint there are flagged as left-censored, and the boundary value is described as a conservative upper bound. | `results/jes2_paired_initial_recovery_runs.csv`, recovery method note, Figure 09, manuscript Methods and Limitations |
 | C29 lifecycle interpretation contradicted its data | The text now reports HECM, not DD, as the smallest full-life adverse gain-error contribution on C29 and explicitly avoids a six-cell lifecycle claim. | `results/c29_bias_temporal_model_summary.csv`, Figure 06 and current-gain Results |
 | Dataset ground-truth construction unclear | The manuscript consistently calls the reconstructed SOC the dataset ground truth and states its offline Coulomb-counting and voltage-anchor construction. | Ground-truth Methods, Baseline Results, Limitations and Conclusion |
-| HECM lookup-table dependence unquantified | A separate 240-run analysis perturbs resistance by +/-10% and OCV by +/-10 mV under baseline and matched +/-3% current gain. All 240 runs use the common mask. The largest absolute macro lookup--gain interaction is 0.000260 MAE and all interaction intervals include zero. | `results/hecm_lookup_sensitivity_*.csv`, Figure 25, HECM Methods, Results and Discussion |
+| HECM lookup-table dependence unquantified | A separate 8,960-run HECM analysis crosses local resistance, time-constant, and OCV perturbations with all 20 measurement and signal-integrity subcases plus paired initialization recovery. Baseline MAE changes from 0.0314 to 0.0373. Every absolute measurement-disturbance interaction remains at or below 0.001921 MAE, while resistance -10% exposes a C27 recovery boundary and raises the six-cell recovery-or-censor mean from 1.20 h to 5.10 h. | `results/hecm_full_lookup_*.csv`, Figure 25, compact lookup table, HECM Methods, Results and Discussion |
 | Hardware and HECM provenance overstated | Runtime RAM is tied to the C09 replay, exact rolling-DD stack use to two valid calls, and SOC-core results are not called full-BMS feasibility. The HECM lookup surfaces originate from the development pool and exclude holdout cells. Figure 26 and its accompanying table make the complete aging envelope, cell-disjoint split, and measured coverage explicit, while Figure 21 retains the separate holdout summary. Raw HPPC identification artifacts, raw hardware records, and a clean firmware state remain release-packaging actions. | Model preparation, Hardware Methods and Limitations, Data availability, release actions below |
 
 The original submitted PDF remains protected. Before resubmission, the hardware

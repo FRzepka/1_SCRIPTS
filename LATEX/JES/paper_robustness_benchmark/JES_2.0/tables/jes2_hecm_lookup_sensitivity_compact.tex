@@ -1,0 +1,20 @@
+\begin{table*}[t]
+    \centering
+    \footnotesize
+    \setlength{\tabcolsep}{4pt}
+    \caption{HECM lookup sensitivity across the complete disturbance benchmark. The largest robustness interaction is selected from the 20 measurement and signal-integrity subcases after equal-weight cell aggregation. Bracketed counts report subcases whose 95\% interaction interval excludes zero. Recovery is the persistent recovery-or-censor time from the paired initialization analysis, with the equal-weight censored-cell percentage in brackets.}
+    \label{tab:hecm_lookup_sensitivity}
+    \begin{tabularx}{0.99\textwidth}{@{}l>{\centering\arraybackslash}p{0.12\textwidth}>{\centering\arraybackslash}p{0.19\textwidth}Y>{\centering\arraybackslash}p{0.17\textwidth}@{}}
+        \toprule
+        Lookup condition & Baseline MAE & Max. robust $|\Delta\Delta\mathrm{MAE}|$ [CI] & Source subcase & Recovery/censor [h] [censored] \\
+        \midrule
+        Nominal lookup & 0.0337 & Reference [--] & -- & 1.20 [0\%] \\
+        Resistance $-10\%$ & 0.0351 & 0.00098 [5/20] & Timing jitter 0.1 s & 5.10 [17\%] \\
+        Resistance $+10\%$ & 0.0327 & 0.00098 [4/20] & Voltage offset & 1.38 [0\%] \\
+        Time constants $-10\%$ & 0.0343 & 0.00113 [6/20] & Current noise 0.10 A & 1.41 [0\%] \\
+        Time constants $+10\%$ & 0.0335 & 0.00122 [5/20] & Voltage spikes & 1.22 [0\%] \\
+        OCV $-10$ mV & 0.0314 & 0.00178 [5/20] & Burst dropout 1 h & 1.18 [0\%] \\
+        OCV $+10$ mV & 0.0373 & 0.00192 [4/20] & Voltage offset & 1.19 [0\%] \\
+        \bottomrule
+    \end{tabularx}
+\end{table*}

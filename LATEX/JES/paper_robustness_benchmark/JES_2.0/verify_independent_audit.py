@@ -170,50 +170,113 @@ def check_protocol_and_statistics() -> str:
 
 
 def check_hecm_lookup_sensitivity() -> str:
-    runs = pd.read_csv(RESULTS / "hecm_lookup_sensitivity_runs.csv")
-    cells = pd.read_csv(RESULTS / "hecm_lookup_sensitivity_cells.csv")
-    stats = pd.read_csv(RESULTS / "hecm_lookup_sensitivity_statistics.csv")
+    baseline = pd.read_csv(RESULTS / "hecm_full_lookup_baseline_cells.csv")
+    counts = pd.read_csv(RESULTS / "hecm_full_lookup_run_counts.csv")
+    cells = pd.read_csv(RESULTS / "hecm_full_lookup_scenario_cells.csv")
+    stats = pd.read_csv(RESULTS / "hecm_full_lookup_scenario_statistics.csv")
+    recovery_runs = pd.read_csv(RESULTS / "hecm_full_lookup_recovery_runs.csv")
+    recovery_stats = pd.read_csv(RESULTS / "hecm_full_lookup_recovery_statistics.csv")
+    summary = pd.read_csv(RESULTS / "hecm_full_lookup_summary.csv")
     protocol = json.loads(
-        (RESULTS / "hecm_lookup_sensitivity_protocol.json").read_text(encoding="utf-8")
+        (RESULTS / "hecm_full_lookup_protocol.json").read_text(encoding="utf-8")
     )
-    table_conditions = {
+    lookup_conditions = {
         "nominal_lookup",
         "resistance_minus_10pct",
         "resistance_plus_10pct",
+        "tau_minus_10pct",
+        "tau_plus_10pct",
         "ocv_minus_10mV",
         "ocv_plus_10mV",
     }
-    gain_conditions = {"gain_minus_3pct", "gain_nominal", "gain_plus_3pct"}
-    require(len(runs) == 240, f"Expected 240 HECM sensitivity runs, found {len(runs)}")
-    require(runs["window_id"].nunique() == 16, "HECM sensitivity does not use 16 windows")
-    require(runs["cell"].nunique() == 6, "HECM sensitivity does not use six cells")
-    require(set(runs["table_condition"]) == table_conditions, "Lookup conditions changed")
-    require(set(runs["gain_condition"]) == gain_conditions, "Gain conditions changed")
-    require(set(runs["evaluation_start_sample"].astype(int)) == {2023}, "HECM mask changed")
-    require(set(runs["evaluation_samples"].astype(int)) == {84377}, "HECM sample count changed")
-    require(len(cells) == 30, "Expected five lookup conditions for each of six cells")
-    require(len(stats) == 15, "Expected three statistics for each lookup condition")
-    gain = stats[stats["metric"] == "adverse_gain_delta_mae"].set_index("table_condition")
-    interaction = stats[stats["metric"] == "gain_interaction_delta_delta_mae"]
-    require(
-        np.isclose(gain.loc["nominal_lookup", "mean"], 0.006016930222536569),
-        "Nominal HECM current-gain penalty changed",
-    )
-    require(
-        float(interaction["mean"].abs().max()) <= 0.000261,
-        "Lookup x current-gain interaction exceeds the recorded result",
-    )
-    non_nominal = interaction[interaction["table_condition"] != "nominal_lookup"]
-    require(
-        ((non_nominal["ci_low"] <= 0.0) & (non_nominal["ci_high"] >= 0.0)).all(),
-        "A reported lookup x gain interaction interval no longer includes zero",
-    )
+    disturbance_aliases = set(protocol["disturbance_aliases"])
+    require(protocol["runs"] == 8960, "HECM sensitivity run count changed")
     require(protocol["evaluation_start_sample"] == 2023, "Sensitivity protocol mask changed")
+    require(set(protocol["lookup_conditions"]) == lookup_conditions, "Lookup conditions changed")
+    require(len(disturbance_aliases) == 21, "Expected 21 disturbance subcases")
+    require(len(protocol["cells"]) == 6, "HECM sensitivity does not use six cells")
+    require(len(protocol["windows"]) == 16, "HECM sensitivity does not use 16 windows")
+    require(int(counts["runs"].sum()) == 8960, "Compact run counts do not sum to 8,960")
+    require(set(counts["lookup_condition"]) == lookup_conditions, "Run-count lookups changed")
+    require(
+        set(counts["alias"])
+        == disturbance_aliases | {"baseline", "missing_gap_baseline_48h", "recovery_baseline"},
+        "Run-count disturbance coverage changed",
+    )
+    require(len(baseline) == 42, "Expected seven lookup conditions for each of six cells")
+    require(len(cells) == 882, "Expected 21 scenario-cell rows for seven lookups and six cells")
+    require(len(stats) == 147, "Expected 21 scenario statistics for seven lookups")
+    require(set(stats["n_cells"].astype(int)) == {6}, "Scenario statistics lost a holdout cell")
+    require(len(recovery_runs) == 112, "Expected 16 paired recovery windows for seven lookups")
+    require(len(recovery_stats) == 7, "Expected one recovery summary per lookup")
+    require(len(summary) == 7, "Expected one compact-summary row per lookup")
+    require(set(summary["scenario_count"].astype(int)) == {20}, "Compact robustness count changed")
+    require(set(summary["lookup_condition"]) == lookup_conditions, "Compact lookups changed")
+    nominal = stats[stats["lookup_condition"] == "nominal_lookup"]
+    require(
+        np.allclose(nominal["interaction_mean"], 0.0),
+        "Nominal lookup interaction is not zero",
+    )
+    perturbed = stats[stats["lookup_condition"] != "nominal_lookup"]
+    robustness = perturbed[
+        perturbed["alias"] != protocol["initialization_recovery_alias"]
+    ]
+    max_interaction = robustness["interaction_mean"].abs().max()
+    require(
+        np.isclose(max_interaction, 0.0019205044933184746),
+        "Largest HECM robustness interaction changed",
+    )
+    current_gain = robustness[robustness["alias"].str.startswith("current_bias_")]
+    require(
+        np.isclose(current_gain["interaction_mean"].abs().max(), 0.00044296097070024664),
+        "Largest HECM current-gain interaction changed",
+    )
+    require(
+        int((~current_gain["interaction_ci_includes_zero"]).sum()) == 6,
+        "Current-gain interval interpretation changed",
+    )
+    baseline_range = (summary["baseline_mae"].min(), summary["baseline_mae"].max())
+    require(
+        np.allclose(baseline_range, (0.031364461924139476, 0.037285653891011634)),
+        "HECM baseline-calibration range changed",
+    )
+    nominal_recovery = summary.loc[
+        summary["lookup_condition"] == "nominal_lookup", "recovery_h"
+    ].iloc[0]
+    resistance_recovery = summary.loc[
+        summary["lookup_condition"] == "resistance_minus_10pct", "recovery_h"
+    ].iloc[0]
+    resistance_censor = summary.loc[
+        summary["lookup_condition"] == "resistance_minus_10pct",
+        "recovery_censored_fraction",
+    ].iloc[0]
+    require(np.isclose(nominal_recovery, 1.2033919753086677), "Nominal recovery changed")
+    require(
+        np.isclose(resistance_recovery, 5.100541666666679),
+        "Resistance -10% recovery changed",
+    )
+    require(np.isclose(resistance_censor, 1.0 / 6.0), "C27 censor fraction changed")
+    require(
+        "every declared JES2 disturbance subcase"
+        in protocol["interpretation_boundary"],
+        "Complete sensitivity scope is not declared",
+    )
+    require(
+        "combined lookup errors" in protocol["interpretation_boundary"],
+        "Sensitivity interpretation boundary is too broad",
+    )
     require(
         (FIGURES / "Figure_25_APPENDIX_HECM_Lookup_Table_Sensitivity.png").is_file(),
         "HECM lookup-sensitivity figure is missing",
     )
-    return "240 common-mask HECM runs bound the macro lookup x gain interaction to 0.000260 MAE"
+    require(
+        (TABLES / "jes2_hecm_lookup_sensitivity_compact.tex").is_file(),
+        "Compact HECM lookup-sensitivity table is missing",
+    )
+    return (
+        "8,960 HECM runs show <=0.001921 MAE measurement-disturbance interactions, "
+        "a 0.0314--0.0373 baseline range, and one resistance-dependent recovery boundary"
+    )
 
 
 def check_build_boundaries() -> str:
@@ -307,14 +370,14 @@ def check_manuscript() -> str:
     require(abstract_match is not None, "Manuscript abstract is missing")
     abstract = abstract_match.group(1).lower()
     abstract_required = [
-        "two complementary test branches",
-        "accuracy under nominal inputs",
-        "robustness to corrupted or unavailable measurements",
-        "recovery after initialization mismatch",
-        "nominal mae is $0.0690$ for dm, $0.0412$ for hdm, $0.0337$ for hecm, and $0.0258$ for dd",
-        "dd provides the strongest aggregate robustness",
-        "hecm provides the strongest observed recovery",
-        "inference time, flash occupancy, and peak runtime ram",
+        "two complementary branches",
+        "accuracy quantifies agreement with the reference soc under nominal input conditions",
+        "robustness quantifies the stability of the soc estimate",
+        "recovery quantifies how rapidly a reliable soc estimate is re-established",
+        "nominal cell-macro mae is $0.0690$ for dm, $0.0412$ for hdm, $0.0337$ for hecm, and $0.0258$ for dd",
+        "dd representative achieves the lowest nominal error and leads several disturbance cases",
+        "hecm provides the strongest observed recovery profile",
+        "inference latency, flash occupancy, and peak runtime ram",
     ]
     for phrase in abstract_required:
         require(phrase in abstract, f"Required abstract statement is missing: {phrase}")
@@ -328,23 +391,27 @@ def check_manuscript() -> str:
     for phrase in abstract_forbidden:
         require(phrase not in abstract, f"Over-specific abstract wording remains: {phrase}")
     required = [
-        "common source-sample mask $k\\geq2023$",
-        "persistent recovery is the primary time endpoint",
+        "dd first requires a causal input context",
+        "persistent recovery is the first subsequent point",
         "equal weight to eight evaluated disturbance families",
         "largest absolute integrated net charge",
         "at least 12~h of pre-gap observations and 24~h of post-gap observations",
         "voltage offset, $+\\si{0.02}{v}$",
         "temperature offset, $+\\si{3}{\\celsius}$",
         "holm correction is applied across the six model-pair tests",
-        "final benchmark build",
+        "benchmark contains 19 scenario definitions",
         "dataset soc ground truth",
         "left-censored",
-        "training and validation development pool",
-        "a separate hecm-only analysis",
-        "largest absolute macro interaction is $0.00026$ mae",
-        "representative c09 replay",
-        "not complete bms feasibility or schedulability",
-        "identifies every cell and its split",
+        "identified exclusively from the training and validation data",
+        "a separate hecm-only sensitivity analysis",
+        "20 measurement and signal-integrity subcases plus the paired initialization intervention",
+        "local one-at-a-time lookup perturbations",
+        "does not represent combined parameter errors or other hecm structures",
+        "largest absolute lookup interaction is $0.00192$ mae",
+        "some subcase intervals exclude zero",
+        "c27 trajectory remains outside the recovery band",
+        "representative holdout-test replay",
+        "hardware profile covers the isolated soc firmware",
     ]
     for phrase in required:
         require(phrase in lower, f"Required manuscript statement is missing: {phrase}")

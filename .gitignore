@@ -25,6 +25,15 @@ env/
 !LATEX/JES/paper_robustness_benchmark/JES_2.0/results/hecm_lookup_sensitivity_cells.csv
 !LATEX/JES/paper_robustness_benchmark/JES_2.0/results/hecm_lookup_sensitivity_runs.csv
 !LATEX/JES/paper_robustness_benchmark/JES_2.0/results/hecm_lookup_sensitivity_statistics.csv
+!LATEX/JES/paper_robustness_benchmark/JES_2.0/results/hecm_full_lookup_baseline_cells.csv
+!LATEX/JES/paper_robustness_benchmark/JES_2.0/results/hecm_full_lookup_run_counts.csv
+!LATEX/JES/paper_robustness_benchmark/JES_2.0/results/hecm_full_lookup_scenario_cells.csv
+!LATEX/JES/paper_robustness_benchmark/JES_2.0/results/hecm_full_lookup_scenario_statistics.csv
+!LATEX/JES/paper_robustness_benchmark/JES_2.0/results/hecm_full_lookup_recovery_runs.csv
+!LATEX/JES/paper_robustness_benchmark/JES_2.0/results/hecm_full_lookup_recovery_statistics.csv
+!LATEX/JES/paper_robustness_benchmark/JES_2.0/results/hecm_full_lookup_summary.csv
+!LATEX/JES/paper_robustness_benchmark/JES_2.0/results/hecm_full_lookup_family_heatmap.csv
+!LATEX/JES/paper_robustness_benchmark/JES_2.0/results/current_offset_extension/*.csv
 *.log
 **/training.log
 **/screenlog_*.txt

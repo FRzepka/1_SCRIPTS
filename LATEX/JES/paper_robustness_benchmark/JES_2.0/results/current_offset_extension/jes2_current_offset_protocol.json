@@ -1,0 +1,50 @@
+{
+  "analysis": "JES2 signed additive current-offset extension",
+  "generated_utc": "2026-09-01T10:47:13.988931+00:00",
+  "current_offset_a": [
+    -0.05,
+    0.05
+  ],
+  "current_offset_mA": [
+    -50,
+    50
+  ],
+  "runs": 128,
+  "cells": [
+    "C09",
+    "C13",
+    "C15",
+    "C25",
+    "C27",
+    "C29"
+  ],
+  "windows": [
+    "C09_aged",
+    "C09_fresh",
+    "C09_mid_life",
+    "C13_aged",
+    "C13_fresh",
+    "C13_mid_life",
+    "C15_aged",
+    "C15_fresh",
+    "C15_mid_life",
+    "C25_aged",
+    "C25_fresh",
+    "C25_mid_life",
+    "C27_fresh",
+    "C29_aged",
+    "C29_fresh",
+    "C29_mid_life"
+  ],
+  "models": [
+    "DM",
+    "HDM",
+    "HECM",
+    "DD"
+  ],
+  "evaluation_start_sample": 2023,
+  "evaluation_samples_per_run": 84377,
+  "aggregation": "windows averaged within cell; equal-weight six-cell macro; 10000-draw cell bootstrap",
+  "adverse_definition": "larger signed delta MAE selected within each cell before equal-weight aggregation",
+  "interpretation_boundary": "One matched signed additive stress level, separate from multiplicative current gain. No combined sensor errors."
+}

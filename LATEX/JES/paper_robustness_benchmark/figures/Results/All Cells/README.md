@@ -23,7 +23,7 @@ HDM = lila, HECM = blau und DD = rot.
 | 16 | ADC quantization | Strom- und Spannungsdetail kombiniert mit Six-Cell-Mittel, hierarchischem 95%-KI sowie ΔMAE- und MAE-Werten. |
 | 17–20 | STM32-Hardwarebenchmark, Hauptteil | Hardware-/Software-Äquivalenz, On-Device-Latenzen, Speicherbedarf und DD-Inferenzmodi. Figure 20 benötigt noch den unten dokumentierten Style-Rebuild. |
 | 21–24 | Anhang (`APPENDIX`) | Bestehende Holdout-Abdeckung, JES2-Testmatrix, Evaluationsfenster und detaillierte DD-Latenzverteilungen. |
-| 25 | HECM Lookup-Sensitivität (`APPENDIX`) | 240 HECM-Läufe über 16 Fenster zeigen Baseline-Accuracy, adverse Current-Gain-Penalty und den Lookup-×-Gain-Interaktionseffekt für Widerstand ±10 % und OCV ±10 mV. |
+| 25 | HECM Lookup-Sensitivität (`APPENDIX`) | Kompakte Gesamtauswertung aus 8.960 HECM-Läufen. Sie kreuzt lokale Widerstands-, Zeitkonstanten- und OCV-Änderungen mit 20 Mess-/Signalstörungs-Unterfällen und der separat gepaarten Initialisierungs-Recovery. |
 | 26 | SOH-Verläufe und Beanspruchung (`APPENDIX`) | Unveränderte Dissertation-Abbildung mit vollständigen SOH-Verläufen sowie Charge-C-Rate, Discharge-C-Rate und DOD. Die Zell-Splits und Messbereiche stehen in der zugehörigen Tabelle. |
 
 ## Wichtiger Rechenstatus

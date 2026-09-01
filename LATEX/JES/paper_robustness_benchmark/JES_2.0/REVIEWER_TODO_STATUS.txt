@@ -175,15 +175,17 @@ R3.10 Runtime memory estimates are lower bounds
   mark, and stack watermark are combined into measured peak runtime RAM. The
   shared SOH service and concurrent BMS tasks remain outside scope.
 
-R3.11 HECM current-gain result may depend on ECM lookup-table quality
+R3.11 HECM disturbance response may depend on ECM lookup-table quality
   Status: DONE.
-  Change: a separate 240-run HECM-only sweep combines the nominal lookup,
-  resistance scaling by +/-10%, and OCV shifts by +/-10 mV with baseline and
-  matched +/-3% current gain over all 16 frozen windows. The adverse gain penalty
-  remains 0.00580--0.00628 MAE versus 0.00602 nominal. Every lookup--gain
-  interaction confidence interval includes zero. Figure 25 and the
-  machine-readable run, cell, protocol, and statistics files report the result.
-  The analysis is excluded from the cross-model robustness score.
+  Change: a separate 8,960-run HECM-only sweep combines the nominal lookup with
+  resistance and time-constant scaling by +/-10% and OCV shifts by +/-10 mV.
+  Every lookup is evaluated across all 20 measurement and signal-integrity
+  subcases plus paired initialization recovery over all 16 frozen windows.
+  Measurement-disturbance interactions remain at or below 0.001921 MAE. Absolute
+  baseline accuracy changes from 0.0314 to 0.0373 MAE, and resistance -10%
+  exposes a censored C27 recovery trajectory. Figure 25 and the machine-readable
+  cell, protocol, statistics, and summary files report the complete result. The
+  analysis is excluded from the cross-model robustness score.
 
 R3.12 Temperature differences may originate from SOH LSTM
   Status: READY_FOR_RUN.

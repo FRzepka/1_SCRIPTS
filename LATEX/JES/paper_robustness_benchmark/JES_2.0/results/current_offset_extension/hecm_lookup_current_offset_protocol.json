@@ -1,0 +1,59 @@
+{
+  "analysis": "HECM lookup sensitivity for the signed additive current-offset extension",
+  "runs": 224,
+  "lookup_conditions": {
+    "nominal_lookup": {},
+    "resistance_minus_10pct": {
+      "--ecm_resistance_scale": "0.90"
+    },
+    "resistance_plus_10pct": {
+      "--ecm_resistance_scale": "1.10"
+    },
+    "tau_minus_10pct": {
+      "--ecm_tau_scale": "0.90"
+    },
+    "tau_plus_10pct": {
+      "--ecm_tau_scale": "1.10"
+    },
+    "ocv_minus_10mV": {
+      "--ecm_ocv_offset_v": "-0.010"
+    },
+    "ocv_plus_10mV": {
+      "--ecm_ocv_offset_v": "0.010"
+    }
+  },
+  "current_offset_a": [
+    -0.05,
+    0.05
+  ],
+  "cells": [
+    "C09",
+    "C13",
+    "C15",
+    "C25",
+    "C27",
+    "C29"
+  ],
+  "windows": [
+    "C09_aged",
+    "C09_fresh",
+    "C09_mid_life",
+    "C13_aged",
+    "C13_fresh",
+    "C13_mid_life",
+    "C15_aged",
+    "C15_fresh",
+    "C15_mid_life",
+    "C25_aged",
+    "C25_fresh",
+    "C25_mid_life",
+    "C27_fresh",
+    "C29_aged",
+    "C29_fresh",
+    "C29_mid_life"
+  ],
+  "evaluation_start_sample": 2023,
+  "aggregation": "windows averaged within cell; equal-weight cell macro; 10000-draw cell bootstrap",
+  "interaction_definition": "lookup-specific current-offset delta MAE minus nominal-lookup current-offset delta MAE",
+  "maximum_absolute_interaction_mae": 0.006116243540545176
+}

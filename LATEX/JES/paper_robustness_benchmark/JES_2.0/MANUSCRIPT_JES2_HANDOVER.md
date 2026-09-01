@@ -17,8 +17,8 @@ existing project directories.
 
 - Editable source: `Robustness_Benchmark_Manuscript_JES2_Updated.tex`
 - Compiled manuscript: `Robustness_Benchmark_Manuscript_JES2_Updated.pdf`
-- Source SHA-256: `f3244b3b187bca548a04c6ae2946908193d5660357fa03c30aaa3c2308e0f524`
-- PDF SHA-256: `fdf254a1611fdf44b2394354660db3f241d602ef492b68ea5d23c60c7bf27075`
+- Source SHA-256: `76363800e96230e76b91618b9e25eee90066a87f64431e72f98945ca9540bfd3`
+- PDF SHA-256: `a5929f17796df90ecba7044e74e9957cddd52c9af6bc8d98fef8462622b551e7`
 - Compiled length: 57 pages
 
 ## Build
@@ -53,7 +53,7 @@ tables.
 - Audited all 26 finalized PNG files against their manuscript captions and dependencies. Only Figures 09 and 15 depend on the corrected recovery analysis. Figure 14 deliberately excludes initialization mismatch because it is a measurement-disturbance heatmap.
 - Included all eight evaluated disturbance families in the illustrative robustness score and added two alternative weighting analyses. The current-gain family uses the adverse direction from the matched signed sweep.
 - Added current-gain lifecycle/reset, initial-state recovery, missing-sample, jitter, burst-dropout, voltage-spike, ADC-quantization, sensor-offset, and cross-scenario interpretations.
-- Added a separate 240-run HECM lookup-table sensitivity over all 16 windows. The tested resistance and OCV perturbations alter baseline accuracy more than the incremental current-gain penalty and remain outside the cross-model score.
+- Added a separate 8,960-run HECM lookup-table sensitivity over all 16 windows. The analysis crosses local resistance, time-constant, and OCV perturbations with all 20 measurement and signal-integrity subcases plus paired initialization recovery. The publication output remains compact through one interaction figure and a seven-row table. Measurement-disturbance interactions stay below 0.001921 MAE, while absolute accuracy and one cell-specific recovery case remain calibration dependent. The analysis remains outside the cross-model score.
 - Replaced the legacy C07 current-noise illustration with a reset-free, sample-matched C29 mechanism example and retained the final six-cell hierarchical confidence intervals for the population-level noise result.
 - Recomputed burst-dropout penalties against an undisturbed 48-hour reference and documented the maximum-absolute-net-charge placement rule.
 - Separated the robustness benchmark from the embedded performance benchmark and added isolated STM32H753ZI SOC-core results for numerical equivalence, latency, compiled flash occupancy, measured peak runtime RAM, and DD inference-mode tradeoffs.
@@ -78,9 +78,9 @@ tables.
 - Confirmed all 26 finalized PNG figures are referenced exactly once.
 - Confirmed that no missing-figure placeholders remain.
 - Confirmed that all active labels and references resolve.
-- Ran the complete simulation-environment test suite: 32 tests passed.
+- Ran the complete simulation-environment test suite: 35 tests passed after adding the full HECM sensitivity regression tests.
 - Ran `python verify_independent_audit.py`: all common-mask, recovery, robustness-score, offset/statistics, signed-build, lifecycle, HECM lookup-sensitivity, dataset-ground-truth, hardware-boundary, and manuscript-consistency checks passed.
 - The test suite requires the `ml1` Conda libraries on this HPC: `LD_LIBRARY_PATH=/home/florianr/anaconda3/envs/ml1/lib /home/florianr/anaconda3/envs/ml1/bin/python -m pytest -q`.
 - Confirmed 7,024 execution records with no failures, comprising 6,912 public benchmark evaluations and 112 internal duration-matched dropout-reference runs.
-- Confirmed 240/240 separate HECM lookup-sensitivity runs completed without failures on the common evaluation mask.
+- Completed all 8,960 HECM lookup-sensitivity runs in `jes2_hecm_full_lookup_sensitivity_20260901` without failures and analyzed them with 10,000 cell-bootstrap repetitions.
 - Rechecked the protected original PDF hash after compilation.

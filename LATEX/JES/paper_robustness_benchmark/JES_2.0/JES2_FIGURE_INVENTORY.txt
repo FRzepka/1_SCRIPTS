@@ -40,7 +40,7 @@ APPENDIX
   Figure 22  Complete 19-scenario JES2 test matrix
   Figure 23  Common-mask evaluation-window and dropout protocol
   Figure 24  DD inference-mode latency distributions
-  Figure 25  HECM lookup-table x current-gain sensitivity
+  Figure 25  HECM lookup sensitivity across the complete disturbance benchmark
   Figure 26  Full SOH trajectories and applied aging conditions
 
 SCIENTIFIC DATA BOUNDARY
@@ -50,8 +50,8 @@ SCIENTIFIC DATA BOUNDARY
   references. Figures 14 and 15 include all eight evaluated disturbance families,
   including voltage and temperature offsets. Figures 17-20 and 24 use measured
   STM32 SOC-core results. Figure 21 summarizes measured holdout coverage and
-  Figures 22-23 visualize the frozen protocol. Figure 25 uses the separate 240-run
-  HECM lookup-sensitivity analysis. Figure 26 retains the dissertation SOH overview
+  Figures 22-23 visualize the frozen protocol. Figure 25 uses the separate 8,960-run
+  HECM lookup-sensitivity analysis across all disturbance subcases. Figure 26 retains the dissertation SOH overview
   with the applied charge-rate, discharge-rate, and depth-of-discharge conditions.
   No synthetic pilot value is used in the manuscript.
 
@@ -59,5 +59,6 @@ EXECUTION STATUS
   Public benchmark: 6720/6720 runs complete.
   Internal duration-matched dropout references: 112/112 runs complete.
   Statistical build: 10000 hierarchical bootstrap repetitions complete.
-  HECM lookup sensitivity: 240/240 runs complete.
-  Tests: 32/32 passed in the ML environment.
+  HECM lookup sensitivity: 8960/8960 runs complete, 0 failures.
+  HECM lookup statistics: 10000 cell-bootstrap repetitions complete.
+  Tests: 35/35 passed in the ML environment.

@@ -1,6 +1,6 @@
 # JES 2.0 reviewer coverage audit
 
-Updated: 2026-08-31
+Updated: 2026-09-01
 
 This file maps the editor and reviewer comments to the current revised
 manuscript. It is intentionally separate from the paper so that the manuscript
@@ -40,7 +40,7 @@ remains concise. `REVIEWER_TODO_STATUS.txt` is the historical implementation log
 | DD voltage-spike mechanism | Event alignment supports the voltage-plus-derivative/recurrent-context explanation; the manuscript labels it as an interpretation because no channel-removal ablation was run. | Addressed without overclaiming |
 | Estimator-specific recovery thresholds | Replaced by the common recovery criterion. | Addressed |
 | Runtime-memory lower bounds | Statically allocated variable storage is combined with on-device measurements of maximum call-stack and dynamic-memory use. The watermark comes from C09, and rolling DD has two valid post-warm-up calls in that replay. The values exclude the shared SOH-LSTM and concurrent BMS tasks. | Addressed for the stated isolated SOC-core replay boundary |
-| HECM dependence on lookup-table quality | A separate 240-run, six-cell analysis combines nominal, resistance +/-10%, and OCV +/-10 mV lookups with baseline and matched +/-3% current gain. The adverse gain penalty remains 0.00580--0.00628 MAE versus 0.00602 nominal. All lookup--gain interaction intervals include zero. | Addressed by Figure 25 and machine-readable result tables |
+| HECM dependence on lookup-table quality | A separate 8,960-run analysis crosses nominal and locally perturbed resistance, time-constant, and OCV lookups with all 20 measurement and signal-integrity subcases plus paired initialization recovery. Measurement-disturbance interactions remain at or below 0.001921 MAE across the tested lookup changes. Absolute baseline accuracy changes from 0.0314 to 0.0373 MAE, and resistance -10% exposes a cell-specific recovery boundary on C27. | Addressed by compact Figure 25, its seven-row table, and machine-readable results |
 | Temperature response through SOH LSTM | Paired reference-SOH temperature-noise runs show that the incremental substitution effect differs from baseline by 0.0015 SOC for HDM and less than 0.0001 for HECM/DD. | Addressed |
 | Measurement-only exclusions | The primary cross-model ranking remains measurement-only. A separate local HECM lookup sensitivity is reported, while larger and combined parameter mismatch, hysteresis, gradients, pack imbalance, balancing/contactor/protocol/numerical/deadline faults remain listed in limitations. | Addressed |
 | Reproducibility artefacts | Public dataset DOI and repository are named; the minimum contents of the versioned release are listed. | Release packaging still required before resubmission |

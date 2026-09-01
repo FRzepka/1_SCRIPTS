@@ -58,6 +58,13 @@ DISPLAY_LABELS = {
     "ocv_plus_10mV": "OCV\n+10 mV",
 }
 
+PERTURBED_TABLE_CONDITIONS = [
+    "resistance_minus_10pct",
+    "resistance_plus_10pct",
+    "ocv_minus_10mV",
+    "ocv_plus_10mV",
+]
+
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
@@ -303,93 +310,159 @@ def build_statistics(metrics: pd.DataFrame, bootstrap_samples: int) -> tuple[pd.
     return cell_results, pd.DataFrame(rows)
 
 
+def build_compact_statistics(statistics: pd.DataFrame) -> pd.DataFrame:
+    indexed = statistics.set_index(["table_condition", "metric"])
+    rows = []
+    for table_condition in TABLE_CONDITIONS:
+        baseline = indexed.loc[(table_condition, "baseline_mae")]
+        penalty = indexed.loc[(table_condition, "adverse_gain_delta_mae")]
+        interaction = indexed.loc[(table_condition, "gain_interaction_delta_delta_mae")]
+        rows.append(
+            {
+                "table_condition": table_condition,
+                "display_label": DISPLAY_LABELS[table_condition].replace("\n", " "),
+                "baseline_mae": float(baseline["mean"]),
+                "adverse_gain_delta_mae": float(penalty["mean"]),
+                "interaction_delta_delta_mae": float(interaction["mean"]),
+                "interaction_ci_low": float(interaction["ci_low"]),
+                "interaction_ci_high": float(interaction["ci_high"]),
+                "interaction_ci_includes_zero": bool(
+                    float(interaction["ci_low"]) <= 0.0 <= float(interaction["ci_high"])
+                ),
+            }
+        )
+    return pd.DataFrame(rows)
+
+
+def write_compact_latex_table(compact: pd.DataFrame, path: Path) -> None:
+    labels = {
+        "nominal_lookup": "Nominal lookup",
+        "resistance_minus_10pct": r"Resistance $-10\%$",
+        "resistance_plus_10pct": r"Resistance $+10\%$",
+        "ocv_minus_10mV": r"OCV $-10$ mV",
+        "ocv_plus_10mV": r"OCV $+10$ mV",
+    }
+    lines = [
+        r"\begin{table}[t]",
+        r"    \centering",
+        r"    \footnotesize",
+        r"    \caption{Compact HECM lookup sensitivity. Lookup calibration changes baseline accuracy, whereas the adverse $\pm3\%$ current-gain interaction remains small and all 95\% intervals include zero.}",
+        r"    \label{tab:hecm_lookup_sensitivity}",
+        r"    \resizebox{\columnwidth}{!}{%",
+        r"    \begin{tabular}{lccc}",
+        r"        \toprule",
+        r"        Lookup condition & Baseline MAE & Gain $\Delta$MAE & Interaction $\Delta\Delta$MAE [95\% CI] \\",
+        r"        \midrule",
+    ]
+    for row in compact.itertuples(index=False):
+        if row.table_condition == "nominal_lookup":
+            interaction = "Reference"
+        else:
+            interaction = (
+                f"{row.interaction_delta_delta_mae:+.5f} "
+                f"[{row.interaction_ci_low:+.5f}, {row.interaction_ci_high:+.5f}]"
+            )
+        lines.append(
+            "        "
+            f"{labels[row.table_condition]} & {row.baseline_mae:.4f} & "
+            f"{row.adverse_gain_delta_mae:.4f} & {interaction} "
+            + r"\\"
+        )
+    lines.extend(
+        [
+            r"        \bottomrule",
+            r"    \end{tabular}",
+            r"    }",
+            r"\end{table}",
+            "",
+        ]
+    )
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("\n".join(lines), encoding="utf-8")
+
+
 def plot_results(cell_results: pd.DataFrame, statistics: pd.DataFrame, path: Path) -> None:
     setup_style()
-    order = list(TABLE_CONDITIONS)
+    order = PERTURBED_TABLE_CONDITIONS
     x = np.arange(len(order), dtype=float)
     color = MODEL_COLORS["HECM"]
-    panels = [
-        ("baseline_mae", "(a) Baseline HECM accuracy", "MAE [SOC]"),
-        (
-            "adverse_gain_delta_mae",
-            "(b) Adverse ±3% current-gain penalty",
-            r"$\Delta$MAE [SOC]",
-        ),
-        (
-            "gain_interaction_delta_delta_mae",
-            "(c) Additional penalty vs nominal lookup",
-            r"$\Delta\Delta$MAE [SOC]",
-        ),
-    ]
-    fig, axes = plt.subplots(1, 3, figsize=(13.2, 5.6))
+    metric = "gain_interaction_delta_delta_mae"
+    fig, ax = plt.subplots(figsize=(7.1, 4.4))
     cells = sorted(cell_results["cell"].unique())
     jitter = np.linspace(-0.10, 0.10, len(cells))
-    for ax, (metric, title, ylabel) in zip(axes, panels):
-        stats = statistics[statistics["metric"] == metric].set_index("table_condition").loc[order]
-        means = stats["mean"].to_numpy(dtype=float)
-        low = means - stats["ci_low"].to_numpy(dtype=float)
-        high = stats["ci_high"].to_numpy(dtype=float) - means
-        ax.bar(
-            x,
-            means,
-            width=0.68,
-            color=to_rgba(color, 0.22),
-            edgecolor=color,
-            linewidth=1.4,
-            zorder=2,
-        )
-        ax.errorbar(
-            x,
-            means,
-            yerr=np.vstack([low, high]),
-            fmt="none",
-            ecolor=color,
-            elinewidth=1.25,
-            capsize=4,
-            capthick=1.25,
-            zorder=4,
-        )
-        for cell_index, cell in enumerate(cells):
-            part = cell_results[cell_results["cell"] == cell].set_index("table_condition").loc[order]
-            ax.scatter(
-                x + jitter[cell_index],
-                part[metric],
-                s=19,
-                facecolor=color,
-                edgecolor="white",
-                linewidth=0.45,
-                alpha=0.75,
-                zorder=5,
-            )
-        if metric == "gain_interaction_delta_delta_mae":
-            ax.axhline(0.0, color=NEUTRAL_DARK, linewidth=0.9, linestyle="--", zorder=1)
-        ax.set_xticks(x, [DISPLAY_LABELS[item] for item in order])
-        ax.set_ylabel(ylabel)
-        ax.set_title(title)
-        clean_axes(ax)
-        span = max(float(np.nanmax(high + means) - np.nanmin(means - low)), 1e-4)
-        for position, value, upper in zip(x, means, high):
-            vertical = value + upper + 0.035 * span
-            ax.text(position, vertical, f"{value:.4f}", ha="center", va="bottom", fontsize=8, color=NEUTRAL_DARK)
-    fig.suptitle(
-        "HECM lookup-table sensitivity across 16 frozen holdout windows",
-        fontsize=14,
-        fontweight="bold",
-        y=1.01,
+    stats = statistics[statistics["metric"] == metric].set_index("table_condition").loc[order]
+    means = stats["mean"].to_numpy(dtype=float)
+    low = means - stats["ci_low"].to_numpy(dtype=float)
+    high = stats["ci_high"].to_numpy(dtype=float) - means
+    ax.bar(
+        x,
+        means,
+        width=0.64,
+        color=to_rgba(color, 0.22),
+        edgecolor=color,
+        linewidth=1.4,
+        zorder=2,
     )
-    fig.text(
-        0.5,
-        -0.015,
-        "Bars: equal-weight six-cell mean   |   Error bars: 95% cell-bootstrap CI   |   Points: cell means",
-        ha="center",
+    ax.errorbar(
+        x,
+        means,
+        yerr=np.vstack([low, high]),
+        fmt="none",
+        ecolor=color,
+        elinewidth=1.25,
+        capsize=4,
+        capthick=1.25,
+        zorder=4,
+    )
+    for cell_index, cell in enumerate(cells):
+        part = cell_results[cell_results["cell"] == cell].set_index("table_condition").loc[order]
+        ax.scatter(
+            x + jitter[cell_index],
+            part[metric],
+            s=21,
+            facecolor=color,
+            edgecolor="white",
+            linewidth=0.45,
+            alpha=0.78,
+            zorder=5,
+        )
+    ax.axhline(0.0, color=NEUTRAL_DARK, linewidth=0.9, linestyle="--", zorder=1)
+    ax.set_xticks(x, [DISPLAY_LABELS[item] for item in order])
+    ax.set_ylabel(r"Lookup $\times$ gain interaction, $\Delta\Delta$MAE [SOC]")
+    ax.set_title("HECM lookup × current-gain interaction")
+    clean_axes(ax)
+    span = max(float(np.nanmax(high + means) - np.nanmin(means - low)), 1e-4)
+    for position, value, upper in zip(x, means, high):
+        vertical = value + upper + 0.035 * span
+        ax.text(
+            position,
+            vertical,
+            f"{value:+.5f}",
+            ha="center",
+            va="bottom",
+            fontsize=8,
+            color=NEUTRAL_DARK,
+        )
+    ax.text(
+        0.02,
+        0.97,
+        "All 95% intervals include zero",
+        transform=ax.transAxes,
+        ha="left",
+        va="top",
         fontsize=9,
         color=NEUTRAL_DARK,
     )
-    fig.tight_layout(w_pad=2.2)
+    fig.tight_layout()
     save_figure(fig, path)
 
 
-def analyze(out_root: Path, bootstrap_samples: int, figure_path: Path | None) -> dict:
+def analyze(
+    out_root: Path,
+    bootstrap_samples: int,
+    figure_path: Path | None,
+    table_path: Path | None,
+) -> dict:
     manifest = json.loads((out_root / "manifest.json").read_text(encoding="utf-8"))
     rows = []
     for record in manifest["runs"]:
@@ -430,9 +503,11 @@ def analyze(out_root: Path, bootstrap_samples: int, figure_path: Path | None) ->
     if len(metrics) != 240:
         raise ValueError(f"Expected 240 completed metrics, found {len(metrics)}")
     cell_results, statistics = build_statistics(metrics, bootstrap_samples)
+    compact = build_compact_statistics(statistics)
     metrics.to_csv(out_root / "hecm_lookup_sensitivity_runs.csv", index=False)
     cell_results.to_csv(out_root / "hecm_lookup_sensitivity_cells.csv", index=False)
     statistics.to_csv(out_root / "hecm_lookup_sensitivity_statistics.csv", index=False)
+    compact.to_csv(out_root / "hecm_lookup_sensitivity_compact.csv", index=False)
     protocol = {
         "analysis": "HECM lookup-table x current-gain sensitivity",
         "scope": "HECM-only explanatory analysis outside the cross-model robustness score",
@@ -454,8 +529,9 @@ def analyze(out_root: Path, bootstrap_samples: int, figure_path: Path | None) ->
             "adverse current-gain delta MAE under the nominal lookup"
         ),
         "interpretation_boundary": (
-            "The one-at-a-time shifts are controlled local sensitivity probes, "
-            "not probabilistic lookup-table uncertainty bounds."
+            "The one-at-a-time shifts test whether the observed current-gain response "
+            "depends strongly on local resistance and OCV calibration changes. They "
+            "are not a general parameter-uncertainty analysis across all disturbances."
         ),
     }
     (out_root / "hecm_lookup_sensitivity_protocol.json").write_text(
@@ -463,17 +539,26 @@ def analyze(out_root: Path, bootstrap_samples: int, figure_path: Path | None) ->
     )
     if figure_path is None:
         figure_path = out_root / "Figure_HECM_Lookup_Table_Sensitivity.png"
+    if table_path is None:
+        table_path = out_root / "Table_HECM_Lookup_Table_Sensitivity.tex"
     plot_results(cell_results, statistics, figure_path)
+    write_compact_latex_table(compact, table_path)
+    perturbed = compact[compact["table_condition"] != "nominal_lookup"]
     summary = {
         "runs": len(metrics),
         "windows": int(metrics["window_id"].nunique()),
         "cells": int(metrics["cell"].nunique()),
         "figure": str(figure_path.resolve()),
         "statistics": str((out_root / "hecm_lookup_sensitivity_statistics.csv").resolve()),
+        "compact_statistics": str((out_root / "hecm_lookup_sensitivity_compact.csv").resolve()),
+        "compact_table": str(table_path.resolve()),
         "largest_absolute_macro_interaction": float(
             statistics[
                 statistics["metric"] == "gain_interaction_delta_delta_mae"
             ]["mean"].abs().max()
+        ),
+        "all_perturbed_interaction_intervals_include_zero": bool(
+            perturbed["interaction_ci_includes_zero"].all()
         ),
     }
     (out_root / "analysis_summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
@@ -497,6 +582,7 @@ def main() -> None:
     parser.add_argument("--bootstrap_samples", type=int, default=10000)
     parser.add_argument("--evaluation_start_sample", type=int, default=2023)
     parser.add_argument("--figure_path", type=Path, default=None)
+    parser.add_argument("--table_path", type=Path, default=None)
     parser.add_argument("--skip_existing", action="store_true")
     parser.add_argument("--analyze_only", action="store_true")
     parser.add_argument("--dry_run", action="store_true")
@@ -507,11 +593,23 @@ def main() -> None:
     args.out_root = args.out_root.resolve()
     if args.figure_path is not None:
         args.figure_path = args.figure_path.resolve()
+    if args.table_path is not None:
+        args.table_path = args.table_path.resolve()
     if args.workers < 1:
         parser.error("--workers must be at least 1")
 
     if args.analyze_only:
-        print(json.dumps(analyze(args.out_root, args.bootstrap_samples, args.figure_path), indent=2))
+        print(
+            json.dumps(
+                analyze(
+                    args.out_root,
+                    args.bootstrap_samples,
+                    args.figure_path,
+                    args.table_path,
+                ),
+                indent=2,
+            )
+        )
         return
 
     sources = load_source_records(args.campaign_manifest, args.signed_manifest)
@@ -569,7 +667,17 @@ def main() -> None:
     write_manifest(manifest_path, payload)
     if failures:
         raise RuntimeError(f"{len(failures)} HECM sensitivity runs failed")
-    print(json.dumps(analyze(args.out_root, args.bootstrap_samples, args.figure_path), indent=2))
+    print(
+        json.dumps(
+            analyze(
+                args.out_root,
+                args.bootstrap_samples,
+                args.figure_path,
+                args.table_path,
+            ),
+            indent=2,
+        )
+    )
 
 
 if __name__ == "__main__":

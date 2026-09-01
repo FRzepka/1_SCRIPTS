@@ -6,6 +6,9 @@ import numpy as np
 import pandas as pd
 
 
+TRAPEZOID = getattr(np, "trapezoid", np.trapz)
+
+
 SCENARIO_CHOICES = [
     "baseline",
     "current_offset",
@@ -886,7 +889,7 @@ def compute_common_recovery_metrics(
         "common_recovery_sustain_seconds": float(sustain_seconds),
         "common_recovery_horizon_seconds": float(horizon_seconds),
         "common_recovery_initial_abs_err": float(err_post[0]),
-        "common_recovery_excess_auc_soc_h": float(np.trapezoid(excess, elapsed_h)) if len(excess) > 1 else 0.0,
+        "common_recovery_excess_auc_soc_h": float(TRAPEZOID(excess, elapsed_h)) if len(excess) > 1 else 0.0,
         "common_recovery_time_s": recovery_time_s,
         "common_recovery_time_h": None if recovery_time_s is None else recovery_time_s / 3600.0,
         "common_recovery_or_censor_time_h": capped_time_s / 3600.0,
