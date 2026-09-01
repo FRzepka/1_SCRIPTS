@@ -1,0 +1,214 @@
+\documentclass[10pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[ngerman]{babel}
+\usepackage[a4paper,top=17mm,bottom=18mm,left=17mm,right=17mm]{geometry}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{microtype}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\usepackage{lastpage}
+
+\definecolor{tured}{HTML}{B6302D}
+\definecolor{darkgray}{HTML}{333333}
+\definecolor{midgray}{HTML}{6B6B6B}
+\definecolor{lightred}{HTML}{F5E8E7}
+\definecolor{lightgray}{HTML}{F2F2F2}
+\definecolor{green}{HTML}{2F6B4F}
+
+\hypersetup{colorlinks=true,linkcolor=tured,urlcolor=tured}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+\setlist[itemize]{leftmargin=5mm,itemsep=2pt,topsep=2pt}
+\renewcommand{\arraystretch}{1.18}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{midgray}JES Revision Summary}
+\fancyhead[R]{\small\color{midgray}31. August 2026}
+\fancyfoot[L]{\small\color{midgray}Performance and Robustness Benchmarking of Battery SOC Estimation Methods}
+\fancyfoot[R]{\small\color{midgray}\thepage/\pageref{LastPage}}
+\renewcommand{\headrulewidth}{0.3pt}
+\renewcommand{\footrulewidth}{0pt}
+\fancypagestyle{plain}{%
+  \fancyhf{}
+  \fancyhead[L]{\small\color{midgray}JES Revision Summary}
+  \fancyhead[R]{\small\color{midgray}31. August 2026}
+  \fancyfoot[L]{\small\color{midgray}Performance and Robustness Benchmarking of Battery SOC Estimation Methods}
+  \fancyfoot[R]{\small\color{midgray}\thepage/\pageref{LastPage}}
+  \renewcommand{\headrulewidth}{0.3pt}
+  \renewcommand{\footrulewidth}{0pt}}
+
+\newcommand{\statusdone}{\textcolor{green}{\textbf{Beantwortet}}}
+\newcommand{\statusscope}{\textcolor{tured}{\textbf{Beantwortet mit Abgrenzung}}}
+\newcommand{\statusrelease}{\textcolor{midgray}{\textbf{Inhaltlich beantwortet, Archivierung offen}}}
+\newcommand{\sectionrule}{\vspace{-2pt}\color{tured}\rule{\textwidth}{0.7pt}\color{black}\vspace{2pt}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+\begin{document}
+
+{\color{tured}\rule{\textwidth}{2.4pt}}
+\vspace{6pt}
+
+{\Large\bfseries Änderungsübersicht zur grundlegend überarbeiteten Fassung}
+
+\vspace{3pt}
+{\large\color{darkgray}Performance and Robustness Benchmarking of Battery SOC Estimation Methods for Embedded Applications}
+
+\vspace{8pt}
+
+\fcolorbox{tured}{lightred}{%
+\begin{minipage}{0.965\textwidth}
+\textbf{Kernaussage.} Die Revision ist keine sprachliche oder punktuelle Korrektur der begutachteten Fassung. Die experimentelle Basis, die statistische Einheit, die Definition der Recovery, die Robustheitskampagne, die Embedded-Validierung und die daraus abgeleiteten Schlussfolgerungen wurden neu aufgebaut. Das Paper beantwortet nun die Frage, wie vier konkrete SOC-Implementierungen unter einer gemeinsamen, zellgetrennten und deployment-orientierten Methodik abschneiden. Es leitet ausdrücklich keinen universellen Sieger aus einer einzelnen MAE-Zahl ab.
+\end{minipage}}
+
+\section*{1. Was unter der Vorgängerversion verstanden wird}
+\sectionrule
+
+Als Vorgängerversion gilt die ursprünglich begutachtete Ein-Zell-Fassung. Sie verwendete eine einzelne repräsentative LFP-Trajektorie, estimatorabhängige Recovery-Schwellen, überwiegend deskriptive Einzelresultate und theoretisch abgeleitete Embedded-Ressourcen. Die aktuelle Fassung basiert dagegen auf einer neuen, zellgetrennten Mehrzellenauswertung mit realen STM32-Messungen.
+
+\begin{table}[h]
+\small
+\begin{tabularx}{\textwidth}{P{3.2cm}YY}
+\toprule
+\textbf{Ebene} & \textbf{Begutachtete Fassung} & \textbf{Aktuelle Fassung} \\
+\midrule
+Datengrundlage & Eine vollständige Zelltrajektorie & Sechs unabhängige Holdout-Zellen und 16 vorab definierte SOH-Fenster \\
+Entwicklungsgrenze & Ausschluss der Testdaten nicht vollständig dokumentiert & Fester Training-, Validierungs- und Holdout-Split für neuronale Modelle, Skalierung und HECM-Parametrisierung \\
+Vergleichseinheit & Einzelne Zeitpunkte und Fenster einer Zelle & Holdout-Zelle als unabhängige statistische Einheit mit gleicher Zellgewichtung \\
+Recovery & Estimatorabhängige Schwellen und nicht äquivalente Auswertung & Gemeinsames 0,02-SOC-Band, 300-s-Haltezeit, persistente Recovery, Relapse und Zensierung \\
+Robustheit & Einzelne Szenarien und überwiegend einzelne Realisierungen & Acht Störungsfamilien, wiederholte Seeds, gepaarte Effekte und Unsicherheitsintervalle \\
+Embedded-Aussage & Ressourcen hauptsächlich berechnet & Auf dem STM32 gemessene Latenz, numerische Äquivalenz und Peak-RAM sowie kompilierter Flash-Bedarf \\
+Schlussfolgerung & Relative Rangfolge aus einer begrenzten Ein-Zell-Auswertung & Deployment-Profil entlang Accuracy, Robustness, Recovery, Latency, Flash und Runtime RAM \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section*{2. Quantitativer Umfang der Neuauswertung}
+\sectionrule
+
+\begin{itemize}
+\item 6 unabhängige Holdout-Zellen mit unterschiedlicher Alterung, Last und Temperatur
+\item 16 festgelegte Fresh-, Mid-Life- und Aged-Fenster
+\item 6.720 Läufe mit gemeinsamer Auswertemaske ab Quellsample 2023
+\item 64 gepaarte Initialisierungsverläufe für die kanonische Recovery-Auswertung
+\item 10.000 hierarchische Bootstrap-Wiederholungen für 95\%-Konfidenzintervalle
+\item 240 zusätzliche HECM-Läufe für die Lookup-Tabellen-Sensitivität
+\item Sechs Hardware-Zellsequenzen mit drei Replay-Runden je SOC-Kern
+\item 25 eindeutig referenzierte Abbildungen einschließlich neuer Appendix-Nachweise
+\end{itemize}
+
+\newpage
+\thispagestyle{fancy}
+\section*{3. Reviewer 1: Darstellung und formale Lesbarkeit}
+\sectionrule
+
+\begin{tabularx}{\textwidth}{P{0.8cm}Y P{3.4cm}}
+\toprule
+\textbf{Nr.} & \textbf{Umgesetzte Änderung} & \textbf{Status} \\
+\midrule
+1 & Zitate und Querverweise werden vollständig aufgelöst. Alle Abbildungen sind in den zugehörigen Abschnitten eingebettet und im Text erläutert. & \statusdone \\
+2 & Die frühere alleinstehende Gleichung für die Ableitungskanäle wurde in die Modellbeschreibung integriert. & \statusdone \\
+3 & Die doppelten Abschnittstitel wurden durch eindeutige Überschriften für SOC- und SOH-Schätzung ersetzt. & \statusdone \\
+\bottomrule
+\end{tabularx}
+
+\section*{4. Reviewer 2: Experimentelles Design und Fairness}
+\sectionrule
+
+\begin{tabularx}{\textwidth}{P{0.8cm}Y P{3.4cm}}
+\toprule
+\textbf{Nr.} & \textbf{Umgesetzte Änderung} & \textbf{Status} \\
+\midrule
+1 & Die Ein-Zell-Validierung wurde durch sechs zellgetrennte Holdout-Zellen, SOH-Strata und eine explizite Coverage-Darstellung ersetzt. Aussagen werden auf den untersuchten LFP-Bereich begrenzt. & \statusdone \\
+2 & Training, Validierung, Hyperparameterwahl, Skalierung, Pruning und HECM-Identifikation werden dem Development-Split zugeordnet. Keine Holdout-Zelle geht in diese Schritte ein. & \statusrelease \\
+3 & Alle Modelle erhalten eine Abweichung von 10 SOC-Prozentpunkten über ihren deployment-zugänglichen Zustand. Realisierte Ausgangsabweichung und strukturelle Nichtäquivalenz werden offengelegt. & \statusscope \\
+4 & Estimatorabhängige Recovery-Schwellen wurden vollständig durch ein gemeinsames gepaartes Kriterium ersetzt. & \statusdone \\
+5 & Direkte STM32-Messungen ersetzen die frühere theoretische Embedded-Aussage. Die Grenze auf isolierte SOC-Kerne wird ausdrücklich genannt. & \statusdone \\
+6 & Wiederholte Zufallsrealisierungen, Zell-Makrostatistik, hierarchisches Bootstrap, gepaarte Sign-Flip-Tests, Effektgrößen und Holm-Korrektur wurden ergänzt. & \statusdone \\
+7 & Referenz-SOH-Ablationen trennen den Einfluss des gemeinsamen LSTM-SOH-Dienstes von den SOC-Zweigen. & \statusdone \\
+\bottomrule
+\end{tabularx}
+
+\section*{5. Reviewer 3: Mechanismen, Grenzen und Reproduzierbarkeit}
+\sectionrule
+
+\small
+\begin{longtable}{P{0.8cm}P{10.5cm}P{3.4cm}}
+\toprule
+\textbf{Nr.} & \textbf{Umgesetzte Änderung} & \textbf{Status} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Nr.} & \textbf{Umgesetzte Änderung} & \textbf{Status} \\
+\midrule
+\endhead
+1 & Sechs Holdout-Zellen und 16 Zustandsfenster ersetzen die einzelne Trajektorie. Load-, Temperatur- und SOH-Abdeckung werden ausgewiesen. & \statusdone \\
+2 & Die Wahl von LFP wird mit dem kontrollierten DoE-Alterungsdatensatz und der flachen OCV-Kennlinie begründet. Die Übertragbarkeit auf andere Chemien wird begrenzt. & \statusdone \\
+3 & Die Referenz-SOH-Ablation quantifiziert, wie der gemeinsame SOH-Dienst HDM, HECM und DD beeinflusst. & \statusdone \\
+4 & Die stündliche SOH-Aktualisierung wird als kausaler Dienst für graduelle Alterung eingeordnet. Abrupte Kapazitätsverluste sind nicht Teil des Datensatzes. & \statusscope \\
+5 & Der DD-Initialisierungseingriff über $Q_c$ wird als deployment-zugänglicher Proxy und nicht als vollständiger Hidden-State-Cold-Start interpretiert. & \statusscope \\
+6 & Burst Dropout wird als Robustheitsproblem mit einer dauerangepassten 48-h-Baseline behandelt. Die modellabhängigen Ursachen nach Wiederaufnahme der Messung werden erklärt. & \statusdone \\
+7 & Timing Jitter wurde auf $\pm0{,}1$, $\pm0{,}5$ und $\pm0{,}9$~s erweitert und mit mehreren Seeds ausgewertet. & \statusdone \\
+8 & Die lokale DD-Spike-Reaktion wird ereignisbezogen ausgewertet und über Spannung, $\mathrm{d}U/\mathrm{d}t$ und rekurrenten Kontext interpretiert. Eine Kanalablation bleibt eine Erweiterung. & \statusscope \\
+9 & Ein gemeinsames Recovery-Kriterium ersetzt die estimatorabhängigen Bänder. & \statusdone \\
+10 & Peak-RAM umfasst statischen Speicher, maximale dynamische Allokation und gemessene maximale Call-Stack-Nutzung. & \statusdone \\
+11 & Eine neue HECM-Sensitivitätsanalyse untersucht systematische Widerstands- und OCV-Abweichungen über alle sechs Holdout-Zellen. & \statusdone \\
+12 & Referenz-SOH-Läufe zeigen, dass die zusätzliche Temperaturstörung überwiegend nicht durch den gemeinsamen SOH-Dienst erklärt wird. & \statusdone \\
+13 & Die Grenze des measurement-only Designs gegenüber allgemeinem Parameter-Mismatch, Pack-Interaktionen und übergeordneten BMS-Fehlern wird methodisch eingeordnet. & \statusdone \\
+14 & Datensatz, Skripte, Modellkonfigurationen, Seeds, Ergebniszusammenfassungen und Hardwareverfahren werden öffentlich zugeordnet. Die vollständige versionierte Release-Verpackung bleibt ein separater Einreichungsschritt. & \statusrelease \\
+\bottomrule
+\end{longtable}
+
+\normalsize
+\section*{6. Neue HECM-Lookup-Sensitivitätsanalyse}
+\sectionrule
+
+Die zusätzliche Analyse beantwortet direkt die Frage, ob die beobachtete Robustheit des HECM lediglich aus einer günstig kalibrierten Lookup-Tabelle entsteht. Untersucht wurden eine einheitliche Skalierung der Widerstände um $\pm10\%$ und OCV-Verschiebungen um $\pm10$~mV. Jede Variante wurde nominal und mit gepaartem $\pm3\%$-Stromverstärkungsfehler über die sechs Holdout-Zellen ausgeführt.
+
+\begin{table}[h]
+\small
+\centering
+\begin{tabular}{lcc}
+\toprule
+\textbf{Lookup-Variante} & \textbf{Baseline-MAE} & \textbf{Adverse $3\%$ $\Delta$MAE} \\
+\midrule
+Nominal & 0,0337 & 0,00602 \\
+Widerstand $-10\%$ & 0,0351 & 0,00614 \\
+Widerstand $+10\%$ & 0,0327 & 0,00610 \\
+OCV $-10$ mV & 0,0314 & 0,00628 \\
+OCV $+10$ mV & 0,0373 & 0,00580 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Der größte absolute Makro-Interaktionseffekt beträgt nur $0{,}000260$ MAE. Alle 95\%-Intervalle dieses Interaktionseffekts enthalten null. Innerhalb der untersuchten lokalen Abweichungen verändert die Lookup-Kalibrierung daher die absolute HECM-Genauigkeit stärker als die zusätzliche Empfindlichkeit gegenüber dem Stromverstärkungsfehler. Die HECM-Robustheitsaussage ist damit nicht unabhängig von der Kalibrierung, aber sie beruht auch nicht ausschließlich auf einer einzigen exakt passenden Parametertabelle.
+
+\clearpage
+\pagestyle{fancy}
+\thispagestyle{fancy}
+\section*{7. Warum die Revision als grundlegend einzustufen ist}
+\sectionrule
+
+\begin{enumerate}[leftmargin=6mm,itemsep=3pt]
+\item \textbf{Die Evidenzbasis wurde ersetzt.} Die zentrale Auswertung beruht nicht mehr auf einer einzelnen Zelltrajektorie, sondern auf unabhängigen Holdout-Zellen und festgelegten Zustandsfenstern.
+\item \textbf{Die Fairness des Vergleichs wurde neu definiert.} Gemeinsame Auswertemasken, gepaarte Baselines, ein gemeinsames Recovery-Kriterium und die Trennung von Entwicklung und Test verhindern, dass Modellunterschiede durch unterschiedliche Bewertungsregeln entstehen.
+\item \textbf{Die Unsicherheit ist Teil des Ergebnisses.} Zellvariation, Seeds, Konfidenzintervalle, Effektgrößen und Korrekturen für multiple Vergleiche ersetzen reine Einzelwerte.
+\item \textbf{Die Embedded-Aussage ist experimentell.} Laufzeit und Peak-RAM wurden auf dem Ziel-Mikrocontroller gemessen. Numerische Hardware-Software-Äquivalenz und verschiedene DD-Inferenzmodi wurden separat geprüft.
+\item \textbf{Die wissenschaftliche Schlussfolgerung hat sich geändert.} Die aktuelle Arbeit bestimmt keinen universell besten Estimator. Sie zeigt, dass sich Accuracy, störungsspezifische Robustheit, Recovery und Hardwarekosten gegenseitig ergänzen und gemeinsam bewertet werden müssen.
+\item \textbf{Reviewer-Fragen führten zu neuen Experimenten.} Mehrzellenauswertung, SOH-Ablation, größere Jitter-Stufen, kanonische Recovery, Runtime-RAM-Messung und HECM-Lookup-Sensitivität sind zusätzliche Analysen und keine rein redaktionellen Ergänzungen.
+\end{enumerate}
+
+\vfill
+{\color{tured}\rule{\textwidth}{1.2pt}}
+\textbf{Zusammenfassung:} Die überarbeitete Fassung ist methodisch, experimentell und in ihrer Aussage ein neues Benchmark-Paper auf Basis derselben Forschungsfrage. Der Fokus liegt weiterhin auf der Robustheit eingebetteter SOC-Methoden. Die Begründung stützt sich nun jedoch auf zellgetrennte Statistik, explizite Störungsmechanismen, gemeinsame Bewertungsregeln und reale Hardwaremessungen.
+
+\end{document}

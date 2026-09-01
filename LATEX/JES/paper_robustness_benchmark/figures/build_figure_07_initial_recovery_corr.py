@@ -205,7 +205,7 @@ def main() -> None:
     ax_c.text(
         0.52,
         0.25,
-        "Observation starts 0.562 h after intervention.\nEarlier returns are left-censored.",
+        "Common evaluation begins after all estimators\nprovide valid output; earlier returns are left-censored.",
         transform=ax_c.transAxes,
         fontsize=7,
         color="#555555",
