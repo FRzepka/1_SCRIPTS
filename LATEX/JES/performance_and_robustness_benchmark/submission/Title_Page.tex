@@ -1,0 +1,49 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=2.3cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage[hidelinks]{hyperref}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.55em}
+\begin{document}
+
+\begin{center}
+{\LARGE\bfseries Performance and Robustness Benchmarking Across Battery SOC Estimator Classes for Embedded Applications\par}
+\vspace{1.2em}
+{\large Florian Rzepka\textsuperscript{*}, Qinnan Chen, Julia Kowal\par}
+\vspace{0.6em}
+Technical University of Berlin, Chair of Electrical Energy Storage Technology,\\
+Einsteinufer 11, 10587 Berlin, Germany
+\end{center}
+
+\textsuperscript{*}Corresponding author: Florian Rzepka, \href{mailto:florian.rzepka@tu-berlin.de}{florian.rzepka@tu-berlin.de}
+
+Qinnan Chen: \href{mailto:qinnan.chen@campus.tu-berlin.de}{qinnan.chen@campus.tu-berlin.de}
+
+Julia Kowal: \href{mailto:julia.kowal@tu-berlin.de}{julia.kowal@tu-berlin.de}
+
+\section*{Abstract}
+Robustness under disturbed sensing and signal-integrity faults is central to battery State-of-Charge (SOC) estimation. This study benchmarks four representative SOC-estimation approaches under one causal and cell-disjoint protocol: a direct-measurement model (DM) implemented as fixed-capacity Coulomb counting, a hybrid direct-measurement model (HDM) combining Coulomb counting with data-driven SOH adaptation, a hybrid equivalent-circuit model (HECM) based on a second-order RC observer, and a data-driven neural model (DD) implemented as a recurrent estimator. LFP aging trajectories cover multiple load, thermal, and SOH conditions. The evaluation comprises two complementary branches. The hardware performance benchmark verifies numerical equivalence between the software and microcontroller implementations and measures inference latency, flash occupancy, and peak runtime RAM. The robustness benchmark characterizes estimator behavior in three dimensions. Accuracy quantifies agreement with the reference SOC under nominal input conditions. Robustness quantifies the stability of the SOC estimate and its resistance to error growth when measurements are corrupted or unavailable. Recovery quantifies how rapidly a reliable SOC estimate is re-established after a defined initialization mismatch. Nominal cell-macro MAE is 0.0690 for DM, 0.0412 for HDM, 0.0337 for HECM, and 0.0258 for DD. The DD representative achieves the lowest nominal error and leads several disturbance cases, whereas HECM provides the strongest observed recovery profile. Individual scenarios therefore produce different model rankings. On the STM32H753, all four isolated SOC implementations reproduce their software references, remain within the available memory, and execute within the one-second sampling interval. Their latency and memory requirements differ substantially, demonstrating that deployment cost must be considered alongside estimation quality. The results show that nominal accuracy alone provides an incomplete basis for model selection and must be complemented by robustness, recovery, and embedded feasibility.
+
+\textbf{Keywords:} Battery management system; State of charge; Robustness benchmark; Fault tolerance; Equivalent circuit model; Recurrent neural network; Embedded implementation; Microcontroller
+
+\section*{Funding}
+This research was funded by the German Federal Ministry of Education and Research (BMBF), grant number 03SF0684A (MG FARM). The authors are responsible for the content. The work was further supported by the German Research Foundation and the Open Access Publication Fund of the Technical University of Berlin.
+
+\section*{Acknowledgements}
+The authors acknowledge the High Performance Computing Service of the Technical University of Berlin for providing the computational resources used for training, benchmarking, and figure generation.
+
+\section*{CRediT authorship contribution statement}
+\textbf{Florian Rzepka:} Conceptualization, methodology, software, validation, formal analysis, investigation, data curation, writing---original draft preparation, writing---review and editing, visualization. \textbf{Qinnan Chen:} Writing---review and editing. \textbf{Julia Kowal:} Resources, supervision, project administration, funding acquisition, writing---review and editing.
+
+\section*{Declaration of competing interest}
+The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
+
+\section*{Declaration of generative AI and AI-assisted technologies in the manuscript preparation process}
+During the preparation of this work the authors used ChatGPT, DeepL, and Grammarly to improve the linguistic quality and style of the manuscript. After using these tools, the authors reviewed and edited the content as needed and take full responsibility for the content of the published article.
+
+\section*{Data availability}
+The dataset is publicly available through its cited TU Berlin repository record. Code, model configurations, benchmark definitions, random seeds, result summaries, hardware timing records, and analysis procedures are maintained at \url{https://github.com/FRzepka/1_SCRIPTS}.
+
+\end{document}

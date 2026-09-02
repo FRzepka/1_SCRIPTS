@@ -1,0 +1,25 @@
+\documentclass[11pt,a4paper]{letter}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\signature{Florian Rzepka\\on behalf of all authors}
+\address{Technical University of Berlin\\Chair of Electrical Energy Storage Technology\\Einsteinufer 11, 10587 Berlin, Germany\\florian.rzepka@tu-berlin.de}
+\date{1 September 2026}
+\begin{document}
+\begin{letter}{Editors\\Journal of Energy Storage}
+\opening{Dear Editors,}
+
+Please consider our manuscript entitled ``Performance and Robustness Benchmarking Across Battery SOC Estimator Classes for Embedded Applications'' for publication in the \emph{Journal of Energy Storage}.
+
+The manuscript presents a causal and cell-disjoint comparison of four representative state-of-charge estimation approaches: fixed-capacity Coulomb counting, Coulomb counting with data-driven state-of-health adaptation, a second-order equivalent-circuit observer, and a recurrent data-driven estimator. The study connects two evaluation branches that are commonly treated separately. The robustness benchmark examines nominal accuracy, resistance to measurement and signal-integrity disturbances, and recovery from initialization mismatch. The hardware performance benchmark verifies software-to-microcontroller equivalence and measures inference latency, flash occupancy, and peak runtime RAM on an STM32H753.
+
+The results demonstrate why nominal error alone is insufficient for deployment-oriented estimator selection. The data-driven representative yields the lowest nominal cell-macro error and leads several disturbance cases, while the equivalent-circuit observer provides the strongest observed recovery profile. All four isolated SOC implementations reproduce their software references and execute within the one-second sampling interval, although their memory and latency requirements differ substantially. The resulting benchmark therefore exposes class-specific strengths, weaknesses, and deployment costs under one common protocol.
+
+This work is original, has not been published previously, and is not under consideration elsewhere. All authors have approved the manuscript and agree with its submission. The authors declare no known competing financial interests or personal relationships that could have influenced the work. The dataset and supporting code are publicly available as described in the manuscript.
+
+Thank you for your consideration.
+
+\closing{Sincerely,}
+\end{letter}
+\end{document}
