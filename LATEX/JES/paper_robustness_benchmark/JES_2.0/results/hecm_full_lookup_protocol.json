@@ -32,6 +32,8 @@
     "current_bias_neg_3p0pct",
     "current_noise_high",
     "current_noise_low",
+    "current_offset_neg_50mA",
+    "current_offset_pos_50mA",
     "initial_soc_error",
     "irregular_sampling_0p1s",
     "irregular_sampling_0p5s",
@@ -54,13 +56,15 @@
       "current_bias_neg_1p5pct",
       "current_bias_neg_3p0pct"
     ],
-    "Sensor noise": [
+    "Random sensor noise": [
       "current_noise_high",
       "current_noise_low",
       "temperature_noise",
       "voltage_noise"
     ],
-    "Sensor offsets": [
+    "Additive sensor offsets": [
+      "current_offset_neg_50mA",
+      "current_offset_pos_50mA",
       "temperature_offset",
       "voltage_offset"
     ],
@@ -84,7 +88,7 @@
     ]
   },
   "initialization_recovery_alias": "initial_soc_error",
-  "runs": 8960,
+  "runs": 9184,
   "cells": [
     "C09",
     "C13",
@@ -115,5 +119,7 @@
   "aggregation": "seeds and windows averaged within each cell; equal-weight cell macro; 10000-draw cell bootstrap",
   "interaction_definition": "scenario delta MAE under the perturbed lookup minus scenario delta MAE under the nominal lookup, each relative to its lookup-matched baseline",
   "recovery_definition": "canonical paired baseline-versus-initialization recovery with 0.02 SOC threshold, 300 s qualification, 24 h horizon, and persistent recovery-or-censor endpoint",
-  "interpretation_boundary": "The analysis covers every declared JES2 disturbance subcase for the fixed HECM implementation under local one-at-a-time lookup perturbations. It does not cover combined lookup errors or other HECM structures."
+  "interpretation_boundary": "The analysis covers all declared JES2 disturbance subcases for the fixed HECM implementation under local one-at-a-time lookup perturbations. The additive current-offset extension is combined with the original full sensitivity campaign. Combined lookup errors and other HECM structures are not covered.",
+  "base_runs_before_current_offset": 8960,
+  "current_offset_extension_runs": 224
 }

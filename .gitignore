@@ -226,3 +226,8 @@ LATEX/**/bib/*.json
 # ── Lokale Kopier- und Cleanup-Logs ──
 cleanup_candidates_overview_*.txt
 1_Scripts_copy_to_synnaseet_*.log
+
+# Local dated dissertation snapshots and temporary render checks
+/LATEX/DISS/Florian_Rzepka_Dissertation_[0-9]*/
+/tmp/
+*.bcf-SAVE-ERROR

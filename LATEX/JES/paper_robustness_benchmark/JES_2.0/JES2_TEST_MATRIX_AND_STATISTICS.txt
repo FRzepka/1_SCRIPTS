@@ -87,10 +87,10 @@ IMPORTANT DISTINCTION
   SOH publication cadence at 1 h, 6 h, and 24 h under baseline conditions.
   HECM lookup-table sensitivity: nominal lookup, joint resistance scaling by
   +/-10%, joint time-constant scaling by +/-10%, and OCV shifts by +/-10 mV.
-  Each condition is crossed with 20 measurement and signal-integrity subcases,
+  Each condition is crossed with 22 measurement and signal-integrity subcases,
   the paired initialization intervention, original seeds, all 16 frozen windows,
   lookup-matched baselines, and paired initialization
-  recovery with a separately matched recovery baseline. The resulting 8,960-run analysis is reported separately and does
+  recovery with a separately matched recovery baseline. The resulting 9,184-run analysis is reported separately and does
   not enter the cross-model robustness score. It evaluates the fixed HECM under
   local one-at-a-time lookup perturbations rather than combined parameter errors
   or alternative observer structures.
@@ -157,8 +157,9 @@ IMPORTANT DISTINCTION
   VERIFIED: 16 frozen full-charge windows cover every available cell/SOH state;
   C27 contributes Fresh only. DD baseline completed for all 16 windows with both
   LSTM-SOH and reference-SOH (32 runs).
-  COMPLETE: DD-only one-seed pilot over all 19 scenarios and all 16 windows;
-  304/304 runs completed successfully.
+  COMPLETE: DD-only one-seed pilot over the original 19-scenario matrix and all
+  16 windows; the matched current-offset extension completes the final
+  20-scenario protocol.
   COMPLETE: full four-estimator 10/5-seed campaign; 6720/6720 runs completed
   successfully across C09, C13, C15, C25, C27, and C29.
   COMPLETE: the common-mask campaign contains 6720 successful records. Non-DD

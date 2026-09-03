@@ -177,12 +177,13 @@ R3.10 Runtime memory estimates are lower bounds
 
 R3.11 HECM disturbance response may depend on ECM lookup-table quality
   Status: DONE.
-  Change: a separate 8,960-run HECM-only sweep combines the nominal lookup with
+  Change: a separate 9,184-run HECM-only sweep combines the nominal lookup with
   resistance and time-constant scaling by +/-10% and OCV shifts by +/-10 mV.
-  Every lookup is evaluated across all 20 measurement and signal-integrity
+  Every lookup is evaluated across all 22 measurement and signal-integrity
   subcases plus paired initialization recovery over all 16 frozen windows.
-  Measurement-disturbance interactions remain at or below 0.001921 MAE. Absolute
-  baseline accuracy changes from 0.0314 to 0.0373 MAE, and resistance -10%
+  The largest absolute lookup--disturbance interaction is 0.006116 MAE and is
+  small relative to the 0.1763 HECM current-offset penalty. Absolute baseline
+  accuracy changes from 0.0314 to 0.0373 MAE, and resistance -10%
   exposes a censored C27 recovery trajectory. Figure 25 and the machine-readable
   cell, protocol, statistics, and summary files report the complete result. The
   analysis is excluded from the cross-model robustness score.
@@ -247,9 +248,10 @@ FIGURE STATUS
 RESULT VALIDATION TODO (updated 2026-08-28)
   PARTIAL: The current-gain concern is resolved and independently rerun; the
   broader cross-scenario plausibility audit below remains open. The implemented
-  and manuscript-declared protocol is a signed multiplicative sensor-gain error,
-  I_meas=I(1+b), not a fixed additive current offset. Both signs were executed at
-  0.5%, 1.5%, and 3.0%. Figure 05 reports the larger paired Delta-MAE for each
+  and manuscript-declared protocol distinguishes signed multiplicative current-
+  gain error, I_meas=I(1+b), from signed additive current offset,
+  I_meas=I+Delta I. Both gain signs were executed at 0.5%, 1.5%, and 3.0%, and
+  both offset signs were executed at 50 mA. Figure 05 reports the larger paired Delta-MAE for each
   cell and magnitude because one direction can compensate a directed baseline
   error. The opposite direction must not be interpreted as improved robustness.
   Focused 3% mechanism tests now include natural windows, a controlled identical-

@@ -744,17 +744,6 @@ def plot_results(
                 linewidth=1.0 if row.censored else 0.45,
                 zorder=5,
             )
-            if row.censored:
-                ax_recovery.annotate(
-                    row.cell,
-                    (lookup_index + jitter[cell_index], row.recovery_delta_h),
-                    xytext=(0, 5),
-                    textcoords="offset points",
-                    ha="center",
-                    va="bottom",
-                    fontsize=7.5,
-                    color="#b6302d",
-                )
     ax_recovery.axhline(0.0, color=NEUTRAL_DARK, linestyle="--", linewidth=0.9)
     ax_recovery.set_xticks(
         x,

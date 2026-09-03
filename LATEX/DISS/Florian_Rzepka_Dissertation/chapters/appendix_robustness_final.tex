@@ -1,0 +1,142 @@
+\section{Supplementary Robustness-Benchmark Material}
+
+The following figures and tables provide the complete scenario traceability, HECM lookup sensitivity, DD execution-mode detail, and numerical summaries supporting Chapter~\ref{chap:robustness}. SOC errors are reported on the normalized 0 to 1 scale unless percentage points are stated explicitly.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{jes_final/Figure_22_APPENDIX_JES2_Test_Matrix.png}
+    \caption[Complete robustness-benchmark scenario matrix.]{Complete 20-scenario benchmark matrix. Red markers identify manipulated measurements, timing, availability, or initialization states. Blue-gray markers denote repeated stochastic cases. Rose markers identify paired ground-truth-SOH diagnostic runs. Current-gain magnitudes and the additive current-offset case contain matched positive and negative sign levels.}
+    \label{fig:robustness_test_matrix}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{jes_final/Figure_24_APPENDIX_DD_Inference_Mode_Latency_Distributions.png}
+    \caption[Latency distributions of the three DD execution modes.]{DD latency distributions over the six hardware cell sequences. Exact rolling-window execution is shown separately from continuous-state and periodically reset execution because their scales and recurrent semantics differ substantially.}
+    \label{fig:robustness_dd_latency_appendix}
+\end{figure}
+
+\subsection{HECM lookup-table sensitivity}
+\label{sec:appendix_hecm_lookup_sensitivity}
+
+The cross-model benchmark evaluates one fixed HECM implementation whose lookup surfaces are identified exclusively from training and validation data. The supplementary HECM-only analysis tests whether its disturbance response depends strongly on local lookup calibration. The $R_i$, $R_1$, and $R_2$ surfaces are jointly scaled by $-10\%$ or $+10\%$. The $\tau_1$ and $\tau_2$ surfaces are likewise scaled by $-10\%$ or $+10\%$, while the OCV surfaces are shifted by $-\SI{10}{\milli\volt}$ or $+\SI{10}{\milli\volt}$. These six one-at-a-time perturbations and the nominal lookup are evaluated across 22 measurement and signal-integrity subcases and the paired initialization intervention. All original seeds and 16 frozen windows are retained. The complete design comprises 9184 HECM executions.
+
+Main-campaign disturbances use their lookup-matched baseline, the one-hour dropout uses a lookup-matched 48-h baseline, and initialization recovery uses a separate paired baseline. For every disturbance, the lookup interaction is the scenario $\Delta\mathrm{MAE}$ under the perturbed lookup minus the corresponding $\Delta\mathrm{MAE}$ under the nominal lookup. Results are summarized within cells before the same equal-weight cell bootstrap used by the primary benchmark is applied.
+
+Local lookup changes shift baseline HECM MAE between $0.0314$ and $0.0373$, compared with $0.0337$ for the nominal lookup. Across the 22 disturbance subcases, the largest absolute interaction is $0.006116$ MAE. It occurs for the $-\SI{0.05}{A}$ current offset under $+10\%$ time-constant scaling, and its cell-bootstrap interval includes zero. This interaction is small relative to the nominal adverse current-offset penalty of $0.1763$ MAE. The largest current-gain interaction is $0.000443$ MAE.
+
+Initialization recovery exposes a separate boundary. Five perturbations retain mean persistent recovery-or-censor times between $1.18$ and $1.41$~h, close to the nominal $1.20$~h. Scaling the resistance surfaces by $-10\%$ increases the equal-weight mean to $5.10$~h because one low-load holdout trajectory remains outside the recovery band for the 24-h horizon. The analysis supports local stability of most measurement-disturbance responses but does not establish lookup independence of baseline accuracy or observer re-anchoring.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{jes_final/Figure_25_APPENDIX_HECM_Lookup_Table_Sensitivity.png}
+    \caption[HECM lookup-table sensitivity.]{HECM lookup sensitivity across the complete disturbance benchmark. Panel (a) reports the largest lookup interaction in each robustness family under local resistance, time-constant, and OCV perturbations. Panel (b) reports the corresponding change in persistent initialization recovery-or-censor time. Open red points identify cell means containing a censored recovery window.}
+    \label{fig:robustness_hecm_lookup_sensitivity}
+\end{figure}
+
+\input{tables/jes_final/jes2_hecm_lookup_sensitivity_compact.tex}
+
+\subsection{Supplementary numerical results}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\caption[Baseline cell-macro statistics.]{Six-cell baseline cell-macro statistics with hierarchical 95\% confidence intervals.}
+\label{tab:robustness_appendix_baseline_metrics}
+\begin{tabular}{lccc}
+\toprule
+Estimator & MAE [SOC] & RMSE [SOC] & P95 error [SOC] \\
+\midrule
+DM   & 0.0690 [0.0499, 0.0823] & 0.0740 [0.0532, 0.0881] & 0.1088 [0.0768, 0.1307] \\
+HDM  & 0.0412 [0.0301, 0.0515] & 0.0442 [0.0319, 0.0557] & 0.0649 [0.0449, 0.0846] \\
+HECM & 0.0337 [0.0246, 0.0434] & 0.0388 [0.0286, 0.0493] & 0.0644 [0.0468, 0.0821] \\
+DD   & 0.0258 [0.0189, 0.0325] & 0.0300 [0.0223, 0.0366] & 0.0508 [0.0375, 0.0619] \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\caption[Paired baseline-MAE comparisons.]{Exact paired baseline-MAE comparisons across the six-cell holdout test set. Differences are defined as estimator B minus estimator A. Holm correction is applied across the six model-pair tests.}
+\label{tab:robustness_appendix_baseline_pair_tests}
+\begin{tabular}{llrrrr}
+\toprule
+Estimator A & Estimator B & Mean difference & 95\% CI & $d_z$ & $p_{\mathrm{exact}}/p_{\mathrm{Holm}}$ \\
+\midrule
+DM   & HDM  & -0.0278 & [-0.0381, -0.0171] & -1.93 & 0.0313 / 0.1875 \\
+DM   & HECM & -0.0352 & [-0.0470, -0.0224] & -2.00 & 0.0313 / 0.1875 \\
+DM   & DD   & -0.0431 & [-0.0558, -0.0286] & -2.29 & 0.0313 / 0.1875 \\
+HDM  & HECM & -0.0075 & [-0.0162,  0.0015] & -0.61 & 0.1563 / 0.1875 \\
+HDM  & DD   & -0.0154 & [-0.0243, -0.0084] & -1.39 & 0.0313 / 0.1875 \\
+HECM & DD   & -0.0079 & [-0.0176, -0.0005] & -0.68 & 0.0938 / 0.1875 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\caption[Selected disturbance penalties.]{Selected cell-macro scenario penalties relative to paired baseline. Current-gain and current-offset values use adverse directions from matched signed sweeps.}
+\label{tab:robustness_appendix_key_results}
+\begin{tabular}{lrrrr}
+\toprule
+Scenario & DM & HDM & HECM & DD \\
+\midrule
+Current noise, $\sigma_I=\SI{0.10}{A}$ & -0.0009 & +0.0000 & +0.0038 & -0.0000 \\
+Current gain, adverse $3\%$ & +0.0108 & +0.0101 & +0.0060 & +0.0038 \\
+Current offset, adverse \SI{50}{\milli\ampere} & +0.2467 & +0.2727 & +0.1763 & +0.0401 \\
+Voltage offset, $+\SI{0.02}{V}$ & +0.0000 & +0.0005 & -0.0040 & +0.0038 \\
+Temperature offset, $+\SI{3}{\celsius}$ & +0.0000 & +0.0002 & +0.0002 & +0.0074 \\
+ADC quantization & +0.0038 & +0.0035 & -0.0018 & +0.0002 \\
+Random missing samples, $2\%$ & +0.0080 & +0.0081 & +0.0039 & +0.0026 \\
+Timing jitter, $\pm\SI{0.9}{s}$ & -0.0003 & +0.0003 & +0.0006 & +0.0003 \\
+Burst dropout, \SI{1}{h} & +0.0050 & +0.0209 & +0.0239 & -0.0093 \\
+Voltage spikes, $\pm\SI{0.20}{V}$ & +0.0000 & -0.0003 & +0.0002 & -0.0001 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\caption[Robustness-score sensitivity.]{Sensitivity of the illustrative normalized robustness score to the aggregation rule.}
+\label{tab:robustness_appendix_score_sensitivity}
+\begin{tabular}{lrrr}
+\toprule
+Estimator & Family balanced & Equal scenario & Highest level plus offsets \\
+\midrule
+DM   & 0.452 & 0.549 & 0.573 \\
+HDM  & 0.351 & 0.476 & 0.469 \\
+HECM & 0.360 & 0.552 & 0.562 \\
+DD   & 0.967 & 0.793 & 0.693 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\renewcommand{\arraystretch}{1.10}
+\setlength{\tabcolsep}{3pt}
+\caption[Recovery and hardware summary.]{Canonical paired initialization recovery and target-hardware summary. Recovery values are equal-weight cell means over the common evaluation interval. Endpoints already satisfied when all estimators first provide valid output are conservative upper bounds.}
+\label{tab:robustness_appendix_recovery_hardware}
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}Xrrrr@{}}
+\toprule
+Metric & DM & HDM & HECM & DD \\
+\midrule
+First 300-s entry or censor time [h] & 22.28 & 17.21 & 1.12 & 1.29 \\
+Persistent recovery or censor time [h] & 22.28 & 22.28 & 1.20 & 2.60 \\
+Recovery excess-error AUC [SOC h] & 1.735 & 1.738 & 0.078 & 0.116 \\
+First-entry censored fraction & 0.89 & 0.67 & 0.00 & 0.00 \\
+Persistent-recovery censored fraction & 0.89 & 0.89 & 0.00 & 0.00 \\
+Relapse fraction after first hold & 0.00 & 0.22 & 0.17 & 0.78 \\
+Median SOC-core latency [$\mu$s] & 0.171 & 0.165 & 23.9 & 424.9$^{a}$ \\
+Flash [KiB] & 27.0 & 27.1 & 470.1 & 115.9$^{a}$ \\
+Peak runtime RAM [KiB] & 2.4 & 2.4 & 2.5 & 4.1$^{a}$ \\
+\bottomrule
+\multicolumn{5}{@{}p{\textwidth}@{}}{\footnotesize $^{a}$Continuous-state DD. Exact rolling-window execution requires approximately 724~ms and 67.3~KiB peak RAM.}
+\end{tabularx}
+\end{table}

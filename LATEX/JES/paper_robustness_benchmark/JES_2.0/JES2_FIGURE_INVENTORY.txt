@@ -48,9 +48,9 @@ SCIENTIFIC DATA BOUNDARY
   Figure 09 is generated from the canonical paired initialization trajectories.
   Figure 11 compares the 48-hour dropout runs with duration-matched undisturbed
   references. Figures 14 and 15 include all eight evaluated disturbance families,
-  including voltage and temperature offsets. Figures 17-20 and 24 use measured
+  including current, voltage, and temperature offsets. Figures 17-20 and 24 use measured
   STM32 SOC-core results. Figure 21 summarizes measured holdout coverage and
-  Figures 22-23 visualize the frozen protocol. Figure 25 uses the separate 8,960-run
+  Figures 22-23 visualize the frozen protocol. Figure 25 uses the separate 9,184-run
   HECM lookup-sensitivity analysis across all disturbance subcases. Figure 26 retains the dissertation SOH overview
   with the applied charge-rate, discharge-rate, and depth-of-discharge conditions.
   No synthetic pilot value is used in the manuscript.
@@ -59,6 +59,6 @@ EXECUTION STATUS
   Public benchmark: 6720/6720 runs complete.
   Internal duration-matched dropout references: 112/112 runs complete.
   Statistical build: 10000 hierarchical bootstrap repetitions complete.
-  HECM lookup sensitivity: 8960/8960 runs complete, 0 failures.
+  HECM lookup sensitivity: 9184/9184 runs complete, 0 failures.
   HECM lookup statistics: 10000 cell-bootstrap repetitions complete.
   Tests: 35/35 passed in the ML environment.

@@ -307,7 +307,15 @@ def scenario_axes(alias: str) -> set[str]:
 
 
 def plot_scenario_matrix(out: Path) -> None:
-    paper_scenarios = [row for row in SCENARIOS if row[0] != "missing_gap_baseline_48h"]
+    paper_scenarios = []
+    for row in SCENARIOS:
+        alias = row[0]
+        if alias == "missing_gap_baseline_48h" or alias == "current_offset_pos_50mA":
+            continue
+        if alias == "current_offset_neg_50mA":
+            paper_scenarios.append(("current_offset_50mA", row[1], row[2]))
+        else:
+            paper_scenarios.append(row)
     columns = ["Baseline", "Current", "Voltage", "Temperature", "Timing", "Availability", "Initialization", "Repeated", "Ref. SOH"]
     keys = ["baseline", "current", "voltage", "temperature", "timing", "availability", "initialization", "stochastic", "reference"]
     matrix = np.zeros((len(paper_scenarios), len(columns)), dtype=int)
@@ -320,7 +328,11 @@ def plot_scenario_matrix(out: Path) -> None:
             active.add("reference")
         for col, key in enumerate(keys):
             matrix[row, col] = int(key in active)
-        label = SCENARIO_LABELS[alias]
+        label = (
+            "Current offset (+/-50 mA)"
+            if alias == "current_offset_50mA"
+            else SCENARIO_LABELS[alias]
+        )
         if alias.startswith("current_bias_"):
             label = label.replace("(", "(±", 1)
         row_labels.append(label)
@@ -346,9 +358,9 @@ def plot_scenario_matrix(out: Path) -> None:
     ax.grid(axis="y", visible=False)
     for spine in ax.spines.values():
         spine.set_visible(False)
-    fig.suptitle("JES 2.0 final benchmark matrix", fontsize=14, fontweight="bold", y=0.985)
+    fig.suptitle("Complete benchmark matrix", fontsize=14, fontweight="bold", y=0.985)
     fig.text(0.61, 0.025,
-             "Current-gain magnitudes contain matched ± sign pairs   |   Blue-gray: 10/5 seeded repetitions   |   Rose: reference-SOH ablation",
+             "Current gain and current offset contain matched sign pairs   |   Blue-gray: 10/5 seeded repetitions   |   Rose: reference-SOH ablation",
              ha="center", fontsize=9, color=NEUTRAL_DARK)
     fig.subplots_adjust(left=0.255, right=0.98, top=0.87, bottom=0.07)
     save_figure(fig, out / "Figure_27_JES2_Test_Matrix.png")
@@ -516,6 +528,7 @@ def main() -> None:
         default=Path("LATEX/JES/paper_robustness_benchmark/JES_2.0/tables/jes2_evaluation_windows.csv"),
     )
     parser.add_argument("--sample_points", type=int, default=30000)
+    parser.add_argument("--scenario_matrix_only", action="store_true")
     args = parser.parse_args()
 
     setup_style()
@@ -527,6 +540,11 @@ def main() -> None:
     })
     args.out_dir.mkdir(parents=True, exist_ok=True)
     args.tables_dir.mkdir(parents=True, exist_ok=True)
+
+    if args.scenario_matrix_only:
+        plot_scenario_matrix(args.out_dir)
+        print(f"Generated scenario matrix in {args.out_dir}")
+        return
 
     cells = load_characteristics(args.characteristics)
     coverage, samples = collect_state_coverage(args.data_root, args.sample_points)

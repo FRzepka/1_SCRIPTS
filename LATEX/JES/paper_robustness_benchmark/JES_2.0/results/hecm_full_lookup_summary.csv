@@ -1,8 +1,8 @@
 lookup_condition,lookup_label,baseline_mae,worst_interaction_alias,worst_interaction_label,worst_absolute_interaction_mae,scenarios_ci_excluding_zero,scenario_count,recovery_h,recovery_delta_h,recovery_censored_fraction
-nominal_lookup,Nominal lookup,0.033735340260119116,adc_quantization,ADC quantization,0.0,0,20,1.2033919753086677,0.0,0.0
-resistance_minus_10pct,Resistance -10%,0.03505910898311496,irregular_sampling_0p1s,Timing jitter 0.1 s,0.0009804052987562998,5,20,5.100541666666679,3.897149691358011,0.16666666666666666
-resistance_plus_10pct,Resistance +10%,0.03266567245494894,voltage_offset,Voltage offset,0.0009815882180523978,4,20,1.3821929012345944,0.17880092592592667,0.0
-tau_minus_10pct,Time constants -10%,0.034293146552120894,current_noise_high,Current noise 0.10 A,0.001131039001979724,6,20,1.408578703703731,0.2051867283950631,0.0
-tau_plus_10pct,Time constants +10%,0.03345322042994294,voltage_spikes,Voltage spikes,0.0012174100979225845,5,20,1.2205617283950891,0.01716975308642123,0.0
-ocv_minus_10mV,OCV -10 mV,0.031364461924139476,missing_gap_1h,Burst dropout 1 h,0.0017779815496848312,5,20,1.1798209876543484,-0.023570987654319475,0.0
-ocv_plus_10mV,OCV +10 mV,0.037285653891011634,voltage_offset,Voltage offset,0.0019205044933184746,4,20,1.1877376543210152,-0.015654320987652903,0.0
+nominal_lookup,Nominal lookup,0.0337353402601191,adc_quantization,ADC quantization,0.0,0,22,1.2033919753086677,0.0,0.0
+resistance_minus_10pct,Resistance -10%,0.0350591089831149,current_offset_pos_50mA,Current offset $+50$ mA,0.0019110032739164,6,22,5.100541666666679,3.897149691358011,0.1666666666666666
+resistance_plus_10pct,Resistance +10%,0.0326656724549489,current_offset_pos_50mA,Current offset $+50$ mA,0.0016197033078829,5,22,1.3821929012345944,0.1788009259259266,0.0
+tau_minus_10pct,Time constants -10%,0.0342931465521208,current_noise_high,Current noise 0.10 A,0.0011310390019797,6,22,1.408578703703731,0.2051867283950631,0.0
+tau_plus_10pct,Time constants +10%,0.0334532204299429,current_offset_neg_50mA,Current offset $-50$ mA,0.0061162435405451,5,22,1.2205617283950891,0.0171697530864212,0.0
+ocv_minus_10mV,OCV -10 mV,0.0313644619241394,current_offset_pos_50mA,Current offset $+50$ mA,0.002595606762146,6,22,1.1798209876543484,-0.0235709876543194,0.0
+ocv_plus_10mV,OCV +10 mV,0.0372856538910116,current_offset_pos_50mA,Current offset $+50$ mA,0.0037808646563157,5,22,1.1877376543210152,-0.0156543209876529,0.0

@@ -18,9 +18,9 @@ SIMULATION = WORKSPACE / "DL_Models" / "LFP_SOC_SOH_Model" / "4_simulation_envir
 FIGURE_SCRIPTS = ROOT.parent / "figures"
 MODELS = {"DM", "HDM", "HECM", "DD"}
 FAMILIES = [
-    "Sensor noise",
+    "Random sensor noise",
     "Current-gain error",
-    "Sensor offsets",
+    "Additive sensor offsets",
     "ADC quantization",
     "Missing samples",
     "Timing jitter",
@@ -149,14 +149,28 @@ def check_robustness_score() -> str:
     require(set(sensitivity.index) == MODELS, "Robustness sensitivity table omits a model")
     require(sensitivity.shape[1] == 3, "Expected three declared robustness aggregations")
     source = (FIGURE_SCRIPTS / "build_revised_all_cells_figures.py").read_text(encoding="utf-8")
-    require('"Sensor offsets": ["voltage_offset", "temperature_offset"]' in source, "Offset family changed")
+    require(
+        '"Additive sensor offsets": ["current_offset_50mA", "voltage_offset", "temperature_offset"]'
+        in source,
+        "Additive-offset family is incomplete",
+    )
     require("for family, aliases in ROBUSTNESS_FAMILIES.items()" in source, "Family balancing is not applied")
-    return "eight families, including sensor offsets, are reported under three aggregations"
+    return "eight families, including random noise and additive offsets, are reported under three aggregations"
 
 
 def check_protocol_and_statistics() -> str:
     runs = pd.read_csv(RESULTS / "jes2_run_metrics.csv")
     require({"voltage_offset", "temperature_offset"}.issubset(set(runs["alias"])), "Offset cases are absent")
+    current_offset = pd.read_csv(
+        RESULTS / "current_offset_extension" / "jes2_current_offset_runs.csv"
+    )
+    require(len(current_offset) == 128, "Current-offset extension is incomplete")
+    require(set(current_offset["model"]) == MODELS, "Current-offset extension omits a model")
+    require(
+        set(current_offset["alias"])
+        == {"current_offset_neg_50mA", "current_offset_pos_50mA"},
+        "Current-offset signed pair changed",
+    )
     tests = pd.read_csv(RESULTS / "jes2_paired_model_tests.csv")
     baseline = tests[(tests["alias"] == "baseline") & (tests["metric"] == "mae")]
     require(len(baseline) == 6, f"Expected six baseline model-pair tests, found {len(baseline)}")
@@ -166,7 +180,7 @@ def check_protocol_and_statistics() -> str:
     require('"--missing_gap_placement", "max_abs_net_charge"' in protocol, "Dropout placement changed")
     require('"--missing_gap_min_pre_seconds", "43200"' in protocol, "Dropout pre-gap context changed")
     require('"--missing_gap_min_post_seconds", "86400"' in protocol, "Dropout post-gap context changed")
-    return "both offsets and all six exact baseline pair tests with Holm correction are present"
+    return "all additive offsets and all six exact baseline pair tests with Holm correction are present"
 
 
 def check_hecm_lookup_sensitivity() -> str:
@@ -177,6 +191,12 @@ def check_hecm_lookup_sensitivity() -> str:
     recovery_runs = pd.read_csv(RESULTS / "hecm_full_lookup_recovery_runs.csv")
     recovery_stats = pd.read_csv(RESULTS / "hecm_full_lookup_recovery_statistics.csv")
     summary = pd.read_csv(RESULTS / "hecm_full_lookup_summary.csv")
+    offset_runs = pd.read_csv(
+        RESULTS / "current_offset_extension" / "hecm_lookup_current_offset_runs.csv"
+    )
+    offset_stats = pd.read_csv(
+        RESULTS / "current_offset_extension" / "hecm_lookup_current_offset_statistics.csv"
+    )
     protocol = json.loads(
         (RESULTS / "hecm_full_lookup_protocol.json").read_text(encoding="utf-8")
     )
@@ -190,17 +210,22 @@ def check_hecm_lookup_sensitivity() -> str:
         "ocv_plus_10mV",
     }
     disturbance_aliases = set(protocol["disturbance_aliases"])
-    require(protocol["runs"] == 8960, "HECM sensitivity run count changed")
+    require(protocol["runs"] == 9184, "HECM sensitivity run count changed")
     require(protocol["evaluation_start_sample"] == 2023, "Sensitivity protocol mask changed")
     require(set(protocol["lookup_conditions"]) == lookup_conditions, "Lookup conditions changed")
-    require(len(disturbance_aliases) == 21, "Expected 21 disturbance subcases")
+    require(len(disturbance_aliases) == 23, "Expected 23 disturbance aliases including initialization")
     require(len(protocol["cells"]) == 6, "HECM sensitivity does not use six cells")
     require(len(protocol["windows"]) == 16, "HECM sensitivity does not use 16 windows")
-    require(int(counts["runs"].sum()) == 8960, "Compact run counts do not sum to 8,960")
+    require(int(counts["runs"].sum()) == 8960, "Original run counts do not sum to 8,960")
+    require(len(offset_runs) == 224, "HECM current-offset extension is incomplete")
+    require(len(offset_stats) == 14, "HECM current-offset statistics are incomplete")
+    require(int(counts["runs"].sum()) + len(offset_runs) == 9184, "Combined HECM run count changed")
     require(set(counts["lookup_condition"]) == lookup_conditions, "Run-count lookups changed")
     require(
         set(counts["alias"])
-        == disturbance_aliases | {"baseline", "missing_gap_baseline_48h", "recovery_baseline"},
+        == disturbance_aliases
+        - {"current_offset_neg_50mA", "current_offset_pos_50mA"}
+        | {"baseline", "missing_gap_baseline_48h", "recovery_baseline"},
         "Run-count disturbance coverage changed",
     )
     require(len(baseline) == 42, "Expected seven lookup conditions for each of six cells")
@@ -210,7 +235,7 @@ def check_hecm_lookup_sensitivity() -> str:
     require(len(recovery_runs) == 112, "Expected 16 paired recovery windows for seven lookups")
     require(len(recovery_stats) == 7, "Expected one recovery summary per lookup")
     require(len(summary) == 7, "Expected one compact-summary row per lookup")
-    require(set(summary["scenario_count"].astype(int)) == {20}, "Compact robustness count changed")
+    require(set(summary["scenario_count"].astype(int)) == {22}, "Compact robustness count changed")
     require(set(summary["lookup_condition"]) == lookup_conditions, "Compact lookups changed")
     nominal = stats[stats["lookup_condition"] == "nominal_lookup"]
     require(
@@ -221,9 +246,12 @@ def check_hecm_lookup_sensitivity() -> str:
     robustness = perturbed[
         perturbed["alias"] != protocol["initialization_recovery_alias"]
     ]
-    max_interaction = robustness["interaction_mean"].abs().max()
+    max_interaction = max(
+        robustness["interaction_mean"].abs().max(),
+        offset_stats["interaction_mae"].abs().max(),
+    )
     require(
-        np.isclose(max_interaction, 0.0019205044933184746),
+        np.isclose(max_interaction, 0.0061162435405451),
         "Largest HECM robustness interaction changed",
     )
     current_gain = robustness[robustness["alias"].str.startswith("current_bias_")]
@@ -257,12 +285,12 @@ def check_hecm_lookup_sensitivity() -> str:
     )
     require(np.isclose(resistance_censor, 1.0 / 6.0), "C27 censor fraction changed")
     require(
-        "every declared JES2 disturbance subcase"
+        "all declared JES2 disturbance subcases"
         in protocol["interpretation_boundary"],
         "Complete sensitivity scope is not declared",
     )
     require(
-        "combined lookup errors" in protocol["interpretation_boundary"],
+        "combined lookup errors" in protocol["interpretation_boundary"].lower(),
         "Sensitivity interpretation boundary is too broad",
     )
     require(
@@ -274,46 +302,29 @@ def check_hecm_lookup_sensitivity() -> str:
         "Compact HECM lookup-sensitivity table is missing",
     )
     return (
-        "8,960 HECM runs show <=0.001921 MAE measurement-disturbance interactions, "
+        "9,184 HECM runs show <=0.006117 MAE lookup--disturbance interactions, "
         "a 0.0314--0.0373 baseline range, and one resistance-dependent recovery boundary"
     )
 
 
 def check_build_boundaries() -> str:
-    main_path = SIMULATION / "campaigns" / "jes2_full_holdout_merged_20260825.json"
-    signed_path = (
-        SIMULATION
-        / "campaigns"
-        / "jes2_signed_gain_common_mask_20260830"
-        / "jes2_manifest.json"
-    )
-    main = json.loads(main_path.read_text(encoding="utf-8"))["runs"]
-    signed = json.loads(signed_path.read_text(encoding="utf-8"))["runs"]
-    main_gain_aliases = {
-        row["alias"] for row in main if row.get("scenario") == "current_offset"
-    }
-    signed_gain_aliases = {
-        row["alias"] for row in signed if row.get("scenario") == "current_offset"
-    }
+    main = pd.read_csv(RESULTS / "jes2_run_metrics.csv")
+    signed = pd.read_csv(RESULTS / "jes2_signed_current_bias_statistics.csv")
+    signed_levels = signed[signed["bias_magnitude_pct"] > 0]
+    require(len(main) == 6720, "Main benchmark build size changed")
+    require(set(signed_levels["model"]) == MODELS, "Signed gain results omit a model")
     require(
-        main_gain_aliases
-        == {
-            "current_bias_0p5pct",
-            "current_bias_1p5pct",
-            "current_bias_3p0pct",
-        },
-        "Main current-gain aliases changed",
+        set(signed_levels["bias_magnitude_pct"].astype(float)) == {0.5, 1.5, 3.0},
+        "Signed gain levels changed",
     )
+    offset = pd.read_csv(
+        RESULTS / "current_offset_extension" / "jes2_current_offset_runs.csv"
+    )
+    signed_extension_runs = len(signed_levels) * 16
     require(
-        signed_gain_aliases
-        == {
-            "current_bias_neg_0p5pct",
-            "current_bias_neg_1p5pct",
-            "current_bias_neg_3p0pct",
-        },
-        "Signed extension aliases changed",
+        len(main) + signed_extension_runs + len(offset) == 7040,
+        "Final public benchmark build size changed",
     )
-    require(len(main) + len(signed) == 6912, "Final public benchmark build size changed")
 
     lifecycle = pd.read_csv(RESULTS / "c29_bias_temporal_model_summary.csv")
     minimum_model = lifecycle.loc[lifecycle["delta_mae_full_life"].idxmin(), "model"]
@@ -333,7 +344,7 @@ def check_build_boundaries() -> str:
     rolling = next(row for row in hardware["models"] if row["model"] == "DD")
     require(rolling["valid_inferences"] == 2, "Rolling-DD RAM call count changed")
     require("dirty" in rolling["firmware_revision"], "Expected release blocker is no longer present")
-    return "6912 public evaluations, signed gain pairs, C29 lifecycle, dataset ground truth, and hardware boundaries are traceable"
+    return "7,040 public evaluations, signed gain and offset pairs, C29 lifecycle, dataset ground truth, and hardware boundaries are traceable"
 
 
 def check_dataset_split_coverage() -> str:
@@ -399,17 +410,17 @@ def check_manuscript() -> str:
         "voltage offset, $+\\si{0.02}{v}$",
         "temperature offset, $+\\si{3}{\\celsius}$",
         "holm correction is applied across the six model-pair tests",
-        "benchmark contains 19 scenario definitions",
+        "benchmark contains 20 scenario definitions",
         "dataset soc ground truth",
         "left-censored",
         "identified exclusively from the training and validation data",
-        "a separate hecm-only sensitivity analysis",
-        "20 measurement and signal-integrity subcases plus the paired initialization intervention",
-        "local one-at-a-time lookup perturbations",
-        "does not represent combined parameter errors or other hecm structures",
-        "largest absolute lookup interaction is $0.00192$ mae",
-        "some subcase intervals exclude zero",
-        "c27 trajectory remains outside the recovery band",
+        "supplementary hecm-only analysis",
+        "22 measurement and signal-integrity subcases plus the paired initialization intervention",
+        "these one-at-a-time perturbations",
+        "do not cover combined parameter deviations",
+        "largest absolute interaction is $0.006116$ mae",
+        "several smaller interactions have intervals that exclude zero",
+        "one low-load holdout cell remains outside the recovery band",
         "representative holdout-test replay",
         "hardware profile covers the isolated soc firmware",
     ]

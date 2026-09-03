@@ -1,0 +1,29 @@
+\documentclass[10pt,a4paper]{letter}
+\usepackage[margin=2.2cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\signature{Florian Rzepka\\on behalf of all authors}
+\address{Technical University of Berlin\\Chair of Electrical Energy Storage Technology\\Einsteinufer 11, 10587 Berlin, Germany\\florian.rzepka@tu-berlin.de}
+\date{3 September 2026}
+\begin{document}
+\begin{letter}{Editors\\Engineering Applications of Artificial Intelligence}
+\opening{Dear Editors,}
+
+Please consider our manuscript entitled ``Performance and Robustness Benchmarking Across Battery State-of-Charge Estimator Classes for Embedded Applications'' for publication in \emph{Engineering Applications of Artificial Intelligence}.
+
+The manuscript presents a causal, cell-disjoint engineering validation of a compact recurrent state-of-charge estimator against three structurally distinct conventional alternatives. The data-driven representative is a structurally pruned and fine-tuned gated recurrent unit. The study evaluates nominal accuracy, disturbance robustness, recovery, numerical equivalence, latency, flash occupancy, and peak runtime RAM on an STM32H753.
+
+The main artificial-intelligence contribution connects neural model preparation, recurrent-state semantics, and deployment behavior. The same compact network is executed through rolling-window recomputation, continuous hidden-state forwarding, and periodic state reset. Continuous forwarding reduces median latency from approximately 724~ms to 0.425~ms and peak runtime RAM from 67.3~KiB to 4.1~KiB while retaining similar nominal error. Periodic resets instead expose pronounced transients. The data-driven representative also yields the lowest nominal cell-macro error and leads several disturbance cases.
+
+The authors have a related manuscript under consideration at this journal that focuses on pruning and quantization of separate LSTM-based SOC and SOH estimators. The present submission instead compares estimator classes under a common fault and recovery protocol and isolates the effect of recurrent execution semantics. The shared application domain and target microcontroller are disclosed to make this relationship transparent.
+
+An earlier, substantially narrower robustness benchmark was assessed at another journal. The present study was rebuilt around a cell-disjoint multicell protocol, automated window selection, expanded disturbance and recovery analyses, statistical uncertainty assessment, parameter sensitivity, and direct hardware measurements. It is therefore submitted as a new original research article.
+
+This work is original, has not been published previously, and is not under consideration elsewhere. All authors have approved the manuscript and agree with its submission. The authors declare no known competing financial interests or personal relationships that could have influenced the work. The dataset and supporting code are publicly available as described in the manuscript.
+
+Thank you for your consideration.
+
+\closing{Sincerely,}
+\end{letter}
+\end{document}

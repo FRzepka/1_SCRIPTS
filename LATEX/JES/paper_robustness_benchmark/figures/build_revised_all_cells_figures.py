@@ -19,12 +19,13 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from matplotlib.colors import LinearSegmentedColormap
+from matplotlib.colors import LinearSegmentedColormap, SymLogNorm
 
 
 PAPER = Path(__file__).resolve().parents[1]
 RESULTS = PAPER / "JES_2.0" / "results"
 FIGURES = Path(__file__).resolve().parent / "Results"
+CURRENT_OFFSET_RESULTS = RESULTS / "current_offset_extension"
 CAMPAIGNS = (
     Path(__file__).resolve().parents[4]
     / "DL_Models/LFP_SOC_SOH_Model/4_simulation_environment/campaigns"
@@ -45,6 +46,7 @@ ALIAS_ORDER = [
     "current_bias_0p5pct",
     "current_bias_1p5pct",
     "current_bias_3p0pct",
+    "current_offset_50mA",
     "voltage_offset",
     "temperature_offset",
     "adc_quantization",
@@ -65,6 +67,7 @@ ALIAS_LABEL = {
     "current_bias_0p5pct": "Gain error\n(±0.5%)",
     "current_bias_1p5pct": "Gain error\n(±1.5%)",
     "current_bias_3p0pct": "Gain error\n(±3.0%)",
+    "current_offset_50mA": "Current offset\n(+/-50 mA)",
     "voltage_offset": "Voltage offset\n(0.02 V)",
     "temperature_offset": "Temperature offset\n(3 °C)",
     "adc_quantization": "ADC\nquantization",
@@ -125,7 +128,11 @@ def lower_better(values: pd.Series) -> pd.Series:
     return (high - values) / (high - low)
 
 
-def revised_delta_matrix(aggregate: pd.DataFrame, signed_bias: pd.DataFrame) -> pd.DataFrame:
+def revised_delta_matrix(
+    aggregate: pd.DataFrame,
+    signed_bias: pd.DataFrame,
+    current_offset: pd.DataFrame,
+) -> pd.DataFrame:
     rows = metric_rows(aggregate, "delta_mae")
     pivot = rows.pivot(index="model", columns="alias", values="mean").reindex(MODEL_ORDER)
     pivot = pivot.reindex(columns=ALIAS_ORDER)
@@ -134,6 +141,11 @@ def revised_delta_matrix(aggregate: pd.DataFrame, signed_bias: pd.DataFrame) -> 
     for magnitude, alias in magnitude_alias.items():
         replacement = signed_bias[np.isclose(signed_bias["bias_magnitude_pct"], magnitude)].set_index("model")["mean"]
         pivot.loc[:, alias] = replacement.reindex(MODEL_ORDER)
+
+    offset = current_offset.set_index("model")["adverse_delta_mae"].reindex(MODEL_ORDER)
+    if offset.isna().any():
+        raise ValueError("Signed additive current-offset results are incomplete")
+    pivot.loc[:, "current_offset_50mA"] = offset
 
     return pivot
 
@@ -232,7 +244,18 @@ def figure_12_heatmap(matrix: pd.DataFrame, output_path: Path | None = None) -> 
     cmap.set_bad("#dedede")
 
     fig, ax = plt.subplots(figsize=(13.8, 4.4))
-    image = ax.imshow(values, aspect="auto", cmap=cmap, vmin=-finite_limit, vmax=finite_limit)
+    norm = SymLogNorm(
+        linthresh=1e-3,
+        linscale=0.8,
+        vmin=-finite_limit,
+        vmax=finite_limit,
+    )
+    image = ax.imshow(
+        values,
+        aspect="auto",
+        cmap=cmap,
+        norm=norm,
+    )
     ax.set_xticks(np.arange(len(matrix.columns)), [ALIAS_LABEL[a] for a in matrix.columns], rotation=35, ha="right")
     ax.set_yticks(np.arange(len(matrix.index)), matrix.index)
     ax.grid(False)
@@ -241,8 +264,15 @@ def figure_12_heatmap(matrix: pd.DataFrame, output_path: Path | None = None) -> 
             value = matrix.iloc[row, col]
             if np.isfinite(value):
                 display_value = 0.0 if abs(value) < 5e-4 else value
-                ax.text(col, row, f"{display_value:+.3f}", ha="center", va="center", fontsize=7,
-                        color="white" if abs(value) > 0.55 * finite_limit else "#222222")
+                ax.text(
+                    col,
+                    row,
+                    f"{display_value:+.3f}",
+                    ha="center",
+                    va="center",
+                    fontsize=7,
+                    color="white" if abs(float(norm(value)) - 0.5) > 0.32 else "#222222",
+                )
             else:
                 ax.text(col, row, "n/a", ha="center", va="center", fontsize=6.5, color="#555555")
     fig.colorbar(image, ax=ax, label=r"Cell-macro $\Delta$MAE [SOC]", shrink=0.82)
@@ -257,9 +287,9 @@ def figure_12_heatmap(matrix: pd.DataFrame, output_path: Path | None = None) -> 
 
 
 ROBUSTNESS_FAMILIES = {
-    "Sensor noise": ["current_noise_low", "current_noise_high", "voltage_noise", "temperature_noise"],
+    "Random sensor noise": ["current_noise_low", "current_noise_high", "voltage_noise", "temperature_noise"],
     "Current-gain error": ["current_bias_0p5pct", "current_bias_1p5pct", "current_bias_3p0pct"],
-    "Sensor offsets": ["voltage_offset", "temperature_offset"],
+    "Additive sensor offsets": ["current_offset_50mA", "voltage_offset", "temperature_offset"],
     "ADC quantization": ["adc_quantization"],
     "Missing samples": ["missing_samples_periodic", "missing_samples_random"],
     "Timing jitter": ["irregular_sampling_0p1s", "irregular_sampling_0p5s", "irregular_sampling_0p9s"],
@@ -307,7 +337,7 @@ def robustness_dimension(revised_matrix: pd.DataFrame) -> tuple[pd.Series, pd.Da
     ).mean(axis=1)
     high_severity = [
         "current_noise_high", "voltage_noise", "temperature_noise", "current_bias_3p0pct",
-        "voltage_offset", "temperature_offset", "adc_quantization", "missing_samples_random",
+        "current_offset_50mA", "voltage_offset", "temperature_offset", "adc_quantization", "missing_samples_random",
         "irregular_sampling_0p9s", "missing_gap_1h", "voltage_spikes",
     ]
     sensitivity["Highest-level cases plus offsets"] = pd.concat(
@@ -437,7 +467,10 @@ def main() -> None:
     setup_style()
     aggregate = pd.read_csv(RESULTS / "jes2_macro_statistics.csv")
     signed_bias = pd.read_csv(RESULTS / "jes2_signed_current_bias_statistics.csv")
-    matrix = revised_delta_matrix(aggregate, signed_bias)
+    current_offset = pd.read_csv(
+        CURRENT_OFFSET_RESULTS / "jes2_current_offset_adverse_statistics.csv"
+    )
+    matrix = revised_delta_matrix(aggregate, signed_bias, current_offset)
     if args.figure_12_only:
         figure_12_heatmap(matrix, args.figure_12_output)
         return

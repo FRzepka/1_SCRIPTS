@@ -232,9 +232,9 @@ I am grateful for the support I received in many forms throughout this work. My 
 \addcontentsline{toc}{chapter}{Abstract}
 Reliable estimates of state of charge (SOC) and state of health (SOH) are central to the safe and efficient operation of lithium-ion battery systems. At the same time, many neural battery estimators are still evaluated mainly as offline models under clean laboratory signals, whereas practical battery management systems (BMS) impose additional requirements through disturbed measurements, limited embedded resources, firmware constraints, and the physical measurement chain. This research therefore develops a deployment-oriented perspective on artificial intelligence for BMS applications. Predictive accuracy is treated as one requirement among others, and is assessed together with robustness, embedded feasibility, and hardware integration.
 
-The work is organized around four connected studies grounded in NMC and LFP ageing datasets and a custom laboratory BMS platform. First, a neural ageing-estimation study shows that a compact multilayer perceptron can estimate SOH with competitive accuracy when cumulative-current information and lag-sequence history are used to represent ageing-relevant temporal context. Second, a measurement-only robustness benchmark compares direct-measurement, hybrid, equivalent-circuit, and data-driven estimator classes under current bias, noise, missing samples, irregular sampling, burst dropout, voltage spikes, ADC quantization, and initialization mismatch. The benchmark demonstrates that clean-condition MAE alone is not sufficient for practical model selection: estimators that are accurate under nominal signals can fail under bias or disturbed sampling, while other classes recover faster or remain more stable under specific faults. Third, an embedded-AI study transfers stateful recurrent SOC and SOH estimators to an STM32 microcontroller through structured pruning and INT8 weight quantization, measuring accuracy, flash, RAM, and latency and deriving a clearly identified constant-power energy proxy. Fourth, the custom BMS platform provides the hardware and firmware context in which estimator exchangeability, sensing, and embedded validation can be investigated reproducibly.
+The work is organized around three connected contribution studies grounded in NMC and LFP ageing datasets and supported by a custom laboratory BMS platform. First, a neural ageing-estimation study shows that a compact multilayer perceptron can estimate SOH with competitive accuracy when cumulative-current information and lag-sequence history are used to represent ageing-relevant temporal context. Second, a common benchmark compares direct-measurement, hybrid, equivalent-circuit, and data-driven SOC estimators. Its robustness branch separates nominal accuracy, resistance to disturbed or incomplete measurements, and recovery after state inconsistency. The data-driven representative is a structurally pruned GRU, and its hardware branch measures numerical equivalence, inference latency, flash occupancy, and peak runtime RAM on an STM32 microcontroller. Exact rolling-window recomputation, continuous hidden-state forwarding, and periodic state reset are compared to distinguish network compactness from the consequences of recurrent-state handling. Third, an embedded-AI study transfers stateful recurrent SOC and SOH estimators to the microcontroller through structured pruning and INT8 weight quantization, measuring retained accuracy and resource demand after compression and deriving a clearly identified constant-power energy proxy. The custom BMS platform provides the hardware and firmware context in which estimator exchangeability, sensing, and embedded validation can be investigated reproducibly.
 
-The central conclusion is that AI-enabled battery-state estimation should not be judged by a single accuracy number or by one nominal test. The goal is not to identify one universally best estimator, but to understand how different estimator classes behave across the requirement dimensions relevant to practical BMS deployment. For this purpose, accuracy, disturbance robustness, recovery behaviour, compressibility, runtime cost, and hardware integration must be evaluated together.
+Taken together, the studies show that neural battery-state estimators can combine expressive temporal modelling with the compactness required for embedded BMS deployment when representation, architecture, evaluation, and implementation are developed as one connected design problem. Useful temporal context does not necessarily require increasingly large networks. Lag-sequence and cumulative-current features can extend a compact MLP, while recurrent models can retain long-term context and still be reduced substantially through structured pruning and quantization. The resulting SOC and SOH estimators preserve strong estimation quality and sequential behaviour while meeting the memory and timing constraints of the selected microcontroller. The central contribution is therefore a deployment-oriented methodology for assigning model complexity where it improves battery-state representation, identifying weaknesses under realistic disturbances, and systematically reducing the remaining computational and memory demand for reliable integration into practical BMS hardware.
 
 \tableofcontents
 \cleardoublepage
@@ -453,9 +453,9 @@ The aim of this work is to develop and evaluate AI-based battery-state estimatio
 Each question targets a different stage of this path. The first concerns model design. Ageing develops slowly and depends on prior operation, so a compact estimator must receive sufficient information about this history. The second concerns evaluation. An estimator that performs well on clean data must also be confronted with disturbed and incomplete signals before its operational reliability can be judged. The third concerns realization. A model is useful in a BMS only if it remains accurate while meeting the resource and timing budget of the target controller.
 
 \section{Contribution, Scope, and Publication Basis}
-The work makes three main technical contributions. First, it studies how lag-sequence construction and cumulative-current history can turn a memoryless multilayer perceptron (MLP) into a time-aware SOH estimator without increasing the architectural complexity unnecessarily. Second, it develops a measurement-only robustness benchmark that compares direct-measurement, hybrid model-based, and data-driven SOC estimators under one common disturbance protocol. Third, it transfers recurrent SOC and SOH models to STM32 microcontroller execution and evaluates the interaction between model architecture, compression, and measured embedded performance.
+The work makes three main technical contributions. First, it studies how lag-sequence construction and cumulative-current history can turn a memoryless multilayer perceptron (MLP) into a time-aware SOH estimator without increasing the architectural complexity unnecessarily. Second, it develops a common performance and robustness benchmark for direct-measurement, hybrid, equivalent-circuit, and data-driven SOC estimators. The benchmark combines nominal, disturbed, and recovery tests with measured latency, flash, and peak runtime RAM on the target microcontroller. For the pruned recurrent representative, it also isolates the influence of rolling-window recomputation, continuous state forwarding, and periodic state reset. Third, it transfers recurrent SOC and SOH models to STM32 microcontroller execution and evaluates the interaction between model architecture, compression, and measured embedded performance.
 
-The ageing-estimation contribution presented in Chapter~\ref{chap:ageing} is based on the published study by Rzepka et al.\autocite{rzepkaNeuralNetworkArchitecture2023a} The robustness benchmark in Chapter~\ref{chap:robustness} forms the basis of a manuscript submitted to the \emph{Journal of Energy Storage}.\autocite{rzepkaPerformanceBenchmarkSubmitted2026} The embedded-AI study in Chapter~\ref{chap:embedded} is available as an SSRN preprint.\autocite{rzepkaEmbeddedArtificialIntelligence2026} The chapter texts are integrated and expanded for the monographic research argument rather than reproduced as independent articles.
+The ageing-estimation contribution presented in Chapter~\ref{chap:ageing} is based on the published study by Rzepka et al.\autocite{rzepkaNeuralNetworkArchitecture2023a} The performance and robustness benchmark in Chapter~\ref{chap:robustness} forms the basis of a manuscript submitted to \emph{Engineering Applications of Artificial Intelligence}.\autocite{rzepkaPerformanceBenchmarkSubmitted2026} The embedded-AI study in Chapter~\ref{chap:embedded} is available as an SSRN preprint.\autocite{rzepkaEmbeddedArtificialIntelligence2026} The chapter texts are integrated and expanded for the monographic research argument rather than reproduced as independent articles.
 
 These contributions are supported by an experimental basis consisting of two ageing datasets and a custom BMS platform. The hardware platform is not treated as a separate algorithmic contribution in the same sense as the three estimator studies. It provides the measurement, firmware, and validation environment required to connect the methodological results to practical BMS implementation.
 
@@ -471,13 +471,14 @@ These contributions are supported by an experimental basis consisting of two age
         \midrule
         Experimental and hardware basis & Data, labels, embedded targets, and validation context & Shared experimental basis & Supports all three contribution studies \\
         Ageing estimation in Chapter~\ref{chap:ageing} & Temporal representation for compact SOH estimation & Representation design and SOH estimation & Published journal article\autocite{rzepkaNeuralNetworkArchitecture2023a} \\
-        Robustness benchmark in Chapter~\ref{chap:robustness} & Matched comparison under measurement disturbances & Disturbed-operation performance & Manuscript submitted to the \emph{Journal of Energy Storage}\autocite{rzepkaPerformanceBenchmarkSubmitted2026} \\
+        Performance and robustness benchmark in Chapter~\ref{chap:robustness} & Matched disturbance, recovery, and on-device comparison & Accuracy, robustness, recovery, and embedded performance & Manuscript submitted to \emph{Engineering Applications of Artificial Intelligence}\autocite{rzepkaPerformanceBenchmarkSubmitted2026} \\
         Embedded AI in Chapter~\ref{chap:embedded} & Compression and measured microcontroller execution & Deployment and compression & SSRN preprint\autocite{rzepkaEmbeddedArtificialIntelligence2026} \\
         \bottomrule
     \end{tabularx}
 \end{table}
 
-\section{Battery-Management Requirement Framework}
+\chapter{Battery-Management Requirement Framework}
+\label{chap:requirements}
 A BMS supervises a lithium-ion cell or pack and keeps it within safe and efficient operating limits by monitoring voltage, current, and temperature and by controlling charging, balancing, protection, and communication. SOC and SOH are central internal quantities in this control chain. They influence usable energy, power limitation, lifetime-aware operation, and maintenance decisions, but they cannot be obtained directly from one sensor channel. They must be inferred from the measurement stream and from knowledge about the cell or pack.\autocite{plettBatteryManagementSystems2015,zhouStateEstimationModels2023a,jiangAdvancesBatteryState2024}
 
 For a BMS, state estimation is therefore not only an algorithmic accuracy problem. The estimator output has to be reliable enough for operating decisions, the implementation has to fit the controller and sensing chain, and the method has to be transferable into maintainable firmware. Figure~\ref{fig:bms_requirements} organizes these constraints into three connected dimensions.
@@ -489,15 +490,15 @@ For a BMS, state estimation is therefore not only an algorithmic accuracy proble
     \label{fig:bms_requirements}
 \end{figure}
 
-\subsection{Performance requirements}
+\section{Performance requirements}
 Performance requirements describe whether the estimated SOC or SOH signal is suitable for BMS decisions during operation. In this work, performance is not reduced to average error under clean measurements. It also includes robustness against disturbed input signals and convergence or recovery after an inconsistent initial state. This distinction is important because bias, noise, missing samples, timing irregularities, and communication interruptions can change the estimator ranking even when the clean-data error is low.\autocite{liRobustnessSOCEstimation2015,naseriReliableWirelessBMS2025,bergerBenchmarkingBatteryManagement2024}
 
-\subsection{Hardware requirements}
+\section{Hardware requirements}
 Hardware requirements define the resource envelope in which state estimation can run on the BMS controller. Flash memory limits the amount of code, parameters, and lookup data that can be stored. RAM usage limits the size of recurrent states, intermediate buffers, stack, and runtime data. Inference time determines whether the estimator can meet the required update rate with sufficient timing margin. Energy per inference becomes relevant when the controller has to operate under strict power budgets.\autocite{linTinyMachineLearning2023,naguibMicroprocessorExecutionTime2022}
 
 Selecting a controller with more internal RAM is possible in principle, but it is not a neutral remedy. A larger device can increase component cost, power consumption, package size, and qualification effort, and it can require changes to the board and firmware platform. External RAM introduces an additional memory interface, access latency, bus traffic, board area, and further power and electromagnetic-compatibility considerations. It can also weaken timing predictability compared with tightly coupled internal memory. A deployable estimator should therefore use the available memory efficiently instead of assuming that the hardware can always be enlarged around the model. The measurement chain belongs to the same requirement area because sensor resolution, noise, sampling timing, and communication behaviour define the input information available to the estimator.
 
-\subsection{Deployment requirements}
+\section{Deployment requirements}
 Deployment requirements describe the engineering path from a trained or identified method to a reusable BMS implementation. Relevant aspects are model complexity, firmware transfer, calibration effort, adaptability to changed cells or operating conditions, and scalability to related estimation tasks or target platforms. A method is therefore not deployment-ready only because it runs once on a controller. It must also be reproducible, maintainable, and modifiable without rebuilding the full BMS software around it. Compression methods such as pruning and quantization can support deployment, but their effect depends on the architecture and must be verified on the target implementation.\autocite{hanLearningBothWeights2015,jacobQuantizationTrainingNeural2017}
 
 \chapter{State of the Art and Technical Foundations}
@@ -887,7 +888,7 @@ Structured pruning removes complete groups such as neurons, channels, filters, a
     W[\mathcal I_{\mathrm{out}},\mathcal I_{\mathrm{in}}].
     \label{eq:fundamental_structured_pruning}
 \end{equation}
-The tensor dimensions are reduced and the remaining values form a smaller dense matrix. Conventional dense kernels can therefore benefit directly, and the reduction can extend to intermediate activations and recurrent states. The coarser granularity provides fewer possible pruning choices than element-wise removal and can cause a larger accuracy loss if an important group is removed. Connected layers must also be modified consistently because removing one output component changes the corresponding input dimension of the following operation.\autocite{wenLearningStructuredSparsity2016,liuNetworkSlimming2017,heStructuredPruningSurvey2024}
+The tensor dimensions are reduced and the remaining values form a smaller dense matrix. Conventional dense kernels can therefore benefit directly, and the reduction can extend to intermediate activations and recurrent states. The coarser granularity provides fewer possible pruning choices than element-wise removal and can cause a larger accuracy loss if an important group is removed. Connected layers must also be modified consistently because removing one output component changes the corresponding input dimension of the following operation. Figure~\ref{fig:fundamental_pruning_granularity} illustrates this difference between individual-weight removal and dimension-reducing structured pruning.\autocite{wenLearningStructuredSparsity2016,liuNetworkSlimming2017,heStructuredPruningSurvey2024}
 
 \begin{figure}[H]
     \centering
@@ -1387,7 +1388,7 @@ The state of research is uneven across the three requirement dimensions introduc
 
 The first gap concerns representation. A complex history-dependent battery state does not necessarily require a large architecture if the input representation makes the relevant history accessible. The second gap concerns evaluation. Clean-condition error alone does not reveal how direct, hybrid, model-based, and data-driven estimators react to the same sensor and timing disturbances. The third gap concerns deployment. Parameter compression has to be traced through model export, stateful streaming execution, linked memory, and measured runtime before its practical benefit is known.
 
-The three contribution chapters address these gaps in sequence. Chapter~\ref{chap:ageing} studies temporal representation for a compact MLP. Chapter~\ref{chap:robustness} compares estimator families under a shared measurement-only disturbance protocol. Chapter~\ref{chap:embedded} connects structured pruning and weight quantization to continuous recurrent inference and measured microcontroller behaviour.
+The three contribution chapters address these gaps in sequence. Chapter~\ref{chap:ageing} studies temporal representation for a compact MLP. Chapter~\ref{chap:robustness} compares estimator families under a shared robustness protocol and a matched embedded-performance assessment. Chapter~\ref{chap:embedded} connects structured pruning and weight quantization to continuous recurrent inference and measured microcontroller behaviour.
 
 \chapter{Experimental Basis and Hardware Ecosystem}
 \label{chap:experimental}
@@ -1469,7 +1470,7 @@ The second dataset is the published LFP DoE Cycle Ageing Dataset recorded at Tec
 
 A design of experiments is used here to structure the ageing campaign so that several operating influences can be varied systematically within a manageable number of cells.\autocite{siebertzStatistischeVersuchsplanung2017} Instead of changing only one operating variable at a time, the DoE plan combines charge rate, discharge rate, and depth of discharge into defined operating points. This makes it possible to observe not only the isolated influence of one factor, but also differences that arise from their combined loading conditions. For the later SOC and SOH studies, this is important because the estimators are not trained and evaluated on one narrow cycling regime. They see cells that have aged under different current rates and cycling depths, while the check-up phases still provide comparable reference information across the campaign. The DoE structure therefore gives the dataset both experimental control and operational diversity, which is useful for robustness benchmarking and embedded estimator validation.
 
-Figure~\ref{fig:embedded_doe_cube} visualizes the three-factor operating-point design. Figure~\ref{fig:embedded_soc_test_trajectory} shows a representative segment of the resulting trajectory structure, combining cyclic ageing blocks, check-up phases, and an approximately one-day stationary-storage load-profile segment. This profile provides one application-oriented example within the broader use-case-dependent profile space. Figure~\ref{fig:embedded_soh_all_days} shows the SOH spread across cells and operating points over the full campaign duration.
+Figure~\ref{fig:embedded_doe_cube} visualizes the three-factor operating-point design. Figure~\ref{fig:embedded_soc_test_trajectory} shows a representative segment of the resulting trajectory structure, combining cyclic ageing blocks, check-up phases, and an approximately one-day stationary-storage load-profile segment. This profile provides one application-oriented example within the broader use-case-dependent profile space. Figure~\ref{fig:embedded_soh_all_days} shows the SOH spread across all cells and operating points over the full campaign duration and identifies the fixed training, validation, and independent holdout test sets used by the robustness benchmark.
 
 \begin{figure}[H]
     \centering
@@ -1487,12 +1488,26 @@ Figure~\ref{fig:embedded_doe_cube} visualizes the three-factor operating-point d
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.82\textwidth]{embedded_soh_all_days.png}
-    \caption[SOH progression across the LFP ageing campaign.]{SOH progression across the 15 LFP cells over the full ageing campaign. Each trajectory is constructed from discrete capacity check-ups. Local increases between successive check-ups represent variations in measured available capacity and do not imply a reversal of the long-term ageing process.}
+    \includegraphics[width=\textwidth]{jes_final/Figure_26_APPENDIX_SOH_Aging_Conditions.png}
+    \caption[SOH progression and data split across the LFP ageing campaign.]{Measured SOH progression across the 15 LFP cells over the complete ageing campaign. Colors distinguish the fixed training, validation, and independent holdout test sets. The legend reports the charge C-rate, discharge C-rate, and depth of discharge assigned to each trajectory. Every SOH trajectory is constructed from discrete capacity check-ups and interpolated between the measured anchors.}
     \label{fig:embedded_soh_all_days}
+    \label{fig:robustness_soh_aging_conditions}
 \end{figure}
 
 The local upward movements in Figure~\ref{fig:embedded_soh_all_days} require a distinction between physical degradation and measured available capacity. The plotted points originate from repeated capacity check-ups and are not model predictions. A later check-up can yield a temporarily higher capacity because relaxation and reversible recovery, conditioning before the test, small temperature differences, current-integration uncertainty, and voltage cut-off detection all affect the measured result.\autocite{baraiComparisonMethodologiesNoninvasive2019} The available data do not isolate one of these effects as the unique cause of every increase. The correct interpretation is therefore a downward long-term ageing trend with locally non-monotonic measurement anchors. Linear interpolation carries these anchor variations into the displayed SOH trajectories.
+
+The robustness study uses a fixed cell-disjoint split consisting of six training cells, three validation cells, and six independent holdout test cells. Neural training, scaler fitting, pruning, model selection, and the identification of the HECM parameter surfaces use only the training and validation sets. The holdout cells are reserved for the final nominal, disturbance, recovery, and embedded comparisons. Table~\ref{tab:dataset_cell_split_coverage} documents the complete assignment and the measured duration, SOH, temperature, and load coverage of every trajectory.
+
+\input{tables/jes_final/jes2_dataset_cell_split_coverage.tex}
+
+The holdout set spans two descriptively low-load trajectories, three middle-load trajectories, and one exploratory high-load trajectory, classified by the measured 95th-percentile absolute C-rate. These labels summarize whole-cell load coverage and are not used as independent statistical samples. Figure~\ref{fig:robustness_holdout_coverage} complements the tabulated split by showing the SOH and thermal envelopes and the fraction of each trajectory that lies in the fresh, mid-life, and aged SOH ranges. One low-load trajectory remains entirely within the fresh range. The robustness protocol therefore contains 16 available cell/SOH combinations rather than 18.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{jes_final/Figure_21_APPENDIX_Holdout_Cell_Coverage.png}
+    \caption[Coverage of the independent LFP holdout test set.]{Measured coverage of the six-cell independent holdout test set. The panels show observed SOH, the descriptive load-class assignment, the thermal envelope, and full-trajectory SOH-state coverage. The high-load group contains one exploratory trajectory, while the low- and middle-load groups contain multiple cells.}
+    \label{fig:robustness_holdout_coverage}
+\end{figure}
 
 \subsection{SOC and SOH Reference-Label Construction}
 The LFP dataset contains measurements from which the labels for Chapters~\ref{chap:robustness} and~\ref{chap:embedded} are constructed. For a sample interval $\Delta t_k$, the signed transferred charge is
@@ -1546,7 +1561,7 @@ The custom laboratory hardware developed in this work is referred to simply as t
 \subsection{System Objective and Laboratory Scope}
 The present implementation is a compact and reproducible 4s laboratory BMS for battery ageing studies and embedded state-estimation experiments at TU Berlin EET. The four-cell configuration was selected as a compromise between system relevance and experimental control. It retains the essential pack-level functions of individual cell monitoring, cell-wise balancing, shared current measurement, protective switching, and spatial temperature sensing, while keeping instrumentation, cell access, replacement, and repeated testing manageable in the laboratory. The platform is therefore intended for ageing tests, cyclic and calendar experiments, pack and general hardware tests, and representative charging and discharging profiles rather than direct qualification for large field-deployed battery racks. Exact field loads are not reproduced one-to-one. Instead, selected operating profiles are applied within a controlled setup that supports calibration, diagnostics, repeated validation, and the generation of well-documented datasets under repeatable conditions.
 
-This laboratory orientation allows different estimators to be compared under the same measurement chain, including classical observers and data-driven or neural methods executed directly on the STM32 controller. One hardware base can support multiple estimator variants without rebuilding the complete BMS around each method. The validation campaigns use duty cycles derived from decentralized stationary-storage applications because these systems form the intended use case and combine alternating charging, discharging, and idle periods with long autonomous operating intervals and limited maintenance access. These application-derived profiles exercise accumulated SOC drift, thermal variation, and history-dependent SOH estimation while remaining repeatable. The recorded quantities include voltage drift, current ripple, temperature gradients, and embedded estimator outputs. The profiles reproduce selected electrical and thermal demands of the target application, but not the complete variability of field operation. The resulting transfer limitations are discussed in Section~\ref{sec:overall_limitations}.
+This laboratory orientation allows different estimators to be compared under the same measurement chain, including classical observers and data-driven or neural methods executed directly on the STM32 controller. One hardware base can support multiple estimator variants without rebuilding the complete BMS around each method. The validation campaigns use duty cycles derived from decentralized stationary-storage applications because these systems form the intended use case and combine alternating charging, discharging, and idle periods with long autonomous operating intervals and limited maintenance access. These application-derived profiles exercise accumulated SOC drift, thermal variation, and history-dependent SOH estimation while remaining repeatable. The recorded quantities include voltage drift, current ripple, temperature gradients, and embedded estimator outputs. The profiles reproduce selected electrical and thermal demands of the target application, but not the complete variability of field operation. Figure~\ref{fig:bms_board_render} shows the physical laboratory platform on which these functions are integrated. The resulting transfer limitations are discussed in Section~\ref{sec:overall_limitations}.
 
 \begin{figure}[H]
     \centering
@@ -1556,7 +1571,7 @@ This laboratory orientation allows different estimators to be compared under the
 \end{figure}
 
 \subsection{Hardware Architecture}
-The Custom BMS Platform can be understood as three tightly coupled hardware domains: the TLE9012DQU-based sensing and balancing stage, the current-measurement and protection interface, and the controller/communication island around the dual-core STM32H755. The board layout keeps the high-current zone, shunt, and relay path physically separated from the low-voltage controller and communication domain. This separation matters not only for safety, but also for electromagnetic compatibility and stable measurement quality.
+The Custom BMS Platform can be understood as three tightly coupled hardware domains: the TLE9012DQU-based sensing and balancing stage, the current-measurement and protection interface, and the controller/communication island around the dual-core STM32H755. The board layout keeps the high-current zone, shunt, and relay path physically separated from the low-voltage controller and communication domain. This separation matters not only for safety, but also for electromagnetic compatibility and stable measurement quality. Figure~\ref{fig:bms_system_block} summarizes the signal and control paths between these domains.
 
 The Infineon TLE9012DQU forms the measurement backbone of the pack. In the present 4s platform configuration, it supervises four series-connected cells with buffered RC filtering and provides cell-voltage and temperature acquisition together with passive balancing capability. The active front-end includes balancing circuitry, while unused monitor inputs are terminated according to the 12-to-4 cell adaptation of the reference design so that measurement integrity is preserved on the active channels. Temperature instrumentation is extended beyond the standard TLE inputs by an NTC harness that can connect additional probes at cell terminals, busbars, or ambient reference points, which provides a finer spatial thermal picture during ageing and state-estimation tests. The controller domain uses an STM32H755ZITx dual-core microcontroller. This design choice is central because it creates a clean architectural separation between conventional BMS functionality and the estimator layer investigated in this work.
 
@@ -1755,483 +1770,7 @@ Within the present work, this chapter should therefore not be read as a claim th
 
 This baseline role is important for the broader research argument. Once a workable representation for ageing information has been identified, the next question is no longer only how well the estimator performs under nominal conditions, but how different estimator classes behave under deployment-relevant disturbances such as bias, noise, missing samples, and initialization errors. This motivates the shift toward the robustness benchmark in the following chapter. Building on this robustness perspective, the later chapters extend the analysis to recurrent LSTM and MLP models for SOC and SOH estimation, where the aim is no longer only to compare estimator concepts at a general level, but to examine whether stateful recurrent models offer advantages when temporal information has to be processed causally over long streaming sequences and ultimately transferred to embedded microcontroller execution.
 
-\chapter{Robustness Benchmarking of Embedded Battery State Estimation}
-\label{chap:robustness}
-The preceding chapter established a nominal data-driven starting point by showing how temporal and throughput information can support SOH estimation. The present chapter advances the research path from constructing one estimator to comparing different estimation principles under a common validation framework. It therefore forms the methodological link between representation design in Chapter~\ref{chap:ageing} and model--hardware optimization in Chapter~\ref{chap:embedded}. This separation is deliberate: the construction of an estimator and the comparative assessment of its behaviour address different stages of the development process.
-
-The direct-measurement, model-based, hybrid, and data-driven foundations required for the comparison are introduced in Chapter~\ref{chap:foundations} and summarized in Figure~\ref{fig:robustness_estimator_families}. Section~\ref{sec:robustness_objective} develops the motivation and precise objective of the benchmark. The subsequent sections define the common test protocol, apply it to the four estimator classes, and derive the validation perspective carried into the embedded implementation.
-
-\section{Motivation and Study Objective}
-\label{sec:robustness_objective}
-Reliable SOC and SOH estimation shapes safety margins, usable energy, operating limits, charge control, and degradation-aware management in mobile and stationary battery systems.\autocite{shrivastavaReviewTechnologicalAdvancement2023,guoSystematicReviewElectrochemical2024,yaoSmarterBatteryManagement2025b} Clean-condition accuracy is not sufficient for this purpose because real BMS operation is exposed to sensor bias, additive noise, missing samples, irregular timing, restart-related initialization mismatch, and transient signal spikes.\autocite{liRobustnessSOCEstimation2015,naseriReliableWirelessBMS2025,bergerBenchmarkingBatteryManagement2024}
-
-The literature provides extensive results for individual estimator families, but shared cross-family disturbance protocols remain less common. A direct integrator, a voltage-corrected observer, and a recurrent neural estimator can obtain similar average errors for different reasons and can therefore fail differently when the same input is disturbed. This comparison problem is not unique to battery estimation. It also occurs in sensor-fusion and autonomous systems whenever different estimators process the same imperfect measurements through different correction mechanisms. In a BMS, the issue is especially relevant because SOC and SOH estimates influence usable-energy limits, charge control, and degradation-aware operation. This chapter addresses the comparison gap by treating estimator quality as three connected properties: nominal baseline accuracy, convergence after state inconsistency, and robustness under disturbed measurements or measurement-continuity faults. Section~\ref{sec:robustness_metrics} defines how these properties are represented by baseline errors, disturbance-related error changes, local response metrics, and recovery times before they are used in the result interpretation.
-
-The central objective is a measurement-only robustness benchmark that isolates estimator-side responses from hardware-resource optimization and implementation-effort differences. Only measured inputs, sample availability, and sample timing are disturbed. The scenarios cover constant sensor offsets and noise, short-lived signal disturbances, interruptions or irregularities in the measurement stream, and initialization mismatch. Figure~\ref{fig:robustness_disturbance_taxonomy} groups these cases by disturbance origin, while Table~\ref{tab:robustness_scenario_protocol} defines the individual scenarios and their numerical settings. All cases remain physically interpretable and allow estimator failure modes to be compared under reproducible conditions.
-
-The benchmark compares four concrete estimators that instantiate the general families introduced in Figure~\ref{fig:robustness_estimator_families}. The \emph{direct-measurement estimator} (DM) represents the direct approach through fixed-capacity charge integration. The \emph{hybrid direct-measurement model} (HDM) retains this integration principle but adapts the effective capacity using a shared online SOH estimate. The \emph{hybrid equivalent-circuit model} (HECM) starts from the model-based family and combines a physical equivalent-circuit observer with the same SOH context and voltage-residual correction. The \emph{data-driven estimator} (DD) represents the neural family and learns the temporal relation between the causal input sequence and SOC. DM and DD therefore provide the direct-measurement and data-driven endpoints of the comparison, while HDM and HECM form two hybrid paths derived from direct integration and model-based observation, respectively. All four estimators process the same causal measurement stream, and the SOH information is kept consistent across the SOH-aware variants. This design isolates the effect of the SOC correction mechanism and supports decision-oriented model selection rather than a claim that one estimator family is universally superior.
-
-\section{Estimator Portfolio and Benchmark Methodology}
-\subsection{Estimator classes under test}
-Figure~\ref{fig:robustness_methodology} summarizes the benchmark chain from measured signals to online feature reconstruction, disturbance injection, estimator execution, and global or local performance evaluation. The comparison covers four estimator classes with deliberately different correction mechanisms: DM is the fixed-capacity Coulomb-counting reference, HDM adds capacity adaptation through the shared online SOH estimate, HECM adds voltage-residual feedback through a SOH-aware two-RC observer,\autocite{gaoEnhancedStateofchargeEstimation2022,guoSystematicReviewElectrochemical2024} and DD represents the compact recurrent neural estimator with stateful GRU-based SOC prediction.\autocite{mondalEstimatingStateofChargeLithiumIon2024,yaoSmarterBatteryManagement2025b}
-
-HDM, HECM, and DD all use the same LSTM-based online SOH estimator. The benchmark therefore compares how the SOC estimators use a common health context instead of comparing different SOH backbones. The causal online quantities required by several estimators, especially cumulative charge $Q_c$, equivalent full cycles $\mathrm{EFC}$, derivatives, and hourly SOH aggregates, are reconstructed from the measured stream during benchmark execution. This prevents precomputed dataset-side features from entering only one estimator class.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{robustness_methodology.png}
-    \caption[Robustness-benchmark methodology.]{Methodology overview of the robustness benchmark. Measured current, voltage, temperature, and time signals are first converted into causal online auxiliary quantities such as cumulative charge $Q_c$, derivative channels, equivalent full cycles $\mathrm{EFC}$, and shared SOH context. The resulting online stream is then processed by the four estimator classes under matched execution conditions, exposed to measurement-only disturbance scenarios, and finally evaluated through global and local performance metrics that separate baseline accuracy, convergence behavior, and disturbed-operation robustness.}
-    \label{fig:robustness_methodology}
-\end{figure}
-
-\subsection{SOC estimation methods}
-\subsubsection{Direct-measurement model (DM)}
-The overview in Figure~\ref{fig:robustness_methodology} is implemented through four estimator variants that differ in their SOC correction mechanism, but share the same causal measurement stream. The direct measurement branch first constructs the cumulative charge state
-\begin{equation}
-    Q_c(k)=Q_c(k-1)+\frac{I_k\Delta t_k}{3600\,\mathrm{s\,h^{-1}}},
-    \label{eq:robustness_qc_update}
-\end{equation}
-where $I_k$ is the measured current and $\Delta t_k$ is the elapsed time between two samples. The division by $3600\,\mathrm{s\,h^{-1}}$ converts the current-time product into ampere-hours. In the DM estimator this charge state is mapped to SOC with a fixed nominal capacity,
-\begin{equation}
-    \widehat{\mathrm{SOC}}_{\mathrm{DM}}(k)
-    =
-    \mathrm{clip}\!\left(1+\frac{Q_c(k)}{C_{\mathrm{nom}}},0,1\right).
-    \label{eq:robustness_soc_dm}
-\end{equation}
-
-\subsubsection{Hybrid direct-measurement model (HDM)}
-The same integration core is also used in the HDM estimator. The difference is that the denominator is updated through the shared online SOH estimate,
-\begin{equation}
-    C_{\mathrm{eff}}(k)=C_{\mathrm{nom}}\cdot\widehat{\mathrm{SOH}}(k),
-    \label{eq:robustness_ceff}
-\end{equation}
-which gives the hybrid direct-measurement SOC estimate
-\begin{equation}
-    \widehat{\mathrm{SOC}}_{\mathrm{HDM}}(k)
-    =
-    \mathrm{clip}\!\left(1+\frac{Q_c(k)}{C_{\mathrm{eff}}(k)},0,1\right).
-    \label{eq:robustness_soc_hdm}
-\end{equation}
-DM and HDM therefore differ only in the assumed usable capacity. Both variants keep the same constant-voltage full-charge reset logic: if the upper-voltage condition is sustained for the configured duration, the internal charge state is reset to $Q_c=0$ and the SOC estimate is anchored at full charge.
-
-\subsubsection{Hybrid equivalent-circuit model (HECM)}
-The HECM extends the current-driven charge balance with voltage-residual correction. It is implemented as a two-RC observer with state vector
-\begin{equation}
-    \mathbf{x}_k=
-    \begin{bmatrix}
-        \widehat{\mathrm{SOC}}_k & U_{1,k} & U_{2,k}
-    \end{bmatrix}^{\top},
-    \label{eq:robustness_hecm_state}
-\end{equation}
-where $U_{1,k}$ and $U_{2,k}$ denote the polarization voltages of the two RC branches. The prediction step uses the previous current sample and propagates the state according to
-\begin{equation}
-    \mathbf{x}_{k}^{-}=\mathbf{A}_k\mathbf{x}_{k-1}+\mathbf{b}_kI_{k-1},
-    \label{eq:robustness_hecm_prediction}
-\end{equation}
-with
-\begin{equation}
-    \mathbf{A}_k=
-    \mathrm{diag}\!\left(1,e^{-\Delta t_k/\tau_1},e^{-\Delta t_k/\tau_2}\right),
-    \qquad
-    \mathbf{b}_k=
-    \begin{bmatrix}
-        \eta\Delta t_k/C_b\\
-        R_1\!\left(1-e^{-\Delta t_k/\tau_1}\right)\\
-        R_2\!\left(1-e^{-\Delta t_k/\tau_2}\right)
-    \end{bmatrix}.
-    \label{eq:robustness_hecm_ab}
-\end{equation}
-Here $C_b=C_0\widehat{\mathrm{SOH}}$ is the SOH-scaled capacity used by the observer. The voltage prediction used for the correction step is
-\begin{equation}
-    \widehat{U}_k
-    =
-    \mathrm{OCV}\!\left(\widehat{\mathrm{SOC}}_k,\widehat{\mathrm{SOH}}_k,I_k\right)
-    +U_{1,k}+U_{2,k}+R_iI_k .
-    \label{eq:robustness_hecm_voltage}
-\end{equation}
-The Kalman correction then uses the residual between this predicted terminal voltage and the measured voltage to update the internal state. The parameters $R_i$, $R_1$, $R_2$, $\tau_1$, $\tau_2$, $\mathrm{OCV}$, and $\mathrm{dOCV}/\mathrm{dSOC}$ are not treated as constants. Instead, they are interpolated from pre-identified SOC/SOH lookup surfaces with separate charge and discharge parameterizations. This is the main structural reason why HECM can re-anchor the integrated SOC estimate through voltage information while still using the same online SOH context as HDM and DD.
-
-\subsubsection{Data-driven SOC model (DD)}
-The DD estimator uses a stateful GRU instead of an explicit observer equation. At each online time step it receives the feature vector
-\begin{equation}
-    \mathbf{z}_k=
-    \begin{bmatrix}
-        U_k & I_k & T_k & \widehat{\mathrm{SOH}}_k & Q_c(k) &
-        \frac{\mathrm{d}U}{\mathrm{d}t}(k) &
-        \frac{\mathrm{d}I}{\mathrm{d}t}(k) &
-        \Delta t_k
-    \end{bmatrix}^{\top}.
-    \label{eq:robustness_dd_feature_vector}
-\end{equation}
-Figure~\ref{fig:robustness_dd_architecture}(a) shows the block structure of this model. In its floating-point base configuration, a single GRU layer with hidden size 96 processes the eight-channel feature vector. An MLP head with one hidden layer of size 96, ReLU activation, and a sigmoid output then maps the recurrent state to a SOC estimate constrained to $[0,1]$. The benchmark itself uses the deployment-prepared variant of this model, in which structured pruning reduces the hidden size from 96 to 67 and the weights are stored as INT8 values (Section~\ref{sec:robustness_embedded_preparation}). During training, the recurrent core is exposed to causal sequence segments of
-\begin{equation}
-    L_{\mathrm{SOC}}=2024
-    \label{eq:robustness_soc_sequence_length}
-\end{equation}
-consecutive time steps. During benchmark execution the same model is run statefully and causally, so the hidden state is carried forward sample by sample and the MLP head produces a continuous SOC trajectory without access to future samples.
-
-The derivative channels in the DD input are rebuilt online from the disturbed measurement stream,
-\begin{equation}
-    \frac{\mathrm{d}I}{\mathrm{d}t}(k)=\frac{I_k-I_{k-1}}{\Delta t_k},
-    \qquad
-    \frac{\mathrm{d}U}{\mathrm{d}t}(k)=\frac{U_k-U_{k-1}}{\Delta t_k}.
-    \label{eq:robustness_derivative_features}
-\end{equation}
-Together with the explicit $\Delta t_k$ channel, these quantities allow the neural model to distinguish local voltage or current dynamics from timing changes under irregular sampling. The inclusion of $Q_c(k)$ also ensures that the DD model receives the same charge-throughput information that drives DM and HDM.\autocite{mondalEstimatingStateofChargeLithiumIon2024,yaoSmarterBatteryManagement2025b}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{robustness_dd_architecture.png}
-    \caption[Architectures of the recurrent estimators in the benchmark.]{Block-level architectures of the data-driven estimator components used in the benchmark. (a)~The DD SOC estimator processes the eight online input channels with a single stateful GRU layer of hidden size 96, followed by an MLP head with one ReLU-activated hidden layer of size 96 and a sigmoid output. (b)~The shared SOH estimator forms a 20-dimensional hourly feature vector by computing four statistics for each of the five causal base signals $\{U,I,T,\mathrm{EFC},Q_c\}$, projects this vector through a two-layer feature-projection block of width 128, processes the projected sequence with a two-layer stateful LSTM of hidden size 160, and maps the recurrent representation through three residual MLP blocks and a prediction head of width 160. The deployment-prepared variants used in the benchmark are described in Section~\ref{sec:robustness_embedded_preparation}.}
-    \label{fig:robustness_dd_architecture}
-\end{figure}
-
-\subsection{SOH estimation method}
-HDM, HECM, and DD all use the same LSTM-based SOH estimator. Its input is reconstructed causally from the five online base signals $\{U,I,T,\mathrm{EFC},Q_c\}$. For every hourly update, the mean, standard deviation, minimum, and maximum are computed over the samples contained in the respective hour. The resulting SOH input is therefore not a set of 20 independently measured channels, but a 20-dimensional feature vector obtained from five base signals and four aggregation statistics per signal.\autocite{Embedded_AI_SOH_badData,gouEnsembleLearningBasedDataDriven2021,liOnlineCapacityEstimation2021,rzepkaNeuralNetworkArchitecture2023a}
-
-Figure~\ref{fig:robustness_dd_architecture}(b) summarizes the architecture. The first stage is a learned feature-projection block with two linear layers of width 128, layer normalization, GELU activation, and dropout. This block rescales and combines the heterogeneous hourly statistics into a learned 128-dimensional feature vector before recurrent processing. The projection allows the subsequent LSTM to operate on combinations of the statistics that are relevant to SOH estimation instead of treating every raw statistic independently. The second stage is a two-layer unidirectional LSTM with hidden size 160. It is operated strictly causally: hidden and cell states are forwarded from one hourly aggregate to the next, and no future measurements are used. The third stage consists of three residual MLP blocks with width 160. In compact form, each residual block refines the recurrent representation as
-\begin{equation}
-    \mathbf{y} = \mathrm{LayerNorm}\!\left(\mathbf{x} + \mathrm{Dropout}\!\left(W_2\,\mathrm{GELU}(W_1\mathbf{x})\right)\right),
-    \label{eq:robustness_soh_residual_block}
-\end{equation}
-so that the block learns a correction to the LSTM representation instead of replacing it completely. A final prediction head of width 160 maps the refined representation to one scalar SOH estimate for the current hourly step.
-
-During benchmark execution the first SOH output is anchored with the configured initial SOH value, and later estimates are held piecewise constant between hourly updates. This common health context is then consumed differently by the SOC estimators: HDM uses it through $C_{\mathrm{eff}}$, HECM uses it in the observer capacity and lookup scheduling, and DD receives it as one channel of its recurrent SOC input. The deployment-prepared SOH-LSTM variant used for the footprint-constrained benchmark is described in Section~\ref{sec:robustness_embedded_preparation}.
-
-\subsection{Embedded Model Preparation}
-\label{sec:robustness_embedded_preparation}
-The benchmark focuses on estimator behavior under disturbed measurements, but the compared variants are still constrained by an embedded reference budget. All four estimator classes are selected and prepared so that they remain deployable on a common STM32H755ZI-class target with a conservative \SI{1}{MB} flash and \SI{1}{MB} RAM reference limit. This prevents an unfair comparison between compact analytical estimators and neural models that would only work as large offline networks.
-
-DM requires no compression because it consists only of the scalar charge-state update and the associated reset logic. HECM also does not require neural-network compression, but its flash demand is dominated by the two SOH$\times$SOC lookup grids for charge and discharge parameterization of the ECM observer. The neural components used by HDM and DD are deployment-prepared before the robustness benchmark. For the SOC-GRU, structured width reduction and short finetuning reduce the hidden size from 96 to 67, followed by INT8 weight quantization. For the SOH-LSTM, the deployment-prepared variant uses hidden size 112 after width reduction, finetuning, and INT8 quantization. The resulting reusable component footprints are listed in Table~\ref{tab:robust_component_footprints}.
-
-The table is a component-level estimate rather than a list of the four complete estimator variants. The complete variants are obtained by combining the SOC core used by each estimator with the shared SOH-LSTM where applicable: DM consists only of the Coulomb-counting core, HDM combines the Coulomb-counting core with the SOH-LSTM, HECM combines the 2RC observer with the SOH-LSTM, and DD combines the SOC-GRU with the SOH-LSTM. This gives lower-bound persistent footprints of 4.2 KiB flash and 16 B RAM for DM, 412.5 KiB and 1808 B for HDM, 850.8 KiB and 1844 B for HECM, and 436.2 KiB and 2060 B for DD. These RAM values count only architecture-intrinsic persistent numerical states, not temporary buffers, stack usage, framework overhead, or complete runtime memory. They therefore provide a strict lower bound, but they show that all four deployment-prepared benchmark variants stay below the \SI{1}{MB} flash and RAM reference limits.
-
-\begin{table}[H]
-    \centering
-    \small
-    \caption[Reusable estimator-component footprints.]{Estimated persistent flash and RAM footprints of the reusable estimator components used in the deployment-prepared benchmark variants. For the recurrent neural components, flash estimates refer to the structured-pruned, finetuned, and INT8-quantized versions. Persistent RAM counts only architecture-intrinsic numerical states. Temporary buffers, framework overhead, stack usage, and system-level runtime memory are excluded.}
-    \label{tab:robust_component_footprints}
-    \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{3.4cm}rr>{\raggedright\arraybackslash}X}
-        \toprule
-        Component & Flash [KiB] & Persistent RAM [B] & Basis \\
-        \midrule
-        DM core (Coulomb counting) & 4.2 & 16 & Four persistent scalar states in the online update logic \\
-        SOC-GRU core & 27.9 & 268 & One recurrent hidden state with size 67 stored as float32 \\
-        SOH-LSTM core & 408.3 & 1792 & Two-layer LSTM with hidden and cell states of size 112 stored as float32 \\
-        HECM core (2RC observer) & 442.5 & 52 & Flash dominated by two SOH$\times$SOC parameter tables for charge and discharge parameterization. RAM: observer state $x \in \mathbb{R}^{3}$, covariance $P \in \mathbb{R}^{3 \times 3}$, previous current \\
-        \bottomrule
-    \end{tabularx}
-\end{table}
-
-\subsection{Disturbance Scenario Design}
-The benchmark perturbs only signals that a BMS controller would actually receive from its sensors: current, voltage, temperature, sample availability, and sampling timing. Model-internal quantities, such as LSTM hidden states or the model weights themselves, are never modified directly. This restriction keeps all disturbance scenarios physically interpretable: every failure mode tested corresponds to something that can go wrong at the sensor, wiring, or communication layer of a real embedded system, rather than to artificial tampering with the estimator internals.\autocite{bergerBenchmarkingBatteryManagement2024}
-
-The disturbance cases are grouped according to the point at which the online estimation process is affected:
-\begin{itemize}
-    \item Input disturbances alter the measured current, voltage, or temperature, or represent finite acquisition resolution.
-    \item Initialization mismatch introduces an incorrect starting condition and tests whether the estimator can re-synchronize.
-    \item Measurement-continuity and timing faults alter sample availability, update timing, or the duration for which an input remains frozen.
-\end{itemize}
-Figure~\ref{fig:robustness_disturbance_taxonomy} summarizes these three groups. The numerical levels in Table~\ref{tab:robustness_scenario_protocol} represent realistic acquisition limits, adverse but plausible measurement disturbances, and deliberate stress cases for recovery analysis.\autocite{BQ7961616SeriesBattery2023,DesignConsiderationsCurrent,TMCS11083Functional,TLE4972HighPrecision,aielloElectromagneticSusceptibilityBattery2020,liuAssessingImpactSampling2025} During every run, all four estimators receive the identical disturbed sensor time series, namely the same modified sequence of voltage, current, temperature, and timing samples, so that any difference in output is attributable to estimator structure rather than to differences in the input. Each estimator then reconstructs its auxiliary quantities (cumulative charge $Q_c$, equivalent full cycles $\mathrm{EFC}$, current derivative, hourly SOH aggregates) causally and online from this disturbed time series, not from precomputed clean dataset columns. A sensor bias therefore propagates into the derived features exactly as it would in a real BMS, which keeps the comparison physically consistent across all estimator classes.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{robustness_disturbance_taxonomy.png}
-    \caption[Robustness-benchmark disturbance taxonomy.]{Disturbance taxonomy used in the robustness benchmark. Input disturbances, initialization mismatch, and measurement-continuity faults are separated so that drift, loss of correction, delayed recovery, and transient instability can be interpreted as different estimator-side effects.}
-    \label{fig:robustness_disturbance_taxonomy}
-\end{figure}
-
-\begingroup
-\small
-\begin{longtable}{@{}>{\raggedright\arraybackslash}p{2.6cm}>{\raggedright\arraybackslash}p{5.6cm}>{\raggedright\arraybackslash}p{5.6cm}@{}}
-\caption[Robustness-benchmark scenario protocol.]{Scenario protocol used in the robustness benchmark. The entries define the fixed disturbance settings and the practical motivation behind each measurement or continuity/timing case.}
-\label{tab:robustness_scenario_protocol}\\
-\toprule
-Scenario & Benchmark setup & Practical rationale \\
-\midrule
-\endfirsthead
-\multicolumn{3}{@{}l}{\small\textit{Table~\thetable\ continued from the previous page}}\\
-\toprule
-Scenario & Benchmark setup & Practical rationale \\
-\midrule
-\endhead
-\midrule
-\multicolumn{3}{r@{}}{\small\textit{Continued on the next page}}\\
-\endfoot
-\bottomrule
-\endlastfoot
-ADC quantization & $\Delta I=\SI{0.01}{A}$, $\Delta U=\SI{0.005}{V}$, $\Delta T=\SI{0.5}{\celsius}$ & Deployment-level discretization, sensor scaling, and rounding effects in embedded acquisition chains.\autocite{BQ7961616SeriesBattery2023,DesignConsiderationsCurrent,10sBatteryPack} \\
-Current bias & Constant $+\SI{0.05}{A}$ in the compact matrix, with an additional sweep of 0.5\%, 1.5\%, and 3.0\% of $|I|_{\max}$ & Sensor offset, gain error, miscalibration, and long-term drift stress on integration-driven estimators.\autocite{DesignConsiderationsCurrent,TMCS11083Functional,TLE4972HighPrecision} \\
-Current noise & Gaussian noise with $\sigma_I=\SI{0.10}{A}$ in the compact matrix, with a local-detail sweep up to $\sigma_I=\SI{0.20}{A}$ & Adverse current-measurement noise and noise-driven disturbance propagation.\autocite{liRobustnessSOCEstimation2015,naseriReliableWirelessBMS2025} \\
-Voltage noise & Additive Gaussian noise with $\sigma_U=\SI{0.01}{V}$ & Wiring noise, front-end noise, insufficient filtering, and EMI-sensitive correction channels.\autocite{liRobustnessSOCEstimation2015,BQ7961616SeriesBattery2023,aielloElectromagneticSusceptibilityBattery2020} \\
-Temperature noise & Additive Gaussian noise with $\sigma_T=\SI{1.0}{\celsius}$ & Sensor tolerance, conversion noise, thermal gradients, and sensor-to-cell mismatch.\autocite{10sBatteryPack,wangFusionEstimationLithiumion2022} \\
-Initial SOC mismatch & Additive initial mismatch of $-0.10$ SOC, corresponding to a 10-percentage-point offset. In DD, this is realized through perturbed online $Q_c$ & Restart conditions, missing recent history, or weak initial anchoring under practical deployment.\autocite{liRobustnessSOCEstimation2015,gaoEnhancedStateofchargeEstimation2022} \\
-Missing samples & Every 50th sample frozen on the nominal \SI{1}{s} grid & Packet loss, blocked updates, logger dropouts, or periodic frozen-data events.\autocite{naseriReliableWirelessBMS2025,liuAssessingImpactSampling2025} \\
-Irregular sampling & Uniform timing jitter of $\pm\SI{0.1}{s}$ around the nominal \SI{1}{s} grid & Scheduling jitter, bus latency, and asynchronous acquisition timing.\autocite{bergerBenchmarkingBatteryManagement2024,naseriReliableWirelessBMS2025,liuAssessingImpactSampling2025} \\
-Burst dropout & One central frozen gap of \SI{3600}{s} & Communication interruption, frozen tasks, or severe delayed-information recovery stress.\autocite{bergerBenchmarkingBatteryManagement2024,naseriReliableWirelessBMS2025} \\
-Voltage spikes & One single-sample spike of $\pm\SI{0.20}{V}$ every 1000 samples (\SI{1000}{s}) & Transient voltage-sample corruption caused by EMI or switching disturbances.\autocite{aielloElectromagneticSusceptibilityBattery2020} \\
-\end{longtable}
-\endgroup
-
-The compact scenario matrix gives one common protocol for the main result figures. Current bias and current noise are additionally examined through local sweeps, while ADC quantization remains included as a deployment-level sensing case even though it is not expected to dominate the ranking. In this form, the benchmark is a controlled estimator comparison under matched disturbances, not a complete validation of a production BMS.
-
-\subsection{Metrics and evaluation criteria}
-\label{sec:robustness_metrics}
-The benchmark evaluates three performance dimensions: nominal accuracy, convergence behavior after state inconsistency, and robustness under both longer-lasting and short-term measurement disturbances. These three dimensions are not independent post-hoc labels, but the aggregation logic used later in the result interpretation and in the decision-oriented synthesis. Nominal accuracy is read from the clean baseline run, robustness is read from the additional error caused by each disturbed scenario relative to that estimator's own baseline, and convergence is read from the time needed to return to a baseline-related error band after an imposed inconsistency or interrupted signal stream.
-
-For each estimator $m$ and disturbed scenario $s$, the main global robustness penalty is therefore defined as
-\begin{equation}
-    \Delta\mathrm{MAE}_{m,s}
-    =
-    \mathrm{MAE}_{m,s}
-    -
-    \mathrm{MAE}_{m,\mathrm{base}} .
-    \label{eq:robustness_delta_mae}
-\end{equation}
-Positive values indicate that the disturbance degrades the estimator relative to its own clean-operation reference. Values close to zero indicate that the disturbance does not materially change the full-trajectory average error. Global disturbed-operation performance is quantified through MAE, RMSE, bias, maximum error, and the $95$th percentile absolute error. MAE and RMSE describe the average error level, bias describes systematic over- or underestimation, the maximum error reports the single largest deviation, and P95 is the absolute-error value that \SI{95}{\percent} of all evaluated samples do not exceed. P95 therefore describes the larger-error range of the trajectory without being determined by the single worst sample.
-
-Local disturbance performance is additionally analysed through scenario-specific quantities such as jump counts, output variance, absolute-error variance, excess rolling MAE, recovery time, and aligned post-disturbance error, because several scenarios do not primarily manifest as a collapse of full-run MAE but as short-term output fluctuations, delayed drift, or slow re-synchronization. For scenarios with a defined disturbance onset and duration, the analysis divides the trajectory into the interval before the disturbance, the affected interval, and the interval after the input stream has returned to normal. This makes it possible to quantify error growth during the disturbance, recovery time after the event, and any residual error after the event. In the current benchmark phase, ADC quantization, current bias, voltage noise, temperature noise, missing samples, and irregular sampling are interpreted mainly through global metrics, whereas burst dropout, voltage spikes, current-noise detail, and initialization mismatch additionally require local evidence because their most relevant effects are episodic, recovery-related, or strongly localized in time.
-
-Recovery after initialization errors is interpreted through two baseline-relative operating bands rather than through one universal fixed threshold. This keeps the recovery criterion tied to the normal clean-condition performance level of each estimator and avoids judging models with very different baseline accuracy against the same absolute tolerance. The strict band is defined as
-\begin{equation}
-    B_{\mathrm{strict}}
-    =
-    \max\!\left(\mathrm{P95}_{\mathrm{base}},\,1.5\cdot\mathrm{MAE}_{\mathrm{base}}\right).
-    \label{eq:robustness_strict_band}
-\end{equation}
-In the strict criterion, $\mathrm{P95}_{\mathrm{base}}$ ensures that the recovery band includes the larger errors that already occur during clean baseline operation, while $1.5 \cdot \mathrm{MAE}_{\mathrm{base}}$ provides a minimum margin around the average baseline error. Taking the maximum of both terms means that recovery is judged against the more tolerant of these two baseline-derived limits, so recovery under this band means re-entry close to the normal baseline regime without imposing unrealistically narrow limits. The fair band is
-\begin{equation}
-    B_{\mathrm{fair}}
-    =
-    \max\!\left(2\cdot\mathrm{P95}_{\mathrm{base}},\,3\cdot\mathrm{MAE}_{\mathrm{base}},\,0.02\right),
-    \label{eq:robustness_fair_band}
-\end{equation}
-and acts as a more deployment-tolerant criterion for estimators that re-enter a practically acceptable operating range without immediately returning to their strict near-baseline regime. The lower bound of $0.02$ avoids unrealistically tight fair-band thresholds for very accurate baseline models. Both recovery bands require sustained re-entry over a fixed horizon so that the reported recovery times reflect stable resynchronization rather than an accidental short crossing of the threshold.
-
-Reporting both bands avoids making the recovery conclusion depend on one manually chosen limit. If an estimator returns only to the fair band, it has reached a practically acceptable range but not its near-baseline regime. If it also returns to the strict band, the recovery is stronger. This multi-scale metric design therefore evaluates performance as a structured combination of nominal accuracy, convergence behavior, global degradation, local disturbance response, and long-term drift.
-
-\begingroup
-\small
-\begin{longtable}{@{}>{\raggedright\arraybackslash}p{2.2cm}>{\raggedright\arraybackslash}p{3.8cm}>{\raggedright\arraybackslash}p{4.7cm}>{\raggedright\arraybackslash}p{3.1cm}@{}}
-\caption[Connection between raw metrics and result dimensions.]{Connection between raw benchmark metrics, result figures, and the three performance dimensions used in the robustness interpretation. The table makes explicit how the later statements on accuracy, robustness, and recovery/convergence are derived from the same metric set rather than from separate evaluation criteria.}
-\label{tab:robustness_metric_dimensions}\\
-\toprule
-Dimension & Primary metric evidence & Role in the result interpretation & Typical result sections \\
-\midrule
-\endfirsthead
-\multicolumn{4}{@{}l}{\small\textit{Table~\thetable\ continued from the previous page}}\\
-\toprule
-Dimension & Primary metric evidence & Role in the result interpretation & Typical result sections \\
-\midrule
-\endhead
-\midrule
-\multicolumn{4}{r@{}}{\small\textit{Continued on the next page}}\\
-\endfoot
-\bottomrule
-\endlastfoot
-Nominal accuracy & Baseline MAE, RMSE, P95 absolute error, maximum error, and bias from the undisturbed run & Quantifies clean-sensing estimator quality before any robustness penalty is applied. This is why an estimator can lead in accuracy even if it is not the most robust under disturbances. & Baseline performance and decision-oriented accuracy score \\
-Disturbed-scenario robustness & $\Delta\mathrm{MAE}_{m,s}$ relative to the estimator's own baseline, complemented by disturbed-window MAE, P95 error, maximum error, bias, jump counts, and local excess rolling MAE where needed & Quantifies how strongly each disturbance changes the estimator's behavior. This supports scenario-specific robustness claims instead of ranking models only by absolute disturbed MAE. & Current bias, noise sensitivity, continuity/timing faults, voltage spikes, cross-scenario comparison \\
-Convergence and recovery & First sustained re-entry into the strict or fair baseline-related error band after initialization mismatch or signal interruption. Non-recovery inside the inspected window is treated as weakest evidence & Quantifies whether an estimator can return to a useful operating regime after state inconsistency. This explains why recovery behavior is evaluated separately from both clean accuracy and global disturbed-operation MAE. & Initialization mismatch, burst-dropout recovery, decision-oriented recovery score \\
-\end{longtable}
-\endgroup
-
-For the decision-oriented synthesis in Section~\ref{sec:robustness_decision_interpretation}, the same logic is condensed into relative lower-is-better scores across the four estimator classes. The accuracy score is based on the clean baseline errors, the robustness score is based on $\Delta\mathrm{MAE}$ across the disturbed scenarios, and the recovery score is based on recovery time after initialization mismatch. This aggregation is used only as a compact decision aid. The individual scenario figures and local recovery analyses remain the primary evidence for the detailed conclusions.
-
-\section{Feature Reconstruction and Experimental Protocol}
-The benchmark uses one representative trajectory from the LFP DoE Cycle Ageing Dataset described in Section~\ref{sec:datasets}.\autocite{lfpDoeCycleAgingDataset2025} It extends from early-life operation into low-SOH operation, including sections below the common \SI{80}{\percent} end-of-life reference level. All estimator classes receive this same trajectory and are evaluated against the fixed SOC and SOH labels defined in Equations~\ref{eq:robustness_reference_soh} and~\ref{eq:robustness_reference_soc}.
-
-\subsection{Causal online feature reconstruction}
-The benchmark reconstructs every online feature from the same current, voltage, temperature, and timing stream received by the respective estimator. These features include cumulative charge $Q_c$, equivalent full cycles $\mathrm{EFC}$, the derivative channels $dU/dt$ and $dI/dt$, and hourly SOH-context aggregates. The channels $\{U,I,T,\mathrm{EFC},Q_c\}$ are summarized over each hourly interval by their mean, standard deviation, minimum, and maximum.
-
-The EFC feature is reconstructed from absolute charge throughput,
-\begin{equation}
-    Q_{\mathrm{thr}}(k)=\sum_{j=1}^{k}\frac{|I_j|\Delta t_j}{3600},
-    \qquad
-    \mathrm{EFC}(k)=\frac{Q_{\mathrm{thr}}(k)}{C_{\mathrm{nom}}}.
-    \label{eq:robustness_efc}
-\end{equation}
-Here, $C_{\mathrm{nom}}$ is the nominal cell capacity used in the benchmark feature pipeline. Unlike the SOC and SOH labels, $\mathrm{EFC}$ is an online feature and is therefore recomputed from the current and timing stream of each benchmark run.
-
-This distinction is central to the disturbance design. The reference labels remain unchanged for scoring, whereas $Q_c$, $\mathrm{EFC}$, $dU/dt$, $dI/dt$, and the hourly aggregates are rebuilt from the clean or disturbed inputs. A current bias therefore changes not only the measured current but also every causal feature that depends on current. This prevents undisturbed dataset-side variables from leaking into a disturbed benchmark run.
-
-\subsection{Test trajectory and benchmark scenarios}
-All estimator classes are run on the same benchmark trajectory and the same scenario protocol from Table~\ref{tab:robustness_scenario_protocol}. This ensures that differences in the results are attributable to estimator structure and disturbance propagation rather than to different data splits or label definitions. The reported scenarios cover the nominal baseline, current bias, additive current noise, voltage noise, temperature noise, initial SOC mismatch, missing samples, irregular sampling, burst dropout, voltage spikes, and ADC quantization. Together they probe long-term integration drift, voltage-correction sensitivity, disturbance propagation through derived features, frozen updates, timing uncertainty, and local post-event recovery. Input disturbances are applied directly to measured channels, initialization errors are injected only where structurally meaningful, and continuity/timing cases manipulate sample availability or timing while preserving online execution logic.
-
-\subsection{Stateful Online Implementation}
-All compared estimators are executed under online conditions. Disturbed inputs are processed sample by sample, and the required auxiliary quantities are rebuilt directly from the disturbed signals rather than copied from precomputed dataset columns. This applies in particular to $Q_c$, $\mathrm{EFC}$, $dU/dt$, $dI/dt$, and the hourly SOH aggregates, so that no hidden dataset-side variables leak into the benchmark runs.
-
-For the recurrent neural estimators, the benchmark uses the intended stateful embedded execution mode. The SOH-LSTM carries its hidden and cell states from one hourly update to the next, while the SOC-GRU preserves its recurrent state along the sample-wise measurement stream. The neural variants used in the benchmark correspond to the compact pruned-and-quantized architectures introduced above. In freeze and dropout scenarios, disturbance propagation is handled consistently by freezing or distorting the derived online features together with the corresponding measured inputs, which is necessary for a physically meaningful comparison between model classes.
-
-The direct-measurement estimators include the same sustained-CV full-charge reset criterion that is also used to define the full-charge reference point in preprocessing, whereas the data-driven initial-SOC test is implemented through an initial offset of the online $Q_c$ feature because the neural estimator does not expose an explicit SOC state variable. The simulation environment therefore keeps the base nominal capacity used for online feature reconstruction fixed across all estimator classes, while all models receive the same disturbed input streams and are evaluated against the same reference labels and global and local metrics. This is one of the main reasons why the benchmark remains close to later embedded deployment: the estimators are not evaluated as offline regressors, but as causal state estimators under matched measurement-side constraints.
-
-\section{Robustness Benchmark Results}
-The following evaluation uses the clean benchmark trajectory as the reference point and then examines how each estimator changes when the same online signal stream is affected by bias, noise, missing data, timing faults, spikes, ADC quantization, or initialization mismatch. The results are therefore organized not only by global error level, but also by local recovery and transient behaviour, because deployment quality depends on both the magnitude of the error and the way in which it develops over time. Numerical SOC errors are kept on the normalized 0 to 1 scale used in the benchmark tables and figures, while percentage-point equivalents are given in the prose where they support interpretation.
-
-\subsection{Baseline performance}
-Under clean measurements, the hybrid direct-measurement model is the nominal-accuracy leader on the selected ageing benchmark trajectory. It reaches $\mathrm{MAE}=0.0024$ (\SI{0.24}{\percent}), followed by HECM with $0.0090$ (\SI{0.90}{\percent}), DD with $0.0100$ (\SI{1.00}{\percent}), and DM with $0.0311$ (\SI{3.11}{\percent}). This baseline ranking is the reference point for the later $\Delta\mathrm{MAE}$ comparisons and recovery bands, but it is not yet a deployment recommendation by itself. The complete baseline metric set, including RMSE, P95 error, maximum error, and signed bias, is listed in Appendix Table~\ref{tab:robustness_appendix_baseline_metrics}. Figure~\ref{fig:robustness_baseline} visualizes the same clean-condition comparison.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{robustness_baseline.png}
-    \caption[Baseline performance on the benchmark trajectory.]{Baseline performance on the selected ageing benchmark trajectory. The summary compares the nominal MAE, RMSE, 95th-percentile error, and signed bias of the four estimator classes and therefore provides the clean-condition reference point for all later disturbed-scenario comparisons. The hybrid direct-measurement model provides the lowest baseline error, whereas the direct-measurement model shows the largest nominal deviation. Error values shown in the figure are SOC fractions on a 0 to 1 scale. Multiplication by 100 gives percentage points.}
-    \label{fig:robustness_baseline}
-\end{figure}
-
-\subsection{Current-bias sensitivity}
-Persistent current bias is the most severe integration stress in the benchmark. The dedicated sweep applies offsets of $0.5\%$, $1.5\%$, and $3.0\%$ of the maximum absolute current of the benchmark trajectory, so the percentages describe the bias magnitude relative to $|I|_{\max}$ rather than an error percentage of SOC. Across this sweep, HECM remains the most robust estimator, DD is intermediate, and DM and HDM degrade strongly because the biased current accumulates directly through their integration path. For the strongly biased case reported in the compact scenario matrix, HECM reaches $\mathrm{MAE}=0.0932$, whereas DD, HDM, and DM increase to $0.2859$, $0.3068$, and $0.3143$, respectively. The full MAE, RMSE, and P95 values are collected in Appendix Table~\ref{tab:robustness_appendix_key_results}. Figure~\ref{fig:robustness_current_bias} shows the corresponding local bias example, sweep trend, and trajectory divergence.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{robustness_current_bias.png}
-    \caption[Current-bias sensitivity.]{Sensitivity to current-measurement bias. The figure combines a representative local example of the applied bias, the global degradation of SOC accuracy across the matched bias sweep, and the resulting SOC divergence over time for a strongly biased case. Together, these views show why persistent current bias clearly separates the integration-based estimators from the voltage-corrected observer variant.}
-    \label{fig:robustness_current_bias}
-\end{figure}
-
-\subsection{Noise sensitivity}
-The noise block is interpreted separately from the current-bias scenario because the injected noise terms are zero-mean disturbances rather than persistent offsets. The relevant question is therefore not only whether SOC drifts over the full trajectory, but also how a corrupted measurement channel propagates into observer correction, neural input features, and local output variability. For current noise, this propagation occurs through the measured current itself and through current-derived quantities such as $Q_c$, $\mathrm{d}I/\mathrm{d}t$, EFC, and the hourly SOH aggregation. In the compact benchmark matrix, the high-current-noise case uses $\sigma_I=\SI{0.10}{A}$. The additional sweep in Figure~\ref{fig:robustness_noise} extends beyond this value to make local output-variability trends visible. Under the high-current-noise case, HECM shows the largest global penalty with $\Delta\mathrm{MAE}=0.0075$, whereas HDM, DD, and DM change by $0.0019$, $0.0009$, and $-0.0001$, respectively. This does not mean that current noise is irrelevant for the other estimators. Rather, it shows that zero-mean noise mainly appears through local variability and disturbance propagation instead of through the same long-term integration drift caused by persistent bias.
-
-Voltage noise with $\sigma_U=\SI{0.01}{V}$ mainly tests the voltage-correction path in HECM and the voltage-dependent input path in the learned estimators. In this scenario HECM remains essentially unchanged at $\mathrm{MAE}=0.0090$, while DM, HDM, and DD increase to $0.0524$, $0.0751$, and $0.0698$, respectively. Temperature noise with $\sigma_T=\SI{1.0}{\celsius}$ is weaker in the global metrics for DM and HECM, but it still affects the SOH-aware paths because temperature enters the learned health context: HDM increases to $\mathrm{MAE}=0.0067$ and DD to $0.0181$. The numerical global and local noise metrics are given in Appendix Tables~\ref{tab:robustness_appendix_key_results} and~\ref{tab:robustness_appendix_local_metrics}.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{robustness_noise.png}
-    \caption[Additive current-noise sensitivity.]{Noise sensitivity under additive current noise. The figure combines a representative disturbed window, a matched SOC comparison in the same interval, the global MAE penalty in the compact benchmark matrix, and the local output-variability trend across an extended current-noise sweep. This makes visible that zero-mean current noise is mainly a local disturbance-propagation test rather than the same type of long-term drift test as persistent current bias.}
-    \label{fig:robustness_noise}
-\end{figure}
-
-\subsection{Initialization error and recovery}
-Initialization mismatch is a recovery problem rather than a simple full-run MAE problem, because the relevant question is whether the estimator can re-synchronize after starting from a wrong SOC value. The benchmark therefore uses a reset-free evaluation window and injects an initial mismatch of $-0.10$ on the normalized SOC scale, meaning that the online estimate starts 10 percentage points too low. This disturbance represents a deliberately visible restart inconsistency, for example after missing recent history or weak anchoring of the initial SOC. For DD, the mismatch is implemented as an offset of the online cumulative-charge feature instead of an artificial reset of an inaccessible latent state, which keeps the test aligned with deployment-time observables.
-
-Recovery is evaluated with the strict and fair baseline-related bands defined in Section~\ref{sec:robustness_metrics}. The bands specify admissible absolute SOC errors on the normalized 0 to 1 scale rather than fixed SOC setpoints or time limits. They differ between estimator classes because they are computed from each estimator's own clean-condition MAE and P95 error. The strict band marks return to the near-baseline regime, while the fair band is a more tolerant operating range. In the inspected window, DD returns to the strict band after about $1.05$~h and to the fair band after about $1.00$~h. DM returns after about $1.17$~h and $0.25$~h, respectively. HECM returns after about $2.37$~h and $1.16$~h. HDM does not re-enter either band. The shared SOH context is updated once per hour and held constant between updates. Consequently, the changes visible near the one-hour mark for HDM and DD reflect the first scheduled health-context update and its propagation into the SOC estimate. The exact threshold values and recovery times are listed in Appendix Table~\ref{tab:robustness_appendix_local_metrics}. Figure~\ref{fig:robustness_init_recovery} shows the corresponding trajectory-level recovery behavior.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{robustness_init_recovery.png}
-    \caption[Recovery after initialization mismatch.]{Recovery after initialization mismatch in a reset-free evaluation window. The figure shows the disturbed SOC trajectories after the imposed initial-state error together with the corresponding absolute SOC error over time, so that re-synchronization to the baseline-relative recovery bands becomes directly visible. This local view is required because full-run averages alone do not capture restart behavior adequately.}
-    \label{fig:robustness_init_recovery}
-\end{figure}
-
-\subsection{Missing samples, irregular sampling, and burst dropout}
-This section covers disturbances that affect the continuity and timing of the measurement time series rather than the amplitude of one sensor channel alone. In this context, signal integrity means that the sampled input stream remains complete, time-consistent, and updated. It does not refer only to electrical signal quality. The three cases therefore belong together: individual samples can be frozen, the sampling interval can jitter, or the input stream can be held constant over a longer dropout window.
-
-Missing samples are the strongest global case in this block when the effect is measured by $\Delta\mathrm{MAE}$ relative to each estimator's own baseline. Under the every-50th-sample freeze, DD changes least with $\Delta\mathrm{MAE}=0.0016$, whereas DM, HDM, and HECM show larger increases of $0.0076$, $0.0079$, and $0.0029$, respectively. Irregular sampling with $\pm\SI{0.1}{s}$ timing jitter remains nearly neutral in the present implementation, with $\Delta\mathrm{MAE}$ values close to zero for all estimator classes. Burst dropout is different: the $\Delta\mathrm{MAE}$ values remain moderate, but one central \SI{3600}{s} frozen-data gap causes long post-gap re-synchronization times for all estimators. The recovery times are $27.35$~h for DM, $27.41$~h for HDM, $28.56$~h for HECM, and $27.44$~h for DD. Figures~\ref{fig:robustness_signal_integrity}, \ref{fig:robustness_dropout_transition}, and~\ref{fig:robustness_dropout_recovery} therefore combine the global $\Delta\mathrm{MAE}$ summary with transition and recovery views. The underlying metrics are listed in Appendix Tables~\ref{tab:robustness_appendix_key_results} and~\ref{tab:robustness_appendix_local_metrics}, and the scenario-to-evidence mapping is summarized in Appendix Table~\ref{tab:robustness_appendix_scenario_overview}.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{robustness_signal_integrity.png}
-    \caption[Continuity and timing disturbance summary.]{Continuity and timing disturbance summary. The figure compares the global $\Delta\mathrm{MAE}$ penalties for missing samples, irregular sampling, and burst dropout, and it complements these full-run penalties with the burst-dropout recovery times. This compact summary shows why missing samples, timing irregularity, and longer frozen-data gaps cannot be judged from one metric alone.}
-    \label{fig:robustness_signal_integrity}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{robustness_dropout_transition.png}
-    \caption[Transition into burst dropout.]{Local transition into the burst-dropout interval. The shaded region marks the frozen-data window and visualizes how the estimator outputs behave while the input stream is held constant. This view isolates the immediate local response that is hidden by full-run aggregate metrics.}
-    \label{fig:robustness_dropout_transition}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{robustness_dropout_recovery.png}
-    \caption[Recovery after burst dropout.]{Post-gap recovery after burst dropout. The figure shows the disturbed SOC trajectories after the frozen interval together with the corresponding absolute SOC error, so that the delayed return toward the baseline bands becomes directly visible. It therefore complements the moderate full-run $\Delta\mathrm{MAE}$ values with the practically more revealing local recovery behavior.}
-    \label{fig:robustness_dropout_recovery}
-\end{figure}
-
-\subsection{Spike sensitivity}
-Single voltage spikes lead to strongly different local reactions even when the full-run MAE remains nearly unchanged for several classes. The spike protocol injects one $\pm\SI{0.20}{V}$ single-sample spike every 1000 samples, corresponding to every \SI{1000}{s} on the nominal \SI{1}{s} time base. HECM is almost unaffected under this protocol, whereas DD shows the clearest spike sensitivity in both the representative local window and the aligned post-spike excess-error response. In the global metrics, the DD MAE increases from $0.0100$ to $0.0144$, while the changes for DM, HDM, and HECM remain smaller or close to their baseline level. The post-spike excess error is evaluated event-wise rather than as a global full-trajectory percentile: for each of the first 40 valid spike events, the SOC-error trajectory is aligned in a window from \SI{-60}{s} to \SI{180}{s} around the injected spike, the mean absolute error over the final \SI{10}{s} before the spike defines the local pre-spike baseline, and the largest positive increase above this baseline after the spike is stored as the event severity. The compact severity value in Figure~\ref{fig:robustness_spike_response} is the 95th percentile of these event-wise peak increases. The figure therefore emphasizes local spike behavior instead of relying only on signed full-run averages. The corresponding global and local metrics are listed in Appendix Tables~\ref{tab:robustness_appendix_key_results} and~\ref{tab:robustness_appendix_local_metrics}.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{robustness_spike_response.png}
-    \caption[Voltage-spike sensitivity.]{Voltage-spike sensitivity. The figure combines a representative local SOC response around an injected spike, a compact spike-severity summary based on the 95th percentile of event-wise post-spike peak excess errors, and the aligned post-spike excess-error behavior across repeated spike events. This local perspective is necessary because isolated spike effects can remain understated in signed full-run averages even when the transient response differs strongly across estimators.}
-    \label{fig:robustness_spike_response}
-\end{figure}
-
-\subsection{Cross-scenario comparison}
-The cross-scenario comparison confirms that no single estimator dominates all criteria. HDM is the clean-condition leader, HECM is strongest in the scenarios that most clearly change the estimator ranking, especially persistent current bias and voltage noise, and DD is most attractive when missing-sample stability or recovery after initialization mismatch is prioritized. ADC quantization remains comparatively weak in this benchmark and is kept in the scenario space for completeness rather than because it changes the main ranking. Figure~\ref{fig:robustness_cross_scenario} condenses the disturbed-scenario $\Delta\mathrm{MAE}$ values into one heatmap, while Appendix Tables~\ref{tab:robustness_appendix_key_results}, \ref{tab:robustness_appendix_scenario_overview}, and~\ref{tab:robustness_appendix_adc_quantization} provide the numerical details. Appendix Figure~\ref{fig:robustness_appendix_adc_quantization} adds the dedicated ADC-quantization illustration from the benchmark protocol.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{robustness_cross_scenario.png}
-    \caption[Cross-scenario error increase heatmap.]{Cross-scenario error increase relative to the baseline case. The heatmap condenses the disturbed-scenario penalties, including the ADC-quantization case, and makes estimator-specific ranking shifts visible across disturbance classes. The symmetric OKLAB scale assigns blue to zero change and approaches the same red endpoint for increasingly large negative or positive changes. Error values in the figure are SOC fractions on a 0 to 1 scale. Multiplication by 100 gives percentage points.}
-    \label{fig:robustness_cross_scenario}
-\end{figure}
-
-\section{Interpretation of Robustness Results}
-The discussion first relates the observed disturbance responses to the mechanisms of the four estimator classes and then translates these findings into deployment priorities. Table~\ref{tab:robustness_decision_guidance} and Figure~\ref{fig:robustness_decision} provide the final decision-oriented synthesis. The following subsections establish how the scenario-wise results lead to this summary.
-
-\subsection{Estimator-Specific Disturbance Behaviour}
-Because the shared LSTM-based SOH support has already been fixed in the methodology, the following comparison focuses on the SOC-estimator families under a common learned health-context signal rather than comparing independently designed SOH models.
-
-The direct-measurement model behaves as the expected drift-prone reference. Persistent current disturbances accumulate directly into the SOC estimate, and missing information cannot be corrected through an additional feedback path. HDM improves nominal calibration by adapting the effective capacity through the shared LSTM-based SOH context, but it remains structurally exposed to the same current-integration failure mode and additionally inherits the dynamics of this learned health signal.
-
-HECM benefits from interpretable parameterization, explicit voltage-residual correction, and causal observer structure. Combined with the same shared online SOH support used by the other SOH-aware variants, this explains why it is the overall robustness leader under persistent current bias and voltage noise. The same result does not mean that all noise channels are irrelevant for HECM: current noise can still affect the observer locally through current-dependent parameter scheduling and update terms. DD behaves as a compact context-rich estimator with channel-dependent strengths and weaknesses. It is especially strong under missing samples and initialization mismatch, but more exposed to voltage spikes and to propagated noise in derived inputs such as $\mathrm{d}I/\mathrm{d}t$, $Q_c$, EFC, and the SOH context. In the present benchmark, this should be read as a design lesson of the compact deployed instance rather than as a hard class limit, because the data-driven family still retains a larger tuning space through architecture, retraining, feature selection, and state-handling choices than the more fixed-form direct or ECM-based alternatives.
-
-\subsection{Accuracy, Robustness, and Recovery Trade-Offs}
-A central insight of the benchmarking process is therefore that low clean-condition MAE does not imply strong disturbed-operation performance. The relevant trade-offs extend beyond accuracy and computational complexity to calibration strength, correction capability, recovery speed, disturbance propagation, and the degree to which a model relies on one dominant trigger variable. Estimator comparison should therefore not collapse all results into one leaderboard. A deployment-oriented assessment must distinguish nominal accuracy, disturbance robustness, recovery after inconsistency, and implementation feasibility. This distinction provides the basis for the deployment priorities considered next.
-
-\subsection{Implications for BMS deployment}
-\label{sec:robustness_decision_interpretation}
-If lowest nominal SOC error under clean sensing is the main design priority, HDM is the recommended class because it achieves the lowest baseline MAE of $0.0024$ (\SI{0.24}{\percent}). This nominal-accuracy advantage is accompanied by substantial degradation under current bias and by failure to re-enter the baseline bands within the initialization-mismatch analysis window. If the primary priority is best overall robustness under uncertain measurement quality, HECM is the strongest choice because it is most resilient under current bias, remains nearly unchanged under voltage noise, and still preserves competitive baseline accuracy. Its main disadvantages are the larger flash footprint and slower strict-band recovery than DD. If fastest resynchronization after restart or wrong initial state dominates the design, DD is the strongest option because it shows the fastest strict-band recovery in the local initialization analysis. Its greater sensitivity to voltage spikes and weaker performance than HECM under current bias must then be considered.
-
-If resilience to missing samples and signal freezing dominates the design, DD again becomes attractive because it shows the smallest MAE increase under missing samples and strong post-disturbance stability, while clean-condition accuracy remains below HDM and voltage-driven disturbances require a careful feature-pipeline design. If iterative development headroom and future model refinement dominate the design strategy, DD is also attractive because architecture, features, and training can be updated directly while keeping the deployment target fixed. The present compact instance is still weaker than HECM in the strongest bias- and voltage-driven stress cases, but it retains the clearest path for systematic model iteration. If the main objective is maximum implementation simplicity and the largest resource margin, DM remains the simplest class by far, but it also shows the weakest robustness under biased current measurements and missing-sample stress.
-
-These results show that no estimator wins universally. Estimator selection must instead be tied to the disturbance profile, recovery requirements, implementation constraints, and expected model-maintenance strategy of the target BMS. The footprint analysis in Section~\ref{sec:robustness_embedded_preparation} further narrows this decision space: all four deployment-prepared variants remain within the common embedded budget, persistent state memory is negligible for all classes, HECM is the tightest flash case, and DM keeps the largest implementation margin. For decision making, Table~\ref{tab:robustness_decision_guidance} summarizes the main evidence and the associated design consequences.
-
-\begingroup
-\small
-\begin{longtable}{@{}>{\raggedright\arraybackslash}p{2.7cm}>{\raggedright\arraybackslash}p{2.5cm}>{\raggedright\arraybackslash}p{4.3cm}>{\raggedright\arraybackslash}p{4.3cm}@{}}
-\caption[Decision-oriented recommendation map for estimator selection.]{Decision-oriented recommendation map derived from the robustness benchmark. The table condenses the scenario-wise findings into dominant deployment priorities, the estimator class most strongly supported by the present evidence, and the corresponding trade-off that must still be considered in design decisions.}
-\label{tab:robustness_decision_guidance}\\
-\toprule
-Primary deployment priority & Recommended\newline class & Main supporting\newline benchmark evidence & Main trade-off\newline to consider \\
-\midrule
-\endfirsthead
-\multicolumn{4}{@{}l}{\small\textit{Table~\thetable\ continued from the previous page}}\\
-\toprule
-Primary deployment priority & Recommended\newline class & Main supporting\newline benchmark evidence & Main trade-off\newline to consider \\
-\midrule
-\endhead
-\midrule
-\multicolumn{4}{r@{}}{\small\textit{Continued on the next page}}\\
-\endfoot
-\bottomrule
-\endlastfoot
-Lowest nominal SOC error under clean sensing & HDM & Lowest baseline MAE on the benchmark trajectory ($0.0024$, \SI{0.24}{\percent}) & Strong sensitivity to current bias and no return to the baseline bands in the inspected initialization-mismatch window \\
-Best overall robustness under uncertain measurement quality & HECM & Strongest current-bias robustness, nearly unchanged under voltage noise, and competitive baseline accuracy & Larger flash footprint and slower strict-band recovery after initialization mismatch than DD \\
-Fastest re-synchronization after restart or wrong initial state & DD & Fastest strict-band recovery in the local initialization analysis & More sensitive than HECM to voltage spikes and less robust than HECM under current bias \\
-Highest resilience to missing samples and signal freezing & DD & Smallest MAE increase under missing samples and strong post-disturbance stability & Clean-condition accuracy remains below HDM, and voltage-driven disturbances require careful feature-pipeline design \\
-Largest development headroom for iterative model improvement & DD & Architecture, features, and training can be updated directly while retaining embedded-feasible deployment and strong performance in recovery and missing-sample scenarios & Present compact instance is still weaker than HECM in the strongest bias- and voltage-driven stress cases \\
-Simplest implementation and largest resource margin & DM & Minimal architecture and smallest flash footprint by a wide margin & Weakest robustness under biased current measurements and missing-sample stress \\
-\end{longtable}
-\endgroup
-
-Table~\ref{tab:robustness_decision_guidance} condenses the benchmark into a deployment-oriented recommendation map so that the reader is not left with a large set of disconnected scenario results. Figure~\ref{fig:robustness_decision} complements this table with a compact visual synthesis of the same evidence. The plotted values are relative scores rather than additional physical measurements. For each lower-is-better metric, the four estimator classes are normalized by their minimum and maximum as $(x_{\max}-x)/(x_{\max}-x_{\min})$, so that the best class within the present comparison receives $1$ and the weakest class receives $0$. The accuracy dimension averages the normalized baseline MAE, RMSE, and P95 error, the robustness dimension averages the normalized $\Delta\mathrm{MAE}$ values across the disturbed scenarios, and the recovery dimension uses the strict recovery time after the initial-SOC perturbation. An estimator that does not recover within the fixed analysis window receives the weakest recovery score.
-
-The three profiles in Figure~\ref{fig:robustness_decision} use illustrative priority weights for accuracy, robustness, and recovery. The respective weight triples are
-\[
-    (0.60,0.20,0.20),\qquad (0.20,0.60,0.20),\qquad (0.20,0.20,0.60).
-\]
-The profiles emphasize accuracy, robustness, and recovery, respectively. They illustrate different deployment compromises and do not replace the raw scenario results or the recommendation map in Table~\ref{tab:robustness_decision_guidance}.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{robustness_decision.png}
-    \caption[Decision-oriented robustness synthesis.]{Decision-oriented synthesis of the robustness benchmark. Panel (a) collapses the benchmark into three relative decision dimensions, namely nominal accuracy, disturbed-scenario robustness, and recovery behavior, using lower-is-better metrics normalized across the four estimator classes. Panel (b) applies three illustrative deployment-priority profiles and is intended as a visual complement to Table~\ref{tab:robustness_decision_guidance}, not as a replacement for the raw scenario-wise evidence.}
-    \label{fig:robustness_decision}
-\end{figure}
-
-\subsection{Limitations and future extensions}
-The matched-trajectory design supports a direct comparison of estimator responses because all four classes receive the same reference labels, measurement sequence, and disturbance realizations. The resulting conclusions apply to the model implementations and the representative LFP trajectory examined here rather than to every cell, pack, or operating profile. Validation with additional cells, broader ageing states, and cross-cell experiments is required to determine how far the observed rankings transfer. The spike study uses isolated events, while clustered disturbances and longer spike sequences may reveal further model differences. For DD, the initialization test perturbs the observable cumulative-charge state $Q_c$ instead of directly resetting an internal latent state. It therefore represents a deployment-relevant state inconsistency but remains a class-specific approximation. Future extensions can retain the same evaluation logic while adding pack-level experiments, hardware-in-the-loop testing, embedded runtime measurements, and a broader range of combined disturbances.
-
-\section{Conclusions from the Robustness Benchmark}
-Chapter~\ref{chap:robustness} shows that SOC-estimator quality for battery management cannot be reduced to clean-condition accuracy alone. It compares four representative families under the same disturbed measurement protocol. These are direct measurement, SOH-supported direct measurement, hybrid equivalent circuit estimation, and data-driven neural estimation. The purpose is not to declare one model universally best. Instead, the analysis identifies the strengths and weaknesses that become visible when different modelling paradigms are exposed to bias, noise, missing information, timing disturbance, spikes, and initialization mismatch.
-
-The clean-condition ranking alone would point to HDM, because it achieves the lowest baseline error with $\mathrm{MAE}=0.0024$ (\SI{0.24}{\percent}). The disturbed scenarios change that interpretation. Under the emphasized disturbance profile, HECM is the strongest overall robustness compromise because its voltage-feedback structure limits several measurement-driven error mechanisms. This becomes clearest under persistent current bias and voltage noise, where HECM remains substantially more stable than the integration-dominated variants. DD does not dominate the full benchmark, but it is the most attractive class when recovery after initialization mismatch or resilience to missing samples is prioritized. DM provides the simplest reference and the largest resource margin, but it exposes the expected vulnerability to drift and missing information.
-
-If one broadly useful estimator class had to be preferred for the particular disturbance profile examined here, the evidence supports the hybrid equivalent-circuit approach as the strongest compromise. Its combination of interpretable physical parameterization, voltage-based correction, and shared data-driven SOH support gives ECM-based estimation a clear role in embedded BMS design. At the same time, the data-driven class remains important because it has the largest development headroom: architecture, features, training data, and state handling can be adapted directly while preserving the same benchmark framework. The present compact DD instance should therefore not be read as the final limit of neural SOC estimation, but as evidence that neural estimators must be trained and feature-engineered to use current, voltage, temperature, timing, and health context in a balanced way instead of relying too strongly on one dominant trigger variable.
-
-The broader implication is that practical BMS evaluation needs more than MAE or another average accuracy score. Average error remains necessary, but it must be complemented by local disturbance response, recovery behavior, tail errors, signal-continuity sensitivity, and the way disturbed measurements propagate through derived online features. Because no finite test catalogue can anticipate every future fault, an operational BMS should additionally monitor signal plausibility, estimator residuals, and consistency between redundant state information. Measurements or estimates outside the validated domain can then trigger a conservative fallback mode, bounded state updates, and diagnostic logging instead of being accepted without qualification. The benchmark is deliberately extensible: the next stages can add more cells, broader ageing states, clustered or longer disturbance events, and eventually hardware-in-the-loop or real embedded runtime validation. Chapter~\ref{chap:embedded} builds on this robustness perspective and turns to recurrent neural SOC and SOH estimation on microcontrollers, where causal state handling, compression, quantization, and runtime feasibility become part of the estimator design itself.
+\input{chapters/06_performance_robustness_benchmark.tex}
 
 \chapter{Efficient Neural SOC and SOH Estimation for Embedded Systems}
 \label{chap:embedded}
@@ -2647,7 +2186,7 @@ For the present firmware, structured pruning is the more balanced operating poin
 \section{Integrated Synthesis of the Research Questions}
 The global result of this work can be read along the three research questions introduced in Chapter~\ref{chap:introduction}. The first question asks how comparatively simple neural models can represent time-dependent ageing without immediately requiring large recurrent architectures. Chapter~\ref{chap:ageing} answers this through representation rather than model complexity: cumulative-current information and lag-sequence history inject degradation-relevant temporal context into an otherwise memoryless MLP. The resulting average SOH error of about \SI{1.10}{\percent} shows that the structure of the input can be as important as the structure of the network, especially for slowly evolving ageing targets.
 
-The second question asks how estimator quality changes under realistic measurement and operating conditions. Chapter~\ref{chap:robustness} shows that the answer cannot be obtained from a clean-condition MAE alone. Under nominal signals, the SOH-supported direct-measurement estimator reaches the lowest SOC MAE of about \SI{0.24}{\percent}. Under a strong persistent current bias, however, it drifts to roughly \SI{30}{\percent} error, while the voltage-corrected equivalent-circuit observer remains closer to \SI{9}{\percent}. The data-driven recurrent estimator is not the universal winner either, but it is strongest under missing-sample stress and fastest in recovery after initialization mismatch. The main result is therefore not a fixed ranking of models, but the need to evaluate accuracy, disturbance sensitivity, and convergence behaviour as separate properties.
+The second question asks how estimator quality changes under realistic measurement and operating conditions. Chapter~\ref{chap:robustness} shows that the answer cannot be obtained from a clean-condition MAE alone. Across the six independent holdout cells, the data-driven representative achieves the lowest nominal cell-macro SOC MAE at $0.0258$, followed by the hybrid equivalent-circuit model at $0.0337$, the SOH-adaptive direct-measurement model at $0.0412$, and fixed-capacity Coulomb counting at $0.0690$. The disturbance tests change the relative distances and, in individual scenarios, the ordering. Additive current offset produces the largest error increase across the tested sensor faults, whereas the initialization test gives the fastest strict recovery to the equivalent-circuit observer at $1.20$~h and then to the recurrent estimator at $2.60$~h. These results demonstrate that accuracy, resistance to disturbed inputs, and recovery are distinct estimator properties. The accompanying STM32 measurements further show that all four isolated SOC cores meet the one-second update interval, although their flash, peak runtime RAM, and latency differ substantially.
 
 The third question asks what remains of neural estimation once embedded hardware is treated as part of the problem. Chapter~\ref{chap:embedded} shows that stateful recurrent SOC and SOH estimators can be executed on the STM32 target with comfortable timing margins, but that compression changes the evaluation. Structured pruning is the most balanced lever for the SOC estimator because it reduces flash, RAM, inference time, and the corresponding timing-derived energy indicator, with an equal-weight utility score of $U=0.71$. INT8 weight quantization reduces non-volatile memory more strongly, but the current mixed-precision path reconstructs effective floating-point weights during inference and raises SOC kernel time, which contributes to $U=1.83$. The embedded result is thus not merely that a neural estimator can be deployed, but that model architecture, compression method, firmware implementation, and measured hardware behaviour must be selected together.
 
@@ -2664,7 +2203,7 @@ Across these questions, the research moves from representation design to disturb
         Research component & Performance & Hardware / embedded & Deployment logic \\
         \midrule
         Neural ageing estimation & SOH accuracy through representation quality & indirect relevance & lag-sequence and feature design for compact models \\
-        Robustness benchmark & nominal accuracy, disturbance sensitivity, and recovery & embedded feasibility as boundary condition & matched multi-scenario evaluation across estimator classes \\
+        Performance and robustness benchmark & nominal accuracy, disturbance sensitivity, and recovery & numerical equivalence, flash, peak runtime RAM, inference latency, and recurrent execution modes & matched multi-scenario and on-device evaluation across estimator classes \\
         Embedded AI implementation & retained accuracy after compression & flash, RAM, and latency measured on MCU, with a timing-based energy proxy & pruning, quantization, export, and firmware validation \\
         BMS platform and datasets & measurement basis for evaluation & sensing chain and controller architecture & reproducible integration and estimator exchange \\
         \bottomrule
@@ -2682,9 +2221,9 @@ Four design lessons can be transferred from the individual chapters to BMS estim
 
 The first lesson is \emph{feature representation before model complexity}. Chapter~\ref{chap:ageing} shows that neural networks do not have to become large merely because the battery state is history-dependent. With cumulative-current features and lag-sequence inputs, a compact MLP can exploit temporal and throughput-related information even though the estimator itself has no recurrent state. This principle also applies to recurrent models: an LSTM or GRU benefits from meaningful causal input channels just as much as a feedforward model does. Chapter~\ref{chap:embedded} adds the complementary result that more expressive time-dependent models can still be made embedded-feasible when their architecture is structured well enough for pruning and quantization. The design message is therefore not MLP versus LSTM. It is to design the representation first, choose only as much model complexity as the task requires, and then optimize the selected architecture for deployment.
 
-The second lesson is that \emph{single-metric accuracy is not enough for deployment decisions}. A clean-condition MAE is a necessary reference, but it does not reveal why an estimator fails. Chapter~\ref{chap:robustness} shows that there is no universally best estimator class under all tested conditions. Current bias, additive noise, missing samples, burst dropout, irregular sampling, voltage spikes, ADC quantization, and initialization mismatch each probe a different weakness of the estimation chain. The practical value of the robustness benchmark is therefore not a fixed leaderboard. It is a way to identify the weak points of a chosen estimator so that they can be addressed through feature design, retraining, observer tuning, filtering, reset logic, or fault handling before deployment.
+The second lesson is that \emph{single-metric accuracy is not enough for deployment decisions}. A clean-condition MAE is a necessary reference, but it does not reveal why an estimator fails. Chapter~\ref{chap:robustness} shows that there is no universally best estimator class under all tested conditions. Current-gain error, additive sensor offsets, noise, missing samples, burst dropout, irregular sampling, voltage spikes, ADC quantization, and initialization mismatch each probe a different weakness of the estimation chain. The practical value of the robustness benchmark is therefore not a fixed leaderboard. It is a way to identify the weak points of a chosen estimator so that they can be addressed through feature design, retraining, observer tuning, filtering, reset logic, or fault handling before deployment.
 
-The third lesson is that \emph{compression must be matched to the active embedded constraint}. Pruning and quantization are useful for different reasons. Structured pruning removes recurrent channels and downstream matrix rows, so it can reduce flash, RAM, inference time, and energy at the same time. Quantization reduces the weight storage more strongly, but the present STM32 implementation shows that it can increase inference time when INT8 weights have to be reconstructed through software-side scaling during every update. If flash memory is the limiting resource, quantization can be the decisive step. If latency or energy is limiting, pruning can be the more balanced option. The most promising direction is therefore not to treat pruning and quantization as alternatives, but to combine them: first reduce the state size and operation count, then quantize the remaining weights to reduce the persistent footprint.
+The third lesson is that \emph{compression and execution semantics must be matched to the active embedded constraint}. Pruning and quantization are useful for different reasons. Structured pruning removes recurrent channels and downstream matrix rows, so it can reduce flash, RAM, inference time, and energy at the same time. Quantization reduces the weight storage more strongly, but the present STM32 implementation shows that it can increase inference time when INT8 weights have to be reconstructed through software-side scaling during every update. The robustness benchmark adds that resource demand also depends on how a recurrent model is executed. Continuous state forwarding reduces repeated computation and temporary memory demand relative to exact rolling-window recomputation, whereas periodic reset can damage estimation behavior by discarding temporal context. If flash memory is the limiting resource, quantization can be the decisive step. If latency, runtime memory, or energy is limiting, pruning and continuous state forwarding can be the more balanced options. The most promising direction is therefore to coordinate architecture, compression, and recurrent execution rather than selecting each one independently.
 
 The fourth lesson is that \emph{deployment constraints have to shape model design from the beginning}. The estimator architecture, feature pipeline, firmware implementation, and target hardware are coupled. A very complex model may look attractive in an offline benchmark, but it is harder to export, optimize, validate, and maintain on a microcontroller than a compact or structurally regular model. Model design should therefore include the expected BMS target from the start: available sensor signals, sampling rate, memory budget, arithmetic support, update frequency, and firmware integration path. Validation should also not end with an offline test. The estimator should be replayed on the target controller or in a hardware-facing test stand where timing, memory, communication, and numerical behaviour can be measured together. The Custom BMS Platform is important for this reason: it provides the environment in which state-estimation software can be tested as deployable BMS functionality rather than only as a model file.
 
@@ -2697,7 +2236,7 @@ The practical implication is a clear design order. Estimator selection should be
 
 \section{Limitations and Generalization Boundaries}
 \label{sec:overall_limitations}
-The results must be interpreted within the boundary conditions of the studies. The ageing-estimation chapter uses an NMC cyclic-ageing dataset, whereas the robustness and embedded chapters use an LFP design-of-experiments campaign. Their numerical results are therefore complementary rather than directly interchangeable. For another cell chemistry, cell format, temperature range, or operating profile, the same evaluation procedure can be applied, but the baseline error, disturbance response, estimator ranking, and accuracy retained after compression may change. The corresponding models must therefore be trained and evaluated with representative measurements and reference values from the intended application. The robustness benchmark focuses on one representative ageing trajectory to isolate estimator-side behaviour, which improves interpretability but limits cross-cell statistics.
+The results must be interpreted within the boundary conditions of the studies. The ageing-estimation chapter uses an NMC cyclic-ageing dataset, whereas the robustness and embedded chapters use an LFP design-of-experiments campaign. Their numerical results are therefore complementary rather than directly interchangeable. For another cell chemistry, cell format, temperature range, or operating profile, the same evaluation procedure can be applied, but the baseline error, disturbance response, estimator ranking, and accuracy retained after compression may change. The corresponding models must therefore be trained and evaluated with representative measurements and reference values from the intended application. The robustness benchmark uses six independent holdout cells and 16 predeclared 24-hour evaluation windows. This design supports cell-level comparisons across different load and ageing conditions, but it does not represent every member of the estimator classes, every possible fault sequence, or pack-level operation. Its class-level conclusions therefore concern the observed structural strengths and weaknesses of the selected representatives rather than a universal ranking.
 
 The embedded results are also specific to the evaluated microcontroller platform. They refer to STM32H7 hardware, hand-written recurrent kernels, and the selected measurement setup for latency and energy. Transferring an estimator to another microcontroller changes the available memory, arithmetic support, execution speed, and energy characteristics rather than the underlying BMS estimation task. Accuracy, flash, RAM, latency, and energy must therefore be evaluated again after porting. A memory-limited controller may require a smaller hidden state, structured pruning, or compact weight storage. Efficient integer instructions can make quantization more attractive, whereas a controller with sufficient memory and floating-point throughput may benefit less from compression. The microcontroller alone does not reduce the estimation error. Lower error primarily requires representative training data and reference values, suitable features, appropriate model capacity, and retraining after compression. More capable hardware can support these measures indirectly by permitting a larger model or higher-precision arithmetic. Other controllers, vendor toolchains, memory hierarchies, or fixed-point kernels could therefore change the quantitative balance between pruning and quantization.
 
@@ -2708,7 +2247,7 @@ The transferable result is therefore the evaluation logic, not every numerical v
 \section{Overall Conclusion}
 This research examined AI-based battery-state estimation from the perspective of a practical BMS rather than from the perspective of an isolated offline model. The work began with the observation that SOC and SOH estimators are only useful in operation if they satisfy more than one requirement at the same time. They must represent the relevant battery history, remain reliable under imperfect measurements, fit within embedded hardware limits, and be transferable into a reproducible firmware and validation chain. The central conclusion is therefore that deployment-oriented battery intelligence is not defined by the lowest clean-data error, but by the behaviour of the full estimator path from data representation to hardware execution.
 
-The contribution chapters address this path step by step. The ageing-estimation study shows that simple models can become time-aware when the input representation contains physically meaningful history, as demonstrated by the MLP-based SOH estimator with cumulative-current and lag-sequence features. The robustness benchmark then shows why such accuracy claims have to be stress-tested under realistic measurement disturbances: bias, noise, missing samples, timing irregularities, voltage spikes, ADC quantization, and initialization mismatch can change the ranking of estimator classes and reveal weaknesses that clean-condition metrics hide. The embedded-AI study extends the argument to microcontroller execution and demonstrates that model quality after pruning, quantization, export, and on-device measurement is the relevant quantity for BMS deployment. The hardware chapter provides the system basis that makes this chain concrete by offering an adaptable Custom BMS Platform with accessible sensing, firmware partitioning, and estimator integration.
+The contribution chapters address this path step by step. The ageing-estimation study shows that simple models can become time-aware when the input representation contains physically meaningful history, as demonstrated by the MLP-based SOH estimator with cumulative-current and lag-sequence features. The performance and robustness benchmark then shows why such accuracy claims have to be stress-tested under realistic measurement disturbances. Its results also show why estimator classes should be compared through their mechanisms rather than through a nominal ranking alone. Direct integration is economical but cannot correct accumulated error by itself. Equivalent-circuit feedback supports recovery when its voltage model remains informative. Recurrent data-driven estimation can use a broader temporal and multichannel context, which gives it substantial potential for low nominal error and resistance to several disturbance types while leaving identifiable sensitivities to local transients and state handling. The on-device branch confirms that representatives of all four tested approaches can run within the selected STM32 memory and timing limits. It also demonstrates that a pruned recurrent estimator changes from a costly rolling-window implementation to a fast and memory-efficient implementation when hidden state is forwarded continuously, while periodic state resets produce pronounced transients. The embedded-AI study extends this argument by demonstrating that model quality after pruning, quantization, export, and on-device measurement is the relevant quantity for deployment. The experimental and hardware basis in Chapter~\ref{chap:experimental} makes this chain concrete through accessible sensing, firmware partitioning, and estimator integration.
 
 Taken together, the work contributes a requirement-based way of evaluating battery-state estimators. The purpose is not to declare one estimator family universally superior. Direct-measurement, model-based, hybrid, and data-driven approaches each have useful operating regions and failure modes. The contribution is instead to show how these methods can be compared in a BMS-relevant way: first by choosing a suitable representation, then by extending the evaluation beyond clean-condition accuracy to disturbance and recovery behaviour, then by selecting pruning, quantization, or their combination according to the actual hardware bottleneck, and finally by validating the result on the controller. This evaluation chain is the main outcome of the research.
 
@@ -2727,165 +2266,7 @@ Finally, the Custom BMS Platform should be extended toward larger pack configura
 \chapter{Supplementary Robustness and Embedded-Compression Analyses}
 This appendix contains supplementary tables, additional hardware documentation, experiment matrices, and publication-specific material that would interrupt the flow of the main text if it were placed directly in the core chapters.
 
-\section{Supplementary Robustness-Benchmark Result Tables}
-The following tables collect the numerical robustness-benchmark values used in Chapter~\ref{chap:robustness}. Unless stated otherwise, SOC error metrics are reported on the normalized 0 to 1 SOC scale. Multiplying by 100 gives percentage points.
-
-\begingroup
-\scriptsize
-\setlength{\tabcolsep}{3pt}
-
-\begin{longtable}{lrrrrr}
-\caption[Baseline metrics for the robustness benchmark.]{Baseline performance metrics for the selected robustness-benchmark trajectory. Values are reported on the normalized 0 to 1 SOC scale.}\label{tab:robustness_appendix_baseline_metrics}\\
-\toprule
-Class & MAE & RMSE & P95 error & Max error & Bias \\
-\midrule
-\endfirsthead
-\toprule
-Class & MAE & RMSE & P95 error & Max error & Bias \\
-\midrule
-\endhead
-DM & 0.0311 & 0.0397 & 0.0800 & 1.0000 & 0.0311 \\
-HDM & 0.0024 & 0.0061 & 0.0094 & 1.0000 & 0.0022 \\
-HECM & 0.0090 & 0.0127 & 0.0241 & 1.0000 & -0.0029 \\
-DD & 0.0100 & 0.0143 & 0.0336 & 0.0686 & -0.0062 \\
-\bottomrule
-\end{longtable}
-
-\begin{longtable}{p{2.4cm}p{1.3cm}rrrrr}
-\caption[Cross-scenario global robustness metrics.]{Cross-scenario global performance metrics used in the Chapter~\ref{chap:robustness} result discussion. Values are reported on the normalized 0 to 1 SOC scale.}\label{tab:robustness_appendix_key_results}\\
-\toprule
-Scenario & Class & MAE & $\Delta$MAE & RMSE & $\Delta$RMSE & P95 error \\
-\midrule
-\endfirsthead
-\toprule
-Scenario & Class & MAE & $\Delta$MAE & RMSE & $\Delta$RMSE & P95 error \\
-\midrule
-\endhead
-Current noise (high) & DM & 0.0310 & -0.0001 & 0.0394 & -0.0002 & 0.0795 \\
-Current bias & DM & 0.3143 & 0.2833 & 0.3683 & 0.3286 & 0.6670 \\
-Initial SOC error & DM & 0.0322 & 0.0011 & 0.0413 & 0.0017 & 0.0833 \\
-Irregular sampling & DM & 0.0309 & -0.0001 & 0.0396 & -0.0001 & 0.0799 \\
-Burst dropout & DM & 0.0332 & 0.0022 & 0.0487 & 0.0090 & 0.0819 \\
-Missing samples & DM & 0.0386 & 0.0076 & 0.0476 & 0.0079 & 0.0926 \\
-Voltage spikes & DM & 0.0312 & 0.0001 & 0.0398 & 0.0001 & 0.0801 \\
-Temperature noise & DM & 0.0311 & 0.0000 & 0.0397 & 0.0000 & 0.0800 \\
-Voltage noise & DM & 0.0524 & 0.0213 & 0.0648 & 0.0252 & 0.1228 \\
-Current noise (high) & HDM & 0.0044 & 0.0019 & 0.0074 & 0.0013 & 0.0120 \\
-Current bias & HDM & 0.3068 & 0.3043 & 0.3638 & 0.3577 & 0.6668 \\
-Initial SOC error & HDM & 0.0036 & 0.0011 & 0.0136 & 0.0075 & 0.0101 \\
-Irregular sampling & HDM & 0.0027 & 0.0003 & 0.0061 & 0.0001 & 0.0095 \\
-Burst dropout & HDM & 0.0051 & 0.0027 & 0.0325 & 0.0265 & 0.0098 \\
-Missing samples & HDM & 0.0103 & 0.0079 & 0.0129 & 0.0069 & 0.0221 \\
-Voltage spikes & HDM & 0.0062 & 0.0038 & 0.0140 & 0.0079 & 0.0328 \\
-Temperature noise & HDM & 0.0067 & 0.0043 & 0.0110 & 0.0049 & 0.0210 \\
-Voltage noise & HDM & 0.0751 & 0.0727 & 0.0908 & 0.0847 & 0.1578 \\
-Current noise (high) & HECM & 0.0165 & 0.0075 & 0.0280 & 0.0154 & 0.0701 \\
-Current bias & HECM & 0.0932 & 0.0842 & 0.1303 & 0.1176 & 0.2954 \\
-Initial SOC error & HECM & 0.0091 & 0.0001 & 0.0143 & 0.0016 & 0.0241 \\
-Irregular sampling & HECM & 0.0095 & 0.0004 & 0.0131 & 0.0004 & 0.0248 \\
-Burst dropout & HECM & 0.0104 & 0.0014 & 0.0228 & 0.0101 & 0.0246 \\
-Missing samples & HECM & 0.0119 & 0.0029 & 0.0163 & 0.0036 & 0.0329 \\
-Voltage spikes & HECM & 0.0090 & 0.0000 & 0.0127 & 0.0000 & 0.0241 \\
-Temperature noise & HECM & 0.0090 & 0.0000 & 0.0127 & 0.0000 & 0.0241 \\
-Voltage noise & HECM & 0.0090 & 0.0000 & 0.0127 & 0.0000 & 0.0241 \\
-Current noise (high) & DD & 0.0109 & 0.0009 & 0.0151 & 0.0008 & 0.0345 \\
-Current bias & DD & 0.2859 & 0.2759 & 0.3426 & 0.3283 & 0.6367 \\
-Initial SOC error & DD & 0.0110 & 0.0010 & 0.0175 & 0.0032 & 0.0355 \\
-Irregular sampling & DD & 0.0105 & 0.0005 & 0.0144 & 0.0001 & 0.0330 \\
-Burst dropout & DD & 0.0122 & 0.0022 & 0.0316 & 0.0173 & 0.0348 \\
-Missing samples & DD & 0.0117 & 0.0016 & 0.0149 & 0.0006 & 0.0302 \\
-Voltage spikes & DD & 0.0144 & 0.0044 & 0.0213 & 0.0070 & 0.0474 \\
-Temperature noise & DD & 0.0181 & 0.0081 & 0.0223 & 0.0080 & 0.0451 \\
-Voltage noise & DD & 0.0698 & 0.0597 & 0.0839 & 0.0696 & 0.1501 \\
-\bottomrule
-\end{longtable}
-
-\begin{longtable}{p{1.2cm}p{2.6cm}p{4.4cm}rr}
-\caption[Local robustness and recovery metrics.]{Local behavior and recovery metrics used in the Chapter~\ref{chap:robustness} result discussion. Thresholds are reported on the normalized 0 to 1 SOC scale where applicable.}\label{tab:robustness_appendix_local_metrics}\\
-\toprule
-Class & Scenario & Local metric & Value & Threshold \\
-\midrule
-\endfirsthead
-\toprule
-Class & Scenario & Local metric & Value & Threshold \\
-\midrule
-\endhead
-DM & Initial SOC error & Recovery time to strict band [h] & 1.1658 & 0.0800 \\
-DM & Initial SOC error & Recovery time to fair band [h] & 0.2500 & 0.1599 \\
-HDM & Initial SOC error & Recovery time to strict band [h] & n.a. & 0.0094 \\
-HDM & Initial SOC error & Recovery time to fair band [h] & n.a. & 0.0200 \\
-HECM & Initial SOC error & Recovery time to strict band [h] & 2.3693 & 0.0241 \\
-HECM & Initial SOC error & Recovery time to fair band [h] & 1.1564 & 0.0482 \\
-DD & Initial SOC error & Recovery time to strict band [h] & 1.0464 & 0.0336 \\
-DD & Initial SOC error & Recovery time to fair band [h] & 1.0014 & 0.0672 \\
-DM & Burst dropout & Recovery time after burst dropout [h] & 27.3511 & 0.0216 \\
-HDM & Burst dropout & Recovery time after burst dropout [h] & 27.4093 & 0.0008 \\
-HECM & Burst dropout & Recovery time after burst dropout [h] & 28.5611 & 0.0095 \\
-DD & Burst dropout & Recovery time after burst dropout [h] & 27.4351 & 0.0070 \\
-DM & Voltage spikes & Median spike recovery time [s] & 0.0000 & 0.0800 \\
-HDM & Voltage spikes & Median spike recovery time [s] & 0.0000 & 0.0094 \\
-HECM & Voltage spikes & Median spike recovery time [s] & 0.0000 & 0.0241 \\
-DD & Voltage spikes & Median spike recovery time [s] & 0.0000 & 0.0336 \\
-DM & Current noise (high) & Late minus early excess rolling MAE & -0.0013 & n.a. \\
-DM & Current noise (high) & Mean excess rolling MAE & -0.0001 & n.a. \\
-HDM & Current noise (high) & Late minus early excess rolling MAE & -0.0011 & n.a. \\
-HDM & Current noise (high) & Mean excess rolling MAE & 0.0019 & n.a. \\
-HECM & Current noise (high) & Late minus early excess rolling MAE & 0.0038 & n.a. \\
-HECM & Current noise (high) & Mean excess rolling MAE & 0.0073 & n.a. \\
-DD & Current noise (high) & Late minus early excess rolling MAE & -0.0002 & n.a. \\
-DD & Current noise (high) & Mean excess rolling MAE & 0.0009 & n.a. \\
-\bottomrule
-\end{longtable}
-
-\begingroup\small
-\begin{longtable}{>{\raggedright\arraybackslash}p{2.2cm}>{\raggedright\arraybackslash}p{3.6cm}>{\raggedright\arraybackslash}p{4.4cm}>{\raggedright\arraybackslash}p{3.0cm}}
-\caption[Robustness scenario evidence map.]{Scenario overview linking disturbance configuration, primary evidence type, and the main figure in Chapter~\ref{chap:robustness}. This table clarifies which scenarios are interpreted predominantly through global metrics and which require additional local evidence.}\label{tab:robustness_appendix_scenario_overview}\\
-\toprule
-Scenario & Configuration & Primary evidence & Main figure(s) \\
-\midrule
-\endfirsthead
-\toprule
-Scenario & Configuration & Primary evidence & Main figure(s) \\
-\midrule
-\endhead
-ADC quantization & Steps of \SI{0.01}{A}, \SI{0.005}{V}, and \SI{0.5}{\celsius} & Global $\Delta$MAE. Detailed values in Appendix Table~\ref{tab:robustness_appendix_adc_quantization} & Figs.~\ref{fig:robustness_cross_scenario}, \ref{fig:robustness_appendix_adc_quantization} \\
-Current bias & Constant current offset in the compact matrix, plus dedicated $0.5\%$/$1.5\%$/$3.0\%$ sweep of $|I|_{\max}$ & Global MAE degradation across the sweep & Fig.~\ref{fig:robustness_current_bias} \\
-Current noise & Compact matrix with $\sigma_I=\SI{0.10}{A}$ and local detail sweep up to $\sigma_I=\SI{0.20}{A}$ & Global $\Delta$MAE plus local output-variability and rolling-MAE evidence & Fig.~\ref{fig:robustness_noise} \\
-Voltage noise & Additive Gaussian noise with $\sigma_U=\SI{0.01}{V}$ & Global $\Delta$MAE & Fig.~\ref{fig:robustness_cross_scenario} \\
-Temperature noise & Additive Gaussian noise with $\sigma_T=\SI{1.0}{\celsius}$ & Global $\Delta$MAE & Fig.~\ref{fig:robustness_cross_scenario} \\
-Initial SOC error & Additive initial mismatch of $-0.10$ SOC, corresponding to 10 percentage points. DD via online $Q_c$ offset & Local recovery to strict and fair baseline bands. Global MAE is secondary & Fig.~\ref{fig:robustness_init_recovery} \\
-Missing samples & Every 50th sample frozen on the nominal \SI{1}{s} grid & Global $\Delta$MAE & Figs.~\ref{fig:robustness_signal_integrity}, \ref{fig:robustness_cross_scenario} \\
-Irregular sampling & Uniform sampling-time jitter of $\pm\SI{0.1}{s}$ around the nominal \SI{1}{s} grid & Global $\Delta$MAE & Figs.~\ref{fig:robustness_signal_integrity}, \ref{fig:robustness_cross_scenario} \\
-Burst dropout & One central frozen gap of \SI{3600}{s} & Global $\Delta$MAE plus local transition and long-horizon recovery & Figs.~\ref{fig:robustness_signal_integrity}, \ref{fig:robustness_dropout_transition}, \ref{fig:robustness_dropout_recovery} \\
-Voltage spikes & One $\pm\SI{0.20}{V}$ single-sample spike every 1000 samples & Global $\Delta$MAE plus event-wise P95 of post-spike peak excess error & Figs.~\ref{fig:robustness_spike_response}, \ref{fig:robustness_cross_scenario} \\
-\bottomrule
-\end{longtable}
-\endgroup
-
-\begin{table}[H]
-    \centering
-    \caption[ADC-quantization robustness metrics.]{ADC-quantization results for the four estimator classes. Values are reported on the normalized 0 to 1 SOC scale.}
-    \label{tab:robustness_appendix_adc_quantization}
-    \begin{tabular}{lrrr}
-        \toprule
-        Class & Baseline MAE & ADC MAE & $\Delta$MAE \\
-        \midrule
-        DM & 0.0311 & 0.0313 & +0.0002 \\
-        HDM & 0.0024 & 0.0029 & +0.0005 \\
-        HECM & 0.0090 & 0.0087 & -0.0003 \\
-        DD & 0.0100 & 0.0098 & -0.0002 \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{robustness_adc_quantization.png}
-    \caption[ADC-quantization robustness illustration.]{ADC-quantization results for the robustness benchmark. The left panels illustrate representative current and voltage quantization in a local window, and the right panel summarizes the resulting global $\Delta\mathrm{MAE}$ relative to the baseline case.}
-    \label{fig:robustness_appendix_adc_quantization}
-\end{figure}
-
-\endgroup
+\input{chapters/appendix_robustness_final.tex}
 
 \section{Supplementary Analyses for Embedded Model Compression}
 This appendix provides the detailed evidence behind the compression, temporal, filtering, utility, and software-fault analyses discussed in Chapter~\ref{chap:embedded}.

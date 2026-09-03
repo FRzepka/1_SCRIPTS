@@ -1,49 +1,49 @@
 family,lookup_condition,interaction_mean,source_alias
-Current gain,resistance_minus_10pct,0.00011579259169995202,current_bias_3p0pct
-Current gain,resistance_plus_10pct,0.00013990132185255925,current_bias_neg_3p0pct
-Current gain,tau_minus_10pct,0.00026462582635657317,current_bias_neg_3p0pct
-Current gain,tau_plus_10pct,-0.0003223924797982422,current_bias_neg_3p0pct
-Current gain,ocv_minus_10mV,0.0004179154755902367,current_bias_3p0pct
-Current gain,ocv_plus_10mV,-0.00044296097070024664,current_bias_3p0pct
-Sensor noise,resistance_minus_10pct,-0.0003079672937074008,current_noise_low
-Sensor noise,resistance_plus_10pct,0.00025883207610438095,current_noise_high
-Sensor noise,tau_minus_10pct,-0.001131039001979724,current_noise_high
-Sensor noise,tau_plus_10pct,0.0012171923473735984,current_noise_high
-Sensor noise,ocv_minus_10mV,0.0010076136273462738,current_noise_low
-Sensor noise,ocv_plus_10mV,-0.001082993164761702,current_noise_high
-Sensor offsets,resistance_minus_10pct,-0.0007144607075762429,voltage_offset
-Sensor offsets,resistance_plus_10pct,0.0009815882180523978,voltage_offset
-Sensor offsets,tau_minus_10pct,-0.0002499065977539838,voltage_offset
-Sensor offsets,tau_plus_10pct,0.00015052133825375812,voltage_offset
-Sensor offsets,ocv_minus_10mV,0.0011119434473295861,voltage_offset
-Sensor offsets,ocv_plus_10mV,-0.0019205044933184746,voltage_offset
-ADC quantization,resistance_minus_10pct,-0.0004241560902934019,adc_quantization
-ADC quantization,resistance_plus_10pct,0.0003461139473477487,adc_quantization
-ADC quantization,tau_minus_10pct,-3.7945909723533893e-05,adc_quantization
+Current gain,resistance_minus_10pct,0.0001157925916999,current_bias_3p0pct
+Current gain,resistance_plus_10pct,0.0001399013218525,current_bias_neg_3p0pct
+Current gain,tau_minus_10pct,0.0002646258263565,current_bias_neg_3p0pct
+Current gain,tau_plus_10pct,-0.0003223924797982,current_bias_neg_3p0pct
+Current gain,ocv_minus_10mV,0.0004179154755902,current_bias_3p0pct
+Current gain,ocv_plus_10mV,-0.0004429609707002,current_bias_3p0pct
+Random sensor noise,resistance_minus_10pct,-0.0003079672937074,current_noise_low
+Random sensor noise,resistance_plus_10pct,0.0002588320761043,current_noise_high
+Random sensor noise,tau_minus_10pct,-0.0011310390019797,current_noise_high
+Random sensor noise,tau_plus_10pct,0.0012171923473735,current_noise_high
+Random sensor noise,ocv_minus_10mV,0.0010076136273462,current_noise_low
+Random sensor noise,ocv_plus_10mV,-0.0010829931647617,current_noise_high
+Additive sensor offsets,resistance_minus_10pct,-0.0019110032739164,current_offset_pos_50mA
+Additive sensor offsets,resistance_plus_10pct,0.0016197033078829,current_offset_pos_50mA
+Additive sensor offsets,tau_minus_10pct,-0.0010476929746581,current_offset_neg_50mA
+Additive sensor offsets,tau_plus_10pct,-0.0061162435405451,current_offset_neg_50mA
+Additive sensor offsets,ocv_minus_10mV,0.002595606762146,current_offset_pos_50mA
+Additive sensor offsets,ocv_plus_10mV,-0.0037808646563157,current_offset_pos_50mA
+ADC quantization,resistance_minus_10pct,-0.0004241560902934,adc_quantization
+ADC quantization,resistance_plus_10pct,0.0003461139473477,adc_quantization
+ADC quantization,tau_minus_10pct,-3.794590972353389e-05,adc_quantization
 ADC quantization,tau_plus_10pct,-2.582404088334923e-05,adc_quantization
-ADC quantization,ocv_minus_10mV,0.00010462692427034289,adc_quantization
-ADC quantization,ocv_plus_10mV,-0.0003827660347749573,adc_quantization
-Missing samples,resistance_minus_10pct,-0.0002460548430793504,missing_samples_random
-Missing samples,resistance_plus_10pct,0.0003487881821823872,missing_samples_periodic
-Missing samples,tau_minus_10pct,0.00012685743889585292,missing_samples_periodic
-Missing samples,tau_plus_10pct,-0.0001431768591271549,missing_samples_random
-Missing samples,ocv_minus_10mV,0.000199020748457151,missing_samples_random
-Missing samples,ocv_plus_10mV,-0.00014335687357728936,missing_samples_random
-Timing jitter,resistance_minus_10pct,-0.0009804052987562998,irregular_sampling_0p1s
-Timing jitter,resistance_plus_10pct,0.0006163829642644526,irregular_sampling_0p1s
+ADC quantization,ocv_minus_10mV,0.0001046269242703,adc_quantization
+ADC quantization,ocv_plus_10mV,-0.0003827660347749,adc_quantization
+Missing samples,resistance_minus_10pct,-0.0002460548430793,missing_samples_random
+Missing samples,resistance_plus_10pct,0.0003487881821823,missing_samples_periodic
+Missing samples,tau_minus_10pct,0.0001268574388958,missing_samples_periodic
+Missing samples,tau_plus_10pct,-0.0001431768591271,missing_samples_random
+Missing samples,ocv_minus_10mV,0.0001990207484571,missing_samples_random
+Missing samples,ocv_plus_10mV,-0.0001433568735772,missing_samples_random
+Timing jitter,resistance_minus_10pct,-0.0009804052987562,irregular_sampling_0p1s
+Timing jitter,resistance_plus_10pct,0.0006163829642644,irregular_sampling_0p1s
 Timing jitter,tau_minus_10pct,6.414584408610237e-05,irregular_sampling_0p5s
-Timing jitter,tau_plus_10pct,-0.00020065780100385423,irregular_sampling_0p1s
-Timing jitter,ocv_minus_10mV,-0.0002511790011445318,irregular_sampling_0p1s
-Timing jitter,ocv_plus_10mV,-0.0003029021699331339,irregular_sampling_0p5s
-Burst dropout,resistance_minus_10pct,-0.00036040316550118554,missing_gap_1h
-Burst dropout,resistance_plus_10pct,0.0004902748479892416,missing_gap_1h
-Burst dropout,tau_minus_10pct,-0.0003422686368463542,missing_gap_1h
-Burst dropout,tau_plus_10pct,0.00021918867110233838,missing_gap_1h
-Burst dropout,ocv_minus_10mV,0.0017779815496848312,missing_gap_1h
-Burst dropout,ocv_plus_10mV,-0.0013352493525929257,missing_gap_1h
+Timing jitter,tau_plus_10pct,-0.0002006578010038,irregular_sampling_0p1s
+Timing jitter,ocv_minus_10mV,-0.0002511790011445,irregular_sampling_0p1s
+Timing jitter,ocv_plus_10mV,-0.0003029021699331,irregular_sampling_0p5s
+Burst dropout,resistance_minus_10pct,-0.0003604031655011,missing_gap_1h
+Burst dropout,resistance_plus_10pct,0.0004902748479892,missing_gap_1h
+Burst dropout,tau_minus_10pct,-0.0003422686368463,missing_gap_1h
+Burst dropout,tau_plus_10pct,0.0002191886711023,missing_gap_1h
+Burst dropout,ocv_minus_10mV,0.0017779815496848,missing_gap_1h
+Burst dropout,ocv_plus_10mV,-0.0013352493525929,missing_gap_1h
 Voltage spikes,resistance_minus_10pct,-7.292629393703156e-05,voltage_spikes
-Voltage spikes,resistance_plus_10pct,0.00015426472955409597,voltage_spikes
-Voltage spikes,tau_minus_10pct,0.0010634142838105841,voltage_spikes
-Voltage spikes,tau_plus_10pct,-0.0012174100979225845,voltage_spikes
+Voltage spikes,resistance_plus_10pct,0.000154264729554,voltage_spikes
+Voltage spikes,tau_minus_10pct,0.0010634142838105,voltage_spikes
+Voltage spikes,tau_plus_10pct,-0.0012174100979225,voltage_spikes
 Voltage spikes,ocv_minus_10mV,-2.9089817864753832e-05,voltage_spikes
-Voltage spikes,ocv_plus_10mV,0.000262497712380449,voltage_spikes
+Voltage spikes,ocv_plus_10mV,0.0002624977123804,voltage_spikes
