@@ -1,0 +1,18 @@
+{
+  "legacy_repository": "C:\\Users\\Florian\\SynologyDrive\\TUB\\1_Dissertation\\1_Scripts\\DL_Models\\LFP_SOH_Optimization_Study\\5_benchmark\\batmm",
+  "legacy_commit": "0ba6381a9b11545ae98b763edee051a6066d0d1d",
+  "data_root": "C:\\Users\\Florian\\SynologyDrive\\TUB\\3_Projekte\\MG_Farm\\5_Data\\01_LFP\\00_Data\\Versuch_18650_standart\\MGFarm_18650_FE",
+  "device": "cpu",
+  "test_cells": [
+    "C11",
+    "C19",
+    "C23"
+  ],
+  "common_comparison_cell": "C11",
+  "target_aggregation": "last value per hour for all architectures",
+  "configuration_precedence": "Checkpoint training configuration overrides the adjacent YAML.",
+  "configuration_finding": "The LSTM YAML is stale and describes a smaller network than the checkpoint.",
+  "independent_window_length_h": 168,
+  "continuous_context": "RNN state carried; causal convolution context retained",
+  "smoothing": "Centered 7-hour rolling median and every third plotting point; display only"
+}

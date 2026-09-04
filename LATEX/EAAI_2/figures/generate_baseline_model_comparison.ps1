@@ -49,17 +49,27 @@ function Add-Bar($slide, [double]$x, [double]$y, [double]$w, [double]$h,
 $figuresDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $sourceDir = Join-Path $figuresDir 'source'
 New-Item -ItemType Directory -Path $sourceDir -Force | Out-Null
+$repoRoot = (Resolve-Path (Join-Path $figuresDir '..\..\..')).Path
+$resultsDir = Join-Path $repoRoot 'DL_Models\LFP_SOH_Optimization_Study\5_benchmark\batmm\LFP_SOH_Optimization_Study\5_benchmark\Stateful_Base_Comparison\results'
+$metrics = Import-Csv -LiteralPath (Join-Path $resultsDir 'metrics_summary.csv') |
+    Where-Object { $_.aggregation -eq 'cell_macro' }
+$inventory = Import-Csv -LiteralPath (Join-Path $resultsDir 'model_inventory.csv')
 
-$pdfPath = Join-Path $figuresDir 'baseline_model_comparison.pdf'
 $pngPath = Join-Path $figuresDir 'baseline_model_comparison.png'
 $pptxPath = Join-Path $sourceDir 'baseline_model_comparison.pptx'
 
-$models = @(
-    [pscustomobject]@{ Name = 'CNN';  Mae = 0.014011; Rmse = 0.017885; Size = 1.920; Color = '#59C7C2' },
-    [pscustomobject]@{ Name = 'GRU';  Mae = 0.012377; Rmse = 0.015248; Size = 3.221; Color = '#59E83A' },
-    [pscustomobject]@{ Name = 'LSTM'; Mae = 0.014226; Rmse = 0.017129; Size = 3.418; Color = '#E76B91' },
-    [pscustomobject]@{ Name = 'TCN';  Mae = 0.012102; Rmse = 0.015626; Size = 1.678; Color = '#294862' }
-)
+$colors = @{ CNN = '#59C7C2'; GRU = '#59E83A'; LSTM = '#E76B91'; TCN = '#294862' }
+$models = foreach ($name in @('CNN', 'GRU', 'LSTM', 'TCN')) {
+    $metric = $metrics | Where-Object { $_.model -eq $name.ToLowerInvariant() }
+    $modelInfo = $inventory | Where-Object { $_.model -eq $name.ToLowerInvariant() }
+    [pscustomobject]@{
+        Name = $name
+        Mae = [double]::Parse($metric.mae, [Globalization.CultureInfo]::InvariantCulture)
+        Rmse = [double]::Parse($metric.rmse, [Globalization.CultureInfo]::InvariantCulture)
+        Size = ([double]::Parse($modelInfo.parameters, [Globalization.CultureInfo]::InvariantCulture) * 4 / [Math]::Pow(1024, 2))
+        Color = $colors[$name]
+    }
+}
 $culture = [Globalization.CultureInfo]::InvariantCulture
 
 $ppt = New-Object -ComObject PowerPoint.Application
@@ -84,13 +94,13 @@ try {
     $leftA = 72
     $rightA = 482
     $centersA = @(130, 225, 320, 415)
-    $maxError = 0.020
+    $maxError = 0.025
     $null = Add-Text $slide 48 12 35 25 '(a)' 16 $true 1
 
-    foreach ($tick in @(0.000, 0.005, 0.010, 0.015, 0.020)) {
+    foreach ($tick in @(0.000, 0.005, 0.010, 0.015, 0.020, 0.025)) {
         $y = $plotBottom - ($tick / $maxError) * $plotHeight
         $null = Add-Line $slide $leftA $y $rightA $y $grid 0.8 ($tick -gt 0)
-        $null = Add-Text $slide 28 ($y - 8) 38 18 ($tick.ToString('0.000', $culture)) 10 $false 3
+        $null = Add-Text $slide 25 ($y - 9) 41 20 ($tick.ToString('0.000', $culture)) 11 $false 3
     }
     $null = Add-Line $slide $leftA $plotTop $leftA $plotBottom $axis 1.2
     $null = Add-Line $slide $leftA $plotBottom $rightA $plotBottom $axis 1.2
@@ -102,18 +112,18 @@ try {
         $rmseHeight = ($m.Rmse / $maxError) * $plotHeight
         $null = Add-Bar $slide ($center - 27) ($plotBottom - $maeHeight) 23 $maeHeight $m.Color 0.52
         $null = Add-Bar $slide ($center + 4) ($plotBottom - $rmseHeight) 23 $rmseHeight $m.Color 0.04
-        $null = Add-Text $slide ($center - 39) ($plotBottom - $maeHeight - 18) 48 16 ($m.Mae.ToString('0.0000', $culture)) 9 $false 2
-        $null = Add-Text $slide ($center - 8) ($plotBottom - $rmseHeight - 18) 48 16 ($m.Rmse.ToString('0.0000', $culture)) 9 $false 2
-        $null = Add-Text $slide ($center - 34) 354 68 20 $m.Name 12 $true 2
+        $null = Add-Text $slide ($center - 42) ($plotBottom - $maeHeight - 19) 54 18 ($m.Mae.ToString('0.0000', $culture)) 10 $false 2
+        $null = Add-Text $slide ($center - 11) ($plotBottom - $rmseHeight - 19) 54 18 ($m.Rmse.ToString('0.0000', $culture)) 10 $false 2
+        $null = Add-Text $slide ($center - 34) 354 68 22 $m.Name 13 $true 2
     }
 
     $legendMae = Add-Bar $slide 225 15 16 12 '#777777' 0.52
     $legendRmse = Add-Bar $slide 310 15 16 12 '#777777' 0.04
-    $null = Add-Text $slide 247 13 52 18 'MAE' 11 $false 1
-    $null = Add-Text $slide 332 13 58 18 'RMSE' 11 $false 1
-    $yLabelA = Add-Text $slide -55 188 160 25 'SOH error [0-1]' 13 $false 2
+    $null = Add-Text $slide 247 12 52 20 'MAE' 12 $false 1
+    $null = Add-Text $slide 332 12 58 20 'RMSE' 12 $false 1
+    $yLabelA = Add-Text $slide -55 188 160 27 'SOH error [0-1]' 14 $false 2
     $yLabelA.Rotation = 270
-    $null = Add-Text $slide 190 398 175 22 'Architecture' 13 $false 2
+    $null = Add-Text $slide 190 398 175 24 'Architecture' 14 $false 2
 
     # Panel (b): parameter-only FP32 footprint.
     $leftB = 576
@@ -125,7 +135,7 @@ try {
     foreach ($tick in @(0, 1, 2, 3, 4)) {
         $y = $plotBottom - ($tick / $maxSize) * $plotHeight
         $null = Add-Line $slide $leftB $y $rightB $y $grid 0.8 ($tick -gt 0)
-        $null = Add-Text $slide 538 ($y - 8) 31 18 ($tick.ToString('0', $culture)) 10 $false 3
+        $null = Add-Text $slide 535 ($y - 9) 34 20 ($tick.ToString('0', $culture)) 11 $false 3
     }
     $null = Add-Line $slide $leftB $plotTop $leftB $plotBottom $axis 1.2
     $null = Add-Line $slide $leftB $plotBottom $rightB $plotBottom $axis 1.2
@@ -135,21 +145,20 @@ try {
         $center = $centersB[$i]
         $height = ($m.Size / $maxSize) * $plotHeight
         $null = Add-Bar $slide ($center - 25) ($plotBottom - $height) 50 $height $m.Color 0.28
-        $null = Add-Text $slide ($center - 35) ($plotBottom - $height - 20) 70 18 ($m.Size.ToString('0.000', $culture)) 10 $false 2
-        $null = Add-Text $slide ($center - 34) 354 68 20 $m.Name 12 $true 2
+        $null = Add-Text $slide ($center - 35) ($plotBottom - $height - 21) 70 20 ($m.Size.ToString('0.000', $culture)) 11 $false 2
+        $null = Add-Text $slide ($center - 34) 354 68 22 $m.Name 13 $true 2
     }
 
-    $yLabelB = Add-Text $slide 450 188 160 25 'FP32 weights [MiB]' 13 $false 2
+    $yLabelB = Add-Text $slide 450 188 160 27 'FP32 weights [MiB]' 14 $false 2
     $yLabelB.Rotation = 270
-    $null = Add-Text $slide 690 398 175 22 'Architecture' 13 $false 2
+    $null = Add-Text $slide 690 398 175 24 'Architecture' 14 $false 2
 
     $presentation.SaveAs($pptxPath, 24)
     $slide.Export($pngPath, 'PNG', 2400, 1104)
-    $presentation.SaveAs($pdfPath, 32)
     $presentation.Close()
 } finally {
     $ppt.Quit()
     [System.Runtime.InteropServices.Marshal]::ReleaseComObject($ppt) | Out-Null
 }
 
-Get-Item -LiteralPath $pdfPath, $pngPath, $pptxPath | Select-Object FullName, Length, LastWriteTime
+Get-Item -LiteralPath $pngPath, $pptxPath | Select-Object FullName, Length, LastWriteTime

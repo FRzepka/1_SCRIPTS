@@ -172,6 +172,9 @@ archive/
 # Local runtime bundles used by the EAAI reviewer analyses
 LATEX/EAAI/elsarticle/elsarticle/review_1/review_analysis/runtime/
 
+# Independent BATMM checkout; kept local and disconnected from its remote.
+/DL_Models/LFP_SOH_Optimization_Study/5_benchmark/batmm/
+
 # ── Embedded / IDE Build Folders ──
 **/Debug/
 **/Release/
