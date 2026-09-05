@@ -1,0 +1,47 @@
+\documentclass[11pt]{letter}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+\usepackage{hyperref}
+
+\address{Florian Rzepka\\
+Technische Universität Berlin\\
+Chair of Electrical Energy Storage Technology\\
+Einsteinufer 11\\
+10587 Berlin, Germany\\
+\href{mailto:florian.rzepka@tu-berlin.de}{florian.rzepka@tu-berlin.de}}
+
+\date{\today}
+
+\begin{document}
+
+\begin{letter}{Editor-in-Chief\\
+Engineering Applications of Artificial Intelligence\\
+Elsevier}
+
+\opening{Dear Editor-in-Chief,}
+
+Please find enclosed the revised version of manuscript EAAI-25-25227, entitled \textbf{``Embedded Artificial Intelligence in Battery Management Systems: Pruning and Quantization for Efficient State-of-Charge and State-of-Health Estimation''}, for consideration in \textit{Engineering Applications of Artificial Intelligence}.
+
+We thank you and the reviewers for the detailed and constructive comments. The manuscript has been substantially revised while retaining its central focus on the accuracy, memory, and timing trade-offs of structured pruning and recurrent-weight quantization for stateful battery-state estimators on a microcontroller.
+
+The principal revisions are as follows:
+\begin{itemize}
+    \item The abstract, introduction, research gap, objectives, and conclusion were revised to state the artificial-intelligence contribution and engineering application more clearly.
+    \item The method now provides an analytical complexity model, a fuller mathematical description of pruning and quantization, and an explicit account of the mixed-precision implementation.
+    \item New analyses cover long-horizon recurrent stability, state-of-health filter response and delay, utility-score sensitivity, and transient input-fault propagation.
+    \item The energy discussion now identifies the reported value as a constant-power timing proxy rather than an independent board-power measurement.
+    \item Figures, captions, language, and paragraph structure were revised for readability, and the manuscript is supplied in single-column format with updated source files.
+\end{itemize}
+
+The accompanying point-by-point response explains how every comment was addressed and identifies the corresponding locations in the revised manuscript. The title and keywords contain no acronyms, and all acronyms in the abstract are defined at first use.
+
+We confirm that the manuscript has not been published elsewhere and is not under consideration by another journal. All authors have approved the revised manuscript and agree with its resubmission.
+
+Thank you for your consideration.
+
+Sincerely,
+
+Florian Rzepka
+\end{letter}
+\end{document}
