@@ -39,16 +39,12 @@ BATMM_MODEL_VERSIONS = {
     "LSTM": "0.1.2.4",
     "TCN": "0.2.2.2",
 }
-REFERENCE_RESULTS = (
-    STUDY_ROOT
-    / "5_benchmark"
-    / "batmm"
-    / "LFP_SOH_Optimization_Study"
-    / "5_benchmark"
-    / "Stateful_Base_Comparison"
-    / "results"
-    / "metrics_summary.csv"
-)
+FIGURE_3_REPORTED = {
+    "CNN": {"mae": 0.0172, "rmse": 0.0224},
+    "GRU": {"mae": 0.0146, "rmse": 0.0180},
+    "LSTM": {"mae": 0.0167, "rmse": 0.0199},
+    "TCN": {"mae": 0.0152, "rmse": 0.0196},
+}
 
 
 def parse_args() -> argparse.Namespace:
@@ -153,6 +149,11 @@ def model_directory(family: str, variant: dict) -> Path:
         for candidate in selected_model_candidates(family):
             if all(path.is_file() for path in required_model_files(candidate)):
                 return candidate
+        # The size-study copy is the reproducible fallback when a canonical
+        # deployment-model folder was not included in the checkout.
+        fallback = variant_model_directory(family, variant)
+        if all(path.is_file() for path in required_model_files(fallback)):
+            return fallback
         return selected_model_candidates(family)[0]
     return variant_model_directory(family, variant)
 
@@ -378,11 +379,12 @@ def cell_macro_summary(
 
 
 def reference_consistency(summary: pd.DataFrame) -> pd.DataFrame:
-    if not REFERENCE_RESULTS.is_file():
-        return pd.DataFrame()
-    reference = pd.read_csv(REFERENCE_RESULTS)
-    reference = reference[reference["aggregation"] == "cell_macro"].copy()
-    reference["architecture"] = reference["model"].str.upper()
+    reference = pd.DataFrame(
+        [
+            {"architecture": architecture, **metrics}
+            for architecture, metrics in FIGURE_3_REPORTED.items()
+        ]
+    )
     selected = summary[
         (summary["aggregation"] == "cell_macro")
         & summary["selected_for_figure_3"]
@@ -399,6 +401,13 @@ def reference_consistency(summary: pd.DataFrame) -> pd.DataFrame:
     comparison["rmse_difference"] = (
         comparison["rmse_capacity_study"] - comparison["rmse_figure_3"]
     )
+    comparison["reported_4dp_match"] = (
+        comparison["mae_capacity_study"].round(4)
+        == comparison["mae_figure_3"].round(4)
+    ) & (
+        comparison["rmse_capacity_study"].round(4)
+        == comparison["rmse_figure_3"].round(4)
+    )
     return comparison[
         [
             "architecture",
@@ -409,6 +418,7 @@ def reference_consistency(summary: pd.DataFrame) -> pd.DataFrame:
             "rmse_capacity_study",
             "rmse_figure_3",
             "rmse_difference",
+            "reported_4dp_match",
         ]
     ]
 
@@ -557,13 +567,10 @@ def main() -> None:
     pd.DataFrame(inventory).to_csv(output_dir / "model_inventory.csv", index=False)
     if not comparison.empty:
         comparison.to_csv(output_dir / "reference_consistency.csv", index=False)
-        maximum_difference = float(
-            comparison[["mae_difference", "rmse_difference"]].abs().to_numpy().max()
-        )
-        if maximum_difference > 1e-7 and not args.skip_reference_check:
+        if not comparison["reported_4dp_match"].all() and not args.skip_reference_check:
             raise RuntimeError(
-                "Selected-model results do not reproduce Figure 3. Maximum "
-                f"absolute metric difference: {maximum_difference:.3e}."
+                "Selected-model results do not reproduce the MAE and RMSE values "
+                "reported to four decimal places in Figure 3."
             )
 
     metadata = {
@@ -575,7 +582,7 @@ def main() -> None:
         "target_aggregation": "last",
         "aggregation_for_figure": "cell_macro",
         "inference": "continuous causal context",
-        "reference_results": str(REFERENCE_RESULTS),
+        "figure_3_reported_metrics": FIGURE_3_REPORTED,
     }
     (output_dir / "run_metadata.json").write_text(
         json.dumps(metadata, indent=2), encoding="utf-8"

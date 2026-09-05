@@ -34,6 +34,7 @@ env/
 !LATEX/JES/paper_robustness_benchmark/JES_2.0/results/hecm_full_lookup_summary.csv
 !LATEX/JES/paper_robustness_benchmark/JES_2.0/results/hecm_full_lookup_family_heatmap.csv
 !LATEX/JES/paper_robustness_benchmark/JES_2.0/results/current_offset_extension/*.csv
+!DL_Models/LFP_SOH_Optimization_Study/5_benchmark/SOH_Comparison_Base/results/CURRENT_MODELS_CELL_MACRO/*.csv
 *.log
 **/training.log
 **/screenlog_*.txt

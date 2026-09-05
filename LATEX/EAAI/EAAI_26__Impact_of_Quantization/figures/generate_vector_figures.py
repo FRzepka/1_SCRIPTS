@@ -26,6 +26,15 @@ STATEFUL_RESULTS = (
     / "Stateful_Base_Comparison"
     / "results"
 )
+CELL_MACRO_RESULTS = (
+    REPOSITORY_ROOT
+    / "DL_Models"
+    / "LFP_SOH_Optimization_Study"
+    / "5_benchmark"
+    / "SOH_Comparison_Base"
+    / "results"
+    / "CURRENT_MODELS_CELL_MACRO"
+)
 CAPACITY_RESULTS = (
     REPOSITORY_ROOT
     / "DL_Models"
@@ -49,7 +58,8 @@ COLORS = {
 def configure_style() -> None:
     plt.rcParams.update(
         {
-            "font.family": "Arial",
+            "font.family": "sans-serif",
+            "font.sans-serif": ["Arial", "Liberation Sans", "DejaVu Sans"],
             "font.size": 18,
             "axes.labelsize": 24,
             "xtick.labelsize": 20,
@@ -85,10 +95,18 @@ def save_pdf(fig: plt.Figure, name: str) -> None:
 
 
 def render_model_comparison() -> None:
-    metrics = pd.read_csv(STATEFUL_RESULTS / "metrics_summary.csv")
-    metrics = metrics[metrics["aggregation"] == "cell_macro"].set_index("model")
+    metrics = pd.read_csv(CELL_MACRO_RESULTS / "metrics_summary.csv")
+    metrics = metrics[
+        (metrics["aggregation"] == "cell_macro")
+        & metrics["selected_for_figure_3"]
+    ].copy()
+    metrics["model"] = metrics["architecture"].str.lower()
+    metrics = metrics.set_index("model")
     metrics = metrics.loc[MODEL_ORDER]
-    inventory = pd.read_csv(STATEFUL_RESULTS / "model_inventory.csv").set_index("model")
+    inventory = pd.read_csv(CELL_MACRO_RESULTS / "model_inventory.csv")
+    inventory = inventory[inventory["selected_for_figure_3"]].copy()
+    inventory["model"] = inventory["architecture"].str.lower()
+    inventory = inventory.set_index("model")
     inventory = inventory.loc[MODEL_ORDER]
 
     fig, (ax_error, ax_size) = plt.subplots(1, 2, figsize=(20, 9.2))
@@ -118,8 +136,8 @@ def render_model_comparison() -> None:
             linewidth=1.8,
             zorder=3,
         )
-        ax_error.text(index - width / 1.6, mae + 0.00065, f"{mae:.4f}", ha="center", fontsize=24)
-        ax_error.text(index + width / 1.6, rmse + 0.00065, f"{rmse:.4f}", ha="center", fontsize=24)
+        ax_error.text(index - width / 1.6, mae + 0.00065, f"{mae:.4f}", ha="center", fontsize=18)
+        ax_error.text(index + width / 1.6, rmse + 0.00065, f"{rmse:.4f}", ha="center", fontsize=18)
 
         parameters = float(inventory.loc[model, "parameters"])
         size_mib = parameters * 4.0 / (1024.0**2)
@@ -132,7 +150,7 @@ def render_model_comparison() -> None:
             linewidth=1.8,
             zorder=3,
         )
-        ax_size.text(index, size_mib + 0.11, f"{size_mib:.3f}", ha="center", fontsize=24)
+        ax_size.text(index, size_mib + 0.11, f"{size_mib:.3f}", ha="center", fontsize=18)
 
     max_error = max(float(metrics["mae"].max()), float(metrics["rmse"].max()))
     error_limit = np.ceil((max_error + 0.002) / 0.005) * 0.005
@@ -140,7 +158,7 @@ def render_model_comparison() -> None:
     ax_error.set_yticks(np.arange(0.0, error_limit + 0.0001, 0.005))
     ax_error.set_ylabel("SOH error [0-1]", fontsize=30)
     ax_error.set_xlabel("Architecture", fontsize=30, labelpad=24)
-    ax_error.set_xticks(positions, [MODEL_LABELS[name] for name in MODEL_ORDER], fontweight="bold", fontsize=25)
+    ax_error.set_xticks(positions, [MODEL_LABELS[name] for name in MODEL_ORDER], fontweight="bold", fontsize=20)
     ax_error.tick_params(axis="y", labelsize=25)
     ax_error.legend(
         handles=[
@@ -158,7 +176,7 @@ def render_model_comparison() -> None:
     ax_size.set_yticks(np.arange(0, 4.1, 1.0))
     ax_size.set_ylabel("FP32 weights [MiB]", fontsize=30)
     ax_size.set_xlabel("Architecture", fontsize=30, labelpad=24)
-    ax_size.set_xticks(positions, [MODEL_LABELS[name] for name in MODEL_ORDER], fontweight="bold", fontsize=25)
+    ax_size.set_xticks(positions, [MODEL_LABELS[name] for name in MODEL_ORDER], fontweight="bold", fontsize=20)
     ax_size.tick_params(axis="y", labelsize=25)
 
     for label, axis in zip(("(a)", "(b)"), (ax_error, ax_size)):

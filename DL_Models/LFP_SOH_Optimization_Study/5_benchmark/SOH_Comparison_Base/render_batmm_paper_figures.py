@@ -136,7 +136,8 @@ def find_result_dir(requested: Path | None) -> Path:
 def configure_style() -> None:
     plt.rcParams.update(
         {
-            "font.family": "Arial",
+            "font.family": "sans-serif",
+            "font.sans-serif": ["Arial", "Liberation Sans", "DejaVu Sans"],
             "font.size": 16,
             "axes.labelsize": 20,
             "xtick.labelsize": 16,
@@ -230,14 +231,14 @@ def render_model_comparison(
             mae + 0.00065,
             f"{mae:.4f}",
             ha="center",
-            fontsize=24,
+            fontsize=18,
         )
         ax_error.text(
             index + width / 1.6,
             rmse + 0.00065,
             f"{rmse:.4f}",
             ha="center",
-            fontsize=24,
+            fontsize=18,
         )
 
         size = float(models.loc[model, "fp32_weights_mib"])
@@ -250,7 +251,7 @@ def render_model_comparison(
             linewidth=1.8,
             zorder=3,
         )
-        ax_size.text(index, size + 0.11, f"{size:.3f}", ha="center", fontsize=24)
+        ax_size.text(index, size + 0.11, f"{size:.3f}", ha="center", fontsize=18)
 
     max_error = max(float(metrics["rmse"].max()), float(metrics["mae"].max()))
     error_limit = np.ceil((max_error + 0.002) / 0.005) * 0.005
@@ -262,7 +263,7 @@ def render_model_comparison(
         positions,
         [MODEL_LABELS[name] for name in MODEL_ORDER],
         fontweight="bold",
-        fontsize=25,
+        fontsize=20,
     )
     ax_error.tick_params(axis="y", labelsize=25)
     ax_error.legend(
@@ -285,7 +286,7 @@ def render_model_comparison(
         positions,
         [MODEL_LABELS[name] for name in MODEL_ORDER],
         fontweight="bold",
-        fontsize=25,
+        fontsize=20,
     )
     ax_size.tick_params(axis="y", labelsize=25)
 

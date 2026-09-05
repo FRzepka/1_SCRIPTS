@@ -1,0 +1,37 @@
+{
+  "data_root": "/home/florianr/MG_Farm/0_Data/MGFarm_18650_FE",
+  "test_cells": [
+    "C11",
+    "C23",
+    "C29"
+  ],
+  "device": "cuda",
+  "sampling_interval_seconds": 3600,
+  "feature_aggregations": [
+    "mean",
+    "std",
+    "min",
+    "max"
+  ],
+  "target_aggregation": "last",
+  "aggregation_for_figure": "cell_macro",
+  "inference": "continuous causal context",
+  "figure_3_reported_metrics": {
+    "CNN": {
+      "mae": 0.0172,
+      "rmse": 0.0224
+    },
+    "GRU": {
+      "mae": 0.0146,
+      "rmse": 0.018
+    },
+    "LSTM": {
+      "mae": 0.0167,
+      "rmse": 0.0199
+    },
+    "TCN": {
+      "mae": 0.0152,
+      "rmse": 0.0196
+    }
+  }
+}
