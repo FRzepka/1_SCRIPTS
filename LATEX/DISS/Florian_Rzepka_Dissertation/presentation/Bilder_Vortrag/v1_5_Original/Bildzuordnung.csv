@@ -1,0 +1,61 @@
+﻿"Slide","Title","Image","SHA256","PowerPointCrop"
+"1","Neuronale Zustandsbestimmung","Folie_01_image3.png","6C5F45EBC92D64792FFAE04C953200983D82E6BDB33AC937AD58C5C3825D21BE","<a:srcRect xmlns:a=""http://schemas.openxmlformats.org/drawingml/2006/main"" l=""0"" t=""25289"" r=""0"" b=""25289"" />"
+"2","Motivation: Batteriespeicher für eine dezentrale","Folie_02_image2.png","7B15E8D113B265A34300418CF6842BD7E3A77E485101156D187315CD8CA794B0",
+"2","Motivation: Batteriespeicher für eine dezentrale","Folie_02_image4.png","F1384BC8DEE30C15BC88311448A03BDFEC19DA7F1BDEDD0D8AAB3B1703AC9FEF",
+"3","Forschungsfragen und Ziele der Dissertation","Folie_03_image5.png","954C9415C63C80A9A9155C9DF12AC851955CE0188B963640A65DB9BA0D1718EE",
+"3","Forschungsfragen und Ziele der Dissertation","Folie_02_image2.png","7B15E8D113B265A34300418CF6842BD7E3A77E485101156D187315CD8CA794B0",
+"4","Betriebsbedingungen prägen den Alterungsverlauf","Folie_04_image6.png","66753573585B3768309884FF5C71FB4E8FB1786B4237F1E804857A97D49E0CA3",
+"5","Betriebsbedingungen prägen den Alterungsverlauf","Folie_05_image7.png","FD88712972320A1FBCD7053044A1182DE23E5BA34BEF356DB212FF111B8D88AA",
+"6","BMS: Messung, Schutz und Zustandsbestimmung","Folie_06_image8.png","4AD821A0325801758716CF1BDFAB6DAD8BD084E89CDF92997CF5073641EFED3F",
+"7","Feature Engineering für kompakte SOH-Modelle","Folie_03_image5.png","954C9415C63C80A9A9155C9DF12AC851955CE0188B963640A65DB9BA0D1718EE",
+"7","Feature Engineering für kompakte SOH-Modelle","Folie_02_image2.png","7B15E8D113B265A34300418CF6842BD7E3A77E485101156D187315CD8CA794B0",
+"8","MLP: Hidden Layers und Activation Functions","Folie_08_image10.png","B23C4B1F327B34005287008661EA0D4105DC544C13AD65F663CDEBB8A0C6F97A",
+"8","MLP: Hidden Layers und Activation Functions","Folie_02_image2.png","7B15E8D113B265A34300418CF6842BD7E3A77E485101156D187315CD8CA794B0",
+"9","Feature Engineering mit Lag Sequences","Folie_09_image11.png","13EFB1E8B9C038478D57E4E7311657DCBDA4429364CA1466174AA7BB5E52BD7D",
+"10","Training und Evaluation auf getrennten Batteriezellen","Folie_10_image12.png","F667CD2A8BF392E8C474C70D7F451D0601796480BC174697628F03EA4F431D1F",
+"11","Ergebnisse: Einfluss von Zeitauflösung und Lag-Sequence Length","Folie_11_image13.png","8EFFD1A66AB706BF453AB68F81EC290C4B82EACA1FA70896992909585C1648B1",
+"12","Ergebnisse: Genauigkeit und Grenzen der SOH-Schätzung","Folie_12_image14.png","3047520356E607FBC680D04108B7C13AEACA6F882FD811AE319D0971B59D7A44",
+"13","Benchmark: Genauigkeit, Robustheit und Recovery","Folie_03_image5.png","954C9415C63C80A9A9155C9DF12AC851955CE0188B963640A65DB9BA0D1718EE",
+"13","Benchmark: Genauigkeit, Robustheit und Recovery","Folie_02_image2.png","7B15E8D113B265A34300418CF6842BD7E3A77E485101156D187315CD8CA794B0",
+"14","Benchmark: Vorgehen","Folie_14_image18.png","9EF3DB09922CF62B8C7A5D3805CEBF515B475CA4F645E6769288A4D8A5268E71",
+"15","Benchmark: Vorgehen","Folie_14_image18.png","9EF3DB09922CF62B8C7A5D3805CEBF515B475CA4F645E6769288A4D8A5268E71",
+"16","Benchmark: Vorgehen","Folie_14_image18.png","9EF3DB09922CF62B8C7A5D3805CEBF515B475CA4F645E6769288A4D8A5268E71",
+"21","Benchmark: Störungen und kausale Auswertung","Folie_21_image19.png","C701324F5765A8255A6DB0A0A9C8710D0B2A35B09F109F3EDEB37B0AB20CC03A","<a:srcRect xmlns:a=""http://schemas.openxmlformats.org/drawingml/2006/main"" l=""0"" t=""0"" r=""20925"" b=""0"" />"
+"22","Benchmark: Störungen und kausale Auswertung","Folie_21_image19.png","C701324F5765A8255A6DB0A0A9C8710D0B2A35B09F109F3EDEB37B0AB20CC03A","<a:srcRect xmlns:a=""http://schemas.openxmlformats.org/drawingml/2006/main"" l=""0"" t=""0"" r=""20925"" b=""0"" />"
+"23","Benchmark: Störungen und kausale Auswertung","Folie_21_image19.png","C701324F5765A8255A6DB0A0A9C8710D0B2A35B09F109F3EDEB37B0AB20CC03A","<a:srcRect xmlns:a=""http://schemas.openxmlformats.org/drawingml/2006/main"" l=""0"" t=""0"" r=""20925"" b=""0"" />"
+"24","Benchmark: Störungen und kausale Auswertung","Folie_21_image19.png","C701324F5765A8255A6DB0A0A9C8710D0B2A35B09F109F3EDEB37B0AB20CC03A","<a:srcRect xmlns:a=""http://schemas.openxmlformats.org/drawingml/2006/main"" l=""0"" t=""0"" r=""20925"" b=""0"" />"
+"25","Ergebnisse: Nominale SOC-Genauigkeit im Benchmark","Folie_25_image20.png","05ECFB0DCD4ECF4D316405BA7160C8D04CF3B3F35808FC779F90BA5D0ED2B4C8",
+"26","Ergebnisse: Sensitivität gegenüber Strom-Gain-Fehlern","Folie_26_image21.png","082DA5C7432812AD207FED5609504F47DFA481777E5C64D296913B33C066885C",
+"27","Ergebnisse: Recovery nach SOC-Initialisierungsfehlern","Folie_27_image22.png","822460AFE5E2D44BD3B20B1133F70B79B3E7F5A6BAAFCDB340F478321EC0C4DA",
+"28","Ergebnisse: Lokale SOC-Reaktion auf Spannungsspitzen","Folie_28_image23.png","CF098C97475B6A491F9799FADC69B98C0E0CA77CEED3D5499F7EA8EDF3CD899B",
+"29","Ergebnisse: Genauigkeit, Robustheit und Recovery","Folie_02_image2.png","7B15E8D113B265A34300418CF6842BD7E3A77E485101156D187315CD8CA794B0",
+"29","Ergebnisse: Genauigkeit, Robustheit und Recovery","Folie_29_image24.png","77D9B9BA79EEF07875C2E68FC57B5D90AFF373F39AA1DA32DC3894D2A191557C",
+"30","Ergebnisse: Flash- und RAM-Bedarf der SOC-Verfahren","Folie_30_image25.png","3725CCABE0816AAAFC1486358DFF62BDEF350145E2CAD670C833EDDF23D65295",
+"31","Embedded AI: Pruning und Quantization","Folie_03_image5.png","954C9415C63C80A9A9155C9DF12AC851955CE0188B963640A65DB9BA0D1718EE",
+"31","Embedded AI: Pruning und Quantization","Folie_02_image2.png","7B15E8D113B265A34300418CF6842BD7E3A77E485101156D187315CD8CA794B0",
+"32","Modellkomplexität: Anzahl der Parameter","Folie_32_image28.png","BC3C5546BF8C7E62304581CB06E5A7D7F625DAA5433CD35F01F0A461F39308AA",
+"33","Modellkomplexität: Anzahl der Parameter","Folie_32_image28.png","BC3C5546BF8C7E62304581CB06E5A7D7F625DAA5433CD35F01F0A461F39308AA",
+"34","Modellkomplexität: Anzahl der Parameter","Folie_32_image28.png","BC3C5546BF8C7E62304581CB06E5A7D7F625DAA5433CD35F01F0A461F39308AA",
+"35","Versuchsaufbau: Kompression und STM32-Benchmark","Folie_35_image29.png","0D2EEAB861AEB07519D5C0776E5EA95B3B8843D6C5F43C82D0286D7788F1FAD8",
+"36","Unstructured und Structured Pruning","Folie_36_image30.png","4A07DAD593C1E089060DBBB89033A1DFAB4E6CDD5A3F585555C649BBDA053384",
+"37","Structured Pruning: Von der Auswahl zum kleineren Modell","Folie_36_image30.png","4A07DAD593C1E089060DBBB89033A1DFAB4E6CDD5A3F585555C649BBDA053384","<a:srcRect xmlns:a=""http://schemas.openxmlformats.org/drawingml/2006/main"" l=""66667"" t=""0"" r=""0"" b=""36111"" />"
+"38","Quantization: Weight-only INT8","Folie_38_image31.png","47B53FCB8C1525DCD827BB000526365DFCEBA0EF4C53D247E89994B4C5511C8F","<ns0:srcRect xmlns:ns0=""http://schemas.openxmlformats.org/drawingml/2006/main"" l=""51389"" t=""10000"" r=""1111"" b=""9222"" />"
+"39","Ergebnisse: Accuracy nach Modellkompression","Folie_39_image32.png","A182EBF2A93757B7070604F48629BB2A89808650164964C7E97A5F20CF69B8AB","<ns0:srcRect xmlns:ns0=""http://schemas.openxmlformats.org/drawingml/2006/main"" l=""0"" t=""0"" r=""50000"" b=""0"" />"
+"39","Ergebnisse: Accuracy nach Modellkompression","Folie_39_image33.png","384B79799F12F5B4230AD2891EE7A52EA5FA24D653E5E0ADB0CE103D6D42CE92","<ns0:srcRect xmlns:ns0=""http://schemas.openxmlformats.org/drawingml/2006/main"" l=""0"" t=""0"" r=""50000"" b=""0"" />"
+"40","Ergebnisse: Flash- und RAM-Bedarf der Modelle","Folie_40_image34.png","D5C7C9386D18E8DEAD9CA07319EC64C4AA5E498ACB1C451916EC089DAE99230E","<a:srcRect xmlns:a=""http://schemas.openxmlformats.org/drawingml/2006/main"" l=""0"" t=""0"" r=""0"" b=""0"" />"
+"40","Ergebnisse: Flash- und RAM-Bedarf der Modelle","Folie_02_image2.png","7B15E8D113B265A34300418CF6842BD7E3A77E485101156D187315CD8CA794B0",
+"41","Ergebnisse: Host-Latenz und Kernelzeit auf dem STM32","Folie_41_image35.png","9BEBD0BE1C299C9F667FD90AEE72F471664F64180696FE10C6E2884362BAAF39",
+"42","Ergebnisse: Host-Latenz und Kernelzeit auf dem STM32","Folie_41_image35.png","9BEBD0BE1C299C9F667FD90AEE72F471664F64180696FE10C6E2884362BAAF39",
+"43","Fazit: Antworten auf die Forschungsfragen","Folie_03_image5.png","954C9415C63C80A9A9155C9DF12AC851955CE0188B963640A65DB9BA0D1718EE",
+"44","44 / 44","Folie_03_image5.png","954C9415C63C80A9A9155C9DF12AC851955CE0188B963640A65DB9BA0D1718EE",
+"45","Anhang: Korrelation der SOH-Eingangsmerkmale","Folie_45_image37.png","8804CDB2616CB5C58AC19A3041B738951A6CA8891E95A4D6949E3AB90EF7F090",
+"45","Anhang: Korrelation der SOH-Eingangsmerkmale","Folie_02_image2.png","7B15E8D113B265A34300418CF6842BD7E3A77E485101156D187315CD8CA794B0",
+"46","Anhang: Störungsszenarien im Robustheitsvergleich","Folie_46_image38.png","03AE76E702EFF6E616C5F19D9FD100362C314DD69FACA0D5149C9DAACB6FC3D1",
+"47","Anhang: Stromrauschen und lokale SOC-Schwankungen","Folie_47_image39.png","49336F1F5D4BBB97B18D3737416AE48F8F3FC2291FFA303451B6F61C46239917",
+"51","Anhang: Parameterspeicher und Firmwarebedarf","Folie_02_image2.png","7B15E8D113B265A34300418CF6842BD7E3A77E485101156D187315CD8CA794B0",
+"51","Anhang: Parameterspeicher und Firmwarebedarf","Folie_51_image40.png","43A7D6336BEE7AFBF40073DF376EFA44974C3B68390E33BC36E4FB131A3FA396",
+"52","Anhang: DD-Ausführung und Zustandsführung","Folie_52_image26.png","AC471FCE1AB8E5C7392022ACDEA7E9470D22794103C013F269D52F21E1D8D51C",
+"53","Anhang: Stateful LSTM und MLP-Head","Folie_32_image28.png","BC3C5546BF8C7E62304581CB06E5A7D7F625DAA5433CD35F01F0A461F39308AA",
+"56","Anhang: Signed Error Distributions von SOC und SOH","Folie_39_image32.png","A182EBF2A93757B7070604F48629BB2A89808650164964C7E97A5F20CF69B8AB","<ns0:srcRect xmlns:ns0=""http://schemas.openxmlformats.org/drawingml/2006/main"" l=""50000"" t=""0"" r=""0"" b=""0"" />"
+"56","Anhang: Signed Error Distributions von SOC und SOH","Folie_39_image33.png","384B79799F12F5B4230AD2891EE7A52EA5FA24D653E5E0ADB0CE103D6D42CE92","<ns0:srcRect xmlns:ns0=""http://schemas.openxmlformats.org/drawingml/2006/main"" l=""50000"" t=""0"" r=""0"" b=""0"" />"
+"57","Anhang: SOH-Ergebnisse im Überblick","Folie_02_image2.png","7B15E8D113B265A34300418CF6842BD7E3A77E485101156D187315CD8CA794B0",

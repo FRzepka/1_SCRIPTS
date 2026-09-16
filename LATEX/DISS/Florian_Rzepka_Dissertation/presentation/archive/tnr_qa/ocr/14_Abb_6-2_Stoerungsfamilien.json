@@ -1,0 +1,89 @@
+﻿{
+    "lines":  [
+                  {
+                      "text":  "Signal-integrity faults",
+                      "words":  [
+                                    {
+                                        "y":  86,
+                                        "w":  256,
+                                        "h":  38,
+                                        "text":  "Signal-integrity",
+                                        "x":  0
+                                    },
+                                    {
+                                        "y":  86,
+                                        "w":  92,
+                                        "h":  30,
+                                        "text":  "faults",
+                                        "x":  267
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Current-gain and bias",
+                      "words":  [
+                                    {
+                                        "y":  279,
+                                        "w":  150,
+                                        "h":  23,
+                                        "text":  "Current-gain",
+                                        "x":  30
+                                    },
+                                    {
+                                        "y":  279,
+                                        "w":  42,
+                                        "h":  18,
+                                        "text":  "and",
+                                        "x":  190
+                                    },
+                                    {
+                                        "y":  279,
+                                        "w":  47,
+                                        "h":  18,
+                                        "text":  "bias",
+                                        "x":  244
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Initialization errors",
+                      "words":  [
+                                    {
+                                        "y":  245,
+                                        "w":  198,
+                                        "h":  29,
+                                        "text":  "Initialization",
+                                        "x":  1051
+                                    },
+                                    {
+                                        "y":  252,
+                                        "w":  99,
+                                        "h":  22,
+                                        "text":  "errors",
+                                        "x":  1263
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Input Disturbances",
+                      "words":  [
+                                    {
+                                        "y":  574,
+                                        "w":  83,
+                                        "h":  37,
+                                        "text":  "Input",
+                                        "x":  988
+                                    },
+                                    {
+                                        "y":  574,
+                                        "w":  224,
+                                        "h":  30,
+                                        "text":  "Disturbances",
+                                        "x":  1084
+                                    }
+                                ]
+                  }
+              ],
+    "file":  "14_Abb_6-2_Stoerungsfamilien.png",
+    "angle":  0
+}

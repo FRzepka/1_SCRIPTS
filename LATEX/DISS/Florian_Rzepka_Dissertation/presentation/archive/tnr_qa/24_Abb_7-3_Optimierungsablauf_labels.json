@@ -1,0 +1,39 @@
+{
+  "file": "24_Abb_7-3_Optimierungsablauf.png",
+  "font": "Times New Roman",
+  "labels": [
+    {
+      "text": "Pruning",
+      "x": 719.0,
+      "y": 95.5,
+      "size": 27,
+      "rotation": 0
+    },
+    {
+      "text": "Quantization",
+      "x": 722.0,
+      "y": 270.5,
+      "size": 27,
+      "rotation": 0
+    }
+  ],
+  "viewbox": [
+    1447,
+    396.0
+  ],
+  "covered_label_areas": [
+    [
+      644,
+      82,
+      150,
+      27
+    ],
+    [
+      632,
+      255,
+      180,
+      31
+    ]
+  ],
+  "data_operation": "none; original curves retained in SVG image layer"
+}

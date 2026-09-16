@@ -1,0 +1,153 @@
+﻿BILDER FUER DEN DISSERTATIONSVORTRAG
+
+Grundlage: Vortrag_Erzaehlfassung_30min_v3.pdf, 37 Seiten.
+32 unveraenderte PNG-Dateien fuer 31 Abbildungsnummern der Dissertation.
+Abbildung 4.1 besteht aus zwei Bilddateien. R01 ist eine Reservegrafik.
+Die ersten Zeichen des Dateinamens geben die Vortragsreihenfolge an.
+Station bezeichnet die Bildstation in der Erzaehlfassung, nicht eine fertige Foliennummer.
+
+BMS-ORIENTIERUNG
+01_Abb_2-1_BMS_Anforderungen.png wird mehrfach benutzt.
+Einstieg und Abschluss: gesamter Anforderungsrahmen.
+Vor dem MLP: Deployment / Modellkomplexitaet, Accuracy ergaenzend.
+Vor dem Benchmark: Performance und Hardware.
+Vor der Optimierung: Deployment und Hardware, Accuracy als Kontrollgroesse.
+Die drei markierten Fokusansichten stehen auf PDF-Seiten 5, 13 und 24.
+Sie sind LaTeX-Anmerkungen ueber dem Originalbild und keine separaten Original-PNGs.
+
+WEITERE INHALTE
+Abbildung 7.2 wird nicht als Bild verwendet. Die Architekturwerte stehen auf Seite 25.
+Formeln sowie Kernelzeiten aus Tabellen 7.1/7.2 bleiben Text bzw. Formeln.
+Vor finalen Folien die Pruefhinweise auf Seite 37 beachten, insbesondere fuer 7.12.
+Die Bilder wurden nur kopiert. Keine Neuberechnung, Farbaenderung oder Verkleinerung.
+
+BILDREIHENFOLGE
+
+01_Abb_2-1_BMS_Anforderungen.png
+  BMS-Anforderungen | Station 1, 27 | PDF-Seite 2, 5, 13, 24, 32
+  Wiederkehrende Orientierung. Hervorhebungen stehen in der Erzaehlfassung auf S. 5, 13 und 24.
+
+02a_Abb_4-1_NMC_SOH_Zyklen.png
+  NMC-Datensatz: SOH ueber Zyklen | Station 2 | PDF-Seite 3
+  Zusammen mit 02b verwenden.
+
+02b_Abb_4-1_NMC_SOH_Zeit.png
+  NMC-Datensatz: SOH ueber Zeit | Station 2 | PDF-Seite 3
+  Zusammen mit 02a verwenden.
+
+03_Abb_4-4_LFP_Datensatz.png
+  LFP-Datensatz und Betriebsbedingungen | Station 2 | PDF-Seite 3
+  Fuer die Folie Zellverlaeufe und Profilzuordnung lesbar vergroessern.
+
+04_Abb_4-6_BMS_Platine.png
+  Eigene BMS-Plattform | Station 3 | PDF-Seite 4
+  Die eigene H755-Platine und die H753-Benchmarkhardware unterscheiden.
+
+05_Abb_3-2_MLP_Architektur.png
+  MLP-Grundlagen | Station 4 | PDF-Seite 6
+  Eingang, Gewichte, Aktivierung und Ausgabe erklaeren.
+
+06_Abb_5-1_Korrelation.png
+  Korrelation der Messgroessen | Station 5 | PDF-Seite 7
+  Korrelation ist weder Kausalitaet noch ein gemessener Feature-Importance-Test.
+
+07_Abb_5-2_Lag_Sequenz.png
+  Lag-Steps und Lag-Sequenzen | Station 6 | PDF-Seite 8
+  Zeitliche Information fuer einen MLP.
+
+08_Abb_5-3_Training_Evaluation.png
+  Datenaufbereitung und Evaluation | Station 7 | PDF-Seite 9
+  Training, Validierung und Test sowie Skalierung und Hyperparameterwahl.
+
+09_Abb_5-5_MLP_Historienvergleich.png
+  Einfluss der Lag-Konfiguration | Station 8 | PDF-Seite 10
+  Zusammen mit Abbildung 5.6.
+
+10_Abb_5-6_MLP_SOH_Ergebnis.png
+  SOH-Schaetzung mit einem MLP | Station 8 | PDF-Seite 10
+  Mit 5.5 zeigen. Einzelne Kurven fuer die Folie vergroessern.
+
+11_Abb_3-3_LSTM_Zelle.png
+  LSTM-Zellstruktur | Station 9 | PDF-Seite 11
+  Uebergang zur internen Zustandsfortschreibung.
+
+12_Abb_3-4_GRU_Zelle.png
+  GRU-Zellstruktur | Station 9 | PDF-Seite 12
+  Mit LSTM vergleichen, nicht mit garantierter hoeherer Genauigkeit begruenden.
+
+13_Abb_6-1_Benchmark_Methodik.png
+  Die vier SOC-Modellzweige | Station 10 | PDF-Seite 14
+  DM, HDM, HECM und DD sowie das gemeinsame SOH-Modell.
+
+14_Abb_6-2_Stoerungsfamilien.png
+  Stoerungsfamilien | Station 11 | PDF-Seite 15
+  Ueberblick ueber das Benchmarkdesign.
+
+15_Abb_6-4_Baseline.png
+  Nominale Genauigkeit | Station 12 | PDF-Seite 16
+  Zelluebergreifende Ergebnisse mit Unsicherheit.
+
+16_Abb_6-5_Current_Gain.png
+  Systematischer Strommessfehler | Station 13 | PDF-Seite 17
+  Die Grafik zeigt multiplikativen Gain, nicht additiven Offset.
+
+17_Abb_6-9_Initialisierung_Erholung.png
+  Erholung nach Initialisierungsfehler | Station 14 | PDF-Seite 18
+  Erholung relativ zum ungestoerten Vergleich erklaeren.
+
+18_Abb_6-13_Spannungsspitze.png
+  Reaktion auf einen lokalen Spannungsimpuls | Station 15 | PDF-Seite 19
+  Hauptbeispiel fuer lokale Ereignisse. Stromrauschen liegt als Reserve bei.
+
+19_Abb_6-15_Stoerungsvergleich.png
+  Szenarienuebergreifende Fehlerzunahme | Station 16 | PDF-Seite 20
+  Stromfehler im Gesamtvergleich einordnen.
+
+20_Abb_6-16_Benchmark_Synthese.png
+  Accuracy, Robustness und Recovery | Station 17 | PDF-Seite 21
+  Relative Synthese der untersuchten Vertreter.
+
+21_Abb_6-19_Hardware_Speicher.png
+  Flash und Peak-RAM der SOC-Implementierungen | Station 18 | PDF-Seite 22
+  Isolierte SOC-Zweige mit extern vorgegebenem SOH, kein mitgemessener SOH-LSTM.
+
+22_Abb_6-20_DD_Ausfuehrungsmodi.png
+  Rolling Window, Continuous State und Periodic Reset | Station 19 | PDF-Seite 23
+  Ausfuehrungsmodi getrennt vom urspruenglichen Robustheitsprotokoll einordnen.
+
+23_Abb_7-1_Embedded_LSTM.png
+  LSTM mit nachgeschaltetem MLP | Station 20 | PDF-Seite 25
+  Architekturwerte aus Abbildung 7.2 als Text bzw. Tabelle verwenden.
+
+24_Abb_7-3_Optimierungsablauf.png
+  Optimierung und C-Export | Station 21 | PDF-Seite 26
+  Pruning und Quantisierung sind hier getrennt untersuchte Varianten.
+
+25_Abb_3-5_Pruning.png
+  Strukturiertes und unstrukturiertes Pruning | Station 22 | PDF-Seite 27
+  Grundlagen unmittelbar vor den Optimierungsergebnissen.
+
+26_Abb_3-7_Quantisierung.png
+  Quantisierungsumfang und Werteraster | Station 23 | PDF-Seite 28
+  Gewichtsquantisierung von anderen FP32-Teilen unterscheiden.
+
+27_Abb_7-8_SOC_Fehler.png
+  SOC-Fehler der Embedded-Varianten | Station 24 | PDF-Seite 29
+  Kleine Zahlenabweichung zwischen Legende und Dissertationstext. Pruefhinweis auf S. 37 beachten.
+
+28_Abb_7-9_SOH_Fehler.png
+  SOH-Fehler der Embedded-Varianten | Station 24 | PDF-Seite 29
+  SOC und SOH getrennt bewerten.
+
+29_Abb_7-12_Parameter_Flash_RAM.png
+  Parameter, Flash und RAM | Station 25 | PDF-Seite 30
+  Vor finalen Folien RAM-Zahl und obere Parameter-/Gewichtspanels abgleichen. Details auf S. 37.
+
+30_Abb_7-13_Host_Latenz.png
+  Verteilung der End-to-End-Latenz | Station 26 | PDF-Seite 31
+  Enthaelt Host und UART. Reine Kernelzeiten kommen aus Tabellen 7.1 und 7.2.
+
+R01_Abb_6-7_Stromrauschen.png
+  Stromrauschen als Reserve | Station Reserve | PDF-Seite 33
+  Ergaenzung oder Ersatz zum lokalen Ereignis in Abbildung 6.13.
+

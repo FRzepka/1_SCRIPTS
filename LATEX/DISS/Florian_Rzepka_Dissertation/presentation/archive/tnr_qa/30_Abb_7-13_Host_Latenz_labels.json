@@ -1,0 +1,351 @@
+{
+  "file": "30_Abb_7-13_Host_Latenz.png",
+  "font": "Times New Roman",
+  "labels": [
+    {
+      "text": "SOC Host Latency Distribution",
+      "x": 546.0,
+      "y": 34.5,
+      "size": 52,
+      "rotation": 0
+    },
+    {
+      "text": "SOH Host Latency Distribution",
+      "x": 1387.0,
+      "y": 34.5,
+      "size": 52,
+      "rotation": 0
+    },
+    {
+      "text": "0",
+      "x": 164,
+      "y": 628.0,
+      "size": 41,
+      "rotation": 0
+    },
+    {
+      "text": "1000",
+      "x": 164,
+      "y": 530.0,
+      "size": 41,
+      "rotation": 0
+    },
+    {
+      "text": "2000",
+      "x": 164,
+      "y": 432.0,
+      "size": 41,
+      "rotation": 0
+    },
+    {
+      "text": "3000",
+      "x": 164,
+      "y": 334.0,
+      "size": 41,
+      "rotation": 0
+    },
+    {
+      "text": "4000",
+      "x": 164,
+      "y": 236.0,
+      "size": 41,
+      "rotation": 0
+    },
+    {
+      "text": "5000",
+      "x": 164,
+      "y": 138.0,
+      "size": 41,
+      "rotation": 0
+    },
+    {
+      "text": "Count",
+      "x": 42,
+      "y": 352,
+      "size": 47,
+      "rotation": -90
+    },
+    {
+      "text": "Count",
+      "x": 979.0,
+      "y": 351.0,
+      "size": 47,
+      "rotation": -90
+    },
+    {
+      "text": "0",
+      "x": 177.0,
+      "y": 658,
+      "size": 41,
+      "rotation": 0
+    },
+    {
+      "text": "5",
+      "x": 259.0,
+      "y": 658,
+      "size": 41,
+      "rotation": 0
+    },
+    {
+      "text": "10",
+      "x": 341.0,
+      "y": 658,
+      "size": 41,
+      "rotation": 0
+    },
+    {
+      "text": "15",
+      "x": 423.0,
+      "y": 658,
+      "size": 41,
+      "rotation": 0
+    },
+    {
+      "text": "20",
+      "x": 505.0,
+      "y": 658,
+      "size": 41,
+      "rotation": 0
+    },
+    {
+      "text": "25",
+      "x": 587.0,
+      "y": 658,
+      "size": 41,
+      "rotation": 0
+    },
+    {
+      "text": "30",
+      "x": 669.0,
+      "y": 658,
+      "size": 41,
+      "rotation": 0
+    },
+    {
+      "text": "35",
+      "x": 751.0,
+      "y": 658,
+      "size": 41,
+      "rotation": 0
+    },
+    {
+      "text": "40",
+      "x": 833.0,
+      "y": 658,
+      "size": 41,
+      "rotation": 0
+    },
+    {
+      "text": "45",
+      "x": 915.0,
+      "y": 658,
+      "size": 41,
+      "rotation": 0
+    },
+    {
+      "text": "Host Latency [ms]",
+      "x": 546,
+      "y": 706,
+      "size": 46,
+      "rotation": 0
+    },
+    {
+      "text": "0",
+      "x": 1018.0,
+      "y": 658,
+      "size": 41,
+      "rotation": 0
+    },
+    {
+      "text": "5",
+      "x": 1099.888888888889,
+      "y": 658,
+      "size": 41,
+      "rotation": 0
+    },
+    {
+      "text": "10",
+      "x": 1181.7777777777778,
+      "y": 658,
+      "size": 41,
+      "rotation": 0
+    },
+    {
+      "text": "15",
+      "x": 1263.6666666666667,
+      "y": 658,
+      "size": 41,
+      "rotation": 0
+    },
+    {
+      "text": "20",
+      "x": 1345.5555555555557,
+      "y": 658,
+      "size": 41,
+      "rotation": 0
+    },
+    {
+      "text": "25",
+      "x": 1427.4444444444443,
+      "y": 658,
+      "size": 41,
+      "rotation": 0
+    },
+    {
+      "text": "30",
+      "x": 1509.3333333333333,
+      "y": 658,
+      "size": 41,
+      "rotation": 0
+    },
+    {
+      "text": "35",
+      "x": 1591.2222222222222,
+      "y": 658,
+      "size": 41,
+      "rotation": 0
+    },
+    {
+      "text": "40",
+      "x": 1673.111111111111,
+      "y": 658,
+      "size": 41,
+      "rotation": 0
+    },
+    {
+      "text": "45",
+      "x": 1755.0,
+      "y": 658,
+      "size": 41,
+      "rotation": 0
+    },
+    {
+      "text": "Host Latency [ms]",
+      "x": 1386,
+      "y": 706,
+      "size": 46,
+      "rotation": 0
+    },
+    {
+      "text": "Base",
+      "x": 806.0,
+      "y": 108.0,
+      "size": 38,
+      "rotation": 0
+    },
+    {
+      "text": "Pruned",
+      "x": 806.0,
+      "y": 154.0,
+      "size": 38,
+      "rotation": 0
+    },
+    {
+      "text": "Quantized",
+      "x": 806.0,
+      "y": 200.0,
+      "size": 38,
+      "rotation": 0
+    },
+    {
+      "text": "Base",
+      "x": 1212.0,
+      "y": 108.0,
+      "size": 38,
+      "rotation": 0
+    },
+    {
+      "text": "Pruned",
+      "x": 1212.0,
+      "y": 154.0,
+      "size": 38,
+      "rotation": 0
+    },
+    {
+      "text": "Quantized",
+      "x": 1212.0,
+      "y": 200.0,
+      "size": 38,
+      "rotation": 0
+    }
+  ],
+  "viewbox": [
+    1800,
+    750.0
+  ],
+  "covered_label_areas": [
+    [
+      177,
+      0,
+      738,
+      69
+    ],
+    [
+      1018,
+      0,
+      738,
+      69
+    ],
+    [
+      0,
+      94,
+      166,
+      552
+    ],
+    [
+      948,
+      272,
+      62,
+      158
+    ],
+    [
+      151,
+      640,
+      792,
+      103
+    ],
+    [
+      994,
+      640,
+      793,
+      103
+    ],
+    [
+      718,
+      89,
+      176,
+      38
+    ],
+    [
+      718,
+      135,
+      176,
+      38
+    ],
+    [
+      718,
+      181,
+      176,
+      38
+    ],
+    [
+      1124,
+      89,
+      176,
+      38
+    ],
+    [
+      1124,
+      135,
+      176,
+      38
+    ],
+    [
+      1124,
+      181,
+      176,
+      38
+    ]
+  ],
+  "data_operation": "none; original curves retained in SVG image layer"
+}

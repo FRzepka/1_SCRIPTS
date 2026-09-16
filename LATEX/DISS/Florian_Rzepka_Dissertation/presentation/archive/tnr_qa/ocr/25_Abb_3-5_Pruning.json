@@ -1,0 +1,255 @@
+﻿{
+    "lines":  [
+                  {
+                      "text":  "(a)",
+                      "words":  [
+                                    {
+                                        "y":  26,
+                                        "w":  45,
+                                        "h":  37,
+                                        "text":  "(a)",
+                                        "x":  36
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "(b)",
+                      "words":  [
+                                    {
+                                        "y":  26,
+                                        "w":  48,
+                                        "h":  37,
+                                        "text":  "(b)",
+                                        "x":  636
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "(c)",
+                      "words":  [
+                                    {
+                                        "y":  26,
+                                        "w":  45,
+                                        "h":  37,
+                                        "text":  "(c)",
+                                        "x":  1236
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "011? •",
+                      "words":  [
+                                    {
+                                        "y":  127,
+                                        "w":  32,
+                                        "h":  15,
+                                        "text":  "011?",
+                                        "x":  1364
+                                    },
+                                    {
+                                        "y":  126,
+                                        "w":  4,
+                                        "h":  4,
+                                        "text":  "•",
+                                        "x":  1402
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "h",
+                      "words":  [
+                                    {
+                                        "y":  104,
+                                        "w":  17,
+                                        "h":  27,
+                                        "text":  "h",
+                                        "x":  888
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "same dimensions, irregular zeros",
+                      "words":  [
+                                    {
+                                        "y":  414,
+                                        "w":  72,
+                                        "h":  16,
+                                        "text":  "same",
+                                        "x":  707
+                                    },
+                                    {
+                                        "y":  408,
+                                        "w":  156,
+                                        "h":  26,
+                                        "text":  "dimensions,",
+                                        "x":  789
+                                    },
+                                    {
+                                        "y":  408,
+                                        "w":  109,
+                                        "h":  28,
+                                        "text":  "irregular",
+                                        "x":  958
+                                    },
+                                    {
+                                        "y":  414,
+                                        "w":  72,
+                                        "h":  16,
+                                        "text":  "zeros",
+                                        "x":  1075
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "unstructured pruning",
+                      "words":  [
+                                    {
+                                        "y":  590,
+                                        "w":  185,
+                                        "h":  25,
+                                        "text":  "unstructured",
+                                        "x":  752
+                                    },
+                                    {
+                                        "y":  590,
+                                        "w":  110,
+                                        "h":  32,
+                                        "text":  "pruning",
+                                        "x":  950
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "h",
+                      "words":  [
+                                    {
+                                        "y":  102,
+                                        "w":  17,
+                                        "h":  27,
+                                        "text":  "h",
+                                        "x":  1489
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "dense weights and activations",
+                      "words":  [
+                                    {
+                                        "y":  408,
+                                        "w":  80,
+                                        "h":  22,
+                                        "text":  "dense",
+                                        "x":  111
+                                    },
+                                    {
+                                        "y":  408,
+                                        "w":  101,
+                                        "h":  28,
+                                        "text":  "weights",
+                                        "x":  200
+                                    },
+                                    {
+                                        "y":  408,
+                                        "w":  47,
+                                        "h":  22,
+                                        "text":  "and",
+                                        "x":  311
+                                    },
+                                    {
+                                        "y":  408,
+                                        "w":  141,
+                                        "h":  22,
+                                        "text":  "activations",
+                                        "x":  369
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "dense reference model",
+                      "words":  [
+                                    {
+                                        "y":  590,
+                                        "w":  91,
+                                        "h":  25,
+                                        "text":  "dense",
+                                        "x":  144
+                                    },
+                                    {
+                                        "y":  590,
+                                        "w":  141,
+                                        "h":  25,
+                                        "text":  "reference",
+                                        "x":  247
+                                    },
+                                    {
+                                        "y":  590,
+                                        "w":  89,
+                                        "h":  25,
+                                        "text":  "model",
+                                        "x":  400
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "smaller dense tensors and states",
+                      "words":  [
+                                    {
+                                        "y":  408,
+                                        "w":  96,
+                                        "h":  22,
+                                        "text":  "smaller",
+                                        "x":  1301
+                                    },
+                                    {
+                                        "y":  408,
+                                        "w":  80,
+                                        "h":  22,
+                                        "text":  "dense",
+                                        "x":  1406
+                                    },
+                                    {
+                                        "y":  409,
+                                        "w":  98,
+                                        "h":  21,
+                                        "text":  "tensors",
+                                        "x":  1495
+                                    },
+                                    {
+                                        "y":  408,
+                                        "w":  47,
+                                        "h":  22,
+                                        "text":  "and",
+                                        "x":  1603
+                                    },
+                                    {
+                                        "y":  409,
+                                        "w":  78,
+                                        "h":  21,
+                                        "text":  "states",
+                                        "x":  1661
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "structured pruning",
+                      "words":  [
+                                    {
+                                        "y":  590,
+                                        "w":  148,
+                                        "h":  25,
+                                        "text":  "structured",
+                                        "x":  1377
+                                    },
+                                    {
+                                        "y":  590,
+                                        "w":  110,
+                                        "h":  32,
+                                        "text":  "pruning",
+                                        "x":  1538
+                                    }
+                                ]
+                  }
+              ],
+    "file":  "25_Abb_3-5_Pruning.png",
+    "angle":  0
+}

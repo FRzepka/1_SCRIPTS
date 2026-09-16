@@ -1,0 +1,91 @@
+\station{BMS-Anforderungen und Forschungsziel}{1:15 min}{Anforderungen}
+\label{sec:start}
+Wie l\"asst sich komplexes Batterieverhalten mit neuronalen Netzen beschreiben, die zugleich auf einem begrenzten Mikrocontroller betrieben werden k\"onnen? Diese Frage steht im Zentrum meiner Arbeit. Ein BMS muss den Ladezustand und den Alterungszustand aus verf\"ugbaren Messungen sch\"atzen. Beide Gr\"o\ss en beschreiben unterschiedliche Eigenschaften:
+\begin{equation}
+  \SOC(t)=\frac{Q_{\mathrm{available}}(t)}{C_{\mathrm{current}}(t)},
+  \qquad
+  \SOH(t)=\frac{C_{\mathrm{current}}(t)}{C_{\mathrm{nominal}}}.
+\end{equation}
+Eine gealterte Batterie kann voll geladen sein und trotzdem weniger Ladung speichern als eine neue. Gerade in dezentralen Speichern und mobilen Anwendungen muss diese Unterscheidung langfristig lokal verf\"ugbar bleiben.
+
+\original{2.1}{bms_requirements.png}{91}{BMS-Anforderungen als gemeinsamer Bezugspunkt der Arbeit.}
+
+Deployment beschreibt die Gestaltung und \"Ubertragung eines Modells in eine anpassbare BMS-Implementierung. Performance beschreibt die G\"ute seiner Zustandsbestimmung: Genauigkeit, Robustheit und Erholung. Hardware erfasst die daf\"ur ben\"otigten Ressourcen: Flash, RAM und Inferenzzeit. Modellkomplexit\"at ist somit eine Entwurfsentscheidung, Speicher und Laufzeit sind ihre konkreten Auswirkungen.
+
+Diese Anforderungen bleiben in der gesamten Arbeit verbunden. Zuerst gestalten wir ein Modell mit geeigneter zeitlicher Information. Danach pr\"ufen wir sein Verhalten unter gest\"orten Bedingungen. Abschlie\ss end optimieren wir die Implementierung. Das Anforderungsbild zeigt jeweils, welcher dieser Aspekte gerade im Vordergrund steht.
+
+\station{Daten als Grundlage der Zustandsbestimmung}{1:30 min}{Datenbasis}
+Die Modelle ben\"otigen Messreihen, in denen nicht nur einzelne Betriebszust\"ande, sondern auch die Entwicklung der Batterie sichtbar wird. Die erste Untersuchung verwendet 14 NMC-Zellen unter unterschiedlichen Belastungsprofilen. Abbildung 4.1 zeigt die Alterung sowohl \"uber Zyklen als auch \"uber die verstrichene Zeit.
+\begin{figure}[H]\centering
+  \includegraphics[width=.48\linewidth,height=52mm,keepaspectratio]{paper1_soh_cycles.png}\hfill
+  \includegraphics[width=.48\linewidth,height=52mm,keepaspectratio]{paper1_soh_time.png}
+  \caption*{\textbf{Dissertation, Abbildung 4.1.} NMC-Alterungsverl\"aufe in beiden urspr\"unglichen Darstellungen.}
+\end{figure}
+F\"ur die folgenden Untersuchungen steht ein LFP-Datensatz mit 15 Zellen und acht Versuchsprofilen zur Verf\"ugung. Die Profile variieren unter anderem Lade- und Entladerate sowie Entladetiefe. Das Design of Experiments verteilt die gew\"ahlten Bedingungen systematisch, damit nicht nur ein einzelner Betriebsfall beobachtet wird.
+\original{4.4}{Figure_26_APPENDIX_SOH_Aging_Conditions.png}{88}{LFP-Zellen, Alterungsverl\"aufe und unterschiedliche Betriebsbedingungen.}
+Diese Vielfalt ist wichtig, weil ein Modell Alterung von kurzfristigen Last- und Temperatureffekten unterscheiden muss. F\"ur den Robustheitsbenchmark werden Trainings-, Validierungs- und Testzellen getrennt. Die sechs Testzellen pr\"ufen somit die \"Ubertragung auf andere Zellen, nicht nur auf sp\"atere Messpunkte derselben Trainingsreihe.
+
+\station{Vom Messsystem zum programmierbaren BMS}{0:45 min}{Hardwarebasis}
+Ein trainiertes Netz ist noch kein Batteriemanagementsystem. Dazu geh\"oren die Messung der Zellgr\"o\ss en, die \"Uberwachung und ein Controller, auf dem die Zustandsbestimmung ausgef\"uhrt werden kann. Die entwickelte Vier-Zell-Plattform verbindet einen Batterie\"uberwachungsbaustein mit einem programmierbaren STM32-Mikrocontroller.
+\original{4.6}{bms_board_render.png}{110}{Eigene BMS-Plattform mit Mess- und Verarbeitungselektronik.}
+Der TLE9012DQU \"ubernimmt die zellnahe \"Uberwachung. Der STM32H755 stellt die Umgebung f\"ur die eigene Software bereit. Die sp\"ater gezeigten Laufzeit- und Speichermessungen wurden auf einem STM32H753 durchgef\"uhrt. Die eigene Platine und dieser Benchmark-Controller haben damit unterschiedliche Rollen. Gemeinsam machen sie deutlich, wo die Methoden eingesetzt werden sollen: zwischen realen Messsignalen und einer begrenzten lokalen Recheneinheit.
+
+\weiter{Zeitliche Repr\"asentation: Modellgestaltung}
+\label{focus:mlp}
+\rahmenbild{1}{Schwerpunkt Deployment, insbesondere Modellkomplexit\"at. Accuracy dient der Bewertung der gew\"ahlten Repr\"asentation.}
+Der erste Teil setzt bei der Modellgestaltung an. Wie l\"asst sich zeitabh\"angiges Batterieverhalten bereits mit einer einfach aufgebauten neuronalen Architektur erfassen? Dazu untersuchen wir, welche Information wir dem Netz durch Merkmalsbildung und eine explizite Historie bereitstellen k\"onnen. Die erreichbare Genauigkeit zeigt anschlie\ss end, ob diese Repr\"asentation funktioniert.
+
+Im Anforderungsbild steht daher die Modellkomplexit\"at im Vordergrund. Hardwareeffizienz ist das \"ubergeordnete Entwurfsziel. Eine konkrete MCU-Vermessung folgt in den weiteren Teilen der Arbeit.
+
+\station{Ein MLP als Ausgangspunkt}{1:30 min einschlie\ss lich Schwerpunktwechsel}{Neuronale Grundlagen}
+Zun\"achst stellt sich die Frage, wie viel Modellstruktur \"uberhaupt n\"otig ist. Ein Multilayer Perceptron ist ein geeigneter Ausgangspunkt, weil es aus einer Folge gut beschreibbarer Rechenoperationen besteht. Eine Schicht gewichtet ihre Eing\"ange, addiert einen Bias und wendet eine Aktivierungsfunktion an:
+\begin{equation}
+  \mathbf a^{(\ell)}=f^{(\ell)}\!\left(
+  W^{(\ell)}\mathbf a^{(\ell-1)}+\mathbf b^{(\ell)}\right),
+  \qquad \operatorname{ReLU}(z)=\max(0,z).
+\end{equation}
+\original{3.2}{mlp_general_architecture.png}{87}{Eing\"ange, verborgene Schichten und Ausgabe eines MLP.}
+Die trainierbaren Parameter sind die Gewichte und Bias-Werte. F\"ur eine voll verbundene Schicht mit $n_{\mathrm{in}}$ Eing\"angen und $n_{\mathrm{out}}$ Ausg\"angen gilt:
+\begin{equation}
+  N_{\mathrm{Parameter}}=n_{\mathrm{in}}n_{\mathrm{out}}+n_{\mathrm{out}}.
+\end{equation}
+Mehr Neuronen bedeuten damit nicht nur mehr Darstellungsf\"ahigkeit, sondern auch mehr Speicher und Rechenaufwand. Ein MLP besitzt jedoch keinen internen zeitlichen Zustand. Werden nur aktuelle Messwerte eingegeben, steht die vorherige Belastung nicht automatisch zur Verf\"ugung. Deshalb betrachten wir zun\"achst die Eingangsrepr\"asentation, bevor wir die Architektur aufwendiger machen.
+
+\station{Welche Information steckt in den Messgr\"o\ss en?}{1:00 min}{Merkmalsbildung}
+Abbildung 5.1 liefert einen ersten Blick auf die Beziehungen im NMC-Datensatz. Die kumulierten Lade- und Entlademengen weisen eine starke negative Korrelation mit dem SOH auf. F\"ur beide liegt der Korrelationskoeffizient ungef\"ahr bei $-0{,}99$. F\"ur Temperatur liegt er bei $-0{,}58$, f\"ur Spannung in dieser Auswertung nahe null.
+\original{5.1}{paper1_correlation.png}{95}{Korrelationsmatrix der Messgr\"o\ss en und abgeleiteten Merkmale.}
+\begin{equation}
+  r_{xy}=\frac{\sum_i(x_i-\bar x)(y_i-\bar y)}
+  {\sqrt{\sum_i(x_i-\bar x)^2}\sqrt{\sum_i(y_i-\bar y)^2}}.
+\end{equation}
+Die Ladungsmengen enthalten bereits Belastungsgeschichte. Damit stellen sie dem Netz Information bereit, die im momentanen Stromwert allein fehlt. Diese Beobachtung motiviert Feature Engineering. Sie beweist allerdings weder eine kausale Wirkung noch die Wichtigkeit eines Eingangs im trainierten Netz. Insbesondere kann eine Gr\"o\ss e mit geringer linearer Korrelation in Kombination mit anderen Eing\"angen dennoch n\"utzlich sein.
+
+\station{Zeitlicher Kontext ohne rekurrente Architektur}{1:00 min}{Lag-Sequenzen}
+Wir erweitern den Eingang des MLP um eine geordnete Historie. Zuerst werden hoch aufgel\"oste Messpunkte zu gr\"o\ss eren Zeitintervallen zusammengefasst. Der Merkmalsvektor eines solchen Intervalls bildet einen Lag-Step. Mehrere aufeinanderfolgende Lag-Steps ergeben eine Lag-Sequenz.
+\original{5.2}{paper1_lag_sequence.png}{94}{Zeitliche Aggregation und Aufbau der Lag-Sequenz.}
+\begin{equation}
+  \mathbf x_k=\begin{bmatrix}
+  \boldsymbol\phi_{k-L+1}^{\mathsf T}&\cdots&
+  \boldsymbol\phi_k^{\mathsf T}
+  \end{bmatrix}^{\mathsf T},
+  \qquad \widehat{\SOH}_k=f_{\theta}(\mathbf x_k).
+\end{equation}
+Hier bezeichnet $\boldsymbol\phi_k$ die Merkmale eines Zeitintervalls und $L$ die Anzahl dieser Intervalle. Beispielsweise bilden 16 Schritte mit jeweils zehn Minuten eine Historie von 160 Minuten. Ein einzelner aggregierter Punkt ist also noch keine Sequenz. Das MLP verarbeitet die gesamte Historie als einen gemeinsamen Eingangsvektor. Die zeitliche Information entsteht hier durch die Datenaufbereitung, nicht durch einen internen Speicher des Netzes.
+
+\station{Training, Modellauswahl und unabh\"angige Evaluation}{1:30 min}{Methodischer Ablauf}
+Wie daraus ein belastbarer Modellvergleich entsteht, zeigt der Ablauf in Abbildung 5.3. Die Messdaten werden bereinigt, Merkmale gebildet und zeitlich geordnet. Die Skalierung bringt Eing\"ange mit unterschiedlichen Einheiten in einen geeigneten Wertebereich. Ihre Parameter werden aus den Trainingsdaten bestimmt und anschlie\ss end unver\"andert auf weitere Daten angewendet.
+\original{5.3}{paper1_process.png}{110}{Datenaufbereitung, Training, Hyperparameteroptimierung und Evaluation.}
+Training passt die Gewichte an. Validierung dient der Auswahl von Einstellungen wie Netzbreite, Sequenzl\"ange und Zeitaufl\"osung. Die zur abschlie\ss enden Bewertung reservierten Testdaten d\"urfen diese Auswahl nicht steuern. Hyperparameteroptimierung untersucht daher mehrere Konfigurationen, statt nur ein Netz mit willk\"urlich gew\"ahlten Einstellungen zu trainieren.
+\begin{equation}
+  \mathcal L_{\mathrm{MSE}}=\frac1N\sum_{i=1}^{N}(y_i-\hat y_i)^2,
+  \qquad
+  \MAE=\frac1N\sum_{i=1}^{N}|y_i-\hat y_i|.
+\end{equation}
+Der quadratische Fehler kann das Training steuern. Der MAE beschreibt die mittlere absolute Abweichung f\"ur die Evaluation. Bei einem auf null bis eins normierten SOH entsprechen $0{,}011$ genau 1,10 Prozentpunkten. Die Trennung von Lernen, Auswahl und Pr\"ufung bildet auch f\"ur die nachfolgenden neuronalen Modelle die methodische Grundlage.
+
+\station{Einfluss der Historie und erreichbare SOH-Sch\"atzung}{1:30 min}{MLP-Ergebnisse}
+\original{5.5}{paper1_mae_matrix.png}{73}{Fehlervergleich f\"ur unterschiedliche Kombinationen aus Lag-L\"ange und Zeitaufl\"osung.}
+\original{5.6}{paper1_soh_pred.png}{73}{Vorhergesagter SOH und Referenzverl\"aufe f\"ur ausgew\"ahlte Testf\"alle.}
+Die beiden Bilder beantworten zusammen die Ausgangsfrage. Erstens beeinflusst die Repr\"asentation das Ergebnis. Eine l\"angere Historie ist nicht automatisch besser. In der untersuchten Suche ergab die Kombination aus 16 Schritten und zehn Minuten eine geeignete Konfiguration. Zweitens l\"asst sich der Alterungsverlauf bereits mit einer Feedforward-Architektur abbilden. Der mittlere Test-MAE liegt bei 1,10 Prozentpunkten, einzelne atypische Verl\"aufe sind schwieriger.
+
+Damit ist gezeigt, dass zeitliche Merkmale schon ohne rekurrente Zellen n\"utzlich sind. Das ausgew\"ahlte MLP besitzt allerdings mehrere breite Schichten. Eine einfache \emph{Architekturfamilie} bedeutet nicht automatisch wenig Parameter oder nachgewiesene MCU-Eignung. Der n\"achste Schritt untersucht deshalb eine andere Form der zeitlichen Verarbeitung und anschlie\ss end deren konkrete Implementierungskosten.

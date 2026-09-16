@@ -1,0 +1,144 @@
+\clearpage
+\section*{Reserve: Warum Stromrauschen anders wirkt}
+\addcontentsline{toc}{section}{Reserve: Stromrauschen}
+\original{6.7}{Figure_07_Noise_Robustness.png}{114}{Lokale Stromrauschreaktion und globaler Fehlervergleich. Reservebild zum Hauptbeispiel 6.13.}
+
+Stromrauschen und eine Spannungsspitze illustrieren unterschiedliche Mechanismen. Bei DM und HDM geht jeder verrauschte Stromwert in die Ladungsbilanz ein. Positive und negative Fehler k\"onnen sich dabei teilweise ausgleichen. Es ist also nicht so, dass kleine neue Werte ignoriert werden. Ihr Beitrag wird integriert:
+\begin{equation}
+ \Delta Q_{c,N}=\frac{\Delta t}{3600}\sum_{k=1}^{N}\varepsilon_k.
+\end{equation}
+Bei unabh\"angigem, mittelwertfreiem Rauschen mit Varianz $\sigma_I^2$ gilt innerhalb eines Intervalls ohne Reset oder Begrenzung
+\begin{equation}
+ \mathbb E[\Delta Q_{c,N}]=0,\qquad
+ \operatorname{Var}(\Delta Q_{c,N})=
+ N\sigma_I^2\left(\frac{\Delta t}{3600}\right)^2.
+\end{equation}
+Die Standardabweichung w\"achst dann mit $\sqrt N$. Ein konstanter Offset liefert dagegen einen gerichteten Beitrag $Nb\Delta t/3600$. Zufallsrauschen verschwindet somit nicht vollst\"andig, erzeugt aber einen anderen Fehlerverlauf als ein anhaltender Offset.
+
+DD verarbeitet Strom und Stromableitung direkt. Dadurch kann mehr kurzfristige Variation im Ausgang sichtbar sein, ohne dass der globale MAE stark steigt. HECM nutzt Strom auch in der Zustands- und Spannungsvorhersage. Ein Kalmanfilter ist daher nicht grunds\"atzlich gegen jede Form von Messrauschen unempfindlich.
+
+\textbf{Auswahl f\"ur 30 Minuten.} Abbildung 6.13 bleibt im Hauptteil, weil sie den Unterschied zwischen globaler Genauigkeit und lokalem Ereignis besonders deutlich macht. Abbildung 6.7 ist sinnvoll als Reserve oder als Ersatz, wenn die Stromintegration im Vortrag st\"arker erkl\"art werden soll. Beide vollst\"andig zu pr\"asentieren w\"urde zus\"atzliche Zeit ben\"otigen.
+
+\clearpage
+\section*{Reserve: Gate-Gleichungen und Parameter}
+\addcontentsline{toc}{section}{Reserve: Gate-Gleichungen}
+\textbf{LSTM.} Aktueller Eingang $\mathbf x_k$, vorheriger Hidden State $\mathbf h_{k-1}$ und Zellzustand $\mathbf c_{k-1}$ bestimmen den n\"achsten Schritt:
+\begin{align}
+ \mathbf f_k&=\sigma(W_f\mathbf x_k+U_f\mathbf h_{k-1}+\mathbf b_f),\\
+ \mathbf i_k&=\sigma(W_i\mathbf x_k+U_i\mathbf h_{k-1}+\mathbf b_i),\\
+ \mathbf g_k&=\tanh(W_g\mathbf x_k+U_g\mathbf h_{k-1}+\mathbf b_g),\\
+ \mathbf o_k&=\sigma(W_o\mathbf x_k+U_o\mathbf h_{k-1}+\mathbf b_o),\\
+ \mathbf c_k&=\mathbf f_k\odot\mathbf c_{k-1}+\mathbf i_k\odot\mathbf g_k,\\
+ \mathbf h_k&=\mathbf o_k\odot\tanh(\mathbf c_k).
+\end{align}
+Die Sigmoidfunktion $\sigma(z)=1/(1+e^{-z})$ beschr\"ankt die Gates auf null bis eins. Der Kandidat $\mathbf g_k$ ist neue Information, kein viertes Sigmoid-Gate.
+
+\textbf{GRU.} Passend zur Darstellung in Abbildung 3.4 wird hier folgende Reset-before-Konvention verwendet:
+\begin{align}
+ \mathbf z_k&=\sigma(W_z\mathbf x_k+U_z\mathbf h_{k-1}+\mathbf b_z),\\
+ \mathbf r_k&=\sigma(W_r\mathbf x_k+U_r\mathbf h_{k-1}+\mathbf b_r),\\
+ \widetilde{\mathbf h}_k&=\tanh\!\left(W_h\mathbf x_k+
+             U_h(\mathbf r_k\odot\mathbf h_{k-1})+\mathbf b_h\right),\\
+ \mathbf h_k&=(1-\mathbf z_k)\odot\mathbf h_{k-1}
+             +\mathbf z_k\odot\widetilde{\mathbf h}_k.
+\end{align}
+Softwarebibliotheken k\"onnen das Update Gate umgekehrt definieren oder den Reset nach der rekurrenten Matrixoperation anwenden. Beim C-Export ist deshalb die konkrete Operatorfolge des trainierten Modells ma\ss geblich. Das vereinfachte Zellbild ersetzt keine Implementierungsspezifikation.
+
+\textbf{Speicherwirkung.} Bei Eingangsdimension $D$, Hidden Size $H$ und einem zusammengefassten Bias pro Transformation sind die Parameterzahlen der rekurrenten Schicht
+\begin{equation}
+ N_{\mathrm{LSTM}}=4H(D+H+1),\qquad
+ N_{\mathrm{GRU}}=3H(D+H+1).
+\end{equation}
+Bei zwei getrennt gespeicherten Bias-Vektoren pro Transformation wird aus $+1$ jeweils $+2$. Hinzu kommen Ausgabe- und gegebenenfalls weitere Schichten. Die reinen FP32-Zust\"ande beanspruchen $8H$ Byte beim LSTM und $4H$ Byte bei der GRU. Das ist kein vollst\"andiger RAM-Wert, da Puffer, Stack und weitere Firmware hinzukommen.
+
+\clearpage
+\section*{Reserve: Repr\"asentation und Optimierung}
+\addcontentsline{toc}{section}{Reserve: Repr\"asentation und Optimierung}
+\textbf{Belastungshistorie als Merkmal.} Bei positiver Laderichtung und Zeitintervallen in Sekunden sind kumulierte Lade- und Entlademengen in Ah
+\begin{align}
+ Q_{+,k}&=Q_{+,k-1}+\frac{\max(I_k,0)\Delta t_k}{3600},\\
+ Q_{-,k}&=Q_{-,k-1}+\frac{\max(-I_k,0)\Delta t_k}{3600}.
+\end{align}
+Anders als die vorzeichenbehaftete Ladungsbilanz enthalten beide Gr\"o\ss en den jeweiligen akkumulierten Durchsatz. Die hohe Korrelation mit Alterung motiviert ihren Einsatz, kann aber zugleich durch die gemeinsame Entwicklung mit der Versuchsdauer gepr\"agt sein.
+
+\textbf{Skalierung.} F\"ur das Min-Max-Prinzip gilt
+\begin{equation}
+ \tilde x=\frac{x-x_{\min,\mathrm{train}}}
+ {x_{\max,\mathrm{train}}-x_{\min,\mathrm{train}}}.
+\end{equation}
+Die Embedded-LSTM-Modelle verwenden dagegen die robuste Skalierung mit Trainingsmedian $m$ und Interquartilsabstand $s$, also $\tilde x=(x-m)/s$. Beide Verfahren lernen ihre Skalierungsparameter aus Trainingsdaten. Das Prinzip ist gemeinsam, das konkrete Verfahren muss je Modell erhalten bleiben.
+
+\textbf{Pruning-Kriterium.} Die Bewertung eines rekurrenten Kanals $h$ fasst die Normen seiner Input- und rekurrenten Gewichtszeilen \"uber die vier LSTM-Bl\"ocke zusammen:
+\begin{equation}
+ s_h=\sum_{a\in\{i,f,o,g\}}
+ \left(\left\|W_{\mathrm{ih}}^{(a)}[h,:]\right\|_2+
+       \left\|W_{\mathrm{hh}}^{(a)}[h,:]\right\|_2\right).
+\end{equation}
+F\"ur die Menge $\mathcal R$ beibehaltener Kan\"ale werden neue dichte Matrizen gebildet:
+\begin{align}
+ \widetilde W_{\mathrm{ih}}^{(a)}&=W_{\mathrm{ih}}^{(a)}[\mathcal R,:],\\
+ \widetilde W_{\mathrm{hh}}^{(a)}&=W_{\mathrm{hh}}^{(a)}[\mathcal R,\mathcal R],\\
+ \widetilde W_{\mathrm{MLP},1}&=W_{\mathrm{MLP},1}[:,\mathcal R].
+\end{align}
+So wird aus dem allgemeinen Pruning-Bild eine konkrete, konsistente Verkleinerung der rekurrenten Implementierung.
+
+\textbf{Gewichtsspeicherung.} F\"ur $N_W$ Gewichte mit $b$ Bits ist der reine Speicher $B_W=N_W b/8$ Byte. Im gemischten Export kommen FP32-Skalen, FP32-Teile und Programmcode hinzu. Darum ist die ideale Vierfachreduktion einzelner Matrizen nicht die Reduktion der gesamten Firmware.
+
+\clearpage
+\section*{Bildauswahl und Weg in die Folien}
+\addcontentsline{toc}{section}{Bildauswahl und Folienplanung}
+Die Originalabbildungen bleiben die Belege. F\"ur die sp\"atere PowerPoint werden bei dichten Mehrfachdiagrammen gezielt Teilpanels vergr\"o\ss ert. Es werden keine neuen Ergebniswerte oder vereinfachten Ersatzkurven erfunden. Neue Elemente dienen lediglich der Orientierung, zum Beispiel der Hervorhebung eines Pfads im BMS-Anforderungsbild.
+
+\small
+\begin{tabularx}{\linewidth}{@{}p{22mm}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{63mm}@{}}
+\toprule
+Station & Originalabbildungen & Aufgabe im Vortrag \\
+\midrule
+1, 27 & 2.1 & Gemeinsamer Rahmen und R\"uckbindung. \\
+Vor 4 & 2.1, Fokusansicht & Deployment und Modellkomplexit\"at, Accuracy erg\"anzend. \\
+2, 3 & 4.1, 4.4, 4.6 & Datenvielfalt und reale BMS-Zielumgebung. \\
+4 bis 7 & 3.2, 5.1, 5.2, 5.3 & Netzoperation, Merkmale, Historie und saubere Evaluation. \\
+8 & 5.5 und 5.6 gemeinsam & Repr\"asentationswahl und erreichbare SOH-Sch\"atzung. \\
+9 & 3.3 und 3.4 & Interne Zeitverarbeitung statt explizitem MLP-Historienvektor. \\
+Vor 10 & 2.1, Fokusansicht & Performance und Hardware. \\
+10, 11 & 6.1 und 6.2 & Modellfamilien und Testfamilien. \\
+12 bis 15 & 6.4, 6.5, 6.9, 6.13 & Baseline, Stromfehler, Erholung und lokales Ereignis. \\
+16, 17 & 6.15 und 6.16 & Einordnung aller Szenarien und Synthese. \\
+18, 19 & 6.19 und zus\"atzlich 6.20 & Ressourcen und kontinuierliche Ausf\"uhrung. \\
+Vor 20 & 2.1, Fokusansicht & Deployment und Hardware, Accuracy als Kontrollgr\"o\ss e. \\
+20, 21 & 7.1, Daten aus 7.2, 7.3 & Konkrete Architektur und Optimierungspfade. \\
+22, 23 & 3.5 und 3.7 & Technische Grundlagen direkt vor ihren Ergebnissen. \\
+24 & 7.8 und zus\"atzlich 7.9 & SOC und SOH getrennt beurteilen. \\
+25, 26 & 7.12, 7.13, Tabellen 7.1/7.2 & Speicher, Gesamtlatenz und reine Inferenz. \\
+Reserve & 6.7 & Stromrauschen als erg\"anzender Mechanismus. \\
+\bottomrule
+\end{tabularx}
+\normalsize
+
+\textbf{Lesbarkeit.} Bei 4.4 nur den relevanten Zellverlauf und die Profilzuordnung fokussieren. Bei 5.5 und 5.6 dieselbe Seite beibehalten, aber die Heatmap und einen Ergebnisverlauf nacheinander hervorheben. Bei 6.5 die Fehlerzunahme und den SOC-Verlauf ausw\"ahlen. Bei 6.13 den Zeitverlauf und die ereignisbezogene Reaktion gegen\"uberstellen. Bei 7.8 und 7.9 jeweils zuerst den Boxplot zeigen. Das ganze Original dient als Kontext, ein vergr\"o\ss erter Ausschnitt macht den Befund lesbar.
+
+\textbf{Navigation.} F\"ur die Folien den seitlichen Fortschrittsbalken aus v3 aufnehmen. Themen hei\ss en Anforderungen, Daten, zeitliche Repr\"asentation, Robustheit und Embedded-Optimierung. Keine Aufteilung in nummerierte Studien. Die drei Fokusansichten stehen vor MLP, Benchmark und Optimierung auf den Seiten \pageref{focus:mlp}, \pageref{focus:benchmark} und \pageref{focus:optimization}. Am Hardware-\"Ubergang innerhalb des Benchmarks wird der linke Bereich zus\"atzlich betont. Der Rest des Rahmens bleibt als Kontext sichtbar.
+
+\textbf{Typografie.} Sp\"atere Folien mit Arial, Titeln in 24 pt und Text in 18 pt. Dichte Originaldiagramme nicht beliebig verkleinern. F\"ur sichtbare Diagrammtexte gelten dieselben Lesbarkeitsanforderungen. Kein dauerhafter roter Fazitsatz am Folienende.
+
+\clearpage
+\section*{Fachliche Pr\"ufhinweise zu den Originalen}
+\addcontentsline{toc}{section}{Pruefhinweise zu den Originalen}
+Diese Hinweise geh\"oren zur Vorbereitung, nicht in den gesprochenen Vortrag. Die Originaldateien bleiben unver\"andert. Die BMS-Fokusansichten erg\"anzen ausschlie\ss lich Konturen im Dokument. Der Abgleich hat folgende Punkte ergeben, die vor der finalen Folienproduktion relevant sind.
+
+\textbf{Abbildung 7.12: RAM-Zahl nicht konsistent.} Der quantisierte SOC-Balken zeigt etwa 3,5 KB. Tabelle 7.1 nennt 3,96 KB. Deshalb wird diese einzelne RAM-Zahl in der Erz\"ahlung nicht als feststehender Wert wiederholt. Vor der \"Ubernahme des RAM-Panels m\"ussen Grafik und Tabelle mit dem zugeh\"origen Firmware-Ergebnis abgeglichen werden.
+
+\textbf{Abbildung 7.12: Parameterzahl und Speicherbasis trennen.} Das obere rechte Panel ist eine idealisierte Gewichtsspeicherung und setzt beim INT8-Balken ungef\"ahr ein Viertel des gesamten FP32-Gewichtsspeichers an. Die real untersuchte Firmware quantisiert dagegen nur die rekurrenten Matrizen. Das untere linke Panel zeigt ihren Flash-Bedarf. Die oberen Parameterzahlen sind zudem nicht ohne Weiteres aus den aktuellen Dimensionen in Abschnitt 7.3 rekonstruierbar. Sie sollten vor einer Formelherleitung am konkreten Export gepr\"uft werden. Die Erz\"ahlung verwendet die im Methodenteil explizit angegebenen MAC-Zahlen und keine aus dem Balken abgelesene Parameterherleitung.
+
+\textbf{Abbildung 7.8: kleine Zahlenabweichung.} Die Originallegende nennt 2,33 und 2,78 Prozentpunkte f\"ur Pruned und Quantized. Der laufende Dissertationstext nennt 2,34 und 2,79. Die Erz\"ahlung verwendet deshalb f\"ur diesen Vergleich transparent gerundete Werte von 2,3 und 2,8. Die Abweichung von jeweils 0,01 Prozentpunkten bleibt ein abzugleichender Quellenpunkt, kein nachgewiesener anderer Effekt.
+
+\textbf{Abbildung 7.13: Messgrenze korrekt.} Gezeigt wird die Host-Gesamtlatenz einschlie\ss lich UART. Die Kernelzeiten stammen aus Tabellen 7.1 und 7.2. Beide werden im Vortrag ausdr\"ucklich getrennt. Die Zeitwerte charakterisieren die verwendeten Referenzkernels und Compilerbedingungen, nicht eine allgemeine Grenze f\"ur INT8-Inferenz auf Mikrocontrollern.
+
+\textbf{Korrelation und Robustheitsmechanismen.} 5.1 zeigt lineare Korrelationen mit kumulierten Ladungsmengen, nicht eine kausale Stromwirkung oder gemessene Feature Importance. 6.5 zeigt Gain, nicht den additiven Offset. 6.9 betrifft definierte Erholung relativ zum ungest\"orten Vergleich, nicht garantierte absolute SOC-Genauigkeit. 6.13 zeigt einen Spannungsimpuls. Stromintegration und geringe Spannungsempfindlichkeit haben deshalb unterschiedliche Erkl\"arungen. Der breitere Kontext des DD ist eine begr\"undete strukturelle Interpretation, kein separater Ablationsnachweis.
+
+\textbf{Verschiedene Untersuchungen nicht gleichsetzen.} Kapitel 6 verwendet f\"ur die Robustheit einen GRU-SOC-Zweig im Fensterbetrieb und einen gemeinsamen st\"undlichen SOH-LSTM. Kapitel 7 untersucht andere, schrittweise arbeitende LSTM-SOC- und LSTM-SOH-Modelle. Ihre MAE-Werte liefern keinen unmittelbaren Architekturvergleich. Die eigene H755-BMS-Platine und die H753-Hardwarebenchmarks sind ebenfalls getrennte Teile der experimentellen Grundlage.
+
+\textbf{Scalability richtig einordnen.} Eine Architektur an unterschiedliche Ressourcenbudgets anzupassen, ist ein Deployment-Aspekt. Pruning kann das unterst\"utzen. Eine nachgewiesene \"Ubertragung auf beliebige Controller, Zellchemien oder gr\"o\ss ere Packs folgt daraus jedoch nicht. Deshalb werden diese nicht als bereits experimentell belegte Skalierungsergebnisse dargestellt.
+
+\textbf{Umfang dieser Bearbeitung.} Dissertation, Originalbilder und vorhandene PowerPoints wurden nicht ge\"andert. Die vorige Erz\"ahlfassung v2 bleibt im Sicherungsordner erhalten:
+\par\texttt{\_build\_erzaehlfassung/previous\_v2}

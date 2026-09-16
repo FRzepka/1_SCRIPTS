@@ -1,0 +1,42 @@
+﻿{
+    "lines":  [
+                  {
+                      "text":  "LSTM",
+                      "words":  [
+                                    {
+                                        "y":  19,
+                                        "w":  96,
+                                        "h":  23,
+                                        "text":  "LSTM",
+                                        "x":  552
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "tanh",
+                      "words":  [
+                                    {
+                                        "y":  260,
+                                        "w":  71,
+                                        "h":  27,
+                                        "text":  "tanh",
+                                        "x":  874
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "tanh",
+                      "words":  [
+                                    {
+                                        "y":  364,
+                                        "w":  71,
+                                        "h":  27,
+                                        "text":  "tanh",
+                                        "x":  564
+                                    }
+                                ]
+                  }
+              ],
+    "file":  "11_Abb_3-3_LSTM_Zelle.png",
+    "angle":  0
+}

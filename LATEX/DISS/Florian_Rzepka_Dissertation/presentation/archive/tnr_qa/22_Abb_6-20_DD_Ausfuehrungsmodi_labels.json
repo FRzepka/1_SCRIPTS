@@ -1,0 +1,552 @@
+{
+  "file": "22_Abb_6-20_DD_Ausfuehrungsmodi.png",
+  "font": "Times New Roman",
+  "labels": [
+    {
+      "text": "Maximum error",
+      "x": 384.5,
+      "y": 25.0,
+      "size": 31,
+      "rotation": 0
+    },
+    {
+      "text": "Runtime",
+      "x": 1066.0,
+      "y": 25.0,
+      "size": 31,
+      "rotation": 0
+    },
+    {
+      "text": "Memory footprint",
+      "x": 1750.5,
+      "y": 25.0,
+      "size": 31,
+      "rotation": 0
+    },
+    {
+      "text": "0",
+      "x": 78,
+      "y": 524.0,
+      "size": 27,
+      "rotation": 0
+    },
+    {
+      "text": "5",
+      "x": 78,
+      "y": 465.5,
+      "size": 27,
+      "rotation": 0
+    },
+    {
+      "text": "10",
+      "x": 78,
+      "y": 407.0,
+      "size": 27,
+      "rotation": 0
+    },
+    {
+      "text": "15",
+      "x": 78,
+      "y": 348.5,
+      "size": 27,
+      "rotation": 0
+    },
+    {
+      "text": "20",
+      "x": 78,
+      "y": 290.0,
+      "size": 27,
+      "rotation": 0
+    },
+    {
+      "text": "25",
+      "x": 78,
+      "y": 231.5,
+      "size": 27,
+      "rotation": 0
+    },
+    {
+      "text": "30",
+      "x": 78,
+      "y": 173.0,
+      "size": 27,
+      "rotation": 0
+    },
+    {
+      "text": "35",
+      "x": 78,
+      "y": 114.5,
+      "size": 27,
+      "rotation": 0
+    },
+    {
+      "text": "40",
+      "x": 78,
+      "y": 56.0,
+      "size": 27,
+      "rotation": 0
+    },
+    {
+      "text": "Maximum SOC error [percentage points]",
+      "x": 22.0,
+      "y": 286.5,
+      "size": 26.5,
+      "rotation": -90
+    },
+    {
+      "text": "10",
+      "x": 738,
+      "y": 453,
+      "size": 29,
+      "rotation": 0
+    },
+    {
+      "text": "0",
+      "x": 758,
+      "y": 443,
+      "size": 21,
+      "rotation": 0
+    },
+    {
+      "text": "10",
+      "x": 738,
+      "y": 321,
+      "size": 29,
+      "rotation": 0
+    },
+    {
+      "text": "1",
+      "x": 758,
+      "y": 311,
+      "size": 21,
+      "rotation": 0
+    },
+    {
+      "text": "10",
+      "x": 738,
+      "y": 188,
+      "size": 29,
+      "rotation": 0
+    },
+    {
+      "text": "2",
+      "x": 758,
+      "y": 178,
+      "size": 21,
+      "rotation": 0
+    },
+    {
+      "text": "10",
+      "x": 738,
+      "y": 56,
+      "size": 29,
+      "rotation": 0
+    },
+    {
+      "text": "3",
+      "x": 758,
+      "y": 46,
+      "size": 21,
+      "rotation": 0
+    },
+    {
+      "text": "Median inference time [ms]",
+      "x": 700,
+      "y": 288,
+      "size": 29,
+      "rotation": -90
+    },
+    {
+      "text": "0",
+      "x": 1446,
+      "y": 524.0,
+      "size": 27,
+      "rotation": 0
+    },
+    {
+      "text": "20",
+      "x": 1446,
+      "y": 454.8333333333333,
+      "size": 27,
+      "rotation": 0
+    },
+    {
+      "text": "40",
+      "x": 1446,
+      "y": 385.66666666666663,
+      "size": 27,
+      "rotation": 0
+    },
+    {
+      "text": "60",
+      "x": 1446,
+      "y": 316.5,
+      "size": 27,
+      "rotation": 0
+    },
+    {
+      "text": "80",
+      "x": 1446,
+      "y": 247.33333333333331,
+      "size": 27,
+      "rotation": 0
+    },
+    {
+      "text": "100",
+      "x": 1446,
+      "y": 178.16666666666663,
+      "size": 27,
+      "rotation": 0
+    },
+    {
+      "text": "120",
+      "x": 1446,
+      "y": 109.0,
+      "size": 27,
+      "rotation": 0
+    },
+    {
+      "text": "Memory [KiB]",
+      "x": 1382,
+      "y": 287,
+      "size": 29,
+      "rotation": -90
+    },
+    {
+      "text": "Rolling",
+      "x": 181,
+      "y": 553,
+      "size": 28,
+      "rotation": 0
+    },
+    {
+      "text": "Continuous",
+      "x": 379,
+      "y": 553,
+      "size": 28,
+      "rotation": 0
+    },
+    {
+      "text": "Periodic",
+      "x": 576,
+      "y": 553,
+      "size": 28,
+      "rotation": 0
+    },
+    {
+      "text": "window",
+      "x": 181,
+      "y": 580,
+      "size": 28,
+      "rotation": 0
+    },
+    {
+      "text": "state",
+      "x": 379,
+      "y": 580,
+      "size": 28,
+      "rotation": 0
+    },
+    {
+      "text": "reset",
+      "x": 576,
+      "y": 580,
+      "size": 28,
+      "rotation": 0
+    },
+    {
+      "text": "Rolling",
+      "x": 865,
+      "y": 553,
+      "size": 28,
+      "rotation": 0
+    },
+    {
+      "text": "Continuous",
+      "x": 1063,
+      "y": 553,
+      "size": 28,
+      "rotation": 0
+    },
+    {
+      "text": "Periodic",
+      "x": 1260,
+      "y": 553,
+      "size": 28,
+      "rotation": 0
+    },
+    {
+      "text": "window",
+      "x": 865,
+      "y": 580,
+      "size": 28,
+      "rotation": 0
+    },
+    {
+      "text": "state",
+      "x": 1063,
+      "y": 580,
+      "size": 28,
+      "rotation": 0
+    },
+    {
+      "text": "reset",
+      "x": 1260,
+      "y": 580,
+      "size": 28,
+      "rotation": 0
+    },
+    {
+      "text": "Rolling",
+      "x": 1555,
+      "y": 553,
+      "size": 28,
+      "rotation": 0
+    },
+    {
+      "text": "Continuous",
+      "x": 1747,
+      "y": 553,
+      "size": 28,
+      "rotation": 0
+    },
+    {
+      "text": "Periodic",
+      "x": 1938,
+      "y": 553,
+      "size": 28,
+      "rotation": 0
+    },
+    {
+      "text": "window",
+      "x": 1555,
+      "y": 580,
+      "size": 28,
+      "rotation": 0
+    },
+    {
+      "text": "state",
+      "x": 1747,
+      "y": 580,
+      "size": 28,
+      "rotation": 0
+    },
+    {
+      "text": "reset",
+      "x": 1938,
+      "y": 580,
+      "size": 28,
+      "rotation": 0
+    },
+    {
+      "text": "116.1",
+      "x": 1522.0,
+      "y": 107.5,
+      "size": 24,
+      "rotation": 0
+    },
+    {
+      "text": "67.3",
+      "x": 1589.0,
+      "y": 277.5,
+      "size": 24,
+      "rotation": 0
+    },
+    {
+      "text": "115.9",
+      "x": 1714.0,
+      "y": 107.5,
+      "size": 24,
+      "rotation": 0
+    },
+    {
+      "text": "4.1",
+      "x": 1780.0,
+      "y": 496.5,
+      "size": 24,
+      "rotation": 0
+    },
+    {
+      "text": "116.0",
+      "x": 1905.0,
+      "y": 107.5,
+      "size": 24,
+      "rotation": 0
+    },
+    {
+      "text": "4.1",
+      "x": 1971.0,
+      "y": 496.5,
+      "size": 24,
+      "rotation": 0
+    },
+    {
+      "text": "Rolling window",
+      "x": 584.5,
+      "y": 671.5,
+      "size": 28,
+      "rotation": 0
+    },
+    {
+      "text": "Continuous state",
+      "x": 872.0,
+      "y": 671.5,
+      "size": 28,
+      "rotation": 0
+    },
+    {
+      "text": "Periodic reset",
+      "x": 1158.0,
+      "y": 671.5,
+      "size": 28,
+      "rotation": 0
+    },
+    {
+      "text": "Flash",
+      "x": 1369.0,
+      "y": 671.5,
+      "size": 28,
+      "rotation": 0
+    },
+    {
+      "text": "Peak RAM",
+      "x": 1564.0,
+      "y": 671.5,
+      "size": 28,
+      "rotation": 0
+    }
+  ],
+  "viewbox": [
+    2048,
+    712.1705999431333
+  ],
+  "covered_label_areas": [
+    [
+      238,
+      6,
+      293,
+      38
+    ],
+    [
+      968,
+      6,
+      196,
+      38
+    ],
+    [
+      1568,
+      6,
+      365,
+      38
+    ],
+    [
+      44,
+      45,
+      37,
+      493
+    ],
+    [
+      6,
+      61,
+      32,
+      451
+    ],
+    [
+      674,
+      42,
+      91,
+      443
+    ],
+    [
+      1364,
+      76,
+      87,
+      462
+    ],
+    [
+      107,
+      538,
+      544,
+      56
+    ],
+    [
+      791,
+      538,
+      545,
+      56
+    ],
+    [
+      1471,
+      538,
+      547,
+      56
+    ],
+    [
+      1491,
+      96,
+      62,
+      23
+    ],
+    [
+      1558,
+      266,
+      62,
+      23
+    ],
+    [
+      1683,
+      96,
+      62,
+      23
+    ],
+    [
+      1749,
+      485,
+      62,
+      23
+    ],
+    [
+      1874,
+      96,
+      62,
+      23
+    ],
+    [
+      1940,
+      485,
+      62,
+      23
+    ],
+    [
+      486,
+      654,
+      197,
+      35
+    ],
+    [
+      762,
+      654,
+      220,
+      35
+    ],
+    [
+      1070,
+      654,
+      176,
+      35
+    ],
+    [
+      1330,
+      654,
+      78,
+      35
+    ],
+    [
+      1499,
+      654,
+      130,
+      35
+    ]
+  ],
+  "data_operation": "none; original curves retained in SVG image layer"
+}

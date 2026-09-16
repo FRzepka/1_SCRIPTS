@@ -1,0 +1,166 @@
+﻿{
+    "lines":  [
+                  {
+                      "text":  "Model",
+                      "words":  [
+                                    {
+                                        "y":  102,
+                                        "w":  82,
+                                        "h":  23,
+                                        "text":  "Model",
+                                        "x":  810
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "complexity",
+                      "words":  [
+                                    {
+                                        "y":  143,
+                                        "w":  144,
+                                        "h":  29,
+                                        "text":  "complexity",
+                                        "x":  779
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Adaptability",
+                      "words":  [
+                                    {
+                                        "y":  276,
+                                        "w":  160,
+                                        "h":  29,
+                                        "text":  "Adaptability",
+                                        "x":  609
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "RAM usage",
+                      "words":  [
+                                    {
+                                        "y":  489,
+                                        "w":  59,
+                                        "h":  21,
+                                        "text":  "RAM",
+                                        "x":  277
+                                    },
+                                    {
+                                        "y":  494,
+                                        "w":  74,
+                                        "h":  22,
+                                        "text":  "usage",
+                                        "x":  349
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Flash usage",
+                      "words":  [
+                                    {
+                                        "y":  667,
+                                        "w":  64,
+                                        "h":  23,
+                                        "text":  "Flash",
+                                        "x":  275
+                                    },
+                                    {
+                                        "y":  674,
+                                        "w":  74,
+                                        "h":  22,
+                                        "text":  "usage",
+                                        "x":  351
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Inference Time",
+                      "words":  [
+                                    {
+                                        "y":  851,
+                                        "w":  121,
+                                        "h":  23,
+                                        "text":  "Inference",
+                                        "x":  255
+                                    },
+                                    {
+                                        "y":  852,
+                                        "w":  64,
+                                        "h":  22,
+                                        "text":  "Time",
+                                        "x":  386
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Scalability",
+                      "words":  [
+                                    {
+                                        "y":  276,
+                                        "w":  132,
+                                        "h":  29,
+                                        "text":  "Scalability",
+                                        "x":  944
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Robustness",
+                      "words":  [
+                                    {
+                                        "y":  493,
+                                        "w":  148,
+                                        "h":  23,
+                                        "text":  "Robustness",
+                                        "x":  1288
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Convergence behavior",
+                      "words":  [
+                                    {
+                                        "y":  666,
+                                        "w":  169,
+                                        "h":  27,
+                                        "text":  "Convergence",
+                                        "x":  1215
+                                    },
+                                    {
+                                        "y":  665,
+                                        "w":  115,
+                                        "h":  23,
+                                        "text":  "behavior",
+                                        "x":  1396
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Accuracy",
+                      "words":  [
+                                    {
+                                        "y":  851,
+                                        "w":  118,
+                                        "h":  27,
+                                        "text":  "Accuracy",
+                                        "x":  1298
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "o",
+                      "words":  [
+                                    {
+                                        "y":  934,
+                                        "w":  18,
+                                        "h":  18,
+                                        "text":  "o",
+                                        "x":  1352
+                                    }
+                                ]
+                  }
+              ],
+    "file":  "01_Abb_2-1_BMS_Anforderungen.png",
+    "angle":  0
+}

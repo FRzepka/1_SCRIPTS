@@ -1,0 +1,369 @@
+﻿{
+    "lines":  [
+                  {
+                      "text":  "SOH",
+                      "words":  [
+                                    {
+                                        "y":  18,
+                                        "w":  79,
+                                        "h":  29,
+                                        "text":  "SOH",
+                                        "x":  132
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Scenario Selection",
+                      "words":  [
+                                    {
+                                        "y":  67,
+                                        "w":  150,
+                                        "h":  29,
+                                        "text":  "Scenario",
+                                        "x":  12
+                                    },
+                                    {
+                                        "y":  67,
+                                        "w":  156,
+                                        "h":  29,
+                                        "text":  "Selection",
+                                        "x":  176
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "SOH",
+                      "words":  [
+                                    {
+                                        "y":  260,
+                                        "w":  50,
+                                        "h":  18,
+                                        "text":  "SOH",
+                                        "x":  115
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Scenario:",
+                      "words":  [
+                                    {
+                                        "y":  290,
+                                        "w":  98,
+                                        "h":  18,
+                                        "text":  "Scenario:",
+                                        "x":  91
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "1",
+                      "words":  [
+                                    {
+                                        "y":  320,
+                                        "w":  7,
+                                        "h":  17,
+                                        "text":  "1",
+                                        "x":  139
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Measured Signals",
+                      "words":  [
+                                    {
+                                        "y":  18,
+                                        "w":  168,
+                                        "h":  28,
+                                        "text":  "Measured",
+                                        "x":  441
+                                    },
+                                    {
+                                        "y":  17,
+                                        "w":  124,
+                                        "h":  37,
+                                        "text":  "Signals",
+                                        "x":  624
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Online feature",
+                      "words":  [
+                                    {
+                                        "y":  295,
+                                        "w":  109,
+                                        "h":  29,
+                                        "text":  "Online",
+                                        "x":  481
+                                    },
+                                    {
+                                        "y":  295,
+                                        "w":  119,
+                                        "h":  29,
+                                        "text":  "feature",
+                                        "x":  603
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "calculation",
+                      "words":  [
+                                    {
+                                        "y":  344,
+                                        "w":  180,
+                                        "h":  29,
+                                        "text":  "calculation",
+                                        "x":  511
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "dl/dt SOH",
+                      "words":  [
+                                    {
+                                        "y":  406,
+                                        "w":  45,
+                                        "h":  18,
+                                        "text":  "dl/dt",
+                                        "x":  616
+                                    },
+                                    {
+                                        "y":  402,
+                                        "w":  49,
+                                        "h":  18,
+                                        "text":  "SOH",
+                                        "x":  705
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "dlJ/dt",
+                      "words":  [
+                                    {
+                                        "y":  405,
+                                        "w":  56,
+                                        "h":  18,
+                                        "text":  "dlJ/dt",
+                                        "x":  517
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Benchmark Models",
+                      "words":  [
+                                    {
+                                        "y":  19,
+                                        "w":  194,
+                                        "h":  28,
+                                        "text":  "Benchmark",
+                                        "x":  853
+                                    },
+                                    {
+                                        "y":  19,
+                                        "w":  121,
+                                        "h":  28,
+                                        "text":  "Models",
+                                        "x":  1060
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "HECM",
+                      "words":  [
+                                    {
+                                        "y":  108,
+                                        "w":  66,
+                                        "h":  18,
+                                        "text":  "HECM",
+                                        "x":  1068
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "soc",
+                      "words":  [
+                                    {
+                                        "y":  222,
+                                        "w":  31,
+                                        "h":  12,
+                                        "text":  "soc",
+                                        "x":  872
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "SOH",
+                      "words":  [
+                                    {
+                                        "y":  223,
+                                        "w":  30,
+                                        "h":  12,
+                                        "text":  "SOH",
+                                        "x":  955
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "soc",
+                      "words":  [
+                                    {
+                                        "y":  225,
+                                        "w":  31,
+                                        "h":  12,
+                                        "text":  "soc",
+                                        "x":  1053
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "SOH",
+                      "words":  [
+                                    {
+                                        "y":  225,
+                                        "w":  31,
+                                        "h":  12,
+                                        "text":  "SOH",
+                                        "x":  1127
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "HDM",
+                      "words":  [
+                                    {
+                                        "y":  303,
+                                        "w":  51,
+                                        "h":  17,
+                                        "text":  "HDM",
+                                        "x":  1077
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "soc",
+                      "words":  [
+                                    {
+                                        "y":  410,
+                                        "w":  32,
+                                        "h":  12,
+                                        "text":  "soc",
+                                        "x":  1051
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "SOH",
+                      "words":  [
+                                    {
+                                        "y":  410,
+                                        "w":  31,
+                                        "h":  12,
+                                        "text":  "SOH",
+                                        "x":  1125
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Disturbance",
+                      "words":  [
+                                    {
+                                        "y":  19,
+                                        "w":  203,
+                                        "h":  28,
+                                        "text":  "Disturbance",
+                                        "x":  1325
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Scenario Selection",
+                      "words":  [
+                                    {
+                                        "y":  67,
+                                        "w":  150,
+                                        "h":  29,
+                                        "text":  "Scenario",
+                                        "x":  1266
+                                    },
+                                    {
+                                        "y":  67,
+                                        "w":  156,
+                                        "h":  29,
+                                        "text":  "Selection",
+                                        "x":  1430
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Input Disturbance",
+                      "words":  [
+                                    {
+                                        "y":  165,
+                                        "w":  51,
+                                        "h":  22,
+                                        "text":  "Input",
+                                        "x":  1339
+                                    },
+                                    {
+                                        "y":  165,
+                                        "w":  123,
+                                        "h":  17,
+                                        "text":  "Disturbance",
+                                        "x":  1398
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Initialisation errors",
+                      "words":  [
+                                    {
+                                        "y":  266,
+                                        "w":  120,
+                                        "h":  18,
+                                        "text":  "Initialisation",
+                                        "x":  1334
+                                    },
+                                    {
+                                        "y":  270,
+                                        "w":  61,
+                                        "h":  14,
+                                        "text":  "errors",
+                                        "x":  1462
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Signal-integrity faults",
+                      "words":  [
+                                    {
+                                        "y":  367,
+                                        "w":  155,
+                                        "h":  23,
+                                        "text":  "Signal-integrity",
+                                        "x":  1319
+                                    },
+                                    {
+                                        "y":  367,
+                                        "w":  55,
+                                        "h":  18,
+                                        "text":  "faults",
+                                        "x":  1481
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "soc",
+                      "words":  [
+                                    {
+                                        "y":  409,
+                                        "w":  31,
+                                        "h":  11,
+                                        "text":  "soc",
+                                        "x":  915
+                                    }
+                                ]
+                  }
+              ],
+    "file":  "13_Abb_6-1_Benchmark_Methodik.png",
+    "angle":  0
+}

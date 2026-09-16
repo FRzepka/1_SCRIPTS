@@ -1,0 +1,101 @@
+\station{Von expliziten Lag-Sequenzen zu rekurrentem Kontext}{1:45 min, beide Seiten}{GRU und LSTM}
+\label{sec:recurrent}
+Beim MLP mussten wir die Historie explizit zusammenstellen. Rekurrente Netze stellen eine wiederverwendbare Struktur zur Verf\"ugung, in der zeitliche Information intern fortgeschrieben wird. Das vereinfacht die Modellierung einer fortlaufenden Verarbeitung. Es beseitigt jedoch weder Feature Engineering noch die Notwendigkeit, mit geeigneten Sequenzen zu trainieren.
+\original{3.3}{lstm_cell_eaai_style.png}{91}{LSTM mit Zellzustand, Hidden State und steuernden Gates.}
+Beim LSTM entscheidet ein Forget Gate, wie viel des bisherigen Zellzustands erhalten bleibt. Ein Input Gate gewichtet neue Information. Ein Output Gate steuert, was davon als Hidden State weitergegeben wird:
+\begin{align}
+  \mathbf c_k&=\mathbf f_k\odot\mathbf c_{k-1}
+             +\mathbf i_k\odot\mathbf g_k,\\
+  \mathbf h_k&=\mathbf o_k\odot\tanh(\mathbf c_k).
+\end{align}
+Die Gate-Werte werden aus dem aktuellen Eingang und dem vorherigen Hidden State gelernt. $\odot$ bezeichnet elementweise Multiplikation. Der interne Zustand ersetzt damit nicht die Messdaten, sondern verdichtet deren bisherige Verarbeitung. Entscheidend ist anschlie\ss end, wann dieser Zustand weitergegeben oder zur\"uckgesetzt wird.
+
+\weiter{GRU: zeitlicher Zustand mit weniger Gate-Struktur}
+\original{3.4}{gru_cell_eaai_style.png}{106}{GRU mit Reset Gate, Update Gate und einem fortgeschriebenen Hidden State.}
+Eine GRU verwendet keinen zus\"atzlichen separaten Zellzustand. In der hier dargestellten Konvention mischt das Update Gate den bisherigen Zustand und einen neuen Kandidaten:
+\begin{equation}
+  \mathbf h_k=(1-\mathbf z_k)\odot\mathbf h_{k-1}
+              +\mathbf z_k\odot\widetilde{\mathbf h}_k.
+\end{equation}
+Damit bieten GRU und LSTM zwei verwandte Wege, mehrere Messgr\"o\ss en und ihren zeitlichen Zusammenhang zu verarbeiten. Der Wechsel vom MLP bedeutet also nicht, dass der erste Ansatz ungeeignet war. Er erweitert die Umsetzungsm\"oglichkeiten. Ob dieser gelernte Kontext im Betrieb tats\"achlich hilfreich ist, zeigt erst der Vergleich unter realistischen St\"orungen. Und ob er kompakt bleibt, muss auf der Zielhardware gepr\"uft werden.
+\hinweis{Die vollst\"andigen Gate-Gleichungen stehen in der Reserve. Im Vortrag an den beiden Bildern den Informationsfluss erkl\"aren, nicht jede Matrix vorlesen.}
+
+\weiter{Robustheitsbenchmark: Verhalten und Ressourcen}
+\label{focus:benchmark}
+\rahmenbild{2}{Schwerpunkt Performance und Hardware. Beide Bereiche werden nacheinander experimentell untersucht.}
+Nach der zeitlichen Repr\"asentation richtet sich der Blick auf die Zuverl\"assigkeit im Betrieb. Wie verhalten sich unterschiedliche Zustandsbestimmungsmethoden bei ver\"anderten Messbedingungen, und welche Ressourcen ben\"otigen sie auf dem Mikrocontroller?
+
+Zuerst vergleichen wir Genauigkeit, Robustheit und Erholung. Anschlie\ss end messen wir Flash, RAM und Laufzeit. Im Anforderungsbild werden daher Performance und Hardware gemeinsam hervorgehoben. Der Vergleich von Fensterbetrieb und kontinuierlicher Zustandsfortschreibung ber\"uhrt zus\"atzlich Deployment, weil sich dabei die Ausf\"uhrungsweise des neuronalen Modells \"andert.
+
+\station{Vier Wege zur SOC-Bestimmung im selben Benchmark}{1:30 min einschlie\ss lich Schwerpunktwechsel}{Modellvergleich}
+\original{6.1}{Figure_02_Methodology_Overview.png}{93}{Gemeinsamer Auswertungsablauf und vier SOC-Modellzweige.}
+Der Benchmark vergleicht unterschiedliche Rechenprinzipien. Direct Measurement, DM, integriert den Strom mit einer festen Kapazit\"at. Hybrid Direct Measurement, HDM, verwendet zus\"atzlich einen gesch\"atzten SOH zur Kapazit\"atsanpassung. F\"ur positive Laderichtung und Zeit in Sekunden l\"asst sich der Kern schreiben als
+\begin{equation}
+  Q_{c,k}=Q_{c,k-1}+\frac{I_k\Delta t_k}{3600},\qquad
+  \widehat{\SOC}_k=\clip\!\left(1+\frac{Q_{c,k}}{C_{\mathrm{eff},k}},0,1\right).
+\end{equation}
+$Q_c$ wird am Vollladeanker zur\"uckgesetzt. Bei DM ist $C_{\mathrm{eff}}=C_{\mathrm{nominal}}$, bei HDM $C_{\mathrm{eff}}=C_{\mathrm{nominal}}\widehat{\SOH}$.
+
+Das hybride Ersatzschaltbildmodell HECM korrigiert seine modellbasierte Vorhersage zus\"atzlich anhand der Spannung. Der datengetriebene Zweig DD verwendet eine GRU mit mehreren Eing\"angen, darunter Spannung, Strom, Temperatur, SOH und zeitliche Ableitungen. HDM, HECM und DD erhalten denselben LSTM-basierten SOH-Sch\"atzer. Unterschiede entstehen damit vor allem daraus, wie die SOC-Zweige die verf\"ugbare Information verarbeiten.
+
+\station{Vom nominalen Test zu Betriebsst\"orungen}{0:30 min}{Benchmark-Design}
+\original{6.2}{Figure_03_Disturbance_Taxonomy.png}{123}{St\"orungsfamilien im kausalen Benchmark.}
+Die Testmatrix umfasst systematische Messfehler, zuf\"alliges Rauschen, Initialisierungsfehler, fehlende Daten und lokale Ereignisse. Alle Modelle erhalten vergleichbar gest\"orte Eing\"ange. Abgeleitete Gr\"o\ss en werden daraus neu berechnet. Die Auswertung folgt dem zeitlichen Verlauf und verwendet keine zuk\"unftigen Messwerte. So untersuchen wir nicht nur Genauigkeit unter idealen Eing\"angen, sondern auch Stabilit\"at und Erholung.
+
+\station{Nominale Genauigkeit als Ausgangspunkt}{0:45 min}{Baseline}
+\original{6.4}{Figure_04_Baseline_Performance.png}{112}{Baseline-Genauigkeit mit der Streuung zwischen den Testzellen.}
+Zun\"achst wird ohne zus\"atzliche St\"orungen ausgewertet. Grundlage sind 16 ausgew\"ahlte Zeitfenster aus sechs Testzellen. Die Zellen gehen gleichgewichtet in das Gesamtergebnis ein. Dieser Zellmittelwert des MAE betr\"agt etwa 6,90 Prozentpunkte f\"ur DM, 4,12 f\"ur HDM, 3,37 f\"ur HECM und 2,58 f\"ur DD. Die Einzelpunkte zeigen die Streuung, die Fehlerbalken das 95-Prozent-Konfidenzintervall des aggregierten Werts.
+
+DD erzielt hier die niedrigste beobachtete mittlere Abweichung. Das ist eine Eigenschaft der untersuchten Modelle und Testdaten, noch keine allgemeine Rangfolge aller Vertreter dieser Familien. Der interessante n\"achste Schritt ist deshalb, ob diese Reihenfolge unter ver\"anderten Messbedingungen erhalten bleibt und welche Fehlermechanismen dabei sichtbar werden.
+
+\station{Warum systematische Stromfehler kritisch sind}{1:00 min}{Current-Gain-Sensitivit\"at}
+\original{6.5}{Figure_05_Current_Bias_REVISED.png}{104}{Einfluss eines multiplikativen Strommessfehlers auf den SOC-Fehler.}
+Ein Stromsensor kann einen Verst\"arkungsfehler, einen additiven Offset oder Rauschen aufweisen. Diese drei Anteile lassen sich unterscheiden durch
+\begin{equation}
+ I_{\mathrm{mess},k}=(1+g)I_k+b+\varepsilon_k.
+\end{equation}
+Abbildung 6.5 untersucht $g$, also den Gain. Bei drei Prozent steigt der MAE um etwa 1,08 Prozentpunkte f\"ur DM, 1,01 f\"ur HDM, 0,60 f\"ur HECM und 0,38 f\"ur DD. Ein systematischer Fehler im Strom geht bei der Ladungsbilanz fortlaufend in die aufsummierte Ladung ein.
+
+HECM besitzt zus\"atzlich Spannungsr\"uckkopplung, bleibt aber vom Strom abh\"angig. DD verarbeitet weitere Messgr\"o\ss en und deren zeitlichen Kontext. Das bietet zus\"atzliche Information, ersetzt jedoch keinen fehlerfreien Sensor. Der additive Offset $b$ wird separat untersucht und erweist sich in der Gesamt\"ubersicht als besonders kritisch.
+
+\station{Erholung durch zus\"atzliche Zustandsinformation}{1:00 min}{Initialisierungsfehler}
+\original{6.9}{Figure_09_Initial_State_Recovery_Six_Cell.png}{98}{Erholung nach einer anf\"anglichen Zustandsabweichung.}
+Eine falsche Initialisierung verschiebt den Startpunkt der Sch\"atzung. Reines Stromz\"ahlen kann diese Verschiebung nicht aus sich heraus erkennen. HECM verwendet dagegen die Differenz zwischen gemessener und vorhergesagter Spannung zur Korrektur:
+\begin{equation}
+  \mathbf x_k^{+}=\mathbf x_k^{-}
+    +\mathbf K_k\left(U_{\mathrm{mess},k}-\widehat U_k^{-}\right).
+\end{equation}
+Die Zustandsgr\"o\ss en umfassen SOC und die beiden RC-Spannungen. Die Gewichtung $\mathbf K_k$ legt fest, wie stark die Spannungsabweichung die Modellvorhersage korrigiert. Diese zus\"atzliche R\"uckkopplung erkl\"art, warum HECM trotz einer falschen Anfangslage wieder zum Referenzverlauf finden kann.
+
+Beim untersuchten Fehler von minus zehn Prozentpunkten erreicht HECM das vorgegebene Erholungsband relativ zum ungest\"orten Vergleich dauerhaft nach im Mittel etwa 1,20 Stunden, DD nach 2,60 Stunden. DD kann den Zustand aus seiner mehrkanaligen Historie neu erschlie\ss en. Die Stromz\"ahler ben\"otigen dagegen einen geeigneten Anker. HECM zeigt hier also eine besondere St\"arke, obwohl DD den kleineren nominalen MAE besitzt.
+
+\station{Lokale Ereignisse trotz kleinem Gesamtfehler}{0:45 min}{Spannungsspitze}
+\original{6.13}{Figure_13_Voltage_Spike_Response_JES2.png}{117}{Spannungsspitze mit zeitaufgel\"oster Reaktion und ereignisbezogener Auswertung.}
+Eine kurze Spannungsspitze liefert ein anderes Bild. DD kann unmittelbar stark reagieren, obwohl der zus\"atzliche MAE \"uber die gesamte Sequenz klein bleibt. Das ist mit der direkten Verarbeitung von Spannung und abgeleiteten dynamischen Merkmalen vereinbar. Der gelernte Kontext sch\"utzt also nicht automatisch vor jeder lokalen Eingabest\"orung.
+
+DM und HDM verwenden die Spannung nicht als laufenden Korrektureingang. Ihre geringe Reaktion auf diesen Spannungsimpuls ist deshalb nicht einfach ein Mittelungseffekt der Stromintegration. Bei HECM wird die Spannungsinformation gewichtet in die Zustandskorrektur eingebracht. Das Beispiel zeigt, warum neben dem Gesamtfehler auch die unmittelbare Ereignisreaktion betrachtet werden muss.
+
+\station{Welche St\"orungen bestimmen das Gesamtbild?}{0:30 min}{Szenario\"ubersicht}
+\original{6.15}{Figure_14_Cross_Scenario_Heatmap_Six_Cell.png}{129}{Fehlerzunahme \"uber die untersuchten St\"orungsfamilien.}
+Die \"Ubersicht ordnet die Einzelbeispiele ein. Vor allem systematische Stromfehler verursachen starke globale Abweichungen. Der additive Stromoffset f\"allt besonders auf. Kurze lokale Ereignisse k\"onnen dagegen im globalen Mittel klein erscheinen und trotzdem eine ausgepr\"agte kurzzeitige Reaktion ausl\"osen. Die beiden Betrachtungen beantworten unterschiedliche praktische Fragen und erg\"anzen sich.
+
+\station{St\"arken der Modellfamilien statt einer einzigen Rangzahl}{0:30 min}{Benchmark-Synthese}
+\original{6.16}{Figure_15_Decision_Synthesis_Six_Cell.png}{116}{Synthese von Accuracy, Robustness und Recovery.}
+In der zusammengef\"uhrten Bewertung erzielt DD das st\"arkste Gesamtergebnis der untersuchten Vertreter. Die vorherigen Beispiele zeigen aber, warum die einzelnen Dimensionen erhalten bleiben m\"ussen. HECM kann bei Erholung besonders gut abschneiden, w\"ahrend DD bei lokalen Eingangsspitzen empfindlich sein kann. Die normierten Scores im Bild sind relative Vergleichsgr\"o\ss en, keine Genauigkeitsprozente. F\"ur das BMS folgt daraus, ein ausgew\"ahltes Modell gezielt auf seine relevanten Schwachstellen zu pr\"ufen und darauf vorzubereiten.
+
+\station{Die Methoden auf dem Mikrocontroller}{0:45 min}{Embedded-Performance}
+\original{6.19}{Figure_19_Hardware_Memory_Footprints.png}{95}{Flash und zur Laufzeit bestimmter RAM-Bedarf der isolierten SOC-Implementierungen.}
+Nun wechseln wir im Anforderungsrahmen von der Sch\"atzg\"ute zur Ausf\"uhrung. Alle vier SOC-Implementierungen wurden auf dem STM32H753 ausgef\"uhrt und mit ihren Software-Referenzen verglichen. Die Abweichungen sind sehr klein. Zugleich unterscheiden sich ihre Kosten deutlich.
+
+DM und HDM ben\"otigen ungef\"ahr 27 KiB Flash, HECM rund 470 KiB und DD im kontinuierlichen Betrieb etwa 116 KiB. Der zugeh\"orige Peak-RAM liegt zwischen 2,4 und 4,1 KiB. Alle passen auf den gew\"ahlten Controller. Gemessen werden hier die SOC-Kerne. Der ben\"otigte SOH wird zugef\"uhrt, nicht mitsamt einem zus\"atzlichen SOH-Netz in diesen Zahlen versteckt.
+
+\station{Fensterbetrieb und kontinuierliche Zustandsfortschreibung}{1:00 min}{Ausf\"uhrungsmodus}
+\original{6.20}{Figure_20_DD_Inference_Mode_Comparison.png}{108}{DD-Vergleich von Rolling Window, Continuous State und Periodic Reset.}
+Im Rolling-Window-Betrieb wird f\"ur jede neue Sch\"atzung erneut eine vollst\"andige Eingangshistorie verarbeitet. Hier umfasst sie ungef\"ahr 34 Minuten. Bei kontinuierlicher Ausf\"uhrung wird dagegen nur der neue Schritt berechnet und der bisherige rekurrente Zustand weitergegeben:
+\begin{equation}
+  \mathbf h_k=F_{\theta}(\mathbf x_k,\mathbf h_{k-1}),
+  \qquad \hat y_k=G_{\theta}(\mathbf h_k).
+\end{equation}
+Das reduziert die gemessene DD-Laufzeit von etwa 724 Millisekunden auf 0,425 Millisekunden pro Ausgabe. Der Peak-RAM sinkt von rund 67,3 auf 4,1 KiB. Periodische Resets ben\"otigen ebenfalls wenig Ressourcen, erzeugen jedoch wiederkehrende Anlauftransienten.
+
+Kontinuierlicher Betrieb ist damit ein sehr wirksamer Hebel. Er ist aber nicht mathematisch identisch mit dem wiederholten Fensterlauf, weil die Zustandsvorgeschichte anders ist. Die gute nominale \"Ubereinstimmung muss daher separat gepr\"uft werden. Die Robustheitsaussagen des urspr\"unglichen Fensterbenchmarks gelten nicht ungepr\"uft f\"ur den anderen Ausf\"uhrungsmodus.

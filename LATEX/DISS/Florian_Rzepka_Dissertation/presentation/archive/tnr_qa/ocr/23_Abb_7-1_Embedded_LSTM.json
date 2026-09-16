@@ -1,0 +1,264 @@
+﻿{
+    "lines":  [
+                  {
+                      "text":  "Input",
+                      "words":  [
+                                    {
+                                        "y":  40,
+                                        "w":  61,
+                                        "h":  25,
+                                        "text":  "Input",
+                                        "x":  115
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Battery measurements",
+                      "words":  [
+                                    {
+                                        "y":  95,
+                                        "w":  86,
+                                        "h":  25,
+                                        "text":  "Battery",
+                                        "x":  23
+                                    },
+                                    {
+                                        "y":  97,
+                                        "w":  166,
+                                        "h":  17,
+                                        "text":  "measurements",
+                                        "x":  116
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "over time (current,",
+                      "words":  [
+                                    {
+                                        "y":  136,
+                                        "w":  52,
+                                        "h":  13,
+                                        "text":  "over",
+                                        "x":  23
+                                    },
+                                    {
+                                        "y":  129,
+                                        "w":  51,
+                                        "h":  20,
+                                        "text":  "time",
+                                        "x":  82
+                                    },
+                                    {
+                                        "y":  129,
+                                        "w":  97,
+                                        "h":  26,
+                                        "text":  "(current,",
+                                        "x":  142
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "voltage, temperature)",
+                      "words":  [
+                                    {
+                                        "y":  164,
+                                        "w":  93,
+                                        "h":  26,
+                                        "text":  "voltage,",
+                                        "x":  22
+                                    },
+                                    {
+                                        "y":  164,
+                                        "w":  147,
+                                        "h":  26,
+                                        "text":  "temperature)",
+                                        "x":  124
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "xt",
+                      "words":  [
+                                    {
+                                        "y":  286,
+                                        "w":  25,
+                                        "h":  20,
+                                        "text":  "xt",
+                                        "x":  218
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "t-1",
+                      "words":  [
+                                    {
+                                        "y":  315,
+                                        "w":  35,
+                                        "h":  13,
+                                        "text":  "t-1",
+                                        "x":  360
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "x",
+                      "words":  [
+                                    {
+                                        "y":  127,
+                                        "w":  12,
+                                        "h":  12,
+                                        "text":  "x",
+                                        "x":  558
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "xt",
+                      "words":  [
+                                    {
+                                        "y":  461,
+                                        "w":  25,
+                                        "h":  20,
+                                        "text":  "xt",
+                                        "x":  553
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "LSTM",
+                      "words":  [
+                                    {
+                                        "y":  18,
+                                        "w":  77,
+                                        "h":  19,
+                                        "text":  "LSTM",
+                                        "x":  723
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "tanh",
+                      "words":  [
+                                    {
+                                        "y":  270,
+                                        "w":  59,
+                                        "h":  20,
+                                        "text":  "tanh",
+                                        "x":  728
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Input",
+                      "words":  [
+                                    {
+                                        "y":  95,
+                                        "w":  62,
+                                        "h":  25,
+                                        "text":  "Input",
+                                        "x":  1204
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Layer",
+                      "words":  [
+                                    {
+                                        "y":  130,
+                                        "w":  67,
+                                        "h":  25,
+                                        "text":  "Layer",
+                                        "x":  1202
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "MLP",
+                      "words":  [
+                                    {
+                                        "y":  19,
+                                        "w":  59,
+                                        "h":  19,
+                                        "text":  "MLP",
+                                        "x":  1288
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Hidden Output",
+                      "words":  [
+                                    {
+                                        "y":  94,
+                                        "w":  86,
+                                        "h":  20,
+                                        "text":  "Hidden",
+                                        "x":  1282
+                                    },
+                                    {
+                                        "y":  95,
+                                        "w":  80,
+                                        "h":  25,
+                                        "text":  "Output",
+                                        "x":  1377
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Layer Layer",
+                      "words":  [
+                                    {
+                                        "y":  130,
+                                        "w":  69,
+                                        "h":  25,
+                                        "text":  "Layer",
+                                        "x":  1291
+                                    },
+                                    {
+                                        "y":  130,
+                                        "w":  68,
+                                        "h":  25,
+                                        "text":  "Layer",
+                                        "x":  1383
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "tanh",
+                      "words":  [
+                                    {
+                                        "y":  186,
+                                        "w":  59,
+                                        "h":  20,
+                                        "text":  "tanh",
+                                        "x":  913
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Output",
+                      "words":  [
+                                    {
+                                        "y":  125,
+                                        "w":  80,
+                                        "h":  25,
+                                        "text":  "Output",
+                                        "x":  1524
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "socte",
+                      "words":  [
+                                    {
+                                        "y":  187,
+                                        "w":  68,
+                                        "h":  25,
+                                        "text":  "socte",
+                                        "x":  1523
+                                    }
+                                ]
+                  }
+              ],
+    "file":  "23_Abb_7-1_Embedded_LSTM.png",
+    "angle":  0
+}

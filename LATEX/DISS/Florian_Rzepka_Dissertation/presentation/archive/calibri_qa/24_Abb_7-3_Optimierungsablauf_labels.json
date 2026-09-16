@@ -1,0 +1,409 @@
+{
+  "source": "C:\\Users\\Florian\\SynologyDrive\\TUB\\1_Dissertation\\1_Scripts\\LATEX\\DISS\\Florian_Rzepka_Dissertation\\presentation\\Bilder_Vortrag\\Times_New_Roman\\24_Abb_7-3_Optimierungsablauf.png",
+  "font": "Calibri",
+  "labels": [
+    {
+      "text": "Dataset",
+      "x": 99.5,
+      "y": 58.0,
+      "size": 33,
+      "rotation": 0
+    },
+    {
+      "text": "LFP DoD cycle",
+      "x": 99.5,
+      "y": 210.0,
+      "size": 25,
+      "rotation": 0
+    },
+    {
+      "text": "Aging Dataset",
+      "x": 99.5,
+      "y": 240.0,
+      "size": 25,
+      "rotation": 0
+    },
+    {
+      "text": "(1Hz)",
+      "x": 100.0,
+      "y": 269.0,
+      "size": 23,
+      "rotation": 0
+    },
+    {
+      "text": "Training",
+      "x": 355.0,
+      "y": 58.0,
+      "size": 33,
+      "rotation": 0
+    },
+    {
+      "text": "Pytorch:",
+      "x": 354.0,
+      "y": 210.0,
+      "size": 25,
+      "rotation": 0
+    },
+    {
+      "text": "LSTM + MLP",
+      "x": 354.5,
+      "y": 240.0,
+      "size": 25,
+      "rotation": 0
+    },
+    {
+      "text": "for",
+      "x": 355.0,
+      "y": 270.0,
+      "size": 25,
+      "rotation": 0
+    },
+    {
+      "text": "SOC & SOH",
+      "x": 355.0,
+      "y": 300.0,
+      "size": 25,
+      "rotation": 0
+    },
+    {
+      "text": "Model optimisation",
+      "x": 723.5,
+      "y": 43.0,
+      "size": 33,
+      "rotation": 0
+    },
+    {
+      "text": "Pruning",
+      "source": "approved SVG",
+      "size": "27"
+    },
+    {
+      "text": "Structured Pruning",
+      "x": 718.0,
+      "y": 134.0,
+      "size": 25,
+      "rotation": 0
+    },
+    {
+      "text": "(remove LSTM units +",
+      "x": 718.0,
+      "y": 162.0,
+      "size": 24,
+      "rotation": 0
+    },
+    {
+      "text": "MLP rows)",
+      "x": 717.5,
+      "y": 190.0,
+      "size": 19,
+      "rotation": 0
+    },
+    {
+      "text": "Quantization",
+      "source": "approved SVG",
+      "size": "27"
+    },
+    {
+      "text": "Per-row INT8 quantization",
+      "x": 717.0,
+      "y": 308.0,
+      "size": 25,
+      "rotation": 0
+    },
+    {
+      "text": "(weights + scales)",
+      "x": 717.5,
+      "y": 338.0,
+      "size": 25,
+      "rotation": 0
+    },
+    {
+      "text": "Firmware",
+      "x": 1030.0,
+      "y": 62.0,
+      "size": 33,
+      "rotation": 0
+    },
+    {
+      "text": "export",
+      "x": 1031.0,
+      "y": 102.0,
+      "size": 33,
+      "rotation": 0
+    },
+    {
+      "text": "Export to",
+      "x": 1031.5,
+      "y": 246.0,
+      "size": 25,
+      "rotation": 0
+    },
+    {
+      "text": "STM32",
+      "x": 1032.0,
+      "y": 276.0,
+      "size": 25,
+      "rotation": 0
+    },
+    {
+      "text": "firmware (C",
+      "x": 1031.5,
+      "y": 304.0,
+      "size": 23,
+      "rotation": 0
+    },
+    {
+      "text": "headers)",
+      "x": 1031.5,
+      "y": 335.0,
+      "size": 24,
+      "rotation": 0
+    },
+    {
+      "text": "STM32",
+      "x": 1302.0,
+      "y": 62.0,
+      "size": 33,
+      "rotation": 0
+    },
+    {
+      "text": "benchmarking",
+      "x": 1301.5,
+      "y": 102.0,
+      "size": 33,
+      "rotation": 0
+    },
+    {
+      "text": "UART feature",
+      "x": 1220.0,
+      "y": 224.0,
+      "size": 25,
+      "rotation": 0
+    },
+    {
+      "text": "stream from PC",
+      "x": 1221.0,
+      "y": 254.0,
+      "size": 25,
+      "rotation": 0
+    },
+    {
+      "text": "On-device inference",
+      "x": 1220.0,
+      "y": 284.0,
+      "size": 25,
+      "rotation": 0
+    },
+    {
+      "text": "(SOC, SOH)",
+      "x": 1220.0,
+      "y": 313.0,
+      "size": 23,
+      "rotation": 0
+    },
+    {
+      "text": "Measure benchmark",
+      "x": 1220.0,
+      "y": 344.0,
+      "size": 25,
+      "rotation": 0
+    },
+    {
+      "text": "features",
+      "x": 1220.0,
+      "y": 374.0,
+      "size": 25,
+      "rotation": 0
+    }
+  ],
+  "masks": [
+    [
+      47,
+      33,
+      153,
+      61
+    ],
+    [
+      16,
+      189,
+      183,
+      218
+    ],
+    [
+      25,
+      219,
+      175,
+      248
+    ],
+    [
+      68,
+      249,
+      131,
+      278
+    ],
+    [
+      296,
+      32,
+      415,
+      68
+    ],
+    [
+      310,
+      189,
+      398,
+      218
+    ],
+    [
+      280,
+      220,
+      430,
+      243
+    ],
+    [
+      338,
+      249,
+      373,
+      273
+    ],
+    [
+      288,
+      280,
+      423,
+      303
+    ],
+    [
+      589,
+      17,
+      858,
+      53
+    ],
+    [
+      644,
+      80,
+      797,
+      112
+    ],
+    [
+      621,
+      113,
+      816,
+      142
+    ],
+    [
+      600,
+      143,
+      836,
+      172
+    ],
+    [
+      663,
+      174,
+      784,
+      197
+    ],
+    [
+      632,
+      251,
+      814,
+      287
+    ],
+    [
+      579,
+      287,
+      856,
+      316
+    ],
+    [
+      626,
+      317,
+      809,
+      346
+    ],
+    [
+      963,
+      36,
+      1098,
+      65
+    ],
+    [
+      986,
+      79,
+      1076,
+      112
+    ],
+    [
+      982,
+      226,
+      1081,
+      254
+    ],
+    [
+      992,
+      256,
+      1072,
+      279
+    ],
+    [
+      968,
+      285,
+      1096,
+      314
+    ],
+    [
+      986,
+      315,
+      1076,
+      344
+    ],
+    [
+      1249,
+      37,
+      1354,
+      65
+    ],
+    [
+      1203,
+      76,
+      1400,
+      112
+    ],
+    [
+      1216,
+      203,
+      1364,
+      227
+    ],
+    [
+      1217,
+      233,
+      1380,
+      257
+    ],
+    [
+      1217,
+      263,
+      1426,
+      287
+    ],
+    [
+      1217,
+      293,
+      1349,
+      322
+    ],
+    [
+      1216,
+      323,
+      1427,
+      347
+    ],
+    [
+      1217,
+      353,
+      1301,
+      377
+    ]
+  ],
+  "size_policy": "Approved native sizes or measured raster type size",
+  "data_operation": "none"
+}

@@ -1,0 +1,92 @@
+\weiter{Embedded-Optimierung: Modell und Implementierung}
+\label{focus:optimization}
+\rahmenbild{3}{Schwerpunkt Deployment und Hardware. Die Genauigkeit bleibt als Kontrollgr\"o\ss e sichtbar.}
+Der abschlie\ss ende Teil ver\"andert nun gezielt das Netz und seine Darstellung. Wie l\"asst sich eine funktionierende neuronale Zustandsbestimmung an begrenzte Hardwareressourcen anpassen, und welche Auswirkungen hat diese Optimierung auf die Sch\"atzg\"ute?
+
+Pruning reduziert die Struktur, Quantisierung die Darstellungsbreite ausgew\"ahlter Gewichte. Das sind Deployment-Entscheidungen. Ihre Wirkung messen wir anhand von Flash, RAM und Laufzeit. Accuracy bleibt mit im Bild, weil eine Ressourceneinsparung nur gemeinsam mit ihrer Auswirkung auf die Zustandsbestimmung beurteilt werden kann.
+
+\station{Welche Teile des Netzes lassen sich verkleinern?}{1:00 min einschlie\ss lich Schwerpunktwechsel}{LSTM-Architektur}
+\original{7.1}{embedded_lstm_schematic.png}{82}{LSTM mit nachgeschaltetem MLP als Ausgangspunkt der Kompression.}
+Der abschlie\ss ende Teil untersucht nun die Architektur selbst. Hier werden eigenst\"andige LSTM-Modelle f\"ur SOC und SOH verwendet, nicht unver\"andert die Modelle des vorherigen Benchmarks. Beide verarbeiten sechs Merkmale. Das SOC-Modell besitzt 64 rekurrente Einheiten, das SOH-Modell 128. Dahinter folgt ein MLP mit ebenfalls 64 beziehungsweise 128 Einheiten.
+%TC:ignore
+\begin{center}\small
+\begin{tabular}{@{}lcc@{}}\toprule
+Architektur und Pruning & SOC & SOH \\
+\midrule
+Eingangsdimension $D$ & 6 & 6 \\
+LSTM-Hidden-Size $H$, Base & 64 & 128 \\
+LSTM-Hidden-Size, Pruned & 45 & 90 \\
+MLP-Breite $M$ & 64 & 128 \\
+Ausgabe & SOC & SOH \\
+\bottomrule\end{tabular}
+\end{center}
+%TC:endignore
+Die Gewichte verbinden den aktuellen Eingang und den vorherigen Hidden State mit den Gates. Deshalb beeinflusst die rekurrente Breite mehrere Matrizen gleichzeitig. Hinzu kommen die Zust\"ande im RAM und die Anbindung an das MLP. Diese Struktur erkl\"art, warum das Entfernen ganzer rekurrenter Einheiten sowohl Speicher als auch Rechenzeit verringern kann.
+
+\station{Von trainierten Parametern zu gepr\"ufter Firmware}{0:30 min}{Optimierungsablauf}
+\original{7.3}{embedded_pipeline.png}{125}{Training, alternative Kompressionspfade, C-Export und Hardware-Evaluation.}
+Aus dem trainierten FP32-Netz entstehen zwei getrennte Varianten. Beim strukturierten Pruning werden Einheiten entfernt und die verbleibenden Gewichte kurz nachtrainiert. Bei der Quantisierung werden ausgew\"ahlte Gewichtsmatrizen kompakter gespeichert. Anschlie\ss end werden die Parameter in C exportiert und auf derselben Hardware gepr\"uft. So lassen sich Auswirkungen auf Genauigkeit, Speicher und Laufzeit gemeinsam betrachten, statt nur eine kleinere Modelldatei zu melden.
+
+\station{Strukturiertes Pruning und sein Rechenvorteil}{1:30 min}{Kompressionsgrundlagen}
+\original{3.5}{pruning_granularity_comparison.png}{84}{Unstrukturiertes Nullsetzen im Vergleich zum Entfernen ganzer Strukturen.}
+Einzelne Gewichte auf null zu setzen macht eine dichte Matrix noch nicht kleiner. Ohne passende Sparse-Kernel werden vielfach weiterhin dieselben Positionen verarbeitet. Strukturiertes Pruning entfernt dagegen ganze Einheiten samt ihren Verbindungen. Beim LSTM m\"ussen die zugeh\"origen Gate-Zeilen, rekurrenten Spalten und MLP-Eing\"ange konsistent verkleinert werden.
+
+Die Auswahl basiert hier auf der Gewichtsnorm der rekurrenten Kan\"ale. Anschlie\ss end wird kurz nachtrainiert. Die Hidden Size sinkt um ungef\"ahr 30 Prozent. Der Einfluss auf die Zahl der Multiply-Accumulate-Operationen, kurz MACs, l\"asst sich absch\"atzen:
+\begin{equation}
+ N_{\mathrm{MAC}}\approx4H(D+H)+HM+M.
+\end{equation}
+Vier affine LSTM-Transformationen erkl\"aren den ersten Term. Die folgenden Terme geh\"oren zum MLP und zur Ausgabe. Da $H$ auch quadratisch eingeht, kann der Rechenaufwand st\"arker sinken als die Hidden Size. F\"ur SOC reduziert sich die Zahl von 22\,080 auf 12\,124 MACs pro Schritt, also um etwa 45 Prozent. Ob das auch schneller wird, pr\"ufen wir anschlie\ss end mit realer Laufzeitmessung.
+
+\station{Quantisierung: weniger Bits, nicht automatisch weniger Laufzeit}{1:15 min}{Kompressionsgrundlagen}
+\original{3.7}{quantization_scope_and_grids.png}{98}{Quantisierungsumfang und Abbildung auf ein diskretes Werteraster.}
+Quantisierung ver\"andert die Darstellung der Gewichte. Anstelle eines FP32-Werts werden ein ganzzahliger Wert und ein Skalierungsfaktor verwendet. Hier wird jede Zeile der rekurrenten Gewichtsmatrizen symmetrisch auf INT8 abgebildet:
+\begin{align}
+ s_r&=\max\!\left(\frac{\max_j|w_{rj}|}{127},\epsilon\right),\\
+ q_{rj}&=\clip\!\left(\operatorname{round}\frac{w_{rj}}{s_r},-127,127\right),
+ \qquad \hat w_{rj}=s_rq_{rj}.
+\end{align}
+F\"ur diese gespeicherten Gewichte sinkt der Bedarf von vier auf ein Byte pro Wert, erg\"anzt um die Skalen. Das gesamte Netz wird dadurch aber nicht viermal kleiner. Zust\"ande, Aktivierungen, Bias und MLP bleiben in diesem Ansatz FP32.
+
+Auch die Rechnung bleibt gleitkommabasiert. Die kompakten Gewichte werden w\"ahrend der Berechnung rekonstruiert. Das spart Flash, kann aber zus\"atzliche Laufzeit kosten. Pruning reduziert also die Struktur, Quantisierung die Darstellungsbreite. Beides sind unterschiedliche Hebel. Ihre Kombination ist eine sinnvolle Weiterentwicklung, wurde hier aber nicht als dritte kombinierte Kompressionsvariante vermessen.
+
+\station{Wie viel Sch\"atzg\"ute bleibt erhalten?}{1:00 min}{SOC- und SOH-Ergebnisse}
+\original{7.8}{embedded_soc_error.png}{66}{SOC-Fehlerverteilungen der drei Deployment-Varianten.}
+\original{7.9}{embedded_soh_error.png}{66}{SOH-Fehlerverteilungen nach der jeweiligen kausalen Ausgabeverarbeitung.}
+Bei SOC bleiben die Verteilungen in einer \"ahnlichen Gr\"o\ss enordnung. Die mittleren absoluten Fehler liegen bei ungef\"ahr 2,7 Prozentpunkten f\"ur Base, 2,3 f\"ur Pruned und 2,8 f\"ur Quantized. Pruning verschlechtert das Ergebnis hier also nicht zwangsl\"aufig. Das ist ein beobachtetes Ergebnis dieses Vergleichs, kein allgemeines Versprechen.
+
+Bei SOH ist der Unterschied deutlicher. Base erreicht 0,85 Prozentpunkte, Pruned 1,46 und Quantized 1,41. Die komprimierten Modelle bleiben nutzbar, bezahlen ihre Ressourceneinsparung hier aber mit h\"oherem Fehler. Die Werte beziehen sich auf die beschriebene kausale Nachverarbeitung. Gerade bei einem langsamen SOH-Signal m\"ussen Gl\"attung und Reaktionsverz\"ogerung mitgedacht werden. Die Aussage lautet deshalb nicht, dass alle Varianten identisch sind, sondern dass sich unterschiedliche praktische Betriebspunkte erreichen lassen.
+
+\station{Parameter, Flash und RAM gemeinsam betrachten}{0:45 min}{Speicherbedarf}
+\original{7.12}{embedded_model_sizes.png}{131}{Parameterzahl, idealisierte Gewichtsspeicherung und Firmware-Ressourcen. Fachliche Pr\"ufhinweise zur Originalgrafik stehen am Ende dieser Fassung.}
+Die Speicherauswertung trennt die reine Gewichtsdarstellung von der tats\"achlichen Firmware. Pruning senkt den SOC-Flash von rund 105 auf 62 KB und den SOH-Flash von 335 auf 182 KB. Quantisierung erreicht mit ungef\"ahr 52 und 138 KB die kleinsten Flash-Werte.
+
+RAM umfasst dagegen auch Zust\"ande, Puffer und den Stack. Deshalb folgt seine Reduktion nicht einfach derselben Quote wie die Gewichtsspeicherung. Die wesentliche Botschaft ist, dass ein Modell nicht nur anhand seiner Parameterzahl beurteilt werden kann. Entscheidend bleibt die gemessene oder aus der Firmware bestimmte Ressource auf der konkreten Zielplattform.
+
+\station{Weniger Rechenoperationen und gemessene Laufzeit}{0:45 min}{Inferenz und Gesamtlatenz}
+\original{7.13}{embedded_latency_hist.png}{79}{Verteilung der End-to-End-Latenz mit UART-Kommunikation und Hardware-Ausf\"uhrung.}
+Abbildung 7.13 zeigt die Zeit vom Host-Aufruf bis zur R\"uckgabe des Ergebnisses. Darin steckt auch Kommunikation. F\"ur die Optimierung des Netzes ist zus\"atzlich die direkt auf dem Controller gemessene Kernelzeit entscheidend:
+%TC:ignore
+\begin{center}\small
+\begin{tabular}{@{}lrrr@{}}\toprule
+Kernelzeit, Tabellen 7.1 und 7.2 & Base & Pruned & Quantized \\
+\midrule
+SOC [ms] & 1,40 & 0,80 & 6,99 \\
+SOH [ms] & 22,73 & 12,72 & 29,21 \\
+\bottomrule\end{tabular}
+\end{center}
+%TC:endignore
+Pruning verk\"urzt die Netzberechnung bei beiden Aufgaben um ungef\"ahr 43 bis 44 Prozent. Quantisierung spart am meisten Flash, ben\"otigt in diesen gemischten INT8/FP32-Kernels aber l\"anger. Welcher Betriebspunkt geeigneter ist, h\"angt davon ab, ob Speicher, Zeit oder Genauigkeit die engste Grenze setzt. Das l\"asst sich aus einem PC-MAE allein nicht entscheiden.
+
+\station{Gesamtergebnis und n\"achste Schritte}{2:15 min}{BMS-Anforderungen zusammenf\"uhren}
+\label{sec:schluss}
+Die Ergebnisse verbinden die drei Bereiche des Anforderungsbilds. Deployment beginnt bereits bei der Modellgestaltung. Das MLP-Beispiel zeigt, dass Merkmalsbildung und explizite Historie einen gro\ss en Beitrag leisten. Zeitabh\"angiges Batterieverhalten verlangt nicht automatisch die aufwendigste Netzstruktur. Rekurrente Modelle erweitern diesen Ansatz um einen intern fortgeschriebenen Zustand.
+
+Performance beschreibt, wie verl\"asslich diese Modelle unter ver\"anderten Messbedingungen arbeiten. Im Benchmark bietet der datengetriebene Ansatz ein starkes Gesamtergebnis. Das passt zur gemeinsamen Verarbeitung mehrerer Eingangsinformationen und ihres zeitlichen Kontexts. Zugleich bleiben spezifische Schwachstellen sichtbar. Systematische Stromfehler belasten die Ladungsbilanz. Spannungsr\"uckkopplung hilft bei Erholung. Lokale Spannungsspitzen k\"onnen gerade im neuronalen Modell ausgepr\"agte Reaktionen hervorrufen. Diese Befunde liefern Ansatzpunkte f\"ur geeignete Trainingsst\"orungen, Signalbehandlung und Zustandsinitialisierung.
+
+Auf der Hardware werden die Folgen der Entwurfsentscheidungen messbar. Kontinuierliche Zustandsfortschreibung vermeidet die wiederholte Berechnung einer langen Historie. Strukturiertes Pruning reduziert die Dimension des Netzes und damit Speicher und Laufzeit. Quantisierung verdichtet die Gewichtsdarstellung, ihre Geschwindigkeitswirkung h\"angt jedoch von der Rechenimplementierung ab. Diese Ma\ss nahmen m\"ussen daher zusammen mit ihrer Auswirkung auf die Sch\"atzung bewertet werden.
+
+\original{2.1}{bms_requirements.png}{73}{R\"uckkehr zum Anforderungsrahmen: Information, Modellverhalten und Implementierung treffen auf demselben BMS zusammen.}
+
+Der Gesamtbeitrag ist damit ein deploymentorientierter Weg vom Messsignal bis zur kompakten neuronalen Firmware. Die Netze sollen genug Komplexit\"at besitzen, um das Batterieverhalten zu erfassen, aber keine unn\"otigen Ressourcen beanspruchen. Die Hardware-Ergebnisse zeigen, dass dies mit den untersuchten Modellen auf einem begrenzten Mikrocontroller erreichbar ist.
+
+Als n\"achste Schritte bieten sich die gemeinsame Optimierung von Architektur und Kompression sowie Hardware-in-the-Loop-Tests mit gezielt gest\"orten Messsignalen auf der eigenen BMS-Plattform an. Hinzu kommen breitere Betriebsdaten und eine erneute Robustheitspr\"ufung der kontinuierlichen Ausf\"uhrung. Damit wird die lokale Zustandsbestimmung nicht nur kompakter, sondern gezielter auf die Bedingungen vorbereitet, unter denen sie sp\"ater verl\"asslich arbeiten soll.

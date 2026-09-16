@@ -1,0 +1,317 @@
+{
+  "file": "28_Abb_7-9_SOH_Fehler.png",
+  "font": "Times New Roman",
+  "labels": [
+    {
+      "text": "Error Distribution (Boxplot) - SOH",
+      "x": 488.0,
+      "y": 33.0,
+      "size": 45,
+      "rotation": 0
+    },
+    {
+      "text": "Error Histogram (Counts) - SOH",
+      "x": 1400.0,
+      "y": 33.0,
+      "size": 45,
+      "rotation": 0
+    },
+    {
+      "text": "0",
+      "x": 86,
+      "y": 613.0,
+      "size": 37,
+      "rotation": 0
+    },
+    {
+      "text": "1",
+      "x": 86,
+      "y": 504.2,
+      "size": 37,
+      "rotation": 0
+    },
+    {
+      "text": "2",
+      "x": 86,
+      "y": 395.4,
+      "size": 37,
+      "rotation": 0
+    },
+    {
+      "text": "3",
+      "x": 86,
+      "y": 286.6,
+      "size": 37,
+      "rotation": 0
+    },
+    {
+      "text": "4",
+      "x": 86,
+      "y": 177.8,
+      "size": 37,
+      "rotation": 0
+    },
+    {
+      "text": "5",
+      "x": 86,
+      "y": 69.0,
+      "size": 37,
+      "rotation": 0
+    },
+    {
+      "text": "Absolute Error [%]",
+      "x": 35,
+      "y": 354,
+      "size": 43,
+      "rotation": -90
+    },
+    {
+      "text": "Base",
+      "x": 228,
+      "y": 668,
+      "size": 36,
+      "rotation": 0
+    },
+    {
+      "text": "Pruned",
+      "x": 480,
+      "y": 668,
+      "size": 36,
+      "rotation": 0
+    },
+    {
+      "text": "Quantized",
+      "x": 733,
+      "y": 668,
+      "size": 36,
+      "rotation": 0
+    },
+    {
+      "text": "Base",
+      "x": 201,
+      "y": 103,
+      "size": 31,
+      "rotation": 0
+    },
+    {
+      "text": "MAE: 0.85",
+      "x": 201,
+      "y": 133,
+      "size": 30,
+      "rotation": 0
+    },
+    {
+      "text": "Pruned",
+      "x": 201,
+      "y": 173,
+      "size": 31,
+      "rotation": 0
+    },
+    {
+      "text": "MAE: 1.46",
+      "x": 201,
+      "y": 203,
+      "size": 30,
+      "rotation": 0
+    },
+    {
+      "text": "Quantized",
+      "x": 201,
+      "y": 243,
+      "size": 31,
+      "rotation": 0
+    },
+    {
+      "text": "MAE: 1.41",
+      "x": 201,
+      "y": 273,
+      "size": 30,
+      "rotation": 0
+    },
+    {
+      "text": "0",
+      "x": 1008,
+      "y": 639.0,
+      "size": 37,
+      "rotation": 0
+    },
+    {
+      "text": "30",
+      "x": 1008,
+      "y": 543.0,
+      "size": 37,
+      "rotation": 0
+    },
+    {
+      "text": "60",
+      "x": 1008,
+      "y": 447.0,
+      "size": 37,
+      "rotation": 0
+    },
+    {
+      "text": "90",
+      "x": 1008,
+      "y": 351.0,
+      "size": 37,
+      "rotation": 0
+    },
+    {
+      "text": "120",
+      "x": 1008,
+      "y": 255.0,
+      "size": 37,
+      "rotation": 0
+    },
+    {
+      "text": "150",
+      "x": 1008,
+      "y": 159.0,
+      "size": 37,
+      "rotation": 0
+    },
+    {
+      "text": "Count [k]",
+      "x": 925.0,
+      "y": 351.0,
+      "size": 41,
+      "rotation": -90
+    },
+    {
+      "text": "-10",
+      "x": 1054,
+      "y": 668,
+      "size": 36,
+      "rotation": 0
+    },
+    {
+      "text": "-5",
+      "x": 1226,
+      "y": 668,
+      "size": 36,
+      "rotation": 0
+    },
+    {
+      "text": "0",
+      "x": 1399,
+      "y": 668,
+      "size": 36,
+      "rotation": 0
+    },
+    {
+      "text": "5",
+      "x": 1571,
+      "y": 668,
+      "size": 36,
+      "rotation": 0
+    },
+    {
+      "text": "10",
+      "x": 1743,
+      "y": 668,
+      "size": 36,
+      "rotation": 0
+    },
+    {
+      "text": "Error (pred - GT) [%]",
+      "x": 1396,
+      "y": 709,
+      "size": 43,
+      "rotation": 0
+    },
+    {
+      "text": "Base",
+      "x": 1681.5,
+      "y": 101.0,
+      "size": 33,
+      "rotation": 0
+    },
+    {
+      "text": "Pruned",
+      "x": 1681.5,
+      "y": 141.0,
+      "size": 33,
+      "rotation": 0
+    },
+    {
+      "text": "Quantized",
+      "x": 1681.5,
+      "y": 181.0,
+      "size": 33,
+      "rotation": 0
+    }
+  ],
+  "viewbox": [
+    1800,
+    750.0
+  ],
+  "covered_label_areas": [
+    [
+      105,
+      0,
+      766,
+      66
+    ],
+    [
+      1025,
+      0,
+      750,
+      66
+    ],
+    [
+      0,
+      55,
+      91,
+      583
+    ],
+    [
+      111,
+      649,
+      756,
+      42
+    ],
+    [
+      117,
+      86,
+      231,
+      208
+    ],
+    [
+      945,
+      84,
+      71,
+      577
+    ],
+    [
+      891,
+      207,
+      68,
+      288
+    ],
+    [
+      1013,
+      649,
+      762,
+      82
+    ],
+    [
+      1605,
+      85,
+      153,
+      32
+    ],
+    [
+      1605,
+      125,
+      153,
+      32
+    ],
+    [
+      1605,
+      165,
+      153,
+      32
+    ]
+  ],
+  "data_operation": "none; original curves retained in SVG image layer"
+}

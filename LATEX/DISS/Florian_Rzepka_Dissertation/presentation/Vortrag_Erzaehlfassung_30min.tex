@@ -1,0 +1,119 @@
+\documentclass[11pt,a4paper]{article}
+%TC:macro \original [ignore,ignore,ignore,ignore]
+%TC:macro \hinweis [ignore]
+%TC:macro \station [ignore,ignore,ignore]
+%TC:macro \weiter [ignore]
+%TC:macro \rahmenbild [ignore,ignore]
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage{lmodern,microtype,amsmath,amssymb}
+\usepackage[margin=22mm,top=20mm,bottom=21mm,headheight=15pt]{geometry}
+\usepackage{graphicx,float,booktabs,tabularx,array,caption,tikz}
+\usepackage{xcolor,fancyhdr,enumitem,hyperref}
+\graphicspath{{../pictures/eaai_palette/}{../pictures/}{../pictures/jes_final/}}
+\definecolor{tured}{HTML}{B6302D}
+\definecolor{ink}{HTML}{333333}
+\definecolor{secondaryfocus}{HTML}{39738E}
+\hypersetup{colorlinks=true,linkcolor=ink,urlcolor=ink,
+  pdftitle={Dissertationsvortrag: illustrierte Erzaehlfassung mit Formeln},
+  pdfauthor={Florian Rzepka},bookmarksnumbered=true}
+\captionsetup{font=small,labelfont=bf,justification=raggedright,singlelinecheck=false}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 1pt}
+\setlength{\intextsep}{9pt}
+\setlength{\textfloatsep}{10pt}
+\setlist[itemize]{leftmargin=*,itemsep=4pt,topsep=5pt}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small Florian Rzepka\enspace |\enspace Dissertationsvortrag}
+\fancyhead[R]{\small Illustrierte Erz\"ahlfassung}
+\fancyfoot[L]{\small Arbeitsfassung vom 7. September 2026}
+\fancyfoot[R]{\small\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\newcommand{\station}[3]{\clearpage\section{#1}\label{station:\thesection}
+  {\small\textit{#2\enspace |\enspace #3}}\par\vspace{3pt}}
+\newcommand{\weiter}[1]{\clearpage{\large\bfseries #1}\par\vspace{4pt}}
+\newcommand{\original}[4]{\begin{figure}[H]\centering
+  \includegraphics[width=0.98\linewidth,height=#3mm,keepaspectratio]{#2}
+  \caption*{\textbf{Dissertation, Abbildung #1.} #4}\end{figure}}
+\newcommand{\hinweis}[1]{\par\vspace{2pt}{\small\color{ink}\textit{Vorbereitung:} #1}\par}
+% The focus outlines are document annotations. The original bitmap is unchanged.
+\newcommand{\rahmenbild}[2]{\begin{figure}[H]\centering
+  \begin{tikzpicture}
+    \node[anchor=south west,inner sep=0] (framework) at (0,0)
+      {\includegraphics[width=.94\linewidth]{bms_requirements.png}};
+    \begin{scope}[x={(framework.south east)},y={(framework.north west)}]
+      \ifnum#1=1
+        \draw[tured,line width=1.6pt] (.448,.470)--(.311,.692)--(.500,.998)--(.692,.692)--(.552,.470);
+        \draw[tured,line width=1.2pt] (.502,.754) ellipse[x radius=.047,y radius=.075];
+        \draw[secondaryfocus,line width=1.2pt,dashed] (.808,.133) ellipse[x radius=.041,y radius=.057];
+      \fi
+      \ifnum#1=2
+        \draw[tured,line width=1.6pt] (.663,.391)--(.806,.619)--(.998,.313)--(.806,.007)--(.663,.235);
+        \draw[tured,line width=1.6pt] (.350,.390)--(.208,.616)--(.018,.310)--(.208,.004)--(.350,.230);
+      \fi
+      \ifnum#1=3
+        \draw[tured,line width=1.6pt] (.448,.470)--(.311,.692)--(.500,.998)--(.692,.692)--(.552,.470);
+        \draw[tured,line width=1.6pt] (.350,.390)--(.208,.616)--(.018,.310)--(.208,.004)--(.350,.230);
+        \draw[secondaryfocus,line width=1.2pt,dashed] (.808,.133) ellipse[x radius=.041,y radius=.057];
+      \fi
+    \end{scope}
+  \end{tikzpicture}
+  \caption*{\textbf{Dissertation, Abbildung 2.1.} #2 Rot markiert den Hauptschwerpunkt.\ifnum#1=2\else\ Ein gestrichelter blauer Kreis markiert die erg\"anzend betrachtete Genauigkeit.\fi}
+  \end{figure}}
+\newcommand{\clip}{\operatorname{clip}}
+\newcommand{\MAE}{\operatorname{MAE}}
+\newcommand{\SOH}{\operatorname{SOH}}
+\newcommand{\SOC}{\operatorname{SOC}}
+\begin{document}
+%TC:ignore
+\thispagestyle{empty}
+{\small\color{tured} DISPUTATION\enspace /\enspace INHALTLICHE ARBEITSFASSUNG}
+\vspace{6mm}
+
+{\LARGE\bfseries Neuronale Zustandsbestimmung\par
+f\"ur eingebettete\par
+Batteriemanagementsysteme\par}
+\vspace{4mm}
+{\large Illustrierte Erz\"ahlfassung mit Modellgrundlagen und Formeln}
+
+\vspace{5mm}
+\textbf{Leitgedanke.} Welche Information ben\"otigt ein neuronales Modell, wie zuverl\"assig verarbeitet es diese Information und wie wird daraus eine kompakte, praktisch einsetzbare BMS-Implementierung? Diese drei Fragen verbinden Datenrepr\"asentation, Robustheit und Embedded-Optimierung zu einer gemeinsamen Arbeit.
+
+\textbf{Lesart.} Die Erz\"ahlung folgt 27 Bildstationen mit drei vorgeschalteten Schwerpunktansichten. Die Abbildungsnummern sind durchg\"angig die Nummern der \emph{Dissertation}. Die Bilder stammen aus der aktuellen Dissertation. Beim BMS-Anforderungsbild markieren zus\"atzliche Konturen den jeweiligen Schwerpunkt, ohne die Originaldatei zu ver\"andern. Die Stationen sind noch keine fertigen Folien.
+
+\renewcommand{\arraystretch}{1.3}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}Xrr@{}}
+\toprule
+Abschnitt & Stationen & Zeit \\
+\midrule
+BMS und experimentelle Grundlage & 1 bis 3 & 3:30 \\
+Zeitliche Repr\"asentation mit einem MLP & 4 bis 8 & 6:30 \\
+Rekurrente Modelle und Robustheitsbenchmark & 9 bis 17 & 8:15 \\
+Ausf\"uhrung auf dem Mikrocontroller & 18 bis 19 & 1:45 \\
+Pruning, Quantisierung und gemessene Effekte & 20 bis 26 & 6:45 \\
+Gesamtergebnis und Ausblick & 27 & 2:15 \\
+\midrule
+Erz\"ahlung & & 29:00 \\
+Puffer & & 1:00 \\
+\bottomrule
+\end{tabularx}
+
+\vspace{3mm}
+\textbf{Roter Faden.} Modell gestalten, Verhalten pr\"ufen, Implementierung optimieren. Beim MLP liegt der Schwerpunkt auf Deployment und Modellkomplexit\"at. Der Benchmark verbindet Performance und Hardware. Die Optimierung verbindet Deployment und Hardware mit Accuracy als Kontrollgr\"o\ss e. Die Bereiche bleiben miteinander verbunden.
+
+\textbf{Zeitliche Konsequenz.} Die Zeitbl\"ocke schlie\ss en die kurzen Schwerpunktwechsel ein. Pro Ergebnisbild wird eine Beobachtung erkl\"art, nicht jedes Teilpanel. Die Zeit ist ein Probenziel. Rauschvertiefung und vollst\"andige Gate-Gleichungen stehen als Reserve am Ende. Bei einer zu langen Generalprobe lassen sich die Syntheseansichten 6.15 und 6.16 gemeinsam besprechen.
+
+\vfill
+{\small Bildauswahl und fachliche Pr\"ufhinweise am Ende geh\"oren nicht zum gesprochenen Vortrag. Dissertation, Originalgrafiken und PowerPoint bleiben unver\"andert.}
+%TC:endignore
+% BEGIN SPOKEN NARRATIVE
+\input{Vortrag_Erzaehlfassung_Grundlagen.tex}
+\input{Vortrag_Erzaehlfassung_Benchmark.tex}
+\input{Vortrag_Erzaehlfassung_Optimierung.tex}
+% END SPOKEN NARRATIVE
+%TC:ignore
+\input{Vortrag_Erzaehlfassung_Reserve.tex}
+%TC:endignore
+\end{document}

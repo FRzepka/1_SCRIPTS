@@ -1,0 +1,39 @@
+{
+  "file": "07_Abb_5-2_Lag_Sequenz.png",
+  "font": "Times New Roman",
+  "labels": [
+    {
+      "text": "Input",
+      "x": 932.5,
+      "y": 47.5,
+      "size": 69,
+      "rotation": 0
+    },
+    {
+      "text": "Output",
+      "x": 1692.5,
+      "y": 47.5,
+      "size": 69,
+      "rotation": 0
+    }
+  ],
+  "viewbox": [
+    2306,
+    1035.0
+  ],
+  "covered_label_areas": [
+    [
+      800,
+      0,
+      265,
+      95
+    ],
+    [
+      1550,
+      0,
+      285,
+      95
+    ]
+  ],
+  "data_operation": "none; original curves retained in SVG image layer"
+}

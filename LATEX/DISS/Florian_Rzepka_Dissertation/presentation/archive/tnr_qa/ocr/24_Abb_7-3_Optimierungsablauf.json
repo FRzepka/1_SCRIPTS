@@ -1,0 +1,605 @@
+﻿{
+    "lines":  [
+                  {
+                      "text":  "Dataset",
+                      "words":  [
+                                    {
+                                        "y":  36,
+                                        "w":  100,
+                                        "h":  22,
+                                        "text":  "Dataset",
+                                        "x":  50
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "LFP DoD cycle",
+                      "words":  [
+                                    {
+                                        "y":  193,
+                                        "w":  42,
+                                        "h":  17,
+                                        "text":  "LFP",
+                                        "x":  19
+                                    },
+                                    {
+                                        "y":  193,
+                                        "w":  48,
+                                        "h":  17,
+                                        "text":  "DoD",
+                                        "x":  67
+                                    },
+                                    {
+                                        "y":  192,
+                                        "w":  58,
+                                        "h":  23,
+                                        "text":  "cycle",
+                                        "x":  122
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Aging Dataset",
+                      "words":  [
+                                    {
+                                        "y":  222,
+                                        "w":  62,
+                                        "h":  23,
+                                        "text":  "Aging",
+                                        "x":  28
+                                    },
+                                    {
+                                        "y":  223,
+                                        "w":  75,
+                                        "h":  17,
+                                        "text":  "Dataset",
+                                        "x":  97
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "(IHz)",
+                      "words":  [
+                                    {
+                                        "y":  252,
+                                        "w":  57,
+                                        "h":  23,
+                                        "text":  "(IHz)",
+                                        "x":  71
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Training",
+                      "words":  [
+                                    {
+                                        "y":  35,
+                                        "w":  113,
+                                        "h":  30,
+                                        "text":  "Training",
+                                        "x":  299
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Pytorch:",
+                      "words":  [
+                                    {
+                                        "y":  192,
+                                        "w":  82,
+                                        "h":  23,
+                                        "text":  "Pytorch:",
+                                        "x":  313
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "LSTM + MLP",
+                      "words":  [
+                                    {
+                                        "y":  223,
+                                        "w":  66,
+                                        "h":  17,
+                                        "text":  "LSTM",
+                                        "x":  283
+                                    },
+                                    {
+                                        "y":  225,
+                                        "w":  13,
+                                        "h":  13,
+                                        "text":  "+",
+                                        "x":  356
+                                    },
+                                    {
+                                        "y":  223,
+                                        "w":  51,
+                                        "h":  17,
+                                        "text":  "MLP",
+                                        "x":  376
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "for",
+                      "words":  [
+                                    {
+                                        "y":  252,
+                                        "w":  29,
+                                        "h":  18,
+                                        "text":  "for",
+                                        "x":  341
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "SOC \u0026 SOH",
+                      "words":  [
+                                    {
+                                        "y":  283,
+                                        "w":  46,
+                                        "h":  17,
+                                        "text":  "SOC",
+                                        "x":  291
+                                    },
+                                    {
+                                        "y":  283,
+                                        "w":  18,
+                                        "h":  17,
+                                        "text":  "\u0026",
+                                        "x":  345
+                                    },
+                                    {
+                                        "y":  283,
+                                        "w":  49,
+                                        "h":  17,
+                                        "text":  "SOH",
+                                        "x":  371
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Model optimisation",
+                      "words":  [
+                                    {
+                                        "y":  20,
+                                        "w":  87,
+                                        "h":  23,
+                                        "text":  "Model",
+                                        "x":  592
+                                    },
+                                    {
+                                        "y":  20,
+                                        "w":  167,
+                                        "h":  30,
+                                        "text":  "optimisation",
+                                        "x":  688
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Pruning",
+                      "words":  [
+                                    {
+                                        "y":  87,
+                                        "w":  87,
+                                        "h":  22,
+                                        "text":  "Pruning",
+                                        "x":  674
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Structured Pruning",
+                      "words":  [
+                                    {
+                                        "y":  116,
+                                        "w":  103,
+                                        "h":  18,
+                                        "text":  "Structured",
+                                        "x":  624
+                                    },
+                                    {
+                                        "y":  116,
+                                        "w":  79,
+                                        "h":  23,
+                                        "text":  "Pruning",
+                                        "x":  734
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "(remove LSTM units +",
+                      "words":  [
+                                    {
+                                        "y":  146,
+                                        "w":  82,
+                                        "h":  23,
+                                        "text":  "(remove",
+                                        "x":  603
+                                    },
+                                    {
+                                        "y":  147,
+                                        "w":  66,
+                                        "h":  17,
+                                        "text":  "LSTM",
+                                        "x":  692
+                                    },
+                                    {
+                                        "y":  146,
+                                        "w":  49,
+                                        "h":  18,
+                                        "text":  "units",
+                                        "x":  764
+                                    },
+                                    {
+                                        "y":  149,
+                                        "w":  13,
+                                        "h":  13,
+                                        "text":  "+",
+                                        "x":  820
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "MLP rows",
+                      "words":  [
+                                    {
+                                        "y":  177,
+                                        "w":  50,
+                                        "h":  17,
+                                        "text":  "MLP",
+                                        "x":  666
+                                    },
+                                    {
+                                        "y":  182,
+                                        "w":  48,
+                                        "h":  12,
+                                        "text":  "rows",
+                                        "x":  722
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Quantization",
+                      "words":  [
+                                    {
+                                        "y":  261,
+                                        "w":  139,
+                                        "h":  21,
+                                        "text":  "Quantization",
+                                        "x":  648
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Per-row INT8 quantization",
+                      "words":  [
+                                    {
+                                        "y":  291,
+                                        "w":  80,
+                                        "h":  17,
+                                        "text":  "Per-row",
+                                        "x":  582
+                                    },
+                                    {
+                                        "y":  291,
+                                        "w":  53,
+                                        "h":  17,
+                                        "text":  "INT8",
+                                        "x":  668
+                                    },
+                                    {
+                                        "y":  290,
+                                        "w":  124,
+                                        "h":  23,
+                                        "text":  "quantization",
+                                        "x":  729
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "(weights + scales)",
+                      "words":  [
+                                    {
+                                        "y":  320,
+                                        "w":  85,
+                                        "h":  23,
+                                        "text":  "(weights",
+                                        "x":  629
+                                    },
+                                    {
+                                        "y":  323,
+                                        "w":  13,
+                                        "h":  13,
+                                        "text":  "+",
+                                        "x":  721
+                                    },
+                                    {
+                                        "y":  320,
+                                        "w":  64,
+                                        "h":  21,
+                                        "text":  "scales)",
+                                        "x":  742
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Firmware",
+                      "words":  [
+                                    {
+                                        "y":  39,
+                                        "w":  129,
+                                        "h":  23,
+                                        "text":  "Firmware",
+                                        "x":  966
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "export",
+                      "words":  [
+                                    {
+                                        "y":  82,
+                                        "w":  84,
+                                        "h":  27,
+                                        "text":  "export",
+                                        "x":  989
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Export to",
+                      "words":  [
+                                    {
+                                        "y":  229,
+                                        "w":  68,
+                                        "h":  22,
+                                        "text":  "Export",
+                                        "x":  985
+                                    },
+                                    {
+                                        "y":  230,
+                                        "w":  19,
+                                        "h":  16,
+                                        "text":  "to",
+                                        "x":  1059
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "STM32",
+                      "words":  [
+                                    {
+                                        "y":  259,
+                                        "w":  74,
+                                        "h":  17,
+                                        "text":  "STM32",
+                                        "x":  995
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "firmware (C",
+                      "words":  [
+                                    {
+                                        "y":  288,
+                                        "w":  91,
+                                        "h":  18,
+                                        "text":  "firmware",
+                                        "x":  971
+                                    },
+                                    {
+                                        "y":  288,
+                                        "w":  24,
+                                        "h":  23,
+                                        "text":  "(C",
+                                        "x":  1069
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "headers)",
+                      "words":  [
+                                    {
+                                        "y":  318,
+                                        "w":  84,
+                                        "h":  23,
+                                        "text":  "headers)",
+                                        "x":  989
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "STM32",
+                      "words":  [
+                                    {
+                                        "y":  40,
+                                        "w":  99,
+                                        "h":  22,
+                                        "text":  "STM32",
+                                        "x":  1252
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "benchmarking",
+                      "words":  [
+                                    {
+                                        "y":  79,
+                                        "w":  191,
+                                        "h":  30,
+                                        "text":  "benchmarking",
+                                        "x":  1206
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "o onnoo",
+                      "words":  [
+                                    {
+                                        "y":  132,
+                                        "w":  4,
+                                        "h":  7,
+                                        "text":  "o",
+                                        "x":  1285
+                                    },
+                                    {
+                                        "y":  132,
+                                        "w":  27,
+                                        "h":  7,
+                                        "text":  "onnoo",
+                                        "x":  1291
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "a ooaao",
+                      "words":  [
+                                    {
+                                        "y":  182,
+                                        "w":  4,
+                                        "h":  7,
+                                        "text":  "a",
+                                        "x":  1285
+                                    },
+                                    {
+                                        "y":  182,
+                                        "w":  27,
+                                        "h":  7,
+                                        "text":  "ooaao",
+                                        "x":  1291
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "• UARTfeature",
+                      "words":  [
+                                    {
+                                        "y":  212,
+                                        "w":  7,
+                                        "h":  6,
+                                        "text":  "•",
+                                        "x":  1192
+                                    },
+                                    {
+                                        "y":  206,
+                                        "w":  142,
+                                        "h":  18,
+                                        "text":  "UARTfeature",
+                                        "x":  1219
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "stream from PC",
+                      "words":  [
+                                    {
+                                        "y":  238,
+                                        "w":  66,
+                                        "h":  16,
+                                        "text":  "stream",
+                                        "x":  1220
+                                    },
+                                    {
+                                        "y":  236,
+                                        "w":  48,
+                                        "h":  18,
+                                        "text":  "from",
+                                        "x":  1293
+                                    },
+                                    {
+                                        "y":  237,
+                                        "w":  30,
+                                        "h":  17,
+                                        "text":  "PC",
+                                        "x":  1347
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "• On-device inference",
+                      "words":  [
+                                    {
+                                        "y":  272,
+                                        "w":  7,
+                                        "h":  6,
+                                        "text":  "•",
+                                        "x":  1192
+                                    },
+                                    {
+                                        "y":  266,
+                                        "w":  103,
+                                        "h":  18,
+                                        "text":  "On-device",
+                                        "x":  1220
+                                    },
+                                    {
+                                        "y":  266,
+                                        "w":  93,
+                                        "h":  18,
+                                        "text":  "inference",
+                                        "x":  1330
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "(SOC, SOH)",
+                      "words":  [
+                                    {
+                                        "y":  296,
+                                        "w":  61,
+                                        "h":  23,
+                                        "text":  "(SOC,",
+                                        "x":  1220
+                                    },
+                                    {
+                                        "y":  296,
+                                        "w":  56,
+                                        "h":  23,
+                                        "text":  "SOH)",
+                                        "x":  1290
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "• Measure benchmark",
+                      "words":  [
+                                    {
+                                        "y":  332,
+                                        "w":  7,
+                                        "h":  6,
+                                        "text":  "•",
+                                        "x":  1192
+                                    },
+                                    {
+                                        "y":  327,
+                                        "w":  86,
+                                        "h":  17,
+                                        "text":  "Measure",
+                                        "x":  1219
+                                    },
+                                    {
+                                        "y":  326,
+                                        "w":  113,
+                                        "h":  18,
+                                        "text":  "benchmark",
+                                        "x":  1311
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "features",
+                      "words":  [
+                                    {
+                                        "y":  356,
+                                        "w":  78,
+                                        "h":  18,
+                                        "text":  "features",
+                                        "x":  1220
+                                    }
+                                ]
+                  }
+              ],
+    "file":  "24_Abb_7-3_Optimierungsablauf.png",
+    "angle":  0
+}

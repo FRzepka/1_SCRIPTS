@@ -1,0 +1,537 @@
+{
+  "file": "17_Abb_6-9_Initialisierung_Erholung.png",
+  "font": "Times New Roman",
+  "labels": [
+    {
+      "text": "Initial SOC mismatch (10%)",
+      "x": 989.0,
+      "y": 26.0,
+      "size": 46,
+      "rotation": 0
+    },
+    {
+      "text": "SOC trajectories",
+      "x": 1034.5,
+      "y": 122.0,
+      "size": 40,
+      "rotation": 0
+    },
+    {
+      "text": "0.0",
+      "x": 100,
+      "y": 602.0,
+      "size": 38,
+      "rotation": 0
+    },
+    {
+      "text": "0.2",
+      "x": 100,
+      "y": 509.25,
+      "size": 38,
+      "rotation": 0
+    },
+    {
+      "text": "0.4",
+      "x": 100,
+      "y": 416.5,
+      "size": 38,
+      "rotation": 0
+    },
+    {
+      "text": "0.6",
+      "x": 100,
+      "y": 323.75,
+      "size": 38,
+      "rotation": 0
+    },
+    {
+      "text": "0.8",
+      "x": 100,
+      "y": 231.0,
+      "size": 38,
+      "rotation": 0
+    },
+    {
+      "text": "SOC",
+      "x": 23,
+      "y": 388,
+      "size": 42,
+      "rotation": -90
+    },
+    {
+      "text": "1",
+      "x": 331.0,
+      "y": 649,
+      "size": 38,
+      "rotation": 0
+    },
+    {
+      "text": "2",
+      "x": 641.6,
+      "y": 649,
+      "size": 38,
+      "rotation": 0
+    },
+    {
+      "text": "3",
+      "x": 952.2,
+      "y": 649,
+      "size": 38,
+      "rotation": 0
+    },
+    {
+      "text": "4",
+      "x": 1262.8000000000002,
+      "y": 649,
+      "size": 38,
+      "rotation": 0
+    },
+    {
+      "text": "5",
+      "x": 1573.4,
+      "y": 649,
+      "size": 38,
+      "rotation": 0
+    },
+    {
+      "text": "6",
+      "x": 1884.0,
+      "y": 649,
+      "size": 38,
+      "rotation": 0
+    },
+    {
+      "text": "Time after initialization [h]",
+      "x": 1040,
+      "y": 687,
+      "size": 42,
+      "rotation": 0
+    },
+    {
+      "text": "Initialization-induced difference",
+      "x": 525,
+      "y": 751,
+      "size": 40,
+      "rotation": 0
+    },
+    {
+      "text": "First entry and persistent recovery",
+      "x": 1553,
+      "y": 751,
+      "size": 40,
+      "rotation": 0
+    },
+    {
+      "text": "0.00",
+      "x": 98,
+      "y": 1191.0,
+      "size": 34,
+      "rotation": 0
+    },
+    {
+      "text": "0.02",
+      "x": 98,
+      "y": 1131.7142857142858,
+      "size": 34,
+      "rotation": 0
+    },
+    {
+      "text": "0.04",
+      "x": 98,
+      "y": 1072.4285714285713,
+      "size": 34,
+      "rotation": 0
+    },
+    {
+      "text": "0.06",
+      "x": 98,
+      "y": 1013.1428571428571,
+      "size": 34,
+      "rotation": 0
+    },
+    {
+      "text": "0.08",
+      "x": 98,
+      "y": 953.8571428571429,
+      "size": 34,
+      "rotation": 0
+    },
+    {
+      "text": "0.10",
+      "x": 98,
+      "y": 894.5714285714286,
+      "size": 34,
+      "rotation": 0
+    },
+    {
+      "text": "0.12",
+      "x": 98,
+      "y": 835.2857142857142,
+      "size": 34,
+      "rotation": 0
+    },
+    {
+      "text": "0.14",
+      "x": 98,
+      "y": 776.0,
+      "size": 34,
+      "rotation": 0
+    },
+    {
+      "text": "|Shifted - correct SOC|",
+      "x": 18,
+      "y": 990,
+      "size": 32,
+      "rotation": -90
+    },
+    {
+      "text": "1",
+      "x": 210.0,
+      "y": 1217,
+      "size": 36,
+      "rotation": 0
+    },
+    {
+      "text": "2",
+      "x": 348.6,
+      "y": 1217,
+      "size": 36,
+      "rotation": 0
+    },
+    {
+      "text": "3",
+      "x": 487.2,
+      "y": 1217,
+      "size": 36,
+      "rotation": 0
+    },
+    {
+      "text": "4",
+      "x": 625.8,
+      "y": 1217,
+      "size": 36,
+      "rotation": 0
+    },
+    {
+      "text": "5",
+      "x": 764.4,
+      "y": 1217,
+      "size": 36,
+      "rotation": 0
+    },
+    {
+      "text": "6",
+      "x": 903.0,
+      "y": 1217,
+      "size": 36,
+      "rotation": 0
+    },
+    {
+      "text": "Time after initialization [h]",
+      "x": 525,
+      "y": 1251,
+      "size": 38,
+      "rotation": 0
+    },
+    {
+      "text": "0",
+      "x": 1127,
+      "y": 1191.0,
+      "size": 38,
+      "rotation": 0
+    },
+    {
+      "text": "5",
+      "x": 1127,
+      "y": 1108.4,
+      "size": 38,
+      "rotation": 0
+    },
+    {
+      "text": "10",
+      "x": 1127,
+      "y": 1025.8,
+      "size": 38,
+      "rotation": 0
+    },
+    {
+      "text": "15",
+      "x": 1127,
+      "y": 943.2,
+      "size": 38,
+      "rotation": 0
+    },
+    {
+      "text": "20",
+      "x": 1127,
+      "y": 860.6,
+      "size": 38,
+      "rotation": 0
+    },
+    {
+      "text": "25",
+      "x": 1127,
+      "y": 778.0,
+      "size": 38,
+      "rotation": 0
+    },
+    {
+      "text": "Recovery / 24-h censoring [h]",
+      "x": 1061,
+      "y": 981,
+      "size": 37,
+      "rotation": -90
+    },
+    {
+      "text": "DM",
+      "x": 1243,
+      "y": 1217,
+      "size": 36,
+      "rotation": 0
+    },
+    {
+      "text": "HDM",
+      "x": 1451,
+      "y": 1217,
+      "size": 36,
+      "rotation": 0
+    },
+    {
+      "text": "HECM",
+      "x": 1658,
+      "y": 1217,
+      "size": 36,
+      "rotation": 0
+    },
+    {
+      "text": "DD",
+      "x": 1865,
+      "y": 1217,
+      "size": 36,
+      "rotation": 0
+    },
+    {
+      "text": "Initial SOC mismatch (10%)",
+      "x": 992,
+      "y": 22,
+      "size": 40,
+      "rotation": 0
+    },
+    {
+      "text": "DM",
+      "x": 226,
+      "y": 1200,
+      "size": 34,
+      "rotation": 0
+    },
+    {
+      "text": "HDM",
+      "x": 426,
+      "y": 1200,
+      "size": 34,
+      "rotation": 0
+    },
+    {
+      "text": "HECM",
+      "x": 636,
+      "y": 1200,
+      "size": 34,
+      "rotation": 0
+    },
+    {
+      "text": "DD",
+      "x": 871,
+      "y": 1200,
+      "size": 34,
+      "rotation": 0
+    },
+    {
+      "text": "Reference",
+      "x": 1066,
+      "y": 1200,
+      "size": 34,
+      "rotation": 0
+    },
+    {
+      "text": "Correct initial SOC",
+      "x": 1316,
+      "y": 1200,
+      "size": 32,
+      "rotation": 0
+    },
+    {
+      "text": "Shifted initial SOC",
+      "x": 1696,
+      "y": 1200,
+      "size": 32,
+      "rotation": 0
+    },
+    {
+      "text": "Recovery threshold (2%)",
+      "x": 226,
+      "y": 1245,
+      "size": 30,
+      "rotation": 0
+    },
+    {
+      "text": "Scoring starts",
+      "x": 711,
+      "y": 1245,
+      "size": 30,
+      "rotation": 0
+    },
+    {
+      "text": "First 5-min entry",
+      "x": 1077,
+      "y": 1245,
+      "size": 32,
+      "rotation": 0
+    },
+    {
+      "text": "Persistent return",
+      "x": 1477,
+      "y": 1245,
+      "size": 32,
+      "rotation": 0
+    }
+  ],
+  "viewbox": [
+    1984,
+    1275.0109831234931
+  ],
+  "covered_label_areas": [
+    [
+      562,
+      7,
+      854,
+      38
+    ],
+    [
+      743,
+      104,
+      583,
+      36
+    ],
+    [
+      5,
+      211,
+      94,
+      408
+    ],
+    [
+      300,
+      637,
+      1613,
+      58
+    ],
+    [
+      1200,
+      547,
+      766,
+      68
+    ],
+    [
+      224,
+      737,
+      690,
+      34
+    ],
+    [
+      1243,
+      737,
+      700,
+      34
+    ],
+    [
+      1,
+      761,
+      99,
+      444
+    ],
+    [
+      174,
+      1205,
+      755,
+      59
+    ],
+    [
+      487,
+      786,
+      445,
+      70
+    ],
+    [
+      217,
+      836,
+      176,
+      48
+    ],
+    [
+      287,
+      942,
+      122,
+      53
+    ],
+    [
+      420,
+      1055,
+      151,
+      52
+    ],
+    [
+      1049,
+      765,
+      84,
+      440
+    ],
+    [
+      1210,
+      1205,
+      702,
+      59
+    ],
+    [
+      1778,
+      785,
+      188,
+      45
+    ],
+    [
+      1393,
+      1069,
+      374,
+      36
+    ]
+  ],
+  "panel_layout": [
+    [
+      [
+        0,
+        141,
+        1984,
+        567
+      ],
+      [
+        0,
+        46,
+        1984,
+        567
+      ]
+    ],
+    [
+      [
+        0,
+        730,
+        1984,
+        543
+      ],
+      [
+        0,
+        619,
+        1984,
+        543
+      ]
+    ]
+  ],
+  "data_operation": "none; original curves retained in SVG image layer"
+}

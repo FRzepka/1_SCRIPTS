@@ -1,0 +1,226 @@
+{
+  "01_Abb_2-1_BMS_Anforderungen.png": {
+    "sha256": "5d148756c253441c99f259e9c7a3a085762a210e8394b3f9476cbd88616c78f0",
+    "size": [
+      1685,
+      1060
+    ]
+  },
+  "02a_Abb_4-1_NMC_SOH_Zyklen.png": {
+    "sha256": "978dbf561369a40ea3d984c315e53a6e1dd40ed93f8b4b490fd54424458b7c6a",
+    "size": [
+      2819,
+      1383
+    ]
+  },
+  "02b_Abb_4-1_NMC_SOH_Zeit.png": {
+    "sha256": "9779bc5c581eb57a9b78dbbdda56441cf2c66485b12f0fe7fdf23ef2f6bc8469",
+    "size": [
+      2819,
+      1383
+    ]
+  },
+  "03_Abb_4-4_LFP_Datensatz.png": {
+    "sha256": "914b8f04123fce364e92d5c0a596d590e5684b13ea5cb67216830bdf9735bfb1",
+    "size": [
+      2991,
+      1693
+    ]
+  },
+  "04_Abb_4-6_BMS_Platine.png": {
+    "sha256": "4ad821a0325801758716cf1bdfab6dad8bd084e89cdf92997cf5073641efed3f",
+    "size": [
+      990,
+      738
+    ]
+  },
+  "05_Abb_3-2_MLP_Architektur.png": {
+    "sha256": "e2babbfcc57255582bffc4d1b0d5856e19bbd48bcc864b828394f4a584f33ca7",
+    "size": [
+      1600,
+      760
+    ]
+  },
+  "06_Abb_5-1_Korrelation.png": {
+    "sha256": "f5b44e357e0d10c013a73c2a8104090d84c87065165eea97acce49245e7a9d0b",
+    "size": [
+      2820,
+      2160
+    ]
+  },
+  "07_Abb_5-2_Lag_Sequenz.png": {
+    "sha256": "65e61777270a9b7d569c5ca8b1de4aad72913a46aa25a21b91704dfd24c800b8",
+    "size": [
+      2306,
+      1035
+    ]
+  },
+  "08_Abb_5-3_Training_Evaluation.png": {
+    "sha256": "72929e9f5fa750119641ed5d8b9d62050a167e690bbc7b5dc25c4d7b4aa5b938",
+    "size": [
+      2107,
+      2890
+    ]
+  },
+  "09_Abb_5-5_MLP_Historienvergleich.png": {
+    "sha256": "7e97c472f47c8bfb7fdb699fa4c948dade9ab3105e124903f481561e07cba4ac",
+    "size": [
+      4500,
+      1500
+    ]
+  },
+  "10_Abb_5-6_MLP_SOH_Ergebnis.png": {
+    "sha256": "f838db80e3ccfe599f52474c6963b64244c07728de28717e1a78f632f711528c",
+    "size": [
+      4500,
+      1500
+    ]
+  },
+  "11_Abb_3-3_LSTM_Zelle.png": {
+    "sha256": "09b3b2ef9d66f9b65f87d9a904577e90ac917eade4b4405db0ab2efddbd0e579",
+    "size": [
+      1200,
+      650
+    ]
+  },
+  "12_Abb_3-4_GRU_Zelle.png": {
+    "sha256": "8821121bf8b50fd13cbf94e2fb68fe3d577976e0f97b906fd1f595558e91c997",
+    "size": [
+      1200,
+      650
+    ]
+  },
+  "13_Abb_6-1_Benchmark_Methodik.png": {
+    "sha256": "481f78a8fdd3d8d2210dff8ee474010094bb7a6e755d1efeb5b14e51756268de",
+    "size": [
+      1600,
+      441
+    ]
+  },
+  "14_Abb_6-2_Stoerungsfamilien.png": {
+    "sha256": "348f7f476c6da35ad0cb0cbaa6b618d59f528d9b0ee755e4674187c69d7080b9",
+    "size": [
+      1730,
+      756
+    ]
+  },
+  "15_Abb_6-4_Baseline.png": {
+    "sha256": "e804509cc19b09f70ce5bbca95576d6ab8f3a84948d9b064d3830c3e8fa6e162",
+    "size": [
+      3211,
+      1190
+    ]
+  },
+  "16_Abb_6-5_Current_Gain.png": {
+    "sha256": "f17a3e833d8e5444622ad3965aa8e49cc3088542985bc893df7f004f21bf59b5",
+    "size": [
+      4066,
+      2445
+    ]
+  },
+  "17_Abb_6-9_Initialisierung_Erholung.png": {
+    "sha256": "5cc183e61f9d37444ceef0d7d0b432b6e2a93bf72dc0fe5742a164e4cb1b2148",
+    "size": [
+      3733,
+      2399
+    ]
+  },
+  "18_Abb_6-13_Spannungsspitze.png": {
+    "sha256": "bfbdf7a4d1f6be767793fdac097198d15751e9853b454e682d3687a8581eaebf",
+    "size": [
+      3414,
+      2209
+    ]
+  },
+  "19_Abb_6-15_Stoerungsvergleich.png": {
+    "sha256": "c2ae813f3d2eadbcf8a68d7d065c895f3d21484e28c084441295197c572e09a2",
+    "size": [
+      3652,
+      1158
+    ]
+  },
+  "20_Abb_6-16_Benchmark_Synthese.png": {
+    "sha256": "0591f9c8fa60245eb6843de99c90caa2421cc38c4a38e1690c1dce0498a88706",
+    "size": [
+      4080,
+      1860
+    ]
+  },
+  "21_Abb_6-19_Hardware_Speicher.png": {
+    "sha256": "0626522d91577b2d01baa6a322908573a7848332a6c7a3bea468709fa030ee15",
+    "size": [
+      2676,
+      1119
+    ]
+  },
+  "22_Abb_6-20_DD_Ausfuehrungsmodi.png": {
+    "sha256": "0c336568b9307ce30150685cd43c56f11b756444f34cb9d767a6768b63361838",
+    "size": [
+      3517,
+      1223
+    ]
+  },
+  "23_Abb_7-1_Embedded_LSTM.png": {
+    "sha256": "8014f63ff2f6ea02b313909948f1eb8de1e4af4908c6f18998967113bb4f2c95",
+    "size": [
+      1625,
+      518
+    ]
+  },
+  "24_Abb_7-3_Optimierungsablauf.png": {
+    "sha256": "ef8fa4e5b67cfc3ead2d5ff7f0e8f8fe2129ee2222cda7008fd03b8f880efbc7",
+    "size": [
+      1447,
+      396
+    ]
+  },
+  "25_Abb_3-5_Pruning.png": {
+    "sha256": "1457f0d97c96a5900589b0c5e620f4ef8359e17932e63f450496c495503aba88",
+    "size": [
+      1800,
+      720
+    ]
+  },
+  "26_Abb_3-7_Quantisierung.png": {
+    "sha256": "4291bd77a0f2d7af303cf5ff558f91aab93028737368035611eae071d50d1abd",
+    "size": [
+      1800,
+      900
+    ]
+  },
+  "27_Abb_7-8_SOC_Fehler.png": {
+    "sha256": "31ea93eb18c06021c4e7fb844d868090f0d0b1e93c9bcf39074d8e34844a5cba",
+    "size": [
+      1800,
+      750
+    ]
+  },
+  "28_Abb_7-9_SOH_Fehler.png": {
+    "sha256": "81f241bd614a04c1df5339ad23bc1de9dea31b058fd040901010974193b19991",
+    "size": [
+      1800,
+      750
+    ]
+  },
+  "29_Abb_7-12_Parameter_Flash_RAM.png": {
+    "sha256": "d4c25573e2cdfbd897e6e30bbd442b959636aa81ff5f0821597244b03cbae4c0",
+    "size": [
+      4200,
+      3000
+    ]
+  },
+  "30_Abb_7-13_Host_Latenz.png": {
+    "sha256": "f17cb66a99cfdbe6f7737b1d0f03d4eb8883b2ef836f3a6181deac88be55ee08",
+    "size": [
+      1800,
+      750
+    ]
+  },
+  "R01_Abb_6-7_Stromrauschen.png": {
+    "sha256": "8fda4b346c99057d0fb857e6de3d97ae42ade7b703d47dbfa7e3bef3044b01e8",
+    "size": [
+      3571,
+      2951
+    ]
+  }
+}

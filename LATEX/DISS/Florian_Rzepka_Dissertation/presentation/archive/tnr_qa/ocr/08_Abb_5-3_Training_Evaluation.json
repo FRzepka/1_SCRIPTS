@@ -1,0 +1,440 @@
+﻿{
+    "lines":  [
+                  {
+                      "text":  "PREPROCESSING",
+                      "words":  [
+                                    {
+                                        "y":  126,
+                                        "w":  528,
+                                        "h":  47,
+                                        "text":  "PREPROCESSING",
+                                        "x":  256
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Battery Data",
+                      "words":  [
+                                    {
+                                        "y":  472,
+                                        "w":  178,
+                                        "h":  55,
+                                        "text":  "Battery",
+                                        "x":  557
+                                    },
+                                    {
+                                        "y":  472,
+                                        "w":  115,
+                                        "h":  42,
+                                        "text":  "Data",
+                                        "x":  751
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "—SOH, Is",
+                      "words":  [
+                                    {
+                                        "y":  669,
+                                        "w":  228,
+                                        "h":  57,
+                                        "text":  "—SOH,",
+                                        "x":  328
+                                    },
+                                    {
+                                        "y":  671,
+                                        "w":  41,
+                                        "h":  61,
+                                        "text":  "Is",
+                                        "x":  577
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "-+ Lag Sequence",
+                      "words":  [
+                                    {
+                                        "y":  778,
+                                        "w":  62,
+                                        "h":  25,
+                                        "text":  "-+",
+                                        "x":  326
+                                    },
+                                    {
+                                        "y":  763,
+                                        "w":  100,
+                                        "h":  59,
+                                        "text":  "Lag",
+                                        "x":  408
+                                    },
+                                    {
+                                        "y":  762,
+                                        "w":  251,
+                                        "h":  60,
+                                        "text":  "Sequence",
+                                        "x":  532
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Split Data",
+                      "words":  [
+                                    {
+                                        "y":  1061,
+                                        "w":  113,
+                                        "h":  56,
+                                        "text":  "Split",
+                                        "x":  388
+                                    },
+                                    {
+                                        "y":  1063,
+                                        "w":  115,
+                                        "h":  42,
+                                        "text":  "Data",
+                                        "x":  515
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Test Split",
+                      "words":  [
+                                    {
+                                        "y":  1592,
+                                        "w":  104,
+                                        "h":  42,
+                                        "text":  "Test",
+                                        "x":  158
+                                    },
+                                    {
+                                        "y":  1590,
+                                        "w":  113,
+                                        "h":  56,
+                                        "text":  "Split",
+                                        "x":  280
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Finished MLP",
+                      "words":  [
+                                    {
+                                        "y":  2605,
+                                        "w":  210,
+                                        "h":  44,
+                                        "text":  "Finished",
+                                        "x":  196
+                                    },
+                                    {
+                                        "y":  2607,
+                                        "w":  120,
+                                        "h":  41,
+                                        "text":  "MLP",
+                                        "x":  422
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Model",
+                      "words":  [
+                                    {
+                                        "y":  2678,
+                                        "w":  157,
+                                        "h":  44,
+                                        "text":  "Model",
+                                        "x":  292
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Training Split",
+                      "words":  [
+                                    {
+                                        "y":  1591,
+                                        "w":  208,
+                                        "h":  56,
+                                        "text":  "Training",
+                                        "x":  551
+                                    },
+                                    {
+                                        "y":  1591,
+                                        "w":  113,
+                                        "h":  56,
+                                        "text":  "Split",
+                                        "x":  778
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "EVALUATION",
+                      "words":  [
+                                    {
+                                        "y":  1970,
+                                        "w":  481,
+                                        "h":  54,
+                                        "text":  "EVALUATION",
+                                        "x":  807
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "100",
+                      "words":  [
+                                    {
+                                        "y":  2166,
+                                        "w":  31,
+                                        "h":  15,
+                                        "text":  "100",
+                                        "x":  824
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "80",
+                      "words":  [
+                                    {
+                                        "y":  2302,
+                                        "w":  21,
+                                        "h":  14,
+                                        "text":  "80",
+                                        "x":  834
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "SOHp dicted",
+                      "words":  [
+                                    {
+                                        "y":  2196,
+                                        "w":  52,
+                                        "h":  17,
+                                        "text":  "SOHp",
+                                        "x":  1160
+                                    },
+                                    {
+                                        "y":  2196,
+                                        "w":  51,
+                                        "h":  14,
+                                        "text":  "dicted",
+                                        "x":  1230
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "100",
+                      "words":  [
+                                    {
+                                        "y":  2544,
+                                        "w":  31,
+                                        "h":  14,
+                                        "text":  "100",
+                                        "x":  1027
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "150",
+                      "words":  [
+                                    {
+                                        "y":  2544,
+                                        "w":  30,
+                                        "h":  14,
+                                        "text":  "150",
+                                        "x":  1115
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "200",
+                      "words":  [
+                                    {
+                                        "y":  2544,
+                                        "w":  32,
+                                        "h":  14,
+                                        "text":  "200",
+                                        "x":  1201
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "%sttlme [Days]",
+                      "words":  [
+                                    {
+                                        "y":  2567,
+                                        "w":  72,
+                                        "h":  14,
+                                        "text":  "%sttlme",
+                                        "x":  1018
+                                    },
+                                    {
+                                        "y":  2567,
+                                        "w":  53,
+                                        "h":  17,
+                                        "text":  "[Days]",
+                                        "x":  1096
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "SOH Prediction",
+                      "words":  [
+                                    {
+                                        "y":  2622,
+                                        "w":  129,
+                                        "h":  48,
+                                        "text":  "SOH",
+                                        "x":  890
+                                    },
+                                    {
+                                        "y":  2621,
+                                        "w":  275,
+                                        "h":  48,
+                                        "text":  "Prediction",
+                                        "x":  1036
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "TRAINING \u0026",
+                      "words":  [
+                                    {
+                                        "y":  83,
+                                        "w":  316,
+                                        "h":  48,
+                                        "text":  "TRAINING",
+                                        "x":  1400
+                                    },
+                                    {
+                                        "y":  84,
+                                        "w":  49,
+                                        "h":  46,
+                                        "text":  "\u0026",
+                                        "x":  1738
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "VALIDATION",
+                      "words":  [
+                                    {
+                                        "y":  163,
+                                        "w":  392,
+                                        "h":  47,
+                                        "text":  "VALIDATION",
+                                        "x":  1397
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Hyperparameter",
+                      "words":  [
+                                    {
+                                        "y":  348,
+                                        "w":  433,
+                                        "h":  59,
+                                        "text":  "Hyperparameter",
+                                        "x":  1445
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "tuning",
+                      "words":  [
+                                    {
+                                        "y":  426,
+                                        "w":  172,
+                                        "h":  61,
+                                        "text":  "tuning",
+                                        "x":  1445
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Model building",
+                      "words":  [
+                                    {
+                                        "y":  531,
+                                        "w":  173,
+                                        "h":  48,
+                                        "text":  "Model",
+                                        "x":  1436
+                                    },
+                                    {
+                                        "y":  531,
+                                        "w":  225,
+                                        "h":  62,
+                                        "text":  "building",
+                                        "x":  1626
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Model Parameter",
+                      "words":  [
+                                    {
+                                        "y":  1593,
+                                        "w":  157,
+                                        "h":  44,
+                                        "text":  "Model",
+                                        "x":  1397
+                                    },
+                                    {
+                                        "y":  1595,
+                                        "w":  247,
+                                        "h":  42,
+                                        "text":  "Parameter",
+                                        "x":  1571
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "ooo",
+                      "words":  [
+                                    {
+                                        "y":  2216,
+                                        "w":  99,
+                                        "h":  26,
+                                        "text":  "ooo",
+                                        "x":  1798
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "MAE",
+                      "words":  [
+                                    {
+                                        "y":  2319,
+                                        "w":  146,
+                                        "h":  46,
+                                        "text":  "MAE",
+                                        "x":  1660
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "MSE",
+                      "words":  [
+                                    {
+                                        "y":  2399,
+                                        "w":  136,
+                                        "h":  47,
+                                        "text":  "MSE",
+                                        "x":  1665
+                                    }
+                                ]
+                  },
+                  {
+                      "text":  "Evaluation",
+                      "words":  [
+                                    {
+                                        "y":  2617,
+                                        "w":  289,
+                                        "h":  49,
+                                        "text":  "Evaluation",
+                                        "x":  1601
+                                    }
+                                ]
+                  }
+              ],
+    "file":  "08_Abb_5-3_Training_Evaluation.png",
+    "angle":  0
+}

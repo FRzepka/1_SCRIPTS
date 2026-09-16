@@ -1,0 +1,104 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:svg xmlns:ns0="http://www.w3.org/2000/svg" xmlns:ns1="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:ns2="http://www.inkscape.org/namespaces/inkscape" width="1200" height="650" viewBox="0 0 1200 650" version="1.1" id="svg19" ns1:docname="gru_cell_eaai_style.svg" ns2:version="1.4.4 (dcaf3e7, 2026-05-05)">
+  <ns1:namedview id="namedview19" pagecolor="#505050" bordercolor="#eeeeee" borderopacity="1" ns2:showpageshadow="0" ns2:pageopacity="0" ns2:pagecheckerboard="0" ns2:deskcolor="#505050" ns2:zoom="1.6569231" ns2:cx="601.41597" ns2:cy="331.03528" ns2:window-width="3840" ns2:window-height="2054" ns2:window-x="3283" ns2:window-y="-11" ns2:window-maximized="1" ns2:current-layer="svg19" />
+  <ns0:defs id="defs1">
+    <ns0:marker id="arrow-blue" markerWidth="13" markerHeight="13" refX="11" refY="6.5" orient="auto" markerUnits="userSpaceOnUse">
+      <ns0:path d="M0,0 L13,6.5 L0,13 Z" fill="#5f9dc9" id="path1" />
+    </ns0:marker>
+    <ns0:style id="style1">
+      .frame {
+        fill: none;
+        stroke: #424242;
+        stroke-width: 5;
+      }
+      .signal {
+        fill: none;
+        stroke: #5f9dc9;
+        stroke-width: 4;
+        stroke-linecap: square;
+        stroke-linejoin: miter;
+      }
+      .signal-arrow {
+        fill: none;
+        stroke: #5f9dc9;
+        stroke-width: 4;
+        stroke-linecap: square;
+        stroke-linejoin: miter;
+        marker-end: url(#arrow-blue);
+      }
+      .gate {
+        fill: #ffffff;
+        stroke: #424242;
+        stroke-width: 4;
+      }
+      .operator {
+        fill: #ffffff;
+        stroke: #424242;
+        stroke-width: 4;
+      }
+      .title {
+        font-family:'Calibri';
+        font-size: 34px;
+        font-weight:normal;
+        fill: #424242;
+        text-anchor: middle;
+      }
+      .math {
+        font-family:'Calibri';
+        font-size: 31px;
+        font-style: italic;
+        fill: #424242;
+      }
+      .small-math {
+        font-family:'Calibri';
+        font-size: 25px;
+        font-style: italic;
+        fill: #424242;
+        text-anchor: middle;
+      }
+      .gate-text {
+        font-family:'Calibri';
+        font-size: 39px;
+        font-style: italic;
+        font-weight:normal;
+        fill: #424242;
+        text-anchor: middle;
+      }
+      .op-text {
+        font-family:'Calibri';
+        font-size: 34px;
+        fill: #424242;
+        text-anchor: middle;
+      }
+    </ns0:style>
+  </ns0:defs>
+  <ns0:text class="title" x="600" y="42" id="text1" style=";font-family:'Calibri' !important;font-weight:normal !important" font-family="Calibri" font-weight="normal">GRU</ns0:text><ns0:rect class="frame" x="180" y="70" width="840" height="480" rx="72" ry="72" id="rect1" />
+  
+  <ns0:text class="math" x="43" y="165" id="text2" style=";font-family:'Calibri' !important;font-weight:normal !important" font-family="Calibri" font-weight="normal">hₜ₋₁</ns0:text><ns0:path class="signal-arrow" d="M128 175 H692" id="path2" />
+  <ns0:circle class="operator" cx="720" cy="175" r="28" id="circle2" />
+  <ns0:text class="op-text" x="720" y="187" id="text3" style=";font-family:'Calibri' !important;font-weight:normal !important" font-family="Calibri" font-weight="normal">×</ns0:text><ns0:path class="signal-arrow" d="M748 175 H922" id="path3" />
+  <ns0:circle class="operator" cx="950" cy="175" r="28" id="circle3" />
+  <ns0:text class="op-text" x="950" y="187" id="text4" style=";font-family:'Calibri' !important;font-weight:normal !important" font-family="Calibri" font-weight="normal">+</ns0:text><ns0:path class="signal-arrow" d="M978 175 H1150" id="path4" />
+  <ns0:text class="math" x="1084" y="157" id="text5" style=";font-family:'Calibri' !important;font-weight:normal !important" font-family="Calibri" font-weight="normal">hₜ</ns0:text><ns0:path class="signal-arrow" d="M320 175 V232" id="path5" />
+  <ns0:circle class="operator" cx="320" cy="260" r="28" id="circle5" />
+  <ns0:text class="op-text" x="320" y="272" id="text6" style=";font-family:'Calibri' !important;font-weight:normal !important" font-family="Calibri" font-weight="normal">×</ns0:text><ns0:rect class="gate" x="410" y="340" width="80" height="76" rx="9" ry="9" id="rect6" />
+  <ns0:text class="gate-text" x="450" y="391" id="text7" style=";font-family:'Calibri' !important;font-weight:normal !important" font-family="Calibri" font-weight="normal">σ</ns0:text><ns0:path class="signal-arrow" d="M 450.73816,338.4689 451.51811,260.01021 380,260 h -32" id="path7" ns1:nodetypes="cccc" />
+  <ns0:text class="small-math" x="469.82794" y="316.18921" id="text8" style=";font-family:'Calibri' !important;font-weight:normal !important" font-family="Calibri" font-weight="normal">rₜ</ns0:text><ns0:rect class="gate" x="560" y="340" width="80" height="76" rx="9" ry="9" id="rect8" />
+  <ns0:text class="gate-text" x="600" y="391" id="text9" style=";font-family:'Calibri' !important;font-weight:normal !important" font-family="Calibri" font-weight="normal">σ</ns0:text><ns0:circle class="operator" cx="601.4187" cy="235.0692" r="28" id="circle9" />
+  <ns0:text class="small-math" x="603.55249" y="244.49596" text-anchor="middle" id="text10" style=";font-family:'Calibri' !important;font-weight:normal !important" font-family="Calibri" font-weight="normal">1−</ns0:text><ns0:path class="signal-arrow" d="m 600.42676,338.77163 0.30449,-75.53634" id="path10" ns1:nodetypes="cc" />
+  <ns0:path class="signal-arrow" d="m 629.58477,238.64936 90.4729,-0.29872 L 720,220 v -17" id="path11" ns1:nodetypes="cccc" />
+  
+  <ns0:circle class="operator" cx="850" cy="285" r="28" id="circle11" />
+  <ns0:text class="op-text" x="850" y="297" id="text11" style=";font-family:'Calibri' !important;font-weight:normal !important" font-family="Calibri" font-weight="normal">×</ns0:text><ns0:path class="signal-arrow" d="M 602.52553,285.30176 822,285" id="path12" ns1:nodetypes="cc" />
+  <ns0:text class="small-math" x="620.91925" y="318.48328" id="text12" style=";font-family:'Calibri' !important;font-weight:normal !important" font-family="Calibri" font-weight="normal">zₜ</ns0:text><ns0:rect class="gate" x="795" y="360" width="110" height="76" rx="9" ry="9" id="rect12" />
+  <ns0:text class="gate-text" x="850" y="411" id="text13" style=";font-family:'Calibri' !important;font-weight:normal !important" font-family="Calibri" font-weight="normal">tanh</ns0:text><ns0:path class="signal-arrow" d="M850 360 V313" id="path13" />
+  
+  <ns0:path class="signal-arrow" d="M878 285 H950 V203" id="path14" />
+  
+  <ns0:path class="signal" d="M220 175 V480 H600 V416" id="path15" />
+  <ns0:path class="signal" d="M450 480 V416" id="path16" />
+  <ns0:circle cx="319.61469" cy="478.49118" r="7" fill="#5f9dc9" id="circle16" />
+  <ns0:path class="signal-arrow" d="m 600.3592,479.98321 251.32639,1.28028 v -44.40996" id="path17" ns1:nodetypes="ccc" />
+  <ns0:path class="signal" d="m 319.96301,478.54295 0.60352,-188.29619" id="path18" ns1:nodetypes="cc" />
+  <ns0:text class="math" x="270" y="610" id="text18" style=";font-family:'Calibri' !important;font-weight:normal !important" font-family="Calibri" font-weight="normal">xₜ</ns0:text><ns0:path class="signal-arrow" d="m 319.78624,575.87885 v -93" id="path19" />
+</ns0:svg>
