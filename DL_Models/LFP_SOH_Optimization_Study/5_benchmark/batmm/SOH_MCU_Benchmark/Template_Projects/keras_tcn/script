@@ -1,0 +1,18 @@
+config load "D:\PRJ\stedgeai-desktop-backend\DevCloud\templates\Validation\NUCLEO-H753ZI\NUCLEO-H753ZI.ioc"
+project toolchain STM32CubeIDE
+
+project toolchain "STM32CubeIDE"
+set mode RCC HSE-External-Clock-Source
+config save
+set ip parameters CORTEX_M7 CPU_ICache Enabled
+set ip parameters CORTEX_M7 CPU_DCache Enabled
+set ip parameters CORTEX_M7 MPU_Control MPU_PRIVILEGED_DEFAULT
+project set heapsize 0x800
+project set stacksize 0x2000
+set gpio parameters PD9 GPIO_PuPd GPIO_PULLUP
+set pin PD9 USART3_RX
+set pin PD8 USART3_TX
+set mode USART3 Asynchronous
+config save
+set ip parameters USART3 BaudRate 115200
+set gpio parameters PD9 GPIO_PuPd GPIO_PULLUP

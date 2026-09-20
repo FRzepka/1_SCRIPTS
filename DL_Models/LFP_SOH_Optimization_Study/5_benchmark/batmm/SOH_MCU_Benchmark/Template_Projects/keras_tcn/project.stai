@@ -1,0 +1,15 @@
+{
+  "toolchain": "STM32CubeIDE",
+  "variant": "Validation",
+  "fromMx": false,
+  "name": "NUCLEO-H753ZI",
+  "createdAt": 1771966819375,
+  "lastModified": 1771967218350,
+  "lastAccessed": 1771966819378,
+  "board": "NUCLEO-H753ZI",
+  "uartInstance": {
+    "usart": "USART3",
+    "txpin": "PD8",
+    "rxpin": "PD9"
+  }
+}
