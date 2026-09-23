@@ -1,0 +1,31 @@
+{
+  "pdf_pages": 117,
+  "question_count": 114,
+  "exercises": 12,
+  "open_points": 10,
+  "covered_figures": 67,
+  "source_table_count": 28,
+  "all_pages_rendered": true,
+  "original_pdf_hash_unchanged": true,
+  "source_pdf_sha256": "e0877299e1ce54a8dde6d880a691d028754fa215aa772c49fbeba0fac79b8d9f",
+  "checked_source_files": {
+    "main.tex": "74e6817878b51ac5b2d3fea8555b6ecdb6cdd3799d0bf868ff100fe18a03f7bc",
+    "chapters/06_performance_robustness_benchmark.tex": "6ba86f679d21525913138a7b3ca00dd9cbd2341187ad61d186ec0ff422927302",
+    "chapters/appendix_robustness_final.tex": "07dea5cfd4f09b01c32338764c227565a0e93cbde5b8517c87702557ef08f99d",
+    "tables/jes_final/jes2_hecm_lookup_sensitivity_compact.tex": "b1fd2511fe80c9a0b69289081184e69e13486afe2cccb3a1df7d0c85fe1adc21",
+    "tables/jes_final/jes2_dataset_cell_split_coverage.tex": "834892b65c5e3ecf27f922d08ebc8360cc5de585a431d2e1fe3731ac1d630a6c"
+  },
+  "render_preview_pages": [
+    1,
+    5,
+    6,
+    18,
+    54,
+    73,
+    109,
+    111,
+    115,
+    117
+  ],
+  "scope": "Structural and rendering checks, not a rerun of thesis experiments."
+}
