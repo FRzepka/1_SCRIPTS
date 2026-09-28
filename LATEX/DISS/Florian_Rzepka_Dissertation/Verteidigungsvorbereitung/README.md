@@ -1,45 +1,29 @@
-# Verteidigungsvorbereitung
+# Verteidigungsvorbereitung – aktualisierter LaTeX-Build
 
-Separates Lernmaterial zur Dissertation. Originaltext, Originalbilder und `../main.pdf`
-werden nicht geaendert.
+Stand: 23.09.2026. Die vorhandenen Markdown-Quellen wurden weitergeführt. Die Dissertation selbst wird nicht verändert.
 
-## Hauptdatei
+## Inhalt und Änderungen
 
-`Dissertation_Fragenkatalog_und_Lernskript.pdf`
+- Englische Fachbegriffe, weiterhin deutsche Erklärungen.
+- F075: verständliche Erklärung von Channel-Auswahl, mitentfernten Verbindungen und Grenzen des Gewichtsscores.
+- Alle 114 Fachfragen, 12 Rechenübungen, 67 Abbildungen und 28 Tabellenhinweise erhalten.
+- Modellübersicht und englischer Begriffsschlüssel ergänzt.
+- Einheitlicher Fließtext (Arial, 11 pt); Tabellen mit einheitlich 9,5 pt. Abbildungen bleiben Originalseiten.
 
-Enthaelt 114 Fachfragen mit Antwortvorschlaegen, 12 geloeste Rechenuebungen,
-10 kritische Pruefpunkte, einen Lern-/Rechercheplan, einen Atlas aller 67
-nummerierten Abbildungen und Hinweise zu allen 28 nummerierten Tabellen.
-Das Inhaltsverzeichnis und PDF-Lesezeichen erleichtern die Navigation.
+## Bearbeiten und bauen
 
-## Bearbeitbare Quellen
+Die drei Markdown-Dateien sind die gepflegten Quellen für den Hauptteil. Die Modellübersicht und das Glossar stehen in `Modelluebersicht_und_Begriffe.tex`; das Layout in `preamble.tex`.
 
-- `Fragen_und_Antworten.md`: Fragen F001-F100, offene Punkte, Uebungen und Lernplan.
-- `Abbildungsatlas.md`: Einzelinterpretationen mit Originalseiten aus der PDF.
-- `Tabellen_und_Vertiefung.md`: Fragen F101-F114 und Tabellenbegleitung.
-- `figure_inventory.json`: Abbildungsnummern, PDF-Seiten und SHA-256 der Original-PDF.
-- `build_guide.py`: reproduzierbarer PDF-Build.
+`python build_latex.py` erzeugt `Fragenkatalog.tex` daraus. Diese vollständige LaTeX-Datei kann auch direkt bearbeitet werden; ein erneuter Generatorlauf überschreibt solche direkten Änderungen.
 
-Die Interpretation basiert auf dem gelesenen Manuskript und seiner Quellenstruktur.
-Es wurden keine Simulationen, Modelltrainings oder Hardwaremessungen wiederholt.
-Nicht nachgewiesene Ursachen sind als Hypothesen oder offene Fragen gekennzeichnet.
-Das Dokument ist keine Vorhersage persoenlicher Fragen der Pruefer und kein
-vollstaendiges Audit aller experimentellen Rohdaten.
+Mit `python build_latex.py --compile` wird zusätzlich dreimal XeLaTeX ausgeführt, um Inhaltsverzeichnis und Seitenzahlen aufzulösen. Voraussetzungen: Python 3, XeLaTeX, Arial und die in der Präambel genannten üblichen LaTeX-Pakete. Der Generator braucht keine zusätzlichen Python-Pakete.
 
-## Build auf diesem HPC
+Alternativ die vorhandene `Fragenkatalog.tex` mit XeLaTeX und Jobname `Dissertation_Fragenkatalog_und_Lernskript` kompilieren (für aktualisierte Verweise mindestens zweimal).
 
-Python-Abhaengigkeiten: `reportlab`, `pymupdf`, `Pillow`.
-DejaVu-Schriften werden aus `/usr/share/fonts/truetype/dejavu` verwendet.
-Im vorhandenen Conda-Setup benoetigt Pillow die zugehoerige C++-Bibliothek:
+Die Ausgabe heißt weiterhin `Dissertation_Fragenkatalog_und_Lernskript.pdf`.
 
-```bash
-env LD_LIBRARY_PATH=/home/florianr/anaconda3/lib python build_guide.py
-```
+`figures/thesis-page-*.pdf` enthält unveränderte einzelne Vektorseiten der Dissertation. Ihre Quelle ist durch `figure_inventory.json` dokumentiert. Diese Assets gehören zum LaTeX-Projekt.
 
-Der Build erzeugt unter `assets/` ausschliesslich abgeleitete Seitenkopien und
-Kontaktboegen. Sie koennen aus der unveraenderten Dissertation neu erzeugt werden.
-Nach Aenderung der Dissertation diese Assets neu generieren, nicht alte Seitenkopien
-mit einer neuen PDF mischen. Der Generator erkennt eine geaenderte Quell-PDF.
+Der bisherige `build_guide.py` bleibt als älterer ReportLab-Build erhalten; für das neue Layout bitte `build_latex.py` verwenden. Die bisherigen Dateien werden vor dem Ersetzen im Unterordner `backup_vor_latex_20260923` gesichert.
 
-Stand: 2026-09-16, nach Fast-forward von GitHub auf `2d8fdc9`.
-Neue Lernunterlagen wurden nicht automatisch committed oder gepusht.
+Die Überarbeitung ist eine sprachliche und typografische Pflege, keine erneute Validierung sämtlicher Studienergebnisse. Bereits gekennzeichnete offene Punkte bleiben offen. Es wurde nichts committed oder nach GitHub gepusht.

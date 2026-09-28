@@ -6,13 +6,13 @@ Dieser Teil ergänzt die Fragen F001 bis F100 um häufige Nachfragen zur Methode
 
 **Antwort:** ReLU gibt bei positiven Eingängen den Wert weiter und bei negativen null. Sigmoid bildet auf 0 bis 1 ab und wird für Gates oder begrenzte Ausgaben verwendet. tanh bildet auf -1 bis 1 ab und kann positive und negative Kandidatenzustände darstellen. Softmax normalisiert mehrere Ausgänge auf eine Summe von eins und passt zu konkurrierenden Klassenwahrscheinlichkeiten.
 
-**Kritische Nachfrage:** Warum wurde Softmax für SOH erwähnt? Bei nur einem Softmax-Ausgang ist die Ausgabe immer eins. Eine sinnvolle Konfiguration müsste sich auf versteckte Schichten oder mehrere Ausgänge beziehen. Der Text nennt eine Aktivierungsvergleichsstudie, aber die konkrete Platzierung muss aus dem ursprünglichen Tuning hervorgehen. Ohne diesen Nachweis nicht behaupten, die Arbeit belege allgemeine Untauglichkeit von Softmax.
+**Kritische Nachfrage:** Warum wurde Softmax für SOH erwähnt? Bei nur einem Softmax-Ausgang ist die Ausgabe immer eins. Eine sinnvolle Konfiguration müsste sich auf Hidden Layers oder mehrere Ausgänge beziehen. Der Text nennt eine Activation-Vergleichsstudie, aber die konkrete Platzierung muss aus dem ursprünglichen Tuning hervorgehen. Ohne diesen Nachweis nicht behaupten, die Arbeit belege allgemeine Untauglichkeit von Softmax.
 
 ## F102. Warum überhaupt skalieren und ist RobustScaler eine Robustheitsgarantie?
 
-**Antwort:** Skalierung verhindert, dass numerisch große Merkmale wie kumulierte Zeit das Training allein durch ihre Größenordnung dominieren. Min-Max verwendet Bereichsgrenzen, RobustScaler typischerweise Median und Interquartilsabstand. Beide müssen mit ausschließlich Entwicklungsdaten bestimmt und unverändert auf Test und MCU angewendet werden.
+**Antwort:** Skalierung verhindert, dass numerisch große Features wie kumulierte Zeit das Training allein durch ihre Größenordnung dominieren. Min-Max verwendet Bereichsgrenzen, RobustScaler typischerweise Median und Interquartilsabstand. Beide müssen mit ausschließlich Entwicklungsdaten bestimmt und unverändert auf Test und MCU angewendet werden.
 
-**Grenze:** RobustScaler ist robust gegenüber manchen extremen Trainingswerten bei der Lage-/Skalenbestimmung. Er macht das neuronale Modell nicht automatisch robust gegen Sensorfehler oder neue Betriebsbereiche. Ein außerhalb des Trainingsbereichs liegendes Merkmal bleibt ein Extrapolationsproblem. **Beleg:** Kapitel 5.2.5 und 7.2.
+**Grenze:** RobustScaler ist robust gegenüber manchen extremen Trainingswerten bei der Lage-/Skalenbestimmung. Er macht das neuronale Modell nicht automatisch robust gegen Sensorfehler oder neue Betriebsbereiche. Ein außerhalb des Trainingsbereichs liegendes Feature bleibt ein Extrapolationsproblem. **Beleg:** Kapitel 5.2.5 und 7.2.
 
 ## F103. Warum MSE als Loss, wenn Sie später MAE berichten?
 
@@ -40,9 +40,9 @@ Dieser Teil ergänzt die Fragen F001 bis F100 um häufige Nachfragen zur Methode
 
 ## F107. Was ist der Unterschied zwischen PTQ und QAT?
 
-**Antwort:** Post-training quantization transformiert ein bereits trainiertes Modell, gegebenenfalls mithilfe von Kalibrierdaten. Quantization-aware training simuliert relevante Quantisierungseffekte während der Gewichtsanpassung. QAT kann das Netz auf die späteren Rundungs- und Clippingeffekte vorbereiten, verursacht aber zusätzlichen Trainingsaufwand.
+**Antwort:** Post-training quantization transformiert ein bereits trainiertes Modell, gegebenenfalls mithilfe von Kalibrierdaten. Quantization-aware training simuliert relevante Quantization Effects während der Gewichtsanpassung. QAT kann das Netz auf die späteren Rundungs- und Clippingeffekte vorbereiten, verursacht aber zusätzlichen Trainingsaufwand.
 
-**Grenze:** Die hier untersuchte zeilenweise Max-Skalierung der Gewichte benötigt kein repräsentatives Aktivierungskalibrierset wie eine vollständige Aktivierungsquantisierung. Sie ist trotzdem nicht allgemein optimal. Die Speicher- und Laufzeitgrenze hängt vom Exportkernel ab, nicht allein von PTQ versus QAT. **Beleg:** Tabellen 3.6 und 3.7 sowie Kapitel 7.5.
+**Grenze:** Die hier untersuchte zeilenweise Max-Skalierung der Gewichte benötigt kein repräsentatives Activation Calibration Set wie eine vollständige Activation Quantization. Sie ist trotzdem nicht allgemein optimal. Die Speicher- und Laufzeitgrenze hängt vom Exportkernel ab, nicht allein von PTQ versus QAT. **Beleg:** Tabellen 3.6 und 3.7 sowie Kapitel 7.5.
 
 ## F108. Warum Per-Row statt Per-Tensor oder Per-Group?
 
@@ -50,13 +50,13 @@ Dieser Teil ergänzt die Fragen F001 bis F100 um häufige Nachfragen zur Methode
 
 **Grenze:** Der hier gewählte Modus ist ein nachvollziehbarer Kompromiss, kein experimenteller Sieg über jede andere Granularität. Für eine Hardwareentscheidung zählen außerdem Skalenanwendung, Vektorisierung und Datentransfer. **Beleg:** Tabelle 3.6 und Abbildung 7.5.
 
-## F109. Warum kann eine einzelne große Gewichtszahl Quantisierung verschlechtern?
+## F109. Warum kann eine einzelne große Gewichtszahl Quantization verschlechtern?
 
 **Antwort:** Bei Max-Abs-Skalierung bestimmt das größte Gewicht die Schrittweite der ganzen Zeile. Viele kleine Gewichte können dadurch auf denselben Code oder null runden. Ein größerer darstellbarer Bereich bedeutet bei festem Bitbudget gröbere Auflösung.
 
-**Vertiefung:** Clipping könnte die Mehrheit genauer repräsentieren, verzerrt aber große Gewichte. Ob das günstiger ist, muss mit Daten und finaler Task-Metrik geprüft werden. Die Dissertation nutzt einen einfach reproduzierbaren Max-Abs-Pfad. Die Halbschrittgrenze gilt für genau diesen Pfad ohne zusätzliches Clipping, nicht für jede Quantisierungsstrategie.
+**Vertiefung:** Clipping könnte die Mehrheit genauer repräsentieren, verzerrt aber große Gewichte. Ob das günstiger ist, muss mit Daten und finaler Task-Metrik geprüft werden. Die Dissertation nutzt einen einfach reproduzierbaren Max-Abs-Pfad. Die Halbschrittgrenze gilt für genau diesen Pfad ohne zusätzliches Clipping, nicht für jede Quantization Strategy.
 
-## F110. Kann man Pruning und Quantisierung kombinieren?
+## F110. Kann man Pruning und Quantization kombinieren?
 
 **Antwort:** Prinzipiell ja, weil sie unterschiedliche Stellgrößen verändern: Topologie und numerische Repräsentation. Man könnte zuerst Kanäle auswählen und fine-tunen und anschließend das kleinere Netz quantisieren. Reihenfolge und gemeinsame Nachanpassung können die Güte beeinflussen.
 
@@ -70,7 +70,7 @@ Dieser Teil ergänzt die Fragen F001 bis F100 um häufige Nachfragen zur Methode
 
 ## F112. Warum manuelle C-Kerne statt automatischem Konverter?
 
-**Antwort:** Sie machen recurrent states, Gateordnung, Skalierung und Quantisierungsgrenzen explizit und erlauben eine nachvollziehbare Referenzimplementierung. Die Arbeit kann so Operationsfolge und Speicher besser kontrollieren.
+**Antwort:** Sie machen recurrent states, Gateordnung, Skalierung und Quantization-Grenzen explizit und erlauben eine nachvollziehbare Referenzimplementierung. Die Arbeit kann so Operationsfolge und Speicher besser kontrollieren.
 
 **Grenze:** Manuelle Umsetzung ist fehleranfällig und nicht automatisch schneller. Numerische Äquivalenztests sind daher notwendig. Automatische Toolchains können hochoptimierte Operatoren bereitstellen, deren Zustandssemantik und Modellabdeckung aber geprüft werden müssen. Tabellen 3.5 und 3.8 sind Softwareübersichten, keine Garantie der Unterstützung genau des eigenen Modellgraphen in jeder Version.
 
@@ -98,7 +98,7 @@ Dieser Teil ergänzt die Fragen F001 bis F100 um häufige Nachfragen zur Methode
 
 **PDF-Seiten 56, 61 und 63.** Granularität, Optimierungsverfahren und Softwareunterstützung sind drei unterschiedliche Achsen. **Prüfungsfrage:** Erzeugt eine hohe Sparse-Rate schon eine schnelle Firmware? **Antwort:** Nein, Format, Operator und Kernel müssen die Sparsity ausnutzen. **Lernauftrag:** One-shot/local/gate-group/structured/dense-export als genaue Beschreibung der eigenen Kapitel-7-Variante zusammensetzen. Frameworkfähigkeiten sind versionsabhängig und dürfen nicht ungeprüft als aktuelle Vollabdeckung ausgegeben werden. Siehe F105, F106 und F112.
 
-## Tabellen 3.6 bis 3.8: Quantisierungsmethoden und Werkzeuge
+## Tabellen 3.6 bis 3.8: Quantization Methods und Werkzeuge
 
 **PDF-Seiten 68, 70 und 72.** Die Tabellen behandeln Granularität, Strategie und Software. **Prüfungsfrage:** An welcher Stelle liegen Kalibrierungsdaten, Rundung, Integerarithmetik und Deploymentoperator? **Antwort:** Das sind getrennte Designentscheidungen. Der eigene Versuch ist zeilenweise symmetrische PTQ nur für Recurrent-Gewichte mit FP32-Zuständen. **Grenze:** Nicht alle aufgeführten Modi wurden selbst gemessen. Siehe F107 bis F109.
 
@@ -124,7 +124,7 @@ Dieser Teil ergänzt die Fragen F001 bis F100 um häufige Nachfragen zur Methode
 
 ## Tabellen 7.1 und 7.2: Hardware-KPIs
 
-**PDF-Seite 167.** **Prüfungsfrage:** Sind Latency und Inference doppelte Messungen? **Antwort:** Nein, Hostlatenz und Kernzeit haben unterschiedliche Grenzen. Flash ist gelinkter Speicher, RAM enthält statische Daten und beobachteten Stack, Eest ist aus Inference berechnet. **Lernauftrag:** SOC Base/Pruned/Quantized mit 1,40/0,80/6,99 ms und SOH mit 22,73/12,72/29,21 ms erklären. Keine unabhängige Energiebestätigung aus der letzten Spalte ableiten. Siehe F087 bis F091.
+**PDF-Seite 167.** **Prüfungsfrage:** Sind Latency und Inference doppelte Messungen? **Antwort:** Nein, Host Latency und Kernzeit haben unterschiedliche Grenzen. Flash ist gelinkter Speicher, RAM enthält statische Daten und beobachteten Stack, Eest ist aus Inference berechnet. **Lernauftrag:** SOC Base/Pruned/Quantized mit 1,40/0,80/6,99 ms und SOH mit 22,73/12,72/29,21 ms erklären. Keine unabhängige Energiebestätigung aus der letzten Spalte ableiten. Siehe F087 bis F091.
 
 ## Tabelle 7.3: Kompressionstrade-off
 

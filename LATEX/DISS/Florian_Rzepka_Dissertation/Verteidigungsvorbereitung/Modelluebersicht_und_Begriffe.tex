@@ -1,0 +1,197 @@
+\topic{Modellübersicht: Architektur, Training und Ergebnisse}
+\subsection*{MODELLÜBERSICHT · 1/\allowbreak{}5}
+\section*{\color{accent}Welche Modelle habe ich benutzt?}
+Lernübersicht zu den Kapiteln 5, 6 und 7. Kapitel 8 fasst die Ergebnisse zusammen. Die drei Untersuchungen beantworten unterschiedliche Fragen.
+
+{\fontsize{9.5}{12}\selectfont\setlength{\tabcolsep}{2mm}\renewcommand{\arraystretch}{1.2}\begin{longtable}{>{\raggedright\arraybackslash}p{35.47mm}>{\raggedright\arraybackslash}p{126.53mm}}
+\toprule
+\textbf{Kapitel /\allowbreak{} Modell} & \textbf{Aufbau und Aufgabe} \\
+\midrule\endhead
+5 · SOH-MLP & Feedforward-Netz ohne rekurrentes Gedächtnis. Spannung, Temperatur und kumulierter Strom werden als Lag-Vektor eingegeben. Neun Dense Hidden Layers mit ReLU, danach ein linearer SOH-Ausgang. Untersucht den Nutzen zeitlicher Input Features. \\
+6 · DM → SOC & Coulomb Counting mit fester Nennkapazität; Stromintegration und Rücksetzen bei erkannter Vollladung. Kein neuronales SOC-Netz. \\
+6 · HDM → SOC & Wie DM, aber effektive Kapazität = Nennkapazität × geschätzter SOH. Nutzt das gemeinsame SOH-LSTM. \\
+6 · HECM → SOC & Ersatzschaltbild mit zwei RC-Zweigen und Kalman-Korrektur anhand der Spannung. Zustände: SOC und zwei Polarisationsspannungen. Tabellenparameter werden nach SOC und SOH angepasst. \\
+6 · DD /\allowbreak{} GRU → SOC & Eine GRU-Schicht: ursprünglich 96, nach Structured Pruning 67 Einheiten. MLP-Kopf mit 96 Hidden Units und einem Sigmoid-Ausgang. Acht Input Features. \\
+6 · gemeinsames SOH-LSTM & 20 stündliche Features → zweistufiges Embedding (Breite 128) → 2 LSTM-Schichten mit je 112 Einheiten → 3 residuale MLP-Blöcke → Kopf mit Breite 160 → SOH. Liefert SOH für HDM, HECM und DD. \\
+7 · SOC-LSTM + MLP & Base: 1 LSTM-Schicht, Hidden Size 64; MLP-Kopf 64 → 1 mit ReLU/\allowbreak{}Sigmoid. Sechs Input Features, sekündliche Verarbeitung. \\
+7 · SOH-LSTM + MLP & Base: 1 LSTM-Schicht, Hidden Size 128; MLP-Kopf 128 → 1 mit ReLU/\allowbreak{}linearem Ausgang. Sechs Input Features, sekündliche Verarbeitung. \\
+\bottomrule
+\end{longtable}}
+MLP-Schichtbreiten in Kapitel 5: 128 → 256 → 256 → 256 → 128 → 512 → 128 → 256 → 256 → 1. Bei 16 Lag-Schritten × 3 Features entstehen 48 Eingabewerte.
+
+Kapitel 7 vergleicht je Aufgabe Base (FP32), strukturell Pruned (FP32) und Quantized (rekurrente Gewichte INT8). Quantized ist kein vollständig ganzzahliges Netz; Zustände und weitere Berechnungen bleiben in Gleitkomma. Quellen: [1], [2], [3], [4].
+
+
+\clearpage
+\subsection*{MODELLÜBERSICHT · 2/\allowbreak{}5}
+\section*{\color{accent}Training, Fenster und Daten}
+Window Length = Zeitspanne eines Training Sample. Batch Size = Anzahl solcher Beispiele in einem Verarbeitungsschritt. Beides ist von der Zahl der Zellen zu unterscheiden.
+
+{\fontsize{9.5}{12}\selectfont\setlength{\tabcolsep}{2mm}\renewcommand{\arraystretch}{1.2}\begin{longtable}{>{\raggedright\arraybackslash}p{25.51mm}>{\raggedright\arraybackslash}p{54.07mm}>{\raggedright\arraybackslash}p{50.12mm}>{\raggedright\arraybackslash}p{24.3mm}}
+\toprule
+\textbf{Modell} & \textbf{Eingaben pro Zeitschritt} & \textbf{Training Window} & \textbf{Batch} \\
+\midrule\endhead
+Kap. 5 SOH-MLP & U, T, kumulierter Strom; flach als Lag-Vektor & Beste berichtete Kombination: 16 × 10 min = 160 min (2 h 40 min) & Nicht bestätigt; gefundenes MLP-Skript derzeit nur als Cloud-Datei verfügbar \\
+Kap. 6 SOC-GRU /\allowbreak{} DD & U, I, T, SOH, Qc, dU/\allowbreak{}dt, dI/\allowbreak{}dt, Δt & 2.024 Punkte bei nominal 1 Hz; rund 34 min & 512; je 2 Batches pro Update laut Konfiguration \\
+Kap. 6 SOH-LSTM & U, I, T, EFC, Qc: jeweils Mittelwert, Std., Min., Max. pro Stunde = 20 Features & 192 Stundenwerte = 8 Tage & 128 \\
+Kap. 7 SOC-LSTM & U, I, T, Qc, dU/\allowbreak{}dt, dI/\allowbreak{}dt & 2.024 Punkte bei 1 Hz; rund 34 min & 512 \\
+Kap. 7 SOH-LSTM & Zeit, U, I, T, EFC, Qc & 2.048 Punkte bei 1 Hz; rund 34 min (0,57 h) & 128 \\
+\bottomrule
+\end{longtable}}
+\subsection*{Welche Daten gehören wohin?}
+{\fontsize{9.5}{12}\selectfont\setlength{\tabcolsep}{2mm}\renewcommand{\arraystretch}{1.2}\begin{longtable}{>{\raggedright\arraybackslash}p{26.84mm}>{\raggedright\arraybackslash}p{135.16mm}}
+\toprule
+\textbf{Studie} & \textbf{Datengrundlage und Aufteilung} \\
+\midrule\endhead
+Kapitel 5 & NMC-Datensatz, 14 Zellen. Vier vollständige Zellen für die unabhängige Prüfung zurückgehalten; 20 \% der Training Sequences für Validierung. Rund 15.000 Training Sequences im beschriebenen Tuning. \\
+Kapitel 6 & LFP DoE Cycle Ageing Dataset. Training: C01, C03, C05, C11, C17, C23. Validierung: C07, C19, C21. Unabhängiger Holdout: C09, C13, C15, C25, C27, C29. SOC-Baseline: 16 ausgewählte Fenster aus diesen sechs Testzellen. \\
+Kapitel 7 & LFP-Daten. Die geprüften SOC-/\allowbreak{}SOH-Konfigurationen verwenden dieselben sechs Trainings- und drei Validierungszellen wie oben. Ergebnisse aus vollständigem Streaming-Replay, nicht aus denselben 16 Robustheitsfenstern. Die lokale SOH-Filteranalyse nutzt C07, das in diesen Konfigurationen zur Validierung gehört. \\
+\bottomrule
+\end{longtable}}
+U = Spannung; I = Strom; T = Temperatur; Qc = kumulierter Ladungszustand der Integration; EFC = äquivalente Vollzyklen; Δt = Zeitabstand. Fensterdauern sind die üblichen nominalen Angaben N × Abtastintervall. Batchwerte stammen aus gespeicherten Konfigurationen, nicht aus einem neuen Training. DM/\allowbreak{}HDM/\allowbreak{}HECM besitzen keine eigene neuronale SOC-Batch Size. Quellen: [1]-[4], [6].
+
+
+\clearpage
+\subsection*{MODELLÜBERSICHT · 3/\allowbreak{}5}
+\section*{\color{accent}Was kam bei SOC und MLP heraus?}
+MAE und RMSE sind hier einheitlich in Prozentpunkten angegeben. Beispiel: 0,0258 auf der 0-bis-1-Skala entspricht 2,58 Prozentpunkten, nicht 97,42 \% Klassifikationsgenauigkeit.
+
+\subsection*{Kapitel 6 · SOC ohne Messstörung}
+{\fontsize{9.5}{12}\selectfont\setlength{\tabcolsep}{2mm}\renewcommand{\arraystretch}{1.2}\begin{longtable}{>{\raggedright\arraybackslash}p{27.34mm}>{\raggedright\arraybackslash}p{16.71mm}>{\raggedright\arraybackslash}p{16.71mm}>{\raggedright\arraybackslash}p{93.25mm}}
+\toprule
+\textbf{Modell} & \textbf{MAE} & \textbf{RMSE} & \textbf{Einordnung} \\
+\midrule\endhead
+DM & 6,90 & 7,40 & Feste Kapazität; größter mittlerer Baseline-Fehler. \\
+HDM & 4,12 & 4,42 & SOH-basierte Kapazitätsanpassung verbessert den beobachteten Mittelwert. \\
+HECM & 3,37 & 3,88 & Spannungsrückführung und dynamisches Ersatzschaltbild. \\
+DD /\allowbreak{} GRU & 2,58 & 3,00 & Kleinster beobachteter mittlerer Baseline-Fehler. \\
+\bottomrule
+\end{longtable}}
+Auswertung: erst Fenster je Zelle mitteln, dann die sechs Zellen gleich gewichten. Diese Rangfolge beschreibt die ungestörte Baseline. Sie gilt nicht automatisch für alle Störungen. Der paarweise Sign-Flip-Test mit Holm-Korrektur liefert hier keinen Signifikanznachweis.
+
+\subsection*{Kapitel 7 · SOC im vollständigen Streaming-Replay}
+{\fontsize{9.5}{12}\selectfont\setlength{\tabcolsep}{2mm}\renewcommand{\arraystretch}{1.2}\begin{longtable}{>{\raggedright\arraybackslash}p{27.34mm}>{\raggedright\arraybackslash}p{16.71mm}>{\raggedright\arraybackslash}p{16.71mm}>{\raggedright\arraybackslash}p{93.25mm}}
+\toprule
+\textbf{Variante} & \textbf{MAE} & \textbf{RMSE} & \textbf{Ergebnis} \\
+\midrule\endhead
+Base FP32 & 2,68 & 3,81 & Unkomprimiertes Referenznetz. \\
+Pruned FP32 & 2,34 & 3,13 & In diesem Lauf kleinster Fehler; zusätzlich weniger Speicher und kürzere Kernel Time. \\
+Quantized & 2,79 & 3,88 & Fehler ähnlich Base; geringerer Flash-Bedarf, aber hier längere Kernel Time. \\
+\bottomrule
+\end{longtable}}
+\subsection*{Kapitel 5 · SOH mit MLP und Lag-Features}
+{\fontsize{9.5}{12}\selectfont\setlength{\tabcolsep}{2mm}\renewcommand{\arraystretch}{1.2}\begin{longtable}{>{\raggedright\arraybackslash}p{43.13mm}>{\raggedright\arraybackslash}p{21.26mm}>{\raggedright\arraybackslash}p{22.78mm}>{\raggedright\arraybackslash}p{66.82mm}}
+\toprule
+\textbf{Ergebnis} & \textbf{MAE} & \textbf{MSE (pp²)} & \textbf{Bedeutung} \\
+\midrule\endhead
+Berichteter Durchschnitt & 1,10 & 2,95 & Mittlerer Fehler über die ausgewerteten Fälle. \\
+Günstige Einzelfälle & 0,487 /\allowbreak{} 0,253 & 0,410 /\allowbreak{} 0,118 & Gute Ergebnisse einzelner Zellen, keine allgemeine Genauigkeitsgarantie. \\
+Atypische Zelle 9 & 2,528 & 8,327 & Deutlich größere Abweichungen vom Referenz-SOH. \\
+\bottomrule
+\end{longtable}}
+MSE ist der mittlere quadratische Fehler, nicht RMSE. Die MLP-Verlaufsbilder enthalten eine Rolling-Glättung; die hier gezeigten Zahlen werden so aus Abschnitt 5.5 übernommen. Der genaue Filterbezug dieser Kennzahlen ist damit nicht zusätzlich auditiert. Kein Architektur-Ranking zwischen Kapiteln: Daten, Ziele, Nachverarbeitung und Gewichtung unterscheiden sich. Quellen: [1], Abschnitte 5.5 und 7.7, Tabelle A.2.
+
+
+\clearpage
+\subsection*{MODELLÜBERSICHT · 4/\allowbreak{}5}
+\section*{\color{accent}SOH: Ergebnisse sauber auseinanderhalten}
+Die Zahlen 0,85 und 1,48 stammen aus unterschiedlichen Ausführungen. „Vor Filterung“ und „nach Filterung“ dürfen nur innerhalb derselben Rechnung direkt verglichen werden.
+
+\subsection*{Robustheitsmodell · stündliches SOH-LSTM}
+{\fontsize{9.5}{12}\selectfont\setlength{\tabcolsep}{2mm}\renewcommand{\arraystretch}{1.2}\begin{longtable}{>{\raggedright\arraybackslash}p{111.25mm}>{\raggedright\arraybackslash}p{23.37mm}>{\raggedright\arraybackslash}p{23.37mm}}
+\toprule
+\textbf{Auswertung laut Modelldokumentation} & \textbf{MAE} & \textbf{RMSE} \\
+\midrule\endhead
+Ungewichteter Mittelwert der Kennzahlen über sechs Holdout-Zellen & 2,4945 & 3,1557 \\
+Alle 13.038 Holdout-Samples zusammengefasst (andere Gewichtung) & 2,1792 & 3,2326 \\
+\bottomrule
+\end{longtable}}
+\subsection*{Embedded · ursprünglich gespeicherter Benchmark}
+{\fontsize{9.5}{12}\selectfont\setlength{\tabcolsep}{2mm}\renewcommand{\arraystretch}{1.2}\begin{longtable}{>{\raggedright\arraybackslash}p{26.43mm}>{\raggedright\arraybackslash}p{18.22mm}>{\raggedright\arraybackslash}p{18.22mm}>{\raggedright\arraybackslash}p{91.12mm}}
+\toprule
+\textbf{Variante} & \textbf{MAE} & \textbf{RMSE} & \textbf{Ausgabestand} \\
+\midrule\endhead
+Base & 0,85 & 1,15 & Gespeicherte Endausgabe nach Nachverarbeitung \\
+Pruned & 1,46 & 1,87 & Gespeicherte Endausgabe nach Nachverarbeitung \\
+Quantized & 1,41 & 1,89 & Gespeicherte Endausgabe nach Nachverarbeitung \\
+\bottomrule
+\end{longtable}}
+\subsection*{Embedded · separate lokale Filteranalyse, gleicher C07-Verlauf}
+{\fontsize{9.5}{12}\selectfont\setlength{\tabcolsep}{2mm}\renewcommand{\arraystretch}{1.2}\begin{longtable}{>{\raggedright\arraybackslash}p{85.66mm}>{\raggedright\arraybackslash}p{22.78mm}>{\raggedright\arraybackslash}p{22.78mm}>{\raggedright\arraybackslash}p{22.78mm}}
+\toprule
+\textbf{MAE nach Verarbeitungsstand} & \textbf{Base} & \textbf{Pruned} & \textbf{Quantized} \\
+\midrule\endhead
+Vor zeitlicher Filterung; Startwert bereits ausgerichtet & 1,8496 & 1,9847 & 2,1064 \\
+Nach Filterstufe 1 & 1,6771 & 1,6436 & 1,9259 \\
+Nach Filterstufen 1 und 2 & 1,4763 & 1,6946 & 1,0279 \\
+\bottomrule
+\end{longtable}}
+Belastbare Aussage: Im lokalen Base-Lauf verändert die Filterkette den MAE von 1,8496 über 1,6771 auf 1,4763 Prozentpunkte. Die 0,85 sind nicht der Endwert dieser Rechnung.
+
+Offener Prüfpunkt: Die lokale Wiederholungsrechnung reproduziert den ursprünglichen Verlauf nicht exakt. Die Unterlagen dokumentieren außerdem unterschiedliche historische Filterdefinitionen. Die tatsächlichen Filterketten, Datenreihenfolge und numerischen Ausführungen beider Läufe müssen abgeglichen werden; die Ursache der Abweichung ist nicht isoliert nachgewiesen.
+
+Alle Werte in Prozentpunkten. Lokaler Vergleich: 14.496.990 Samples nach 2.048 Warm-up-Punkten, mit Startwertskalierung; kein erneutes Training und kein neuer STM32-Lauf. Ein kleinerer Wert allein beweist keine Überlegenheit sekündlicher gegenüber stündlichen Eingaben. Quellen: [1], Abschnitte 7.7/\allowbreak{}7.8 und Abb. A.6; [3], [5], [6].
+
+
+\clearpage
+\subsection*{MODELLÜBERSICHT · 5/\allowbreak{}5}
+\section*{\color{accent}So erkläre ich es in der Prüfung}
+Training, gespeichertes Gedächtnis und Auswertung sind drei verschiedene Ebenen. Diese Begriffe helfen, die Tabellen richtig einzuordnen.
+
+{\fontsize{9.5}{12}\selectfont\setlength{\tabcolsep}{2mm}\renewcommand{\arraystretch}{1.2}\begin{longtable}{>{\raggedright\arraybackslash}p{35.79mm}>{\raggedright\arraybackslash}p{126.21mm}}
+\toprule
+\textbf{Begriff} & \textbf{Bedeutung in deinen Modellen} \\
+\midrule\endhead
+Training Window /\allowbreak{} Chunk & Ein zusammenhängender Zeitabschnitt einer Zelle. Beim Embedded-LSTM bleiben seine Messpunkte chronologisch; die Fenster werden über Trainingszellen hinweg gemischt. \\
+Batch & Mehrere Fenster, gegebenenfalls aus verschiedenen Trainingszellen. Jedes Fenster besitzt seinen eigenen Zustand. Beim Embedded-SOC: 512 Fenster; beim Embedded-SOH: 128. \\
+Epoche & Ein Durchgang durch die Training Windows. Bei den geprüften Embedded-Loadern wird ein unvollständiger letzter Batch weggelassen. Validation Data und Test Data gehören nicht zur Trainingsepoche. \\
+Gedächtnis im Training & Die geprüften Kapitel-7-Skripte starten Hidden State und Cell State für jedes Fenster neu. Die gelernten Gewichte bleiben erhalten. Backpropagation reicht innerhalb des Fensters zurück. \\
+Rolling Window im Benchmark & Kapitel-6-DD: für jede Vorhersage die letzten 2.024 Punkte erneut verarbeiten; Zustand zwischen Fenstern zurücksetzen. Das ist kein dauerhaft weitergereichtes Gedächtnis. \\
+Stateful Streaming & Kapitel-7-LSTMs: Zustände im Einsatz zwischen Messpunkten weitergeben. Kapitel-6-SOH-LSTM: Zustände zwischen stündlichen Updates weitergeben. Trainingsfensterlänge ist keine feste Gedächtnis-Löschfrist im Einsatz. \\
+\bottomrule
+\end{longtable}}
+\textbf{Merksatz:} Kapitel 5: MLP mit expliziter Vergangenheit. Kapitel 6: Robustheitsvergleich mit SOC-GRU und gemeinsamem stündlichem SOH-LSTM. Kapitel 7: zwei sekündliche LSTMs für den Embedded-Kompressionsvergleich.
+
+\subsection*{Quellen und Prüfstand}\begingroup\fontsize{9.5}{11.5}\selectfont\setlength{\parskip}{4pt}
+[1] Dissertation main(1).pdf: Tabelle 5.1; Abschnitte 5.2-5.5, 6.2.2-6.2.3, 7.2-7.3 und 7.7-7.8; Tabelle A.2; Abbildung A.6.
+
+[2] LFP\_\allowbreak{}SOC\_\allowbreak{}SOH\_\allowbreak{}Model/\allowbreak{}2\_\allowbreak{}models/\allowbreak{}SOC\_\allowbreak{}1.7.0.0: train\_\allowbreak{}soc.yaml sowie PrunedFT\_\allowbreak{}1.7.0.0\_\allowbreak{}s30\_\allowbreak{}struct/\allowbreak{}config/\allowbreak{}train\_\allowbreak{}soc.yaml. Architektur, Batch und Akkumulation aus gespeicherten Konfigurationen.
+
+[3] LFP\_\allowbreak{}SOC\_\allowbreak{}SOH\_\allowbreak{}Model/\allowbreak{}2\_\allowbreak{}models/\allowbreak{}SOH\_\allowbreak{}JES2\_\allowbreak{}0.1.0: config/\allowbreak{}train\_\allowbreak{}soh.yaml und README.md. Fenster 192 Stunden; Architektur, Zellaufteilung und SOH-Holdout-Metriken.
+
+[4] LFP\_\allowbreak{}LSTM\_\allowbreak{}MLP/\allowbreak{}1\_\allowbreak{}training: 1.5.0.0/\allowbreak{}config/\allowbreak{}train\_\allowbreak{}soc.yaml und scripts/\allowbreak{}train\_\allowbreak{}soc.py; 2.1.0.0/\allowbreak{}config/\allowbreak{}train\_\allowbreak{}soh.yaml und scripts/\allowbreak{}train\_\allowbreak{}soh.py. Belegt Fenster, Batch, gemischte Reihenfolge und fehlende Zustandsübergabe zwischen Training Windows.
+
+[5] LATEX/\allowbreak{}EAAI/\allowbreak{}embedded\_\allowbreak{}AI\_\allowbreak{}optimization/\allowbreak{}review\_\allowbreak{}1/\allowbreak{}review\_\allowbreak{}analysis: KEY\_\allowbreak{}RESULTS.md und results/\allowbreak{}filter/\allowbreak{}soh\_\allowbreak{}filter\_\allowbreak{}compression\_\allowbreak{}local\_\allowbreak{}windows.csv. Für die Endfilterkette gilt die CSV-Zeile FinalSequential; ältere Zusammenfassungen enthalten auch alternative Filtervarianten.
+
+[6] Derselbe review\_\allowbreak{}analysis-Ordner: LOCAL\_\allowbreak{}WINDOWS\_\allowbreak{}REEXECUTION.md und results/\allowbreak{}analysis\_\allowbreak{}provenance.json. Kennzeichnen die lokale Wiederholungsrechnung und die Unterschiede zur archivierten Auswertung.
+
+Zusätzliche MLP-Codeprüfung: Im Ordner TUB/\allowbreak{}7\_\allowbreak{}Codes/\allowbreak{}MLP wurde SOH\_\allowbreak{}sliding\_\allowbreak{}window.py gefunden. Der Inhalt war wegen des nicht laufenden Synology-Clouddienstes nicht lesbar; daher ist weder seine Zuordnung zum finalen Modell noch eine Batch Size daraus bestätigt.
+
+Quellen [2]-[6] relativ zu 1\_\allowbreak{}Scripts. Ergänzung geprüft am 23.09.2026. Vorhandene Fragenkatalogseiten bleiben erhalten. Kein neues Training oder Benchmark für diese Übersicht.
+
+\endgroup\topic{Englische Fachbegriffe auf einen Blick}
+Hidden Channel und Hidden State sind bewusst getrennt: Ein Channel ist eine Komponente, der State der gesamte Vektor.
+
+{\fontsize{9.5}{12}\selectfont\begin{longtable}{>{\raggedright\arraybackslash}p{51mm}>{\raggedright\arraybackslash}p{109mm}}\toprule\textbf{Fachbegriff} & \textbf{Bedeutung} \\ \midrule\endhead
+Hidden State h & Gesamter interner Ausgabe-/\allowbreak{}Gedächtnisvektor des LSTM oder der GRU. \\[4pt]
+Cell State c & Zusätzlicher interner Speichervektor des LSTM. Nicht der Zustand einer Batteriezelle. \\[4pt]
+Hidden Channel /\allowbreak{} Hidden Unit & Eine interne Dimension. Beim LSTM-Pruning werden die zugehörigen Komponenten von h und c und ihre Verbindungen gemeinsam entfernt. \\[4pt]
+Hidden Size & Anzahl interner Dimensionen, zum Beispiel 64 beim SOC-LSTM. \\[4pt]
+Hidden Layer & Eine ganze interne Netzschicht; nicht dasselbe wie ein einzelner Hidden Channel. \\[4pt]
+Feature /\allowbreak{} Input Feature & Eingangsgröße, z. B. Spannung oder eine berechnete Ableitung. \\[4pt]
+Training Chunk /\allowbreak{} Training Window & Zusammenhängender Abschnitt einer Zeitreihe, der als Trainingsbeispiel verarbeitet wird. \\[4pt]
+Batch /\allowbreak{} Batch Size & Gruppe von Trainingsbeispielen /\allowbreak{} Anzahl der Beispiele in dieser Gruppe. \\[4pt]
+Epoch /\allowbreak{} Epoche & Ein Durchgang durch die Trainingsbeispiele; Details wie drop\_\allowbreak{}last können Restbeispiele auslassen. \\[4pt]
+Forward Pass /\allowbreak{} Backpropagation & Vorhersage berechnen /\allowbreak{} Fehlergradienten zur Anpassung der Gewichte zurückrechnen. \\[4pt]
+Recurrent State & Oberbegriff: GRU hat h; LSTM hat h und c. \\[4pt]
+Stateful Streaming & Zustände zwischen aufeinanderfolgenden Eingaben weitergeben. \\[4pt]
+Rolling Window & Jeweils einen begrenzten zurückliegenden Abschnitt neu auswerten. \\[4pt]
+Structured Pruning & Ganze Hidden Channels mit den zugehörigen Verbindungen entfernen. \\[4pt]
+Quantization & Gewichte oder andere Zahlen mit geringerer numerischer Auflösung darstellen. \\[4pt]
+Fine-Tuning & Ein bestehendes Modell durch weiteres Training anpassen. \\[4pt]
+Loss Function /\allowbreak{} Learning Rate & Trainingsfehlerfunktion /\allowbreak{} Schrittweite für die Anpassung der Gewichte. \\[4pt]
+Overfitting /\allowbreak{} Validation Data & Zu starke Anpassung an Trainingsdaten /\allowbreak{} Daten zur Modellkontrolle und Auswahl. \\[4pt]
+Backward Difference & Änderungsrate aus aktuellem minus vorherigem Messwert, geteilt durch Zeitabstand. \\[4pt]
+Cell-Macro /\allowbreak{} Coordinate-wise Median & Gleich gewichteter Mittelwert über Batteriezellen /\allowbreak{} Median separat für jedes Feature. \\[4pt]
+\bottomrule\end{longtable}}
+\end{document}

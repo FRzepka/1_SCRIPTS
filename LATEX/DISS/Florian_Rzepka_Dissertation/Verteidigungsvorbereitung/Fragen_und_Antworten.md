@@ -10,7 +10,7 @@ Fragenkatalog, begründete Antwortvorschläge, Rechenübungen und Abbildungsatla
 
 **Evidenzkennzeichnung:** BELEGT bezeichnet Angaben der Dissertation, nicht eine hier erneut durchgeführte Messung. HERLEITUNG bezeichnet eine nachvollziehbare Rechnung oder fachliche Einordnung. HYPOTHESE bezeichnet einen möglichen Mechanismus ohne isolierenden Nachweis. OFFEN bezeichnet Angaben, die vor der Verteidigung anhand von Skripten, Messprotokollen oder Originalarbeiten geklärt werden sollten. Diese Vorbereitung wiederholt keine Simulation und zertifiziert weder Firmware noch Versuchsdaten.
 
-**Aufbau:** Teil 1 behandelt roten Faden und Grundbegriffe. Teil 2 behandelt Daten und Referenzen. Teil 3 behandelt den SOH-MLP. Teil 4 behandelt Robustheit und Statistik. Teil 5 behandelt Mikrocontroller, Pruning und Quantisierung. Teil 6 enthält kritische Rückfragen, Rechenübungen und einen Lernplan. Der anschließende Atlas behandelt alle 67 nummerierten Abbildungen einschließlich Anhang und zeigt die Originalseiten.
+**Aufbau:** Teil 1 behandelt roten Faden und Grundbegriffe. Teil 2 behandelt Daten und Referenzen. Teil 3 behandelt den SOH-MLP. Teil 4 behandelt Robustheit und Statistik. Teil 5 behandelt Mikrocontroller, Pruning und Quantization. Teil 6 enthält kritische Rückfragen, Rechenübungen und einen Lernplan. Der anschließende Atlas behandelt alle 67 nummerierten Abbildungen einschließlich Anhang und zeigt die Originalseiten.
 
 **Lernmethode:** Erst die Frage ohne Antwort lesen. Dann eine Antwort von 30 bis 60 Sekunden geben. Anschließend die ausführliche Begründung und die genannte Grenze erklären. Zahlen immer mit Modell, Datensatz, Einheit und Auswertungsfenster nennen. Ein plausibler Mechanismus ist noch kein experimentell identifizierter Mechanismus.
 
@@ -18,7 +18,7 @@ Fragenkatalog, begründete Antwortvorschläge, Rechenübungen und Abbildungsatla
 
 ## F001. Was ist Ihre Dissertation in drei Sätzen?
 
-**Antwort:** Ich untersuche Batteriezustandsschätzung als durchgängige Aufgabe von der zeitlichen Eingangsrepräsentation bis zur Ausführung im BMS. Zuerst zeige ich, wie ein feedforward SOH-Modell durch Historienmerkmale zeitliche Information nutzen kann, dann vergleiche ich vier SOC-Repräsentanten unter nominalen und gestörten Messungen, anschließend untersuche ich die Kompression und Mikrocontroller-Ausführung rekurrenter SOC- und SOH-Modelle. Die gemeinsame Aussage ist, dass geringer Testfehler allein nicht genügt, weil Störungsverhalten, Recovery, Zustandshandhabung, Speicher und Laufzeit eigenständige Anforderungen sind.
+**Antwort:** Ich untersuche Batteriezustandsschätzung als durchgängige Aufgabe von der zeitlichen Eingangsrepräsentation bis zur Ausführung im BMS. Zuerst zeige ich, wie ein feedforward SOH-Modell durch History Features zeitliche Information nutzen kann, dann vergleiche ich vier SOC-Repräsentanten unter nominalen und gestörten Messungen, anschließend untersuche ich die Kompression und Mikrocontroller-Ausführung rekurrenter SOC- und SOH-Modelle. Die gemeinsame Aussage ist, dass geringer Testfehler allein nicht genügt, weil Störungsverhalten, Recovery, Zustandshandhabung, Speicher und Laufzeit eigenständige Anforderungen sind.
 
 **Vertiefung:** Die Beiträge sind keine lückenlose Versuchsreihe mit einem einzigen Modell. Kapitel 5 verwendet NMC und ein MLP, Kapitel 6 LFP und unter anderem eine GRU, Kapitel 7 LFP und zwei LSTM-Modelle. Verbunden werden sie durch die Evaluationslogik. **Beleg:** Kapitel 1 und 8. **Nicht behaupten:** Alle Schlussfolgerungen seien am selben Modell oder in einem vollständig integrierten Feldsystem gemessen worden.
 
@@ -36,7 +36,7 @@ Fragenkatalog, begründete Antwortvorschläge, Rechenübungen und Abbildungsatla
 
 ## F004. Warum ist die Arbeit keine Suche nach dem universell besten Modell?
 
-**Antwort:** Ein Ranking hängt von Referenzdefinition, Eingangsmerkmalen, Trainingsdaten, Störungen, Auswertungsfenstern und Hardware ab. DD hat in Kapitel 6 den kleinsten nominalen MAE und führt mehrere Robustheitszusammenfassungen an. HECM hat die bessere beobachtete Recovery. DM und HDM sind wesentlich billiger in der Ausführung. Schon diese Ergebnisse verhindern eine eindimensionale allgemeine Siegerbehauptung.
+**Antwort:** Ein Ranking hängt von Referenzdefinition, Input Features, Training Data, Störungen, Auswertungsfenstern und Hardware ab. DD hat in Kapitel 6 den kleinsten nominalen MAE und führt mehrere Robustheitszusammenfassungen an. HECM hat die bessere beobachtete Recovery. DM und HDM sind wesentlich billiger in der Ausführung. Schon diese Ergebnisse verhindern eine eindimensionale allgemeine Siegerbehauptung.
 
 **Vertiefung:** Ein vollständiger Familienvergleich müsste mehrere Vertreter, Architekturen, Parametrierungen und Trainingsinitialisierungen einschließen. Hier werden vier festgelegte Repräsentanten verglichen. Die übertragbaren Aussagen betreffen ihre Mechanismen, zum Beispiel Integration ohne kontinuierliche Spannungskorrektur, nicht jede mögliche Implementierung einer Klasse.
 
@@ -144,7 +144,7 @@ Fragenkatalog, begründete Antwortvorschläge, Rechenübungen und Abbildungsatla
 
 **Antwort:** Benachbarte Zeitfenster teilen Zellchemie, Fertigungseigenschaften, Historie und oft große Teile derselben Signale. Sie sind korreliert. Millionen Samples oder viele Seeds ersetzen deshalb keine zusätzlichen unabhängigen Zellen.
 
-**Vertiefung:** Zell-disjunkte Testdaten prüfen Transfer auf neue Zellen innerhalb der abgedeckten Domäne. Ein zusätzlicher betriebsbedingungs-disjunkter Split würde stärker prüfen, ob neue Last- oder Temperaturregime generalisiert werden. Auch verschiedene Zellen aus derselben Charge sind nicht automatisch repräsentativ für die gesamte Produktpopulation. **Beleg:** Kapitel 6.2.6 und Grenzen in Kapitel 8.
+**Vertiefung:** Zell-disjunkte Test Data prüfen Transfer auf neue Zellen innerhalb der abgedeckten Domäne. Ein zusätzlicher betriebsbedingungs-disjunkter Split würde stärker prüfen, ob neue Last- oder Temperaturregime generalisiert werden. Auch verschiedene Zellen aus derselben Charge sind nicht automatisch repräsentativ für die gesamte Produktpopulation. **Beleg:** Kapitel 6.2.6 und Grenzen in Kapitel 8.
 
 ## F022. Sind Low, Middle und High physikalische Alterungsklassen?
 
@@ -158,37 +158,64 @@ Fragenkatalog, begründete Antwortvorschläge, Rechenübungen und Abbildungsatla
 
 **Vertiefung:** Dadurch sind die Altersgruppen nicht vollständig balanciert. Ein Unterschied zwischen fresh und aged kann zum Teil daran liegen, dass unterschiedliche Zellen beitragen. Eine alterskausale Aussage verlangt innerhalb derselben Zellen gepaarte Vergleiche und die Kontrolle anderer Betriebsänderungen. **Beleg:** Kapitel 4.1.2 und 6.3.
 
-## F024. Wie wurde verhindert, dass besonders günstige Testfenster ausgewählt wurden?
+@latex \clearpage
+## F024. Wie wurden die 16 repräsentativen Testfenster automatisch ausgewählt?
 
-**Antwort:** Innerhalb jeder vorhandenen Zell-SOH-Kombination wird ein gemessenes Fenster anhand von SOH, Temperatur, P95-C-Rate, Durchsatz und Anteil niedrigen SOCs gewählt. Der Abstand zur robust skalierten typischen Merkmalslage entscheidet, nicht der Modellfehler. Damit ist die Auswahl nicht direkt auf einen Estimator optimiert.
+**Kurzantwort:** Pro Zelle und vorhandenem SOH-Bereich wird ein tatsächlich gemessenes Fenster gewählt, dessen Betriebsmerkmale möglichst typisch für diese Gruppe sind. Die Auswahl verwendet keine Modellvorhersagen oder Modellfehler. Dieselben festgelegten Fenster bilden die Grundlage für Baseline, Noise- und Gain-Versuche aller vier Modelle.
 
-**Kritische Präzisierung:** Die dargestellte Formel wählt den Punkt mit geringstem Abstand zum Koordinatenmedian, nicht zwingend den klassischen Medoid mit minimaler Summe aller paarweisen Abstände. Das sollte terminologisch erklärt werden. **OFFEN:** Wie behandelt das Skript eine MAD von null? Welche SOH-Grenzen gelten genau? Warum repräsentieren typische Fenster auch seltene gefährliche Zustände? Letzteres tun sie nicht vollständig. Daher ergänzen Störungsversuche und Ereignisanalysen die Auswahl.
+**1. Welche Fenster kommen überhaupt infrage?**
 
+@latex {\small\renewcommand{\arraystretch}{1.18}\begin{tabular}{p{0.27\textwidth}p{0.65\textwidth}}\toprule
+@latex \textbf{Kriterium} & \textbf{Umsetzung im Auswahlskript} \\\midrule
+@latex Startpunkt & Letzter Messpunkt eines zusammenhängenden Abschnitts mit Referenz-SOC $\geq 98\,\%$ und Spannung $\geq 3{,}58\,\mathrm{V}$. \\
+@latex Abstand der Kandidaten & Mindestens 43\,200 Zeilen zwischen aufgenommenen Startpunkten, bei nominal 1 Hz zwölf Stunden. \\
+@latex Verfügbare Folgedaten & Mindestens 172\,800 Zeilen ab Start, bei 1 Hz 48 Stunden. \\
+@latex Standardfenster & 86\,400 Zeilen, bei 1 Hz 24 Stunden. Burst-Dropout nutzt 48 Stunden ab demselben Start. \\
+@latex SOH-Bereich & SOH-Median der ersten 24 Stunden: frisch $\geq90\,\%$, mittlere Alterung $80\,\%\leq\mathrm{SOH}<90\,\%$, gealtert $<80\,\%$. \\\bottomrule\end{tabular}}\par\medskip
+
+**2. Welche Merkmale bestimmen das typische Fenster?**
+
+@latex {\small\renewcommand{\arraystretch}{1.12}\begin{tabular}{p{0.27\textwidth}p{0.65\textwidth}}\toprule
+@latex \textbf{Merkmal} & \textbf{Berechnung je 24-Stunden-Kandidat} \\\midrule
+@latex SOH & Median im Fenster \\
+@latex Temperatur, mittleres Niveau & Arithmetischer Mittelwert \\
+@latex Temperatur, oberer Bereich & 95. Perzentil \\
+@latex Belastung & 95. Perzentil der absoluten C-Rate \\
+@latex Ladungsdurchsatz & $\sum_k |I_k|\Delta t_k/3600$ in Ah, Laden und Entladen zählen beide \\
+@latex Niedriger SOC & Anteil der Messpunkte mit Referenz-SOC $<20\,\%$ \\\bottomrule\end{tabular}}\par\medskip
+
+**3. Wie wird entschieden?** Innerhalb derselben Zelle und desselben SOH-Bereichs bildet das Skript den Median jedes Merkmals über alle Kandidaten. Es skaliert die Abweichungen mit der medianen absoluten Abweichung (MAD) und wählt den Kandidaten mit kleinstem euklidischem Abstand zu diesem Merkmalszentrum. Ist die MAD höchstens 10 hoch minus 12, verwendet es die Standardabweichung; ist auch diese zu klein, setzt es den Skalierungswert auf 1. Es wählt damit ein vorhandenes Fenster, keinen künstlich gemittelten Verlauf.
+
+**Warum 16?** Sechs Zellen mal drei Bereiche ergäben 18. C27 bleibt im frischen Bereich; zwei Kombinationen fehlen. Temperatur, C-Rate und Durchsatz sind Vergleichsmerkmale, keine festen Zulassungsgrenzen. Seltene Extremzustände sind durch ein typisches Fenster nicht automatisch abgedeckt.
+
+**Terminologie und Quelle:** Das Skript nennt die Auswahl „Medoid“. Rechnerisch ist es die Nähe zum komponentenweisen Median, nicht zwingend der klassische Medoid mit minimaler Summe aller paarweisen Abstände. Geprüft: select_jes2_evaluation_windows.py; Kapitel 6, Auswertungsprotokoll. Die zusätzliche Lebenszeitanalyse aus Abbildung 6.6 ist ein separater Langzeitversuch.
+
+@latex \clearpage
 ## F025. Was bringt das DoE und was beweist es nicht?
 
 **Antwort:** Das DoE verteilt endliche Versuchskapazität strukturiert über Lade-C-Rate, Entlade-C-Rate und Entladetiefe. Dadurch entstehen systematisch verschiedene Betriebsbedingungen statt zufälliger Einzelprofile. Die Arbeit nutzt diese Diversität für Zustandsschätzung und Robustheitsbewertung.
 
 **Grenze:** Die Darstellung eines DoE-Würfels ist noch keine statistische Identifikation aller Haupteffekte und Interaktionen. Dafür braucht man den genauen Designplan, Wiederholungen, Auswertungsmodell und gegebenenfalls eine Alias-Struktur bei fraktionellen Designs. Die drei Faktoren sind nicht die einzigen physikalischen Einflussgrößen. Alterung, Eigenerwärmung und Fertigungsstreuung bleiben relevant.
 
-# 4. SOH-MLP und zeitliche Merkmale
+# 4. SOH-MLP und zeitliche Features
 
 ## F026. Wie erhält ein speicherloses MLP zeitliche Information?
 
-**Antwort:** Die Historie wird vor dem Netz in einen festen Featurevektor geschrieben. Lag-Sequenzen enthalten vergangene Spannungs-, Temperatur- und kumulierte Stromwerte. Das Netz verarbeitet diese gemeinsam, ohne einen internen rekurrenten Zustand zwischen zwei Aufrufen zu benötigen.
+**Antwort:** Die Historie wird vor dem Netz in einen festen Featurevektor geschrieben. Lag-Sequenzen enthalten vergangene Spannungs-, Temperatur- und kumulierte Stromwerte. Das Netz verarbeitet diese gemeinsam, ohne einen internen Recurrent State zwischen zwei Aufrufen zu benötigen.
 
-**Vertiefung:** Speicherlos ist nur das Netz als Funktion. Das Gesamtsystem benötigt den Historienpuffer, Resampling und kumulative Zustände. Der Vergleich lautet daher nicht mit oder ohne Gedächtnis, sondern explizit repräsentierte versus intern gelernte Historie. **Beleg:** Abbildungen 5.2 und 5.4. **Nachfrage:** Warum nicht aktueller Strom allein? Durchsatzmerkmale enthalten längerfristige Betriebsinformation, können aber auch als Zeit- oder Altersproxy fungieren.
+**Vertiefung:** Speicherlos ist nur das Netz als Funktion. Das Gesamtsystem benötigt den Historienpuffer, Resampling und kumulative Zustände. Der Vergleich lautet daher nicht mit oder ohne Gedächtnis, sondern explizit repräsentierte versus intern gelernte Historie. **Beleg:** Abbildungen 5.2 und 5.4. **Nachfrage:** Warum nicht aktueller Strom allein? Throughput Features enthalten längerfristige Betriebsinformation, können aber auch als Zeit- oder Altersproxy fungieren.
 
 ## F027. Warum getrennte kumulierte Lade- und Entladeströme?
 
 **Antwort:** Ein vorzeichenbehaftetes Gesamtintegral kann nach einem vollständigen Zyklus wieder nahe null liegen, obwohl die Zelle erheblichen Durchsatz erfahren hat. Getrennte oder betragsbezogene Integrale erhalten diese Beanspruchungsinformation. Die physikalische Relevanz liegt in der Vorgeschichte, nicht in einer direkten Gleichsetzung von Ah und Kapazitätsverlust.
 
-**Grenze:** Korrelation mit SOH kann durch gemeinsame Zeitabhängigkeit entstehen. Für einen Nachweis des zusätzlichen Merkmalsnutzens wären Ablationen gegen Zeit, Zykluszahl, kumulierten Durchsatz und einfache Regressionsbaselines hilfreich. **Beleg:** Kapitel 5.2.1 bis 5.2.2. Die Vorzeichen und Resetregeln dieser NMC-Merkmale nicht mit Qc des SOC-Benchmarks vermischen.
+**Grenze:** Korrelation mit SOH kann durch gemeinsame Zeitabhängigkeit entstehen. Für einen Nachweis des zusätzlichen Feature-Nutzens wären Ablationen gegen Zeit, Zykluszahl, kumulierten Durchsatz und einfache Regressionsbaselines hilfreich. **Beleg:** Kapitel 5.2.1 bis 5.2.2. Die Vorzeichen und Resetregeln dieser NMC-Features nicht mit Qc des SOC-Benchmarks vermischen.
 
 ## F028. Bedeutet die rote Korrelationsfarbe positive Korrelation?
 
 **Antwort:** In Abbildung 5.1 ausdrücklich nicht. Die Farbstärke kodiert den Betrag des Pearson-Koeffizienten. Sowohl -1 als auch +1 liegen am roten Ende, null am blauen. Das Vorzeichen muss aus der gedruckten Zahl gelesen werden.
 
-**Vertiefung:** Pearson misst linearen Zusammenhang und ist empfindlich gegenüber Trend, Ausreißern und Mischungen verschiedener Zellen. Hohe Korrelation beweist weder Ursache noch Nichtredundanz. Ein Netz kann aus zwei stark korrelierten Merkmalen dennoch unterschiedliche Informationen gewinnen, oder nur dieselbe Zeitentwicklung doppelt sehen. **Übung:** Erkläre an einer negativen Durchsatz-SOH-Korrelation, warum ein positives Durchsatzsignal einen sinkenden Zielwert begleiten kann.
+**Vertiefung:** Pearson misst linearen Zusammenhang und ist empfindlich gegenüber Trend, Ausreißern und Mischungen verschiedener Zellen. Hohe Korrelation beweist weder Ursache noch Nichtredundanz. Ein Netz kann aus zwei stark korrelierten Features dennoch unterschiedliche Informationen gewinnen, oder nur dieselbe Zeitentwicklung doppelt sehen. **Übung:** Erkläre an einer negativen Durchsatz-SOH-Korrelation, warum ein positives Durchsatzsignal einen sinkenden Zielwert begleiten kann.
 
 ## F029. Warum gerade 16 Lag-Schritte und 10 Minuten?
 
@@ -198,7 +225,7 @@ Fragenkatalog, begründete Antwortvorschläge, Rechenübungen und Abbildungsatla
 
 ## F030. Ist Ihr MLP tatsächlich klein?
 
-**Antwort:** Es ist strukturell einfach, weil es ein Feedforward-Netz ohne rekurrente Zustandsverwaltung ist. Die finale Tabelle listet aber neun versteckte Schichten mit 128, 256, 256, 256, 128, 512, 128, 256 und 256 Neuronen. Deshalb sollte einfach nicht mit nachgewiesen geringer Parameterzahl verwechselt werden.
+**Antwort:** Es ist strukturell einfach, weil es ein Feedforward-Netz ohne rekurrente Zustandsverwaltung ist. Die finale Tabelle listet aber neun Hidden Layers mit 128, 256, 256, 256, 128, 512, 128, 256 und 256 Neuronen. Deshalb sollte einfach nicht mit nachgewiesen geringer Parameterzahl verwechselt werden.
 
 **Herleitung:** Unter der Annahme von 48 Eingängen, also drei Features mal 16 Lag-Werte, ergeben die dichten Schichten einschließlich Bias 434561 Parameter. Bei FP32 sind das rund 1,74 MB reine Parameterdaten. Der Wert ist eine Architektur-Rechnung, kein verifizierter Modellexport. **OFFEN:** Tatsächliche Eingangsdimension und gespeichertes Modell prüfen. Der anfängliche Suchkandidat mit acht Neuronen beschreibt nicht das finale Modell. **Beleg:** Tabelle 5.1.
 
@@ -208,7 +235,7 @@ Fragenkatalog, begründete Antwortvorschläge, Rechenübungen und Abbildungsatla
 
 **Grenze:** Frühe Trainingsleistung ist nicht immer ein zuverlässiger Prädiktor späterer Leistung. Ein langsamer konvergierender guter Kandidat kann zu früh ausscheiden. Die Auswahl muss an Validation erfolgen und das finale Testset unberührt lassen. **OFFEN:** Wenn Abbildung 5.5 Testzellen zeigt, darf deren Optimum nicht als ausschließlich validation-basierte Auswahl dargestellt werden, bevor die historische Auswertung geklärt ist. **Lernquelle:** Hyperband-Originalarbeit im Quellenabschnitt.
 
-## F032. Wie zuverlässig ist die Validation mit 20 Prozent der Trainingssequenzen?
+## F032. Wie zuverlässig ist die Validation mit 20 Prozent der Training Sequences?
 
 **Antwort:** Die vier vollständig zurückgehaltenen NMC-Testzellen schaffen eine wichtige unabhängige Testgrenze. Innerhalb des Trainingspools können zufällig getrennte, überlappende Sequenzen jedoch eine optimistische Validation erzeugen. Das hängt von der tatsächlichen Aufteilung und Fensterüberlappung ab.
 
@@ -218,7 +245,7 @@ Fragenkatalog, begründete Antwortvorschläge, Rechenübungen und Abbildungsatla
 
 **Antwort:** Das Modell folgt nur Teilen der Referenzentwicklung und hat größere absolute und systematische Abweichungen. Die U-Form allein erzeugt keinen Fehler. Würde sie exakt reproduziert, wären MAE und MSE klein. Der Befund spricht für eine Grenze der Generalisierung unter dieser ungewöhnlichen Trajektorie.
 
-**Beleg:** Kapitel 5.5 nennt MAE 2,528 Prozentpunkte und MSE 8,327 Quadrat-Prozentpunkte für Zelle 9. Mögliche Ursachen sind unzureichende Trainingsabdeckung, Label-/Check-up-Besonderheiten und eine unpassende Merkmalsrepräsentation. Welche davon dominiert, ist nicht isoliert belegt. **Nicht sagen:** Das Modell versagt, weil SOH niemals steigen dürfe.
+**Beleg:** Kapitel 5.5 nennt MAE 2,528 Prozentpunkte und MSE 8,327 Quadrat-Prozentpunkte für Zelle 9. Mögliche Ursachen sind unzureichende Trainingsabdeckung, Label-/Check-up-Besonderheiten und eine unpassende Feature Representation. Welche davon dominiert, ist nicht isoliert belegt. **Nicht sagen:** Das Modell versagt, weil SOH niemals steigen dürfe.
 
 ## F034. Was zeigen die guten NMC-Fehlerwerte wirklich?
 
@@ -234,7 +261,7 @@ Fragenkatalog, begründete Antwortvorschläge, Rechenübungen und Abbildungsatla
 
 ## F036. Ist dies Alterungsprognose oder Zustandsschätzung?
 
-**Antwort:** Das Netz schätzt den aktuellen SOH aus bis dahin vorliegenden Betriebsmerkmalen. Eine über die Zeit gezeichnete Folge solcher Schätzungen ist noch keine Vorhersage zukünftiger Restlebensdauer. Eine Prognose braucht einen Zukunftshorizont und Annahmen über die zukünftige Nutzung.
+**Antwort:** Das Netz schätzt den aktuellen SOH aus bis dahin vorliegenden Operating Features. Eine über die Zeit gezeichnete Folge solcher Schätzungen ist noch keine Vorhersage zukünftiger Restlebensdauer. Eine Prognose braucht einen Zukunftshorizont und Annahmen über die zukünftige Nutzung.
 
 **Nachfrage:** Kann es für eine neue Chemie benutzt werden? Die Verfahrensidee ist übertragbar, die gelernten Gewichte und optimalen Zeitskalen nicht ohne Validierung. NMC- und LFP-Spannungsverläufe und Alterungsmechanismen unterscheiden sich. Neu trainieren oder anpassen und zell-disjunkt testen wäre der saubere Weg.
 
@@ -242,27 +269,27 @@ Fragenkatalog, begründete Antwortvorschläge, Rechenübungen und Abbildungsatla
 
 ## F037. Erklären Sie die vier Repräsentanten in einer Minute.
 
-**Antwort:** DM integriert Strom mit fester Kapazität und einem Volladeanker. HDM benutzt denselben Kern, skaliert die Kapazität aber mit geschätztem SOH. HECM ergänzt eine 2RC-Zustandsbeschreibung, SOH-abhängige Tabellen und EKF-Spannungskorrektur. DD ist eine geprunte GRU, die Messkanäle und abgeleitete Merkmale gemeinsam aus einer kausalen Sequenz auf SOC abbildet.
+**Antwort:** DM integriert Strom mit fester Kapazität und einem Volladeanker. HDM benutzt denselben Kern, skaliert die Kapazität aber mit geschätztem SOH. HECM ergänzt eine 2RC-Zustandsbeschreibung, SOH-abhängige Tabellen und EKF-Spannungskorrektur. DD ist eine geprunte GRU, die Messkanäle und abgeleitete Features gemeinsam aus einer kausalen Sequenz auf SOC abbildet.
 
 **Präzisierung:** HDM, HECM und DD erhalten denselben kausalen SOH-Verlauf. Das kontrolliert einen gemeinsamen Eingang, macht die Modelle aber nicht identisch empfindlich gegen SOH-Fehler. DD ist kein raw-signal-only-Modell, weil Qc, Ableitungen, Zeitabstand und SOH bereits Vorwissen enthalten. **Beleg:** Kapitel 6.2.1 bis 6.2.3.
 
 ## F038. Wie sieht die DD-GRU exakt aus?
 
-**Antwort:** Der Ausgangspunkt hat 96 rekurrente Einheiten. Strukturelles Pruning entfernt 29 vollständige Einheiten und zugehörige Verbindungen, sodass 67 bleiben. Danach folgen ein MLP mit 96 versteckten Einheiten und ein Sigmoid-Ausgang. Die Eingänge sind U, I, T, SOH, Qc, dU/dt, dI/dt und Δt. Im primären Benchmark verwendet jede Ausgabe die letzten 2024 Samples und beginnt die Fensterrechnung mit zurückgesetztem rekurrentem Zustand.
+**Antwort:** Der Ausgangspunkt hat 96 Recurrent Units. Strukturelles Pruning entfernt 29 vollständige Einheiten und zugehörige Verbindungen, sodass 67 bleiben. Danach folgen ein MLP mit 96 Hidden Units und ein Sigmoid-Ausgang. Die Eingänge sind U, I, T, SOH, Qc, dU/dt, dI/dt und Δt. Im primären Benchmark verwendet jede Ausgabe die letzten 2024 Samples und beginnt die Fensterrechnung mit zurückgesetztem Recurrent State.
 
 **Grenze:** Das ist nicht das 64er SOC-LSTM aus Kapitel 7. Die 30,2 Prozent Breitenreduktion entspricht auch nicht exakt einer 30,2-prozentigen Laufzeit- oder Parameterreduktion. Quadratische rekurrente Matrizen verändern sich stärker. **Beleg:** Kapitel 6.2.2.
 
 ## F039. Warum bekommt DD Qc, obwohl daraus direkt SOC berechnet werden kann?
 
-**Antwort:** Qc ist ein kausal integriertes Ladungsmerkmal und damit ein starker, physikalisch sinnvoller SOC-Prädiktor. DD kann diese Information mit Spannungs-, Temperatur- und Zeitkontext verbinden. Es ist legitim, dieses Merkmal zu nutzen, solange seine Konstruktion online verfügbar ist und dieselben Störungen erfährt wie die Rohmessungen.
+**Antwort:** Qc ist ein kausal integriertes Charge Feature und damit ein starker, physikalisch sinnvoller SOC-Prädiktor. DD kann diese Information mit Spannungs-, Temperatur- und Zeitkontext verbinden. Es ist legitim, dieses Feature zu nutzen, solange seine Konstruktion online verfügbar ist und dieselben Störungen erfährt wie die Rohmessungen.
 
 **Kritische Grenze:** Wenn das eingegebene Qc bereits offline driftkorrigierte Zielinformation enthielte, wäre der Vergleich problematisch. Deshalb trennt die Arbeit Online-Qc von der Dataset-Referenz. Ohne Feature-Ablation ist nicht gemessen, welcher Anteil des Erfolgs allein auf Qc oder auf die GRU zurückgeht. Eine sinnvolle Vergleichsbaseline wäre ein einfacher Regressor mit denselben Features.
 
 ## F040. Was bedeutet gemeinsame kausale SOH-Spur?
 
-**Antwort:** Aus fünf Basissignalen werden stündlich Mittelwert, Standardabweichung, Minimum und Maximum gebildet. Diese 20 Merkmale gehen in ein gemeinsames SOH-Netz mit Feature-Embedding, zweilagigem LSTM und MLP-Blöcken. Seine Zustände laufen kausal weiter, und seine Ausgabe wird zwischen Stundenupdates gehalten. Alle SOH-abhängigen SOC-Zweige erhalten diese identische Information.
+**Antwort:** Aus fünf Basissignalen werden stündlich Mittelwert, Standardabweichung, Minimum und Maximum gebildet. Diese 20 Features gehen in ein gemeinsames SOH-Netz mit Feature-Embedding, zweilagigem LSTM und MLP-Blöcken. Seine Zustände laufen kausal weiter, und seine Ausgabe wird zwischen Stundenupdates gehalten. Alle SOH-abhängigen SOC-Zweige erhalten diese identische Information.
 
-**Vertiefung:** Vor dem Test gibt es 192 Stunden ungestörten Kontext. Nach Störungsbeginn werden betroffene abgeleitete Merkmale aus dem gestörten Stream rekonstruiert. Das ist wichtig, weil andernfalls künstlich perfekte Nebenkanäle verbleiben könnten. **Grenze:** Gleiche SOH-Spur kontrolliert den Eingang, beseitigt aber keine SOH-Unsicherheit. Im Hardwareteil von Kapitel 6 wird sie extern geliefert, nicht auf dem Controller berechnet.
+**Vertiefung:** Vor dem Test gibt es 192 Stunden ungestörten Kontext. Nach Störungsbeginn werden betroffene abgeleitete Features aus dem gestörten Stream rekonstruiert. Das ist wichtig, weil andernfalls künstlich perfekte Nebenkanäle verbleiben könnten. **Grenze:** Gleiche SOH-Spur kontrolliert den Eingang, beseitigt aber keine SOH-Unsicherheit. Im Hardwareteil von Kapitel 6 wird sie extern geliefert, nicht auf dem Controller berechnet.
 
 ## F041. Wie unterscheiden sich Accuracy, Robustness und Recovery?
 
@@ -290,7 +317,7 @@ Fragenkatalog, begründete Antwortvorschläge, Rechenübungen und Abbildungsatla
 
 ## F045. Warum kann DD kurz recovern und danach wieder schlechter werden?
 
-**Antwort:** DD kombiniert Qc mit wechselnden Messverläufen innerhalb eines rollenden Fensters. Die Vorhersage kann zeitweise wenig und später wieder stärker vom fehlerhaften Merkmal abhängen. Außerdem ändern sich SOC-Region und Dynamik. Der erste Bandeintritt beweist keine dauerhafte Entfernung aller Ursachen.
+**Antwort:** DD kombiniert Qc mit wechselnden Messverläufen innerhalb eines rollenden Fensters. Die Vorhersage kann zeitweise wenig und später wieder stärker vom fehlerhaften Feature abhängen. Außerdem ändern sich SOC-Region und Dynamik. Der erste Bandeintritt beweist keine dauerhafte Entfernung aller Ursachen.
 
 **Beleg:** DD hat eine Rückfallfraktion von 0,78 gegenüber 0,17 bei HECM. Die beobachteten persistenten Recovery-oder-Zensur-Mittel sind 2,60 h für DD und 1,20 h für HECM. **Grenze:** Die Feature-Erklärung ist plausibel, aber keine gemessene Attribution ohne Ablation. DM/HDM haben jeweils eine hohe persistente Zensurfraktion von 0,89.
 
@@ -344,7 +371,7 @@ Fragenkatalog, begründete Antwortvorschläge, Rechenübungen und Abbildungsatla
 
 ## F054. Warum verstärken Ableitungsfeatures Rauschen und Spikes?
 
-**Antwort:** Eine Rückwärtsdifferenz zieht zwei Messungen voneinander ab und teilt durch den Zeitabstand. Unabhängiges Messrauschen addiert sich in der Varianz. Bei gleichem Δt hat die Differenz zweier unabhängiger Fehler mit Varianz σ² die Varianz 2σ². Kleine Zeitabstände vergrößern zusätzlich die Ableitungsamplitude.
+**Antwort:** Eine Backward Difference zieht zwei Messungen voneinander ab und teilt durch den Zeitabstand. Unabhängiges Messrauschen addiert sich in der Varianz. Bei gleichem Δt hat die Differenz zweier unabhängiger Fehler mit Varianz σ² die Varianz 2σ². Kleine Zeitabstände vergrößern zusätzlich die Ableitungsamplitude.
 
 **Vertiefung:** Ein einzelner Spannungsspike erzeugt typischerweise eine große positive und danach negative Ableitungsstörung. DD sieht damit sowohl absolute Spannung als auch dU/dt. Eine Filterung könnte helfen, verändert aber Verzögerung und Trainingsverteilung. **HYPOTHESE:** Dieser Pfad ist ein plausibler Grund für DD-Transienten, nicht durch kanalweise Ablation bewiesen.
 
@@ -354,9 +381,9 @@ Fragenkatalog, begründete Antwortvorschläge, Rechenübungen und Abbildungsatla
 
 **Beleg:** Kapitel 6.4.4 berichtet kleine MAE-Zunahmen bei Spannungsrauschen auch für DM und HDM. **Grenze:** Ohne Ereignislog der Resetentscheidungen ist die Ankererklärung plausibel, aber nicht für jeden konkreten Knick direkt bewiesen. Eine sichere Diagrammantwort nennt den beobachteten Knick und den zu prüfenden Resetzeitpunkt, statt jede Bewegung nachträglich zu erklären.
 
-## F056. Warum ist Jitter hier weniger kritisch als Sampleverlust?
+## F056. Warum ist Jitter hier weniger kritisch als Sample Loss?
 
-**Antwort:** Der Jittertest erhält Messinformation und rekonstruiert zeitabhängige Größen mit den gestörten Zeitabständen. Beim Sampleverlust wird Information durch gehaltene Werte ersetzt. Insbesondere fehlende Ladung kann Integration nicht nachträglich rekonstruieren.
+**Antwort:** Der Jittertest erhält Messinformation und rekonstruiert zeitabhängige Größen mit den gestörten Zeitabständen. Beim Sample Loss wird Information durch gehaltene Werte ersetzt. Insbesondere fehlende Ladung kann Integration nicht nachträglich rekonstruieren.
 
 **Grenze:** Das ist keine Entwarnung für beliebige asynchrone Sensoren. Kanalversatz, falsche Timestamps, Frequenzdrift oder aliasierte hochfrequente Signale sind andere Fehler. Die konkrete Jitterimplementierung muss zu der behaupteten realen Störung passen. **Beleg:** Abbildung 6.10, drei Stufen ±0,1, ±0,5 und ±0,9 s.
 
@@ -446,49 +473,82 @@ Fragenkatalog, begründete Antwortvorschläge, Rechenübungen und Abbildungsatla
 
 **Praktischer Ablauf:** Erst Roh- und Baselinekurven paaren, dann Ereigniszeitpunkt und Kausalität prüfen, dann lokale und globale Metriken unterscheiden, zuletzt interpretieren. Wenn sich die Story dadurch ändert, ändert man die Aussage und nicht die Daten. Explorative Analysen dürfen Teil einer kohärenten Arbeit sein, müssen aber nicht fälschlich als vorab registrierte Bestätigung bezeichnet werden.
 
-# 7. Neuronale Grundlagen, Pruning und Quantisierung
+# 7. Neuronale Grundlagen, Pruning und Quantization
 
 ## F071. Wie erklären Sie LSTM und GRU an der Tafel?
 
-**Antwort:** Ein LSTM besitzt einen Zellzustand c und einen sichtbaren Zustand h. Forget-, Input- und Output-Gates steuern Behalten, Schreiben und Ausgeben. Die Kandidateninformation wird typischerweise mit tanh berechnet. Eine GRU hat nur einen rekurrenten Zustand und verwendet Reset- und Update-Gate, um alte und neue Information zu mischen.
+**Antwort:** Ein LSTM besitzt einen Cell State c und einen Hidden State h. Forget-, Input- und Output-Gates steuern Behalten, Schreiben und Ausgeben. Die Kandidateninformation wird typischerweise mit tanh berechnet. Eine GRU hat nur einen Recurrent State und verwendet Reset- und Update-Gate, um alte und neue Information zu mischen.
 
 **Prüfpunkt:** Update-Gate-Konventionen unterscheiden sich. Im Grundlagenbild der Dissertation gewichtet z den Kandidaten, während beispielsweise PyTorch in seiner Dokumentation z den alten Zustand gewichten lässt. Das kann durch z gegen 1-z mathematisch äquivalent sein, wenn Parameter und Gleichungen konsistent sind. Auch reset-before und reset-after unterscheiden sich. Beim C-Export zählt die konkret trainierte Framework-Semantik, nicht nur der Name GRU. **Beleg:** Abbildungen 3.3 und 3.4, PyTorch-Quelle im Quellenabschnitt.
 
-## F072. Warum helfen Gates gegen verschwindende Gradienten, ohne Stabilität zu garantieren?
+## F072. Warum helfen Gates gegen Vanishing Gradients, ohne Stabilität zu garantieren?
 
-**Antwort:** Der additive Zellzustandspfad im LSTM erleichtert den Informationstransport über viele Schritte gegenüber einer ausschließlichen wiederholten nichtlinearen Transformation. Gates können steuern, wie viel Information erhalten bleibt. Dennoch können Aktivierungen sättigen, Gradienten verschwinden oder wachsen und lange Extrapolationen problematisch sein.
+**Antwort:** Der additive Cell-State-Pfad im LSTM erleichtert den Informationstransport über viele Schritte gegenüber einer ausschließlichen wiederholten nichtlinearen Transformation. Gates können steuern, wie viel Information erhalten bleibt. Dennoch können Activations sättigen, Gradienten verschwinden oder wachsen und lange Extrapolationen problematisch sein.
 
 **Vertiefung:** Gradient Clipping beschränkt große Gradienten beim Training, beweist aber keine BIBO-Stabilität des trainierten Modells. Endlich lange fehlerfreie Replays liefern empirische Evidenz, keinen allgemeinen mathematischen Stabilitätsbeweis. Ein Sigmoid-Ausgang begrenzt SOC, nicht zwingend alle internen Zustände.
 
-## F073. Was unterscheidet Trainingschunk, Rolling Window und dauerhaften Zustand?
+## F073. Was unterscheidet Training Chunk, Rolling Window und dauerhaften Zustand?
 
-**Antwort:** Ein Trainingschunk begrenzt den Backpropagation-Horizont. Ein Rolling Window berechnet jede Ausgabe aus einem begrenzten Fenster mit neu initialisiertem Zustand. Dauerhaftes Streaming führt h und gegebenenfalls c von Sample zu Sample weiter. Diese Begriffe beschreiben unterschiedliche Ebenen und dürfen nicht gleichgesetzt werden.
+**Antwort:** Ein Training Chunk begrenzt den Backpropagation-Horizont. Ein Rolling Window berechnet jede Ausgabe aus einem begrenzten Fenster mit neu initialisiertem Zustand. Dauerhaftes Streaming führt h und gegebenenfalls c von Sample zu Sample weiter. Diese Begriffe beschreiben unterschiedliche Ebenen und dürfen nicht gleichgesetzt werden.
 
-**Beleg:** Kapitel 6 primär Rolling-GRU mit 2024 Samples, Hardware zusätzlich continuous und periodic reset. Kapitel 7 stateful LSTM-Ausführung mit Training über begrenzte Chunks. **OFFEN:** Ob Trainingszustände zwischen Chunks übernommen und nur vom Gradienten getrennt wurden oder tatsächlich zurückgesetzt wurden, muss die jeweilige Trainingsschleife belegen. Das beeinflusst die Interpretation des Trainings-Deployment-Mismatches.
+**Beleg:** Kapitel 6 primär Rolling-GRU mit 2024 Samples, Hardware zusätzlich continuous und periodic reset. Kapitel 7 stateful LSTM-Ausführung mit Training über begrenzte Chunks. **OFFEN:** Ob Recurrent States im Training zwischen Chunks übernommen und nur vom Gradienten getrennt wurden oder tatsächlich zurückgesetzt wurden, muss die jeweilige Trainingsschleife belegen. Das beeinflusst die Interpretation des Trainings-Deployment-Mismatches.
 
-## F074. Warum ist strukturiertes Pruning für den Mikrocontroller attraktiv?
+## F074. Warum ist Structured Pruning für den Mikrocontroller attraktiv?
 
-**Antwort:** Ganze versteckte Kanäle und abhängige Matrixdimensionen werden entfernt. Es entstehen kleinere dichte Arrays, die bestehende dichte C-Schleifen unmittelbar verarbeiten können. Gewichte, recurrent state und ein Teil des Rechenaufwands schrumpfen gemeinsam.
+**Antwort:** Ganze Hidden Channels und abhängige Matrixdimensionen werden entfernt. Es entstehen kleinere dichte Arrays, die bestehende dichte C-Schleifen unmittelbar verarbeiten können. Gewichte, recurrent state und ein Teil des Rechenaufwands schrumpfen gemeinsam.
 
-**Grenze:** Unstrukturiertes Nullsetzen verkleinert dichte Arrays zunächst nicht und kann ohne Sparse-Kernel kaum Laufzeit sparen. Sparse-Indexierung verursacht eigenen Speicher- und Steuerungsaufwand. Strukturiertes Pruning ist hier eine hardwaregerechte Wahl, aber nicht allgemein genauer als unstrukturiertes. **Beleg:** Abbildungen 3.5 und 3.6 sowie 7.4.
+**Grenze:** Unstrukturiertes Nullsetzen verkleinert dichte Arrays zunächst nicht und kann ohne Sparse-Kernel kaum Laufzeit sparen. Sparse-Indexierung verursacht eigenen Speicher- und Steuerungsaufwand. Structured Pruning ist hier eine hardwaregerechte Wahl, aber nicht allgemein genauer als unstrukturiertes. **Beleg:** Abbildungen 3.5 und 3.6 sowie 7.4.
 
 ## F075. Was genau wird beim LSTM-Pruning entfernt?
 
-**Antwort:** Für einen versteckten Kanal werden die zugehörigen Zeilen sämtlicher vier Gate-Matrizen, Bias-Einträge, die entsprechenden rekurrenten Spalten, Zustandskomponenten und MLP-Eingangsspalten entfernt. Nur so bleiben alle Abhängigkeiten und Dimensionen kompatibel.
+**Antwort:** Entfernt wird ein ganzer Hidden Channel, also eine interne Dimension des LSTM. Dazu gehören jeweils eine Komponente des Hidden State h und des Cell State c sowie die zugehörigen Gewichte und Bias-Einträge. Auch die Verbindungen zu den übrigen Channels und zum nachfolgenden MLP müssen entfernt werden, damit das verkleinerte Netz zusammenpasst.
 
-**Vertiefung:** Der verwendete L2-Score summiert Normen der Input- und Recurrent-Gatezeilen. Die aus Konsistenzgründen mit entfernten Spalten gehen nicht als eigener Term in genau diesen Score ein. Aus kleiner Gewichtsnorm folgt nicht automatisch geringe dynamische Bedeutung. **Beleg:** Kapitel 7.4, Abbildung 7.4 und A.10. Nach dem einmaligen Schnitt folgt kurzes Fine-Tuning.
+**Auswahl:** Für jeden Channel berechnet ihr einen L2-Score. Er fasst die Größe der zugehörigen Gewichte in den Zeilen der Input- und Recurrent-Gate-Matrizen zusammen. Channels mit kleinem Score werden als Kandidaten für das Pruning ausgewählt.
+
+**Technisches Detail:** Beim Entfernen fallen zusätzlich Spalten der Recurrent-Matrizen und der MLP-Eingangsmatrix weg. Diese Spalten müssen mit entfernt werden, weil sie den gestrichenen Channel weiterverwenden würden. Sie werden in dem hier verwendeten Auswahl-Score jedoch nicht als eigener Beitrag mitgezählt.
+
+**Grenze:** Kleine Gewichte bedeuten nicht automatisch, dass ein Channel für die Vorhersage unwichtig ist. Ein Channel kann Informationen speichern, die erst später gebraucht werden. Die Gewichtsnorm misst diesen Einfluss auf das Gedächtnis und spätere Vorhersagen nicht direkt.
+
+**Beispiel:** Ein Channel könnte Information über eine frühere Belastung speichern, die eine spätere SOC-Schätzung unterstützt. Auch bei einem kleinen Gewichtsscore könnte sein Entfernen deshalb den Fehler erhöhen. Das ist eine Veranschaulichung, kein Nachweis für einen bestimmten Channel eures Netzes.
+
+**Merksatz:** Wir wählen Channels anhand ihrer Gewichtsgröße aus. Das ist eine Näherung für ihre Wichtigkeit. Nach dem Pruning folgt kurzes Fine-Tuning; anschließend wird die Genauigkeit des verkleinerten Modells überprüft. Beleg: Kapitel 7.4, Abbildungen 7.4 und A.10.
 
 ## F076. Warum 30 Prozent und warum nicht viel mehr?
 
-**Antwort:** Die Studie verwendet einen moderaten Betriebspunkt, SOC 64 auf 45 und SOH 128 auf 90 versteckte Einheiten. Das ist kein experimentell bewiesenes globales Optimum. Ein breiter Sweep müsste für jede Rate Auswahl, Fine-Tuning und unabhängige Bewertung wiederholen.
+**Antwort:** Die Studie verwendet einen moderaten Betriebspunkt, SOC 64 auf 45 und SOH 128 auf 90 Hidden Units. Das ist kein experimentell bewiesenes globales Optimum. Ein breiter Sweep müsste für jede Rate Auswahl, Fine-Tuning und unabhängige Bewertung wiederholen.
 
-**Grenze:** Bei stärkerer Reduktion kann die zeitliche Repräsentation oder die lokale Dynamik leiden. Die ideale Rate hängt von Redundanz, Datensatz, Verlustfunktion und Hardwareengpass ab. Ein einzelner günstiger Betriebspunkt reicht zur Demonstration einer Möglichkeit, nicht zur Behauptung, 30 Prozent seien universell optimal.
+**Grenze:** Bei stärkerer Reduktion kann die zeitliche Repräsentation oder die lokale Dynamik leiden. Die ideale Rate hängt von Redundanz, Datensatz, Loss Function und Hardwareengpass ab. Ein einzelner günstiger Betriebspunkt reicht zur Demonstration einer Möglichkeit, nicht zur Behauptung, 30 Prozent seien universell optimal.
 
+@latex \clearpage
 ## F077. Warum spart 30 Prozent Breite etwa 45 Prozent MACs?
 
-**Antwort:** Der rekurrente Anteil enthält Matrizen, deren Größe quadratisch mit der versteckten Breite wächst. Wird H auf 0,7H reduziert, bleibt asymptotisch 0,49 des quadratischen Anteils. Das entspricht 51 Prozent Reduktion für diesen Grenzfall. Lineare Eingangs- und Kopfanteile verringern den tatsächlichen Gesamteffekt.
+**Kurzantwort:** Beim Pruning werden nicht nur Channels entfernt, sondern auch ihre Verbindungen untereinander. Die rekurrenten Matrizen verlieren dadurch Zeilen und Spalten. Deshalb sinkt dieser Rechenanteil stärker als die Hidden Size. Gemeint sind hier rund 45 Prozent, nicht 75 Prozent.
 
-**Beleg:** Die Arbeit zählt für SOC 22080 auf 12124 MACs und für SOH 85120 auf 46208. Das sind ungefähr 45,1 und 45,7 Prozent. Bias, Aktivierungen, Speicherbewegungen und Schleifen sind darin nicht enthalten. Deshalb folgt aus der MAC-Reduktion nicht exakt derselbe Laufzeitfaktor. **Übung:** Die Rechnung am Ende selbst ausführen.
+**Was ist ein MAC?** MAC steht für Multiply-Accumulate: Einen Wert mit einem Gewicht multiplizieren und das Produkt zu einer laufenden Summe addieren. Bei einer dichten Matrix-Vektor-Multiplikation benötigt jedes Matrixelement einen solchen Schritt.
+
+**1. Zahlenbeispiel für den quadratischen Anteil:** Stell dir eine rekurrente Matrix mit 10 Channels vor. Jeder neue Channel kann Informationen aus allen 10 bisherigen Channels erhalten. Nach 30 Prozent Pruning bleiben 7 Channels.
+
+@latex \begin{center}\begin{tabular}{lrr}\toprule & Vorher & Nach Pruning \\ \midrule Hidden Channels & 10 & 7 \\ Matrixgröße & $10\times10$ & $7\times7$ \\ MACs für diese Matrix pro Zeitschritt & 100 & 49 \\ \bottomrule\end{tabular}\end{center}
+
+Von 100 MACs bleiben 49 übrig. Für diese Matrix sparst du also 51 MACs beziehungsweise 51 Prozent. Das LSTM hat vier Gates; der gemeinsame Faktor vier ändert dieses Verhältnis nicht.
+
+**2. Allgemeine Formel:** H bezeichnet die ursprüngliche Hidden Size. Bei genau 30 Prozent weniger Channels beträgt die neue Breite 0,7 H. Für den quadratischen Rechenanteil gilt:
+
+@latex \[ \frac{(0{,}7H)^2}{H^2}=0{,}49 \qquad\Rightarrow\qquad 1-0{,}49=0{,}51=51\,\%. \]
+
+**3. Warum im gesamten Modell nur etwa 45 Prozent?** Nicht alle Berechnungen schrumpfen quadratisch. Bei den Input-Matrizen bleibt etwa die Zahl der Input Features gleich. Auch der nachfolgende MLP hat andere Skalierungsanteile. Außerdem werden ganzzahlige Channel-Zahlen verwendet: SOC 64 auf 45, SOH 128 auf 90. Die genaue Ersparnis ergibt sich daher aus der MAC-Zählung des gesamten Modells.
+
+@latex \begin{center}\begin{tabular}{lrrr}\toprule Modell & MACs vorher & MACs nachher & Einsparung \\ \midrule SOC & 22.080 & 12.124 & 45,1\,\% \\ SOH & 85.120 & 46.208 & 45,7\,\% \\ \bottomrule\end{tabular}\end{center}
+
+**Rechnung für das SOC-Modell:**
+
+@latex \[ \frac{22\,080-12\,124}{22\,080}\cdot100\,\%=45{,}1\,\%. \]
+
+**Merksatz für die Prüfung:** Weniger Channels bedeuten auch weniger Verbindungen zwischen den Channels. Deshalb sparen 30 Prozent weniger Breite bei unseren Modellen etwa 45 Prozent MACs.
+
+**Grenze und Beleg:** Weniger MACs bedeuten nicht automatisch denselben prozentualen Laufzeitgewinn. Bias, Activations, Speicherbewegungen und Schleifen sind in diesen MAC-Zahlen nicht enthalten. Beleg: Kapitel 7 und die MAC-Zählung der Arbeit.
+
+@latex \clearpage
 
 ## F078. Warum kann ein gepruntes Modell genauer werden?
 
@@ -496,7 +556,7 @@ Fragenkatalog, begründete Antwortvorschläge, Rechenübungen und Abbildungsatla
 
 **Grenze:** Eine Regularisierungswirkung ist eine mögliche Erklärung, keine isoliert bewiesene Ursache. Unterschiedliches Fine-Tuning-Budget kann ebenfalls wirken. Zur Attribution braucht man eine weitertrainierte ungeprunte Kontrollgruppe, mehrere Initialisierungen und mehrere Zellen. SOH verschlechtert sich bei Kompression im primären Vergleich, was eine allgemeine Verbesserung widerlegt.
 
-## F079. Wie funktioniert die verwendete INT8-Quantisierung?
+## F079. Wie funktioniert die verwendete INT8-Quantization?
 
 **Antwort:** Für jede Matrixzeile wird ein Maßstab aus ihrem maximalen Absolutgewicht geteilt durch 127 berechnet. Die Gewichte werden durch diesen Maßstab geteilt, auf ganze Zahlen gerundet und im symmetrischen Bereich -127 bis 127 gespeichert. Im Kernel wird der effektive Gewichtswert mit dem zeilenspezifischen FP32-Maßstab rekonstruiert.
 
@@ -504,25 +564,69 @@ Fragenkatalog, begründete Antwortvorschläge, Rechenübungen und Abbildungsatla
 
 ## F080. Warum werden -128 und volle Integer-Arithmetik nicht genutzt?
 
-**Antwort:** Der genau symmetrische Bereich -127 bis 127 besitzt gleich große positive und negative Endpunkte und stellt null exakt dar. Der zusätzliche negative INT8-Code bleibt ungenutzt. Vollständige Integer-Arithmetik wäre eine andere Implementierung mit quantisierten Aktivierungen, Akkumulatoren, Requantisierung und geeigneten Kernen.
+**Antwort:** Der genau symmetrische Bereich -127 bis 127 besitzt gleich große positive und negative Endpunkte und stellt null exakt dar. Der zusätzliche negative INT8-Code bleibt ungenutzt. Vollständige Integer-Arithmetik wäre eine andere Implementierung mit quantisierten Activations, Akkumulatoren, Requantization und geeigneten Kernen.
 
-**Beleg:** In dieser Arbeit sind nur die recurrent matrices Wih und Whh INT8 gespeichert. Bias, Zeilenskalen, Zustände, Aktivierungen, MLP und Rechenpfad bleiben FP32. Das Modell ist daher weight-only mixed precision, nicht vollständig INT8. Diese Präzisionsgrenze muss bei jedem Speicher- und Laufzeitargument genannt werden.
+**Beleg:** In dieser Arbeit sind nur die recurrent matrices Wih und Whh INT8 gespeichert. Bias, Zeilenskalen, Zustände, Activations, MLP und Rechenpfad bleiben FP32. Das Modell ist daher weight-only mixed precision, nicht vollständig INT8. Diese Präzisionsgrenze muss bei jedem Speicher- und Laufzeitargument genannt werden.
 
-## F081. Warum spart Quantisierung nicht 75 Prozent des gesamten Flash?
+@latex \clearpage
+## F081. Warum spart Quantization nicht 75 Prozent des gesamten Flash?
 
-**Antwort:** Nur ein Teil der Daten wird von vier auf ein Byte reduziert. Code, Bibliotheken, MLP-Gewichte, Bias und Skalen bleiben vorhanden. Die Zeilenskalen erzeugen zusätzlichen Speicher. Deshalb ist die 4:1-Ersparnis eine idealisierte Aussage für die quantisierten Matrixelemente, nicht für die komplette Firmware.
+**Kurzantwort:** Unser Modell besteht aus einem LSTM und einem nachgeschalteten MLP. Nur die LSTM-Matrizen Input-to-Hidden (Wih) und Hidden-to-Hidden (Whh) werden als INT8 gespeichert. Deren einzelne Gewichte brauchen ein Byte statt vier Byte. Die MLP-Gewichte bleiben FP32.
 
-**Beleg:** SOC-Flash sinkt von 105,32 auf 52,48 KB, SOH von 335 auf 138 KB. Das ist deutlich, aber nicht ein Viertel der Gesamtfirmware. Für RAM gilt die Gewichtsspeicherargumentation erst recht nicht, weil Zustände und Arbeitsdaten weiterhin FP32 sind. **OFFEN:** KB/KiB-Konvention des ursprünglichen Messskripts für genaue Bytevergleiche dokumentieren.
+**Was bleibt zusätzlich im Flash?** Programmcode, Bibliotheken, MLP-Gewichte, Bias-Werte und die FP32-Skalierungsfaktoren je quantisierter Matrixzeile. Deshalb gelten 75 Prozent Einsparung nur für die quantisierten Matrixelemente. Für RAM lässt sich diese Rechnung nicht übernehmen: Hidden State, Cell State und Arbeitsdaten bleiben in dieser Implementierung FP32.
 
+**Warum wurde der MLP nicht ebenfalls quantisiert?** Eine sachliche Begründung für den gewählten Umfang ist, dass der größte Matrixgewichtsblock im LSTM liegt. Der MLP-Output-Head bleibt als unveränderte Ausgabestufe in FP32. Das ist eine nachvollziehbare Eingrenzung der Untersuchung, aber kein Nachweis, dass MLP-Quantization die Genauigkeit verschlechtern würde oder diese Auswahl optimal ist.
+
+@latex \begin{center}\small\begin{tabular}{lrrr}\toprule Modell & LSTM-Matrixgewichte & MLP-Matrixgewichte & LSTM-Anteil\\\midrule SOC & 17\,920 & 4\,160 & 81,2\,\%\\ SOH & 68\,608 & 16\,512 & 80,6\,\%\\\bottomrule\end{tabular}\end{center}
+
+**Rechnung:** LSTM: 4H(D + H), MLP: HM + M, jeweils ohne Bias und zusätzliche Skalierungswerte. Mit D = 6, H = M = 64 beim SOC sowie H = M = 128 beim SOH liegen rund 80 Prozent der Matrixgewichte im LSTM. Eine zusätzliche MLP-Quantization wäre ein weiterer Optimierungsschritt und müsste separat auf Genauigkeit, Speicher und Laufzeit geprüft werden.
+
+**Gemessener Flash:** SOC 105,32 auf 52,48 KB; SOH 335 auf 138 KB. **Offen:** Die KB/KiB-Konvention des ursprünglichen Messskripts ist für exakte Bytevergleiche zu klären. kB bedeutet 1.000 Byte, KiB bedeutet 1.024 Byte.
+
+**Für die Verteidigung:** Wir untersuchen gezielt Weight-only Quantization der LSTM-Matrizen. Sie betreffen den größten Gewichtsblock. Der MLP-Head bleibt FP32; deshalb erwarten wir keine 75 Prozent Einsparung für die gesamte Firmware.
+
+@latex \clearpage
 ## F082. Warum ist Ihr quantisiertes Netz langsamer?
 
-**Antwort:** Der untersuchte Kernel konvertiert INT8-Gewichte während der Akkumulation nach FP32 und wendet die Skalen an. Es wird kein optimierter vollständig ganzzahliger Dot-Product-Pfad genutzt. Die Topologie und die Zahl der Modell-MACs bleiben unverändert, zusätzliche Operationen kommen hinzu.
+**Kurzantwort:** Die Gewichte sind platzsparend als INT8 gespeichert, die Rechnung läuft aber weiterhin in FP32. Der Kernel konvertiert die Gewichte und berücksichtigt die gespeicherten Skalen während der Berechnung. Die Modell-MAC-Zahl bleibt gleich, zusätzliche Arbeit kommt hinzu. Die Skalen werden dabei verwendet, nicht bei jedem Schritt neu bestimmt.
 
-**Beleg:** SOC-Kernelzeit steigt von 1,40 auf 6,99 ms, SOH von 22,73 auf 29,21 ms. Die Projekte sind laut Text ohne Compileroptimierung gebaut. **Grenze:** Das beweist nicht, dass Quantisierung grundsätzlich langsamer ist. Auch die genaue Verteilung auf Konversion, Cache, Schleifen und Speicher wurde nicht profiliert. CMSIS-NN zeigt, dass optimierte Integer-Kernel einen anderen Implementierungsraum darstellen.
+**Beleg und Grenze:** Die SOC-Kernel Time steigt von 1,40 auf 6,99 ms, die SOH-Kernel Time von 22,73 auf 29,21 ms. Laut Arbeit ist die Compileroptimierung ausgeschaltet. Wie viel Konversion, Skalierung, Speicherzugriffe oder Schleifen jeweils beitragen, wurde nicht einzeln gemessen. Auch die Messgrenzen sind zu beachten (F083). Diese Ergebnisse belegen keine allgemeine Verlangsamung durch Quantization.
 
+**Was ist ein Integer Kernel?** Ein Kernel ist eine Rechenroutine, etwa für ein Dot Product. Ein Integer Kernel verarbeitet dabei Ganzzahlen. Ein FP32-Kernel arbeitet dagegen mit Gleitkommazahlen. Der frühere Ausdruck Implementierungsraum meint lediglich eine andere technische Umsetzung der Berechnung.
+
+**Warum nicht jede Zwischenzahl INT8 sein kann:** INT8 reicht von -128 bis 127. Zwei Eingabewerte können hineinpassen, ihr Produkt aber nicht:
+
+@latex \[100\cdot100=10\,000,\qquad 10\,000>127.\]
+
+**Accumulator:** Produkte und ihre Summe benötigen einen größeren Datentyp, typischerweise INT32. Am Ende passt der Kernel die Skala an, rundet und begrenzt auf den vorgesehenen Ausgangsbereich (Requantization). Größere Integer-Zwischenwerte machen daraus keine FP32-Rechnung.
+
+**Was übernimmt die Bibliothek?** CMSIS-NN stellt optimierte Rechenroutinen für Arm-Cortex-M-Prozessoren bereit. Passende Routinen übernehmen unter anderem Integer-Multiplikation, Accumulation und Requantization. Das exportierte Modell muss jedoch zum unterstützten Operator, Zahlenformat und Skalierungsschema passen. Nur INT8-Gewichte zu speichern stellt die übrige Verarbeitung nicht automatisch um.
+
+**Besonderheit LSTM:** Der Cell State trägt Informationen über viele Zeitschritte weiter. Zustände können deshalb größere Integer-Datentypen benötigen. Auch Sigmoid und Tanh brauchen passende Integer- oder Fixed-Point-Verfahren. Ob eine Bibliothek die konkrete LSTM-Variante unterstützt, muss geprüft werden. Diese Arbeit hat eine solche vollständige Integer-Umsetzung nicht benchmarked.
+
+@latex \clearpage
+@latex {\large\bfseries\color{accent}F082 -- Vertiefung: Mikrocontroller, NPU und Quantization}\par
+
+**Kann unser STM32 Integer rechnen?** Ja. Der STM32H753ZI besitzt einen Cortex-M7 mit Integer-/DSP-Befehlen und einer Floating-Point Unit. Er ist nicht auf FP32 beschränkt, besitzt aber keine dedizierte NPU. Welche Variante schneller ist, hängt vom Kernel, Compiler, Speicherzugriff und den unterstützten Befehlen ab. Aus unseren Zeiten folgt nicht, dass Integer-Inferenz auf dieser Hardware langsamer sein muss.
+
+**Was ist eine NPU?** Neural Processing Unit bezeichnet spezialisierte Hardware für neuronale Netze. Sie führt viele MACs parallel aus und nutzt Gewichte und Zwischenwerte möglichst mehrfach, um Speichertransfers zu sparen. Bei gleichem Modell kann die mathematische MAC-Zahl gleich bleiben, obwohl Laufzeit und Energiebedarf sinken. Weniger MACs durch Pruning und schnellere Ausführung derselben MACs durch Hardware sind verschiedene Effekte.
+
+**Was hat das mit Quantization zu tun?** Quantization stellt Zahlen mit geringerer Genauigkeit dar. INT8-Werte brauchen weniger Speicher und können kompakte, parallele Recheneinheiten ermöglichen. Eine NPU ist dagegen die Hardware, die unterstützte Netzoperationen ausführt. Nicht alle Netze sind quantisiert und nicht jede NPU ist auf INT8 beschränkt; die unterstützten Formate sind gerätespezifisch.
+
+**Konkrete Beispiele:** STM32N6 besitzt den Neural-ART-Beschleuniger von ST für unterstützte quantisierte Netze. Arm Ethos-U55 ist ein weiterer Beschleuniger mit INT8-/INT16-Unterstützung. Solche Hardware ist eine mögliche weitere Untersuchungsplattform, keine garantierte Beschleunigung unseres LSTM. Operator-Unterstützung, recurrent states und Übergaben zwischen CPU und NPU müssen zum Modell passen.
+
+**Wer bereitet das Netz vor?** Die Softwarewerkzeuge exportieren beziehungsweise konvertieren das Modell und ordnen unterstützte Operationen dem Beschleuniger zu. Andere Operationen können auf der CPU bleiben, sofern die Toolchain dies unterstützt. Die NPU selbst macht aus unserem FP32-LSTM nicht automatisch ein korrekt quantisiertes Modell.
+
+**Für die Verteidigung:** Unsere Variante spart Gewichtsspeicher, rechnet jedoch weiter in FP32. Eine optimierte Integer-Implementierung oder eine NPU wäre eine andere Ausführung, deren Genauigkeit und Laufzeit separat zu prüfen wären.
+
+**Merksatz:** NPU = spezialisierte Rechenhardware. Quantization = kompaktere Zahlendarstellung. CMSIS-NN = Softwarebibliothek mit optimierten Rechenroutinen.
+
+@latex {\small\textbf{Quellen zur Einordnung (24.09.2026):} \href{https://github.com/ARM-software/CMSIS-NN}{Arm CMSIS-NN}; \href{https://www.st.com/en/microcontrollers-microprocessors/stm32h753zi.html}{ST: STM32H753ZI}; \href{https://www.st.com/en/development-tools/stm32n6-ai.html}{ST: STM32N6-AI}; \href{https://support.arm.com/compute-ip/ethos-u55}{Arm: Ethos-U55}. Eigene Messwerte und Architektur: Dissertation, Kapitel 7.}\par
+
+@latex \clearpage
 ## F083. Warum unterscheiden sich SOC- und SOH-Laufzeitfaktoren so stark?
 
-**Antwort:** MAC-Zahl ist nur ein statischer Teil der Kosten. Aktivierungen, Indexierung, Schleifen, Speicherzugriffe und Funktionsgrenzen haben andere Skalierungen. Außerdem sind die Zeitmessgrenzen nicht vollständig gleich, etwa bezüglich SOH-Skalierung im Quantized-Pfad.
+**Antwort:** MAC-Zahl ist nur ein statischer Teil der Kosten. Activations, Indexierung, Schleifen, Speicherzugriffe und Funktionsgrenzen haben andere Skalierungen. Außerdem sind die Zeitmessgrenzen nicht vollständig gleich, etwa bezüglich SOH-Skalierung im Quantized-Pfad.
 
 **Grenze:** Es gibt in der Arbeit keine operation-level-Zerlegung, mit der der Faktor 4,99 bei SOC gegenüber 1,29 bei SOH eindeutig erklärt werden könnte. Die ehrliche Antwort benennt gemessenen Unterschied und plausible Beiträge, ohne einen speziellen Cacheeffekt als bewiesene Ursache auszugeben. Ein nächster Versuch würde identische Messgrenzen, Optimierungsflags und Kernelprofiling verwenden.
 
@@ -532,7 +636,7 @@ Fragenkatalog, begründete Antwortvorschläge, Rechenübungen und Abbildungsatla
 
 **Antwort:** Es sind unterschiedliche Modelle, Eingangsvektoren, Messgrenzen und Firmwarepfade. Kapitel 6 misst isolierte SOC-Kerne mit extern bereitgestelltem kausalem SOH. Kapitel 7 misst eigenständige stateful SOC- und SOH-LSTM-Modelle mit vorbereiteten Featurevektoren.
 
-**Beleg:** Continuous-DD in Kapitel 6 benötigt etwa 0,425 ms und 4,1 KiB Peak-RAM. Das SOC-Base-LSTM in Kapitel 7 benötigt 1,40 ms Kernelzeit und 4,93 KB RAM. Daraus lässt sich kein sauberer Architektursieger GRU gegen LSTM ableiten. Dafür müssten Features, Genauigkeitsziel, Toolchain und Rechenmodus kontrolliert werden.
+**Beleg:** Continuous-DD in Kapitel 6 benötigt etwa 0,425 ms und 4,1 KiB Peak-RAM. Das SOC-Base-LSTM in Kapitel 7 benötigt 1,40 ms Kernel Time und 4,93 KB RAM. Daraus lässt sich kein sauberer Architektursieger GRU gegen LSTM ableiten. Dafür müssten Features, Genauigkeitsziel, Toolchain und Rechenmodus kontrolliert werden.
 
 ## F085. Was zeigen 724 ms gegenüber 0,425 ms?
 
@@ -542,27 +646,74 @@ Fragenkatalog, begründete Antwortvorschläge, Rechenübungen und Abbildungsatla
 
 ## F086. Warum sind periodische Resets trotz ähnlicher Laufzeit schlecht?
 
-**Antwort:** Ein Reset verwirft die akkumulierte versteckte Repräsentation. Das Netz muss Kontext neu aufbauen und kann währenddessen große Fehler erzeugen. Das ist nicht dasselbe wie das rollende Neuberechnen eines vollständigen historischen Fensters.
+**Antwort:** Ein Reset verwirft die akkumulierte Hidden Representation. Das Netz muss Kontext neu aufbauen und kann währenddessen große Fehler erzeugen. Das ist nicht dasselbe wie das rollende Neuberechnen eines vollständigen historischen Fensters.
 
-**Beleg:** Der Mittelwert der zellweisen maximalen Dataset-SOC-Fehler liegt bei periodischem Reset um 29 Prozentpunkte, einzelne Zellen erreichen etwa 39. Continuous und Rolling haben hier viel günstigere Verläufe. **Nachfrage:** Was bei Stromausfall tun? Zustandscheckpointing, definierte Kaltstartprozedur, verifizierte Anker und ein Fallback sind mögliche Erweiterungen, aber ihre sichere Funktion ist nicht durch diese Studie bereits nachgewiesen.
+**Beleg:** Der Mittelwert der zellweisen maximalen Dataset-SOC-Fehler liegt bei periodischem Reset um 29 Prozentpunkte, einzelne Zellen erreichen etwa 39. Continuous und Rolling haben hier viel günstigere Verläufe. **Nachfrage:** Was bei Stromausfall tun? State Checkpointing, definierte Kaltstartprozedur, verifizierte Anker und ein Fallback sind mögliche Erweiterungen, aber ihre sichere Funktion ist nicht durch diese Studie bereits nachgewiesen.
 
+@latex \clearpage
 ## F087. Wie wurden Flash und RAM bestimmt?
 
-**Antwort:** Flash stammt aus den belegten Bereichen des gelinkten Programms. Das ist eine präzise Build-Eigenschaft, keine Schätzung aus der Parameterzahl. Runtime-RAM kombiniert statische Daten mit tatsächlich beobachtetem dynamischem Bedarf und Stack-Hochwassermarke entsprechend dem jeweiligen Kapitel.
+**Kurzantwort wie auf Folie 36:** Flash wird aus dem fertig gelinkten Programm bestimmt. RAM umfasst Variablen, Puffer und den maximal beobachteten Stack. Die folgenden Bilanzen verwenden dieselben Begriffe wie die Präsentation.
 
-**Grenze:** Ein beobachteter Peak ist nicht automatisch eine formal bewiesene Obergrenze für jeden Interrupt-, Fehler- und Schedulingpfad. Die Rolling-DD-Messung muss nach gefülltem Fenster eine gültige Inferenz umfassen. Unbenutzte Reserven dürfen nicht als tatsächlich benötigter Speicher missverstanden werden. **Beleg:** Kapitel 6.2.4, 7.6.2, Abbildungen 6.19 und 7.12.
+**Flash-Bilanz der Folie:**
+
+@latex \[ F_{\mathrm{Firmware}}=F_{\mathrm{Gewichte}}+F_{\mathrm{Code}}+F_{\mathrm{Konstanten}}. \]
+
+Gewichte sind technisch ebenfalls Konstanten; hier werden sie als eigene Gruppe gezählt. Der letzte Term meint deshalb die übrigen Konstanten und weiteren Flash-Inhalte, einschließlich gespeicherter Startwerte für initialisierte RAM-Variablen. Gemessen werden die belegten Flash-Bereiche des Firmware-Images. Code und Konstanten dürfen nicht doppelt gezählt werden; manche Size-Werkzeuge fassen sie bereits unter text zusammen.
+
+**RAM-Bilanz der Folie für die Embedded-Auswertung:**
+
+@latex \[ R_{\mathrm{gesamt}}=R_{\mathrm{Variablen}}+R_{\mathrm{Puffer}}+R_{\mathrm{Stack,max}}. \]
+
+**Was bedeuten die drei Teile?**
+
+@latex \noindent\textbf{\(R_{\mathrm{Variablen}}\):} RAM für die übrigen statisch gespeicherten Werte, zum Beispiel Zähler oder Statusvariablen. Die separat gezählten Puffer sind hier ausgenommen.\par\smallskip
+
+@latex \noindent\textbf{\(R_{\mathrm{Puffer}}\):} RAM für statisch angelegte Datenfelder, zum Beispiel Eingaben, Hidden State, Cell State und Zwischenergebnisse. Puffer sind im Code ebenfalls Variablen, werden in dieser Bilanz aber als eigene Gruppe gezählt.\par\smallskip
+
+@latex \noindent\textbf{\(R_{\mathrm{Stack,max}}\):} Größter während des Tests beobachteter Stack-Bedarf. Der Stack enthält unter anderem lokale Variablen und Informationen zu laufenden Funktionsaufrufen; seine Belegung kann sich während der Ausführung ändern.\par\smallskip
+
+**Verbindung zur technischen Messung in Kapitel 7:** Die statischen Variablen und Puffer liegen in den Speicherbereichen .data und .bss. .data enthält initialisierte, .bss mit null initialisierte statische Daten. Daher gilt für die beschriebene Auswertung:
+
+@latex \[ R_{\mathrm{Variablen}}+R_{\mathrm{Puffer}}=|\mathrm{.data}|+|\mathrm{.bss}|. \]
+
+Puffer sind darin bereits enthalten und werden nicht nochmals addiert. Die statischen Größen werden aus dem Firmware-Build bestimmt, der Stack-Peak während der Ausführung beobachtet.
+
+**Rechenbeispiel, erfunden:** 2 KiB Variablen + 6 KiB Puffer + 3 KiB maximaler Stack ergeben 11 KiB RAM. Die ersten beiden Teile ergeben zusammen 8 KiB statischen RAM. Ein KiB entspricht 1.024 Byte.
+
+**Abgrenzung zu Kapitel 6:** Dort wird zusätzlich dynamisch angeforderter Speicher (Heap) berücksichtigt:
+
+@latex \[ R_{\mathrm{reported,Kap.6}}=R_{\mathrm{static}}+H_{\max,\mathrm{obs}}+S_{\max,\mathrm{obs}}. \]
+
+**Grenzen:** Beobachtete Maxima sind kein Beweis für den maximal möglichen Bedarf aller Ausführungspfade. Einzelne Peaks müssen nicht gleichzeitig auftreten. Unbenutzte Reserven zählen nicht als tatsächliche Belegung; bereits gezählte Puffer dürfen nicht doppelt eingehen. Quellen: Präsentation, Folie 36; Kapitel 6.2.4 (S. 90) und 7.6.2 (S. 137). Die Folienbilanzen sind keine nummerierten Gleichungen der Dissertation.
+
+@latex \clearpage
+
+**Ergänzung zu F087: Einheiten für RAM und Datenübertragung**
+
+Die Tabelle unterscheidet zwei Dinge: Bit gegenüber Byte sowie dezimale gegenüber binären Vielfachen. Für RAM sind sowohl kB als auch KiB möglich; entscheidend ist, dass die Einheit zur verwendeten Umrechnung passt.
+
+@latex \begin{center}\renewcommand{\arraystretch}{1.5}\begin{tabular}{|p{2.1cm}|p{2.0cm}|p{3.2cm}|p{7.0cm}|}\hline \textbf{Einheit}&\textbf{Abkürzung}&\textbf{Bedeutung}&\textbf{Typische Verwendung}\\\hline Bit&bit (auch b)&Eine 0 oder 1&Datenübertragung\\\hline Byte&B&8 Bit&Speicherbedarf, Dateigrößen\\\hline Kilobit&kbit (auch kb)&1.000 Bit&Übertragungsraten, etwa kbit/s\\\hline Kilobyte&kB&1.000 Byte&Dateigrößen und dezimale Speicherangaben\\\hline Kibibyte&KiB&1.024 Byte&RAM und Speicherangaben in Zweierpotenzen\\\hline\end{tabular}\end{center}
+
+**Merksatz:** Großes B bedeutet Byte. kB und KiB sind beide Byte-Einheiten, keine Bit-Einheiten. Die Angabe kbit/s bezeichnet dagegen eine Datenmenge pro Sekunde, also eine Übertragungsrate.
+
+**Warum KiB bei RAM?** Speicher wird über binäre Adressen angesprochen und ist häufig in Größen organisiert, die Zweierpotenzen entsprechen. KiB passt zu diesen Größen und liefert dafür glatte Zahlen. Es ist aber keine Pflicht: kB wäre ebenfalls zulässig. Die Einheit ändert nicht den tatsächlichen Speicherbedarf.
+
+**Umrechnungsbeispiel:** 4,1 KiB entsprechen 4,1984 kB, gerundet 4,2 kB. Hier wird ausschließlich dieselbe Datenmenge in einer anderen Einheit angegeben.
+
+@latex \clearpage
 
 ## F088. Warum ändern Zellen den Flash kaum, aber die Laufzeit möglicherweise schon?
 
-**Antwort:** Bei identischer Firmware bleiben Code, Gewichte und statische Puffer unabhängig von den Eingangssequenzen gleich. Laufzeit kann dagegen durch datenabhängige Zweige, Aktivierungsfunktionen, Cachezustand oder Interrupts variieren. Wiederholungen prüfen diese Variation.
+**Antwort:** Bei identischer Firmware bleiben Code, Gewichte und statische Puffer unabhängig von den Eingangssequenzen gleich. Laufzeit kann dagegen durch datenabhängige Zweige, Activation Functions, Cachezustand oder Interrupts variieren. Wiederholungen prüfen diese Variation.
 
 **Grenze:** Laufzeitverteilungen sind keine verschiedenen Modellgrößen. Umgekehrt kann eine andere Eingangsfolge einen höheren Stack- oder Heap-Peak auslösen, wenn datenabhängige Pfade existieren. Deswegen bleibt der Messumfang wichtig. In deterministischen dichten Kernen ist geringe Streuung durchaus plausibel und kein Beweis für fehlende Zellvielfalt.
 
-## F089. Was misst der DWT-Cycle-Counter, was die Hostlatenz?
+## F089. Was misst der DWT-Cycle-Counter, was die Host Latency?
 
-**Antwort:** Der Cycle-Counter zählt CPU-Zyklen zwischen instrumentierten Grenzen auf dem Mikrocontroller. Teilt man durch den tatsächlichen Prozessortakt, erhält man die verstrichene Zeit dieses Bereichs. Hostlatenz enthält zusätzlich UART-Transfer, Protokoll, Scheduling und Rücktransport.
+**Antwort:** Der Cycle-Counter zählt CPU-Zyklen zwischen instrumentierten Grenzen auf dem Mikrocontroller. Teilt man durch den tatsächlichen Prozessortakt, erhält man die verstrichene Zeit dieses Bereichs. Host Latency enthält zusätzlich UART-Transfer, Protokoll, Scheduling und Rücktransport.
 
-**Vertiefung:** Interrupts innerhalb der Messgrenzen können mitzählen. Messoverhead, Taktkonfiguration, Cache/Warm-up und Zählerüberlauf müssen dokumentiert werden. Bei 480 MHz entsprechen 204000 Zyklen 0,425 ms. **Beleg:** Kapitel 6.2.4 und 7.6.2. Eine hohe Hostlatenz widerlegt nicht automatisch einen schnellen Kern.
+**Vertiefung:** Interrupts innerhalb der Messgrenzen können mitzählen. Messoverhead, Taktkonfiguration, Cache/Warm-up und Zählerüberlauf müssen dokumentiert werden. Bei 480 MHz entsprechen 204000 Zyklen 0,425 ms. **Beleg:** Kapitel 6.2.4 und 7.6.2. Eine hohe Host Latency widerlegt nicht automatisch einen schnellen Kern.
 
 ## F090. Haben Sie Echtzeitfähigkeit bewiesen?
 
@@ -572,7 +723,7 @@ Fragenkatalog, begründete Antwortvorschläge, Rechenübungen und Abbildungsatla
 
 ## F091. Warum keine unabhängige Energieaussage?
 
-**Antwort:** Eest wird aus angenommener konstanter Boardleistung 0,5 W mal gemessener Kernelzeit berechnet. Der Wert besitzt damit exakt dieselbe relative Rangfolge wie die Zeit. Es wurde für die Varianten keine unabhängige Leistungsaufnahme gemessen.
+**Antwort:** Eest wird aus angenommener konstanter Boardleistung 0,5 W mal gemessener Kernel Time berechnet. Der Wert besitzt damit exakt dieselbe relative Rangfolge wie die Zeit. Es wurde für die Varianten keine unabhängige Leistungsaufnahme gemessen.
 
 **Herleitung:** 0,5 W mal 0,8 ms sind 0,4 mJ. Bei 6,99 ms sind es 3,495 mJ. **Grenze:** Wirkliche Energie hängt von Aktivität, Speicher, Peripherie, Spannungsreglern und Schlafphasen ab. Für eine reale Messung wären synchronisierte Strom-/Spannungserfassung, definierte Systemgrenzen und Wiederholungen erforderlich. Der Proxy ist nützlich, darf aber nicht als zusätzlicher unabhängiger Erfolg verkauft werden.
 
@@ -588,15 +739,29 @@ Fragenkatalog, begründete Antwortvorschläge, Rechenübungen und Abbildungsatla
 
 **Grenze:** Bei unbekanntem gebrauchten Akku oder Neustart ohne Historie wäre y0 nicht selbstverständlich bekannt. Die Sensitivität gegenüber falschem Start-SOH müsste separat untersucht werden. Eine genaue Antwort sagt deshalb initial kalibriert statt vollständig blind geschätzt. Außerdem sollte der Nenner der Ausrichtung auf problematisch kleine Anfangsausgaben geprüft werden.
 
+@latex \clearpage
+
 ## F094. Warum unterscheiden sich SOH-Zahlen zwischen Dashboard und Filteranalyse?
 
-**Antwort:** Die Hauptauswertung nennt final 0,85, 1,46 und 1,41 Prozentpunkte MAE für Base, Pruned und Quantized. Die kontrollierte Filteranalyse nennt final 1,476, 1,695 und 1,028. Der Text beschreibt die zweite Auswertung als kontrollierte Sequenz, spezifiziert im unmittelbaren Absatz aber nicht vollständig die Unterschiede der Datenbasis.
+**Kurzantwort für die Verteidigung:** Die Zahlen stammen aus zwei getrennten Auswertungen. Die ursprünglichen Benchmarkwerte lassen sich aus den gespeicherten Vorhersagen nachrechnen und gehören zur ersten Filterstufe. Für die spätere Filteranalyse wurden die Vorhersagen neu berechnet und anschließend die Filterstufen verglichen. Diese Wiederholungsrechnung reproduziert den ursprünglichen Verlauf nicht exakt. Deshalb dürfen beide Zahlenreihen nicht als eine gemeinsame Vorher-nachher-Kette interpretiert werden.
 
-**OFFEN:** Vor einer sicheren Erklärung müssen Zelle, Zeitraum, Maskierung, Vorinitialisierung, Filterzustand und Versionsstand beider Exporte gegenübergestellt werden. Unterschiedliche Sequenzen können andere Rangfolgen erklären, sind hier aber nicht allein aus der Zahl bewiesen. Eine belastbare Antwort lautet, dass die Ergebnisse unterschiedliche Auswertungspfade betreffen und ihre genaue Provenienz vor der Verteidigung tabellarisch nachgewiesen werden muss. Nicht behaupten, beide seien dieselbe vollständige Trajektorie.
+**Welche Werte gehören zusammen?** Alle Angaben sind SOH-MAE in Prozentpunkten; gerundet auf zwei Nachkommastellen.
 
-## F095. Was beweist die Langhorizontanalyse zur Quantisierung?
+@latex \begin{center}\renewcommand{\arraystretch}{1.3}\begin{tabular}{|p{8.5cm}|r|r|r|}\hline \textbf{Auswertung und Verarbeitungsstand}&\textbf{Base}&\textbf{Pruned}&\textbf{Quantized}\\\hline Ursprünglicher Benchmark: gespeichert nach Stufe 1&0,85&1,46&1,41\\\hline Wiederholungsrechnung: vor zeitlicher Filterung, bereits am Startwert ausgerichtet&1,85&1,98&2,11\\\hline Wiederholungsrechnung: nach Stufe 1&1,68&1,64&1,93\\\hline Wiederholungsrechnung: nach Stufe 1 und 2&1,48&1,69&1,03\\\hline\end{tabular}\end{center}
 
-**Antwort:** Die Trajektorie wird in zehn aufeinanderfolgende Teile geteilt, ohne recurrent state zurückzusetzen. Beim SOC steigen sowohl Base- als auch Quantized-Zielfehler. Gleichzeitig sinkt ihre mittlere gegenseitige Abweichung von 0,332 auf 0,271 Prozentpunkte. Das spricht gegen wachsende quantisierungsspezifische Abweichung in diesem Replay.
+**Was ist geklärt?** Die ursprünglichen Werte 0,85 / 1,46 / 1,41 sind nicht als Ergebnisse beider Filterstufen zu behandeln: Sie stammen aus den nach der ersten Stufe gespeicherten Benchmarkverläufen. Der Vergleich dieser Werte mit der letzten Tabellenzeile vermischt also sowohl unterschiedliche Läufe als auch unterschiedliche Filterstände.
+
+**Was bleibt ungeklärt?** Auch beim Vergleich derselben Filterstufe stimmen die Läufe nicht überein: Beim Base-Modell stehen nach Stufe 1 ursprünglich 0,85 gegenüber später 1,68 Prozentpunkten. Die zusätzliche zweite Stufe erklärt diese Abweichung nicht. Unterschiede in numerischer Verarbeitung und Datenaufbereitung sind mögliche Ursachen; ihr konkreter Beitrag wurde nicht isoliert nachgewiesen. Die Abweichung darf deshalb nicht einfach als Rundungsfehler oder als nachgewiesener Filtereffekt erklärt werden.
+
+**Was zeigt die Filteranalyse trotzdem?** Innerhalb der Wiederholungsrechnung wird der Einfluss der Filter auf dieselben neu berechneten Vorhersagen verglichen. Beim Base-Modell ergibt sich die Kette 1,85 zu 1,68 zu 1,48. Außerdem kann die Filterung die Rangfolge der Varianten verändern. Daraus lässt sich aber nicht der ursprüngliche Benchmarkwert 0,85 ableiten.
+
+**Bei kritischer Nachfrage:** Die gespeicherten Benchmarkwerte sind nachrechenbar. Die spätere Rechnung ist keine exakte Reproduktion dieses Laufs. Diese Trennung hätte klarer gekennzeichnet werden müssen; die Ursache der verbleibenden Abweichung ist noch offen. Die Zahlen werden nicht nachträglich so ersetzt, dass sie scheinbar übereinstimmen.
+
+@latex \clearpage
+
+## F095. Was beweist die Langhorizontanalyse zur Quantization?
+
+**Antwort:** Die Trajektorie wird in zehn aufeinanderfolgende Teile geteilt, ohne recurrent state zurückzusetzen. Beim SOC steigen sowohl Base- als auch Quantized-Zielfehler. Gleichzeitig sinkt ihre mittlere gegenseitige Abweichung von 0,332 auf 0,271 Prozentpunkte. Das spricht gegen wachsende quantization-bedingte Abweichung in diesem Replay.
 
 **Grenze:** Das beweist keine generelle rekurrente Stabilität über beliebige Laufzeiten. Gemeinsame Zielabweichung kann durch schwierigere späte Betriebsbedingungen entstehen. Die Pruned-zu-Base-Differenz wächst, obwohl Pruned insgesamt kleineres MAE hat. Nähe zum Base ist daher nicht identisch mit Genauigkeit. **Beleg:** Abbildung A.5.
 
@@ -604,7 +769,7 @@ Fragenkatalog, begründete Antwortvorschläge, Rechenübungen und Abbildungsatla
 
 **Antwort:** Im Embedded-Report-Loss-Test läuft die Inferenz im Hintergrund weiter. Nur der ausgegebene Bericht fehlt, und die letzte gültige Ausgabe wird gehalten. Im Messstream-Dropout aus Kapitel 6 fehlen dem Estimator dagegen neue Eingangsinformationen. Die internen Zustände können sich dadurch falsch entwickeln.
 
-**Beleg:** Kapitel 7.6.1 und 7.10. Bei langsamem SOH verändert gehaltene Ausgabe wenig, bei dynamischem SOC kann ein langer Berichtsausfall relevante Abweichungen erzeugen. **Nicht sagen:** Kaum Fehler bei 10 Prozent Reportverlust belege Robustheit des rekurrenten Modells gegen 10 Prozent fehlende Sensorwerte.
+**Beleg:** Kapitel 7.6.1 und 7.10. Bei langsamem SOH verändert gehaltene Ausgabe wenig, bei dynamischem SOC kann ein langer Report Loss relevante Abweichungen erzeugen. **Nicht sagen:** Kaum Fehler bei 10 Prozent Report Loss belege Robustheit des rekurrenten Modells gegen 10 Prozent fehlende Sensorwerte.
 
 ## F097. Was zeigt der Bitflip-Versuch und was nicht?
 
@@ -712,7 +877,7 @@ Diese Liste enthält keine automatischen Änderungen an der Dissertation. Sie un
 
 **Lösung:** Nach n Schritten ist der verbleibende Anteil eines Sprungs (1-α)^n. Die Zeitkonstante ist -1/ln(1-α), näherungsweise eine Million Sekunden beziehungsweise 11,57 Tage. Für 90 Prozent Antwort setzt man den Rest auf 0,1. Daraus folgen ln(0,1)/ln(1-α), etwa 2,303 Millionen Sekunden oder 26,65 Tage. Nichtlineare Rate-Limiter können das reale Verhalten zusätzlich verändern.
 
-## R06. Quantisierung einer Zeile
+## R06. Quantization einer Zeile
 
 **Aufgabe:** Die Gewichtzeile lautet -0,8, 0,1, 0,4. Bestimme Skala, Codes und rekonstruierten mittleren Wert.
 
@@ -770,7 +935,7 @@ Diese Liste enthält keine automatischen Änderungen an der Dissertation. Sie un
 - 2RC-Modell, EKF-Prädiktion, Spannungsresiduum und lokale Beobachtbarkeit auf dem LFP-Plateau.
 - LSTM- und GRU-Gates einschließlich Framework-Konventionen. Zeige, wo der Zustand gespeichert wird.
 - Gate-konsistentes Pruning, Matrixdimensionen und quadratische MAC-Skalierung.
-- Zeilenweise Quantisierung, Halbschritt-Fehlergrenze und warum sie keine Ausgangsfehlerschranke ist.
+- Zeilenweise Quantization, Halbschritt-Fehlergrenze und warum sie keine Ausgangsfehlerschranke ist.
 - Gepaarten Kontrast, Lookup-Interaktion und unterschiedliche Unsicherheitsdarstellungen.
 
 ## Priorität C: Vor der Verteidigung anhand von Unterlagen klären
@@ -795,7 +960,7 @@ Diese Liste enthält keine automatischen Änderungen an der Dissertation. Sie un
 
 **Tag 6:** F061 bis F070. Statistik an den Rechenübungen trainieren. Alle Fehlerbalken im Robustheitskapitel korrekt benennen.
 
-**Tag 7:** F071 bis F083. LSTM/GRU zeichnen, Pruning-Matrizen ausschneiden, eine Quantisierungszeile von Hand berechnen.
+**Tag 7:** F071 bis F083. LSTM/GRU zeichnen, Pruning-Matrizen ausschneiden, eine Quantization-Zeile von Hand berechnen.
 
 **Tag 8:** F084 bis F100. Hardwaremesskette und Filterung erklären. Hauptzahlen auf eine einzige Backup-Seite bringen.
 
@@ -813,7 +978,7 @@ Diese Liste enthält keine automatischen Änderungen an der Dissertation. Sie un
 
 **Antwortkern:** Gleiche kausale Informationsbasis und rekonstruierte Features, aber unterschiedliche Hypothesenräume erläutern. Repräsentantenvergleich statt Universalaussage. Paarung und kleine Zellzahl erklären. Continuous als separat nominal validierten Deployment-Modus behandeln, dessen volle Störungsübertragung nicht bereits bewiesen ist.
 
-**Prüfpfad C:** Quantisierung soll effizient sein. Warum ist sie langsamer? Was ist überhaupt quantisiert? Wo sind Energie und RAM gemessen? Wie viel schneller würde optimierter Code sein?
+**Prüfpfad C:** Quantization soll effizient sein. Warum ist sie langsamer? Was ist überhaupt quantisiert? Wo sind Energie und RAM gemessen? Wie viel schneller würde optimierter Code sein?
 
 **Antwortkern:** Weight-only-Speicherung von Recurrent-Matrizen, FP32-Rekonstruktion, unveränderte Topologie und nicht optimierte Referenzkerne erklären. Messgrenzen und Proxy nennen. Keine nicht gemessene Beschleunigung durch einen optimierten Kernel versprechen.
 
@@ -843,7 +1008,7 @@ Die LSTM-Grundlagen und Framework-Referenzen stehen außerdem in der Dissertatio
 
 ## Q4. Literatur bereits in der Dissertation
 
-**Plett, Battery Management Systems:** Zustandsdefinition, Coulomb Counting, OCV, Observer und Parametrierung wiederholen. **Hyperband, Li et al.:** Budgetzuteilung und Early-Stopping-Verfahren lernen. **Structured Sparsity, Wen et al., sowie recurrent pruning nach Narang/Lobacheva:** Strukturauswahl von Deploymentrepräsentation unterscheiden. **Quantisierung nach Jacob et al. und Krishnamoorthi:** Post-Training-Verfahren, Quantization-Aware Training und Requantisierung auseinanderhalten. Die genauen bibliografischen Angaben stehen in bib/Dissertation.bib. Diese Werke sind gezielte Leseaufträge, keine Behauptung, sämtliche Volltexte seien für diese Vorbereitung erneut geprüft worden.
+**Plett, Battery Management Systems:** Zustandsdefinition, Coulomb Counting, OCV, Observer und Parametrierung wiederholen. **Hyperband, Li et al.:** Budgetzuteilung und Early-Stopping-Verfahren lernen. **Structured Sparsity, Wen et al., sowie recurrent pruning nach Narang/Lobacheva:** Strukturauswahl von Deploymentrepräsentation unterscheiden. **Quantization nach Jacob et al. und Krishnamoorthi:** Post-Training-Verfahren, Quantization-Aware Training und Requantization auseinanderhalten. Die genauen bibliografischen Angaben stehen in bib/Dissertation.bib. Diese Werke sind gezielte Leseaufträge, keine Behauptung, sämtliche Volltexte seien für diese Vorbereitung erneut geprüft worden.
 
 ## Q5. Eigene Belegmappe
 

@@ -25,42 +25,55 @@ Dieser Atlas folgt den 67 tatsächlich nummerierten Abbildungen der angegebenen 
 
 **Frage:** Was repräsentiert eine Verbindung und wie berechnet sich die nächste Schicht?
 
-**Antwort:** Jede Verbindung ist ein Gewicht. Ein Neuron summiert gewichtete Eingänge plus Bias und wendet eine Aktivierungsfunktion an. Die ganze Schicht berechnet a = f(Wx+b). Training verändert W und b, nicht die aktuelle Eingangsmessung. **Vertiefung:** Für n Eingänge und m Ausgänge gibt es nm Gewichte plus m Biasparameter. **Grenze:** Die gezeichnete kleine Knotenzahl ist schematisch und keine Größenangabe des finalen SOH-Modells. Siehe F030.
+**Antwort:** Jede Verbindung ist ein Gewicht. Ein Neuron summiert gewichtete Eingänge plus Bias und wendet eine Activation Function an. Die ganze Schicht berechnet a = f(Wx+b). Training verändert W und b, nicht die aktuelle Eingangsmessung. **Vertiefung:** Für n Eingänge und m Ausgänge gibt es nm Gewichte plus m Biasparameter. **Grenze:** Die gezeichnete kleine Knotenzahl ist schematisch und keine Größenangabe des finalen SOH-Modells. Siehe F030.
 
 # Abbildung 3.3: LSTM-Zelle
 @figure 3.3
 
 **Frage:** Warum gibt es zwei horizontale Zustandswege?
 
-**Antwort:** c speichert den Zellzustand, h die nach außen gegebene rekurrente Repräsentation. Forget-Gate und Input-Gate bestimmen alte und neue Information im Zellzustand, Output-Gate steuert die sichtbare Ausgabe. Die obere additive Verbindung erleichtert lange Abhängigkeiten. **Grenze:** Ein offenes Gate garantiert weder physikalische Interpretierbarkeit noch beliebig langes korrektes Gedächtnis. Auf Nachfrage die Dimensionen sämtlicher Gates angeben: jeweils H Komponenten. Siehe F071 und F072.
+**Antwort:** c speichert den Cell State, h die nach außen gegebene rekurrente Repräsentation. Forget-Gate und Input-Gate bestimmen alte und neue Information im Cell State, Output-Gate steuert die sichtbare Ausgabe. Die obere additive Verbindung erleichtert lange Abhängigkeiten. **Grenze:** Ein offenes Gate garantiert weder physikalische Interpretierbarkeit noch beliebig langes korrektes Gedächtnis. Auf Nachfrage die Dimensionen sämtlicher Gates angeben: jeweils H Komponenten. Siehe F071 und F072.
 
 # Abbildung 3.4: GRU-Zelle
 @figure 3.4
 
 **Frage:** Welcher Zweig wird hier mit z gewichtet und ist das überall gleich?
 
-**Antwort:** Die Dissertation verwendet die Kandidatengewicht-Konvention. Andere Implementierungen gewichten mit z den bisherigen Zustand. Das ist nur bei konsistenter Umdefinition äquivalent. Reset-before und reset-after beeinflussen ebenfalls die konkrete Rechnung. **Grenze:** Nicht allein anhand des Diagramms einen Framework-Export bestätigen. Das endgültige C-Modell muss gegen exakt dessen Gateordnung, Biasbehandlung und Aktivierungen geprüft werden. Siehe F071.
+**Antwort:** Die Dissertation verwendet die Kandidatengewicht-Konvention. Andere Implementierungen gewichten mit z den bisherigen Zustand. Das ist nur bei konsistenter Umdefinition äquivalent. Reset-before und reset-after beeinflussen ebenfalls die konkrete Rechnung. **Grenze:** Nicht allein anhand des Diagramms einen Framework-Export bestätigen. Das endgültige C-Modell muss gegen exakt dessen Gateordnung, Biasbehandlung und Activations geprüft werden. Siehe F071.
 
 # Abbildung 3.5: Pruning-Granularität
 @figure 3.5
 
 **Frage:** Warum sparen die roten Nullen im mittleren Bild nicht zwingend Laufzeit?
 
-**Antwort:** Unstrukturierte Nullen behalten die ursprünglichen Matrixdimensionen. Eine dichte Schleife multipliziert sie weiterhin, sofern kein spezieller Sparse-Pfad verwendet wird. Rechts entfernt strukturiertes Pruning ganze Zeilen und passende Spalten, sodass wirklich kleinere dichte Tensoren entstehen. **Grenze:** Die Zeichnung illustriert Speicherrepräsentation, keine gemessenen Zeitverhältnisse. Sparsity-Anteil und effektiver Speed-up sind getrennte Größen. Siehe F074.
+**Antwort:** Unstrukturierte Nullen behalten die ursprünglichen Matrixdimensionen. Eine dichte Schleife multipliziert sie weiterhin, sofern kein spezieller Sparse-Pfad verwendet wird. Rechts entfernt Structured Pruning ganze Zeilen und passende Spalten, sodass wirklich kleinere dichte Tensoren entstehen. **Grenze:** Die Zeichnung illustriert Speicherrepräsentation, keine gemessenen Zeitverhältnisse. Sparsity-Anteil und effektiver Speed-up sind getrennte Größen. Siehe F074.
 
 # Abbildung 3.6: Abhängige Strukturen
 @figure 3.6
 
 **Frage:** Warum ist unabhängig beschnittenes Pruning vor einer Addition ungültig?
 
-**Antwort:** Addierte Zweige müssen dieselben Dimensionen und die beabsichtigte semantische Zuordnung besitzen. Werden verschiedene Kanäle entfernt, können Dimensionen oder Bedeutungen nicht mehr zusammenpassen. Gemeinsame Auswahlregeln erhalten die Struktur. **Übertragung:** Im LSTM betrifft derselbe versteckte Kanal mehrere Gates, recurrent columns, Zustände und MLP-Eingänge. Alle müssen zusammen angepasst werden. Siehe F075.
+**Antwort:** Addierte Zweige müssen dieselben Dimensionen und die beabsichtigte semantische Zuordnung besitzen. Werden verschiedene Kanäle entfernt, können Dimensionen oder Bedeutungen nicht mehr zusammenpassen. Gemeinsame Auswahlregeln erhalten die Struktur. **Übertragung:** Im LSTM betrifft derselbe Hidden Channel mehrere Gates, recurrent columns, Zustände und MLP-Eingänge. Alle müssen zusammen angepasst werden. Siehe F075.
 
-# Abbildung 3.7: Quantisierungsorte und Gitter
+# Abbildung 3.7: Quantization Points und Gitter
 @figure 3.7
 
-**Frage:** Sind Gewichte, Aktivierungen und Akkumulatoren dieselbe Quantisierungsentscheidung?
+@latex \clearpage
+**Frage:** Was zeigt Abbildung 3.7, und welche Teile haben wir tatsächlich quantisiert?
 
-**Antwort:** Nein. Sie besitzen unterschiedliche Wertebereiche und Fehlereigenschaften. Das Diagramm zeigt allgemeine Möglichkeiten und symmetrische beziehungsweise asymmetrische Gitter. Der untersuchte Export nutzt nur zeilenweise symmetrische recurrent weights, nicht alle gezeichneten Quantisierungsorte. **Nachfrage:** Warum Zero-point? Er verschiebt die Ganzzahlabbildung, um asymmetrische Realbereiche zu repräsentieren. **Grenze:** Aus dem Grundlagenbild nicht auf Full-Integer-Ausführung der eigenen Firmware schließen. Siehe F079 bis F081.
+**Kurzantwort:** Die Abbildung zeigt allgemeine Möglichkeiten der Quantization. Unsere Umsetzung verwendet Weight-only Quantization: Die beiden LSTM-Gewichtsmatrizen Input-to-Hidden und Hidden-to-Hidden werden als INT8 gespeichert. Beim Rechnen werden die Gewichtswerte in FP32 umgewandelt und ihre Scales berücksichtigt. Die MLP-Gewichte, Biases, States und Activations bleiben FP32. Es wird also nicht das gesamte Netz auf INT8 umgestellt.
+
+**Welche Gewichte genau?** Sowohl W_ih (Input-to-Hidden) als auch W_hh (Hidden-to-Hidden), jeweils für alle vier LSTM-Transformationen. Der frühere Ausdruck „recurrent weights“ war hier missverständlich: Gemeint sind die LSTM-Gewichtsmatrizen insgesamt, nicht nur W_hh. „Zeilenweise symmetrisch“ bedeutet: Jede Matrixzeile erhält einen eigenen Scale; verwendet werden die Integer-Codes von -127 bis +127 mit Zero Point 0.
+
+**Warum nicht alle Gewichte?** Die untersuchte Umsetzung konzentriert sich auf den großen LSTM-Gewichtsblock. Der MLP-Head bleibt FP32. Auch seine Gewichte zu quantisieren wäre ein zusätzlicher Optimierungsschritt, dessen Genauigkeit und Laufzeit separat geprüft werden müssten. Siehe F079 bis F082.
+
+**Was unterscheidet Weights, Activations und Akkumulatoren?** Weights sind gespeicherte Modellparameter. Activations sind Zwischenwerte, die beim Verarbeiten der Eingaben entstehen. Ein Akkumulator sammelt die Produkte einer gewichteten Summe. Diese Summe kann einen größeren Wertebereich benötigen: Schon 100 mal 100 ergibt 10 000 und passt nicht in INT8. Integer Kernels verwenden deshalb häufig INT32 für die Summen. In unserer Umsetzung erfolgt die Rechnung weiterhin in FP32. INT8-Gewichte bedeuten also nicht automatisch INT8-Zwischenwerte oder INT8-Summen.
+
+**Was ist der Zero Point?** Er ist die gespeicherte Ganzzahl z, die den realen Wert null repräsentiert. Im oberen, symmetrischen Beispiel gilt z = 0: Integer-Code 0 bedeutet realer Wert 0. Bei einer asymmetrischen Abbildung könnte beispielsweise Code 100 den realen Wert 0 darstellen. Es geht nicht bloß um positive und negative Werte; diese gibt es auch bei symmetrischer Quantization.
+
+**Wie liest man die drei Gitter rechts?** Oben stehen die Integer-Codes q, darunter die zugehörigen realen Werte x. Das obere Gitter ist symmetrisch um null. Das mittlere nutzt UINT8 von 0 bis 255 für nichtnegative Werte, ebenfalls mit Zero Point 0. Das untere nutzt einen verschobenen Zero Point für einen asymmetrischen Wertebereich. „Gitter“ meint die diskreten darstellbaren Zahlenstufen; Werte dazwischen werden gerundet.
+
+**Was bedeutet Full Integer?** Die Netzoperationen werden mit geeigneten Integer- beziehungsweise Fixed-Point-Verfahren ausgeführt, statt die Gewichte zum Rechnen wieder nach FP32 zu konvertieren. Dabei müssen nicht alle Zwischenwerte INT8 sein: INT32-Summen oder breitere States sind möglich. Dafür braucht man passende Kernels und Scales auch für die Zwischenwerte. Das ist eine andere Umsetzung als unsere Weight-only Quantization. Abbildung 3.7 beschreibt die Grundlagen und belegt keine Full-Integer-Ausführung unserer Firmware.
 
 # Abbildung 4.1: NMC-Alterung über Zyklen und Zeit
 @figure 4.1
@@ -72,9 +85,19 @@ Dieser Atlas folgt den 67 tatsächlich nummerierten Abbildungen der angegebenen 
 # Abbildung 4.2: LFP-DoE-Würfel
 @figure 4.2
 
-**Frage:** Was bedeuten die drei Achsen und warum sind nicht alle Zellen eigene Designpunkte?
+@latex \clearpage
+@latex {\large\bfseries\color{accent}Abbildung 4.2 -- DoE kurz erklärt}\par
+**Frage:** Warum verwendet man ein Design of Experiments (DoE), und was zeigt der Würfel?
 
-**Antwort:** Lade-C-Rate, Entlade-C-Rate und DOD spannen den Plan auf. Mehrere Zellen können Replikate eines Betriebspunktes sein. Die 15 Zellen sind deshalb nicht 15 vollständig unabhängige Betriebsklassen. **Nachfrage:** Welche Wechselwirkungen lassen sich identifizieren? Dafür den tatsächlichen gemischten Voll-/Teilfaktorplan und seine Wiederholungen zeigen. **Grenze:** Der Würfel ist Designbeschreibung, keine statistische Effektschätzung. Siehe F025.
+**Zweck:** DoE ist statistische Versuchsplanung. Lade-C-Rate, Entlade-C-Rate und DoD werden gezielt kombiniert, um ihre Einflüsse auf die Alterung mit begrenzter Versuchskapazität zu untersuchen. Ein Designpunkt ist eine Kombination dieser drei Einstellungen.
+
+**Full Factorial Design:** Bei drei Faktoren mit je zwei Stufen (niedrig/hoch) werden alle 2 x 2 x 2 = 8 Kombinationen getestet. Sie bilden die acht grünen Würfelecken. Man kann damit Haupteffekte untersuchen, etwa den durchschnittlichen Einfluss einer höheren Lade-C-Rate, und Wechselwirkungen: Wirkt schnelles Laden bei hoher DoD anders als bei niedriger DoD?
+
+**Central Composite Design (CCD):** Die gezeichnete Anordnung ergänzt die acht Eckpunkte um einen roten Mittelpunkt und sechs blaue Axialpunkte. An jedem Axialpunkt wird ein Faktor weiter nach oben oder unten variiert, während die anderen auf mittlerer Einstellung bleiben. Diese zusätzlichen Punkte ermöglichen eine quadratische Modellierung und damit die Untersuchung von Krümmung, etwa eines überproportional steigenden Kapazitätsverlusts bei hoher Belastung.
+
+**Nutzen für unsere Modelle:** Die Kampagne liefert Messdaten aus systematisch unterschiedlichen Belastungs- und Alterungsverläufen für Training und Bewertung der SOC-/SOH-Schätzer. Wiederholungen derselben Einstellung würden zusätzlich die Zellstreuung erfassen. Ob Einflüsse tatsächlich nachgewiesen sind, ergibt erst die statistische Auswertung, nicht der Würfel allein.
+
+**Einordnung der Unterlagen:** Die Grafik zeigt 15 unterschiedliche Positionen; der Begleittext nennt dagegen acht Betriebspunkte mit Wiederholungen. Die konkrete Zellzuordnung muss am Versuchsplan abgeglichen werden. Die frühere pauschale Erklärung, die 15 Zellen seien lediglich Wiederholungen von acht Punkten, ist damit nicht belegt. Siehe F025.
 
 # Abbildung 4.3: Struktur eines LFP-Verlaufs
 @figure 4.3
@@ -121,9 +144,41 @@ Dieser Atlas folgt den 67 tatsächlich nummerierten Abbildungen der angegebenen 
 # Abbildung 5.2: Lag-Konstruktion
 @figure 5.2
 
-**Frage:** Woher kommt das Gedächtnis, wenn das Netz kein recurrent state hat?
+@latex \clearpage
+@latex {\large\bfseries\color{accent}Abbildung 5.2 -- Resampling und Aggregation}\par
+**Frage:** Wie werden die Messdaten für das MLP zeitlich aufbereitet, und welche Information bleibt erhalten?
 
-**Antwort:** Vergangene Featurewerte werden als feste Eingangskoordinaten nebeneinandergestellt. Das Ziel gehört zum aktuellen Zeitpunkt, nicht zu einem ungeklärten zukünftigen SOH. **Vertiefung:** Resampling und Aggregation bestimmen, welche Zeitinformation erhalten bleibt. Überlappende Lag-Fenster erfordern vorsichtige Splits. **Offen:** Punkt- oder Bininterpretation der 160 Minuten verifizieren. Die effektive Pufferlänge gehört zur Deploymentkomplexität. Siehe F026 und F029.
+**Die beiden Zeitraster auseinanderhalten:** Laut Dissertation werden die zunächst je Prozessschritt unterschiedlich abgetasteten NMC-Messungen auf ein Sekundenraster gebracht. Für die MLP-Historie folgt eine gröbere Zeitauflösung. Der Startpunkt der Untersuchung ist 30 Minuten mit 12 Lags; als beste untersuchte Kombination nennt die Arbeit 10 Minuten mit 16 Lags, also 160 Minuten Historie. Das sind zwei verschiedene Verarbeitungsschritte, keine widersprüchlichen Abtastraten.
+
+**Resampling: Welches Zeitraster?** Es legt die neuen Zeitintervalle fest. Im gefundenen NMC-Vorverarbeitungsskript wird ein Sekundenraster erzeugt und interpoliert. Resampling erzeugt dabei keine neuen unabhängigen Messungen. Im späteren Lag-Code wird auf die übergebene gröbere Intervalllänge resampled; für die in der Arbeit genannte 10-Minuten-Konfiguration sind das 600 Sekunden pro Intervall.
+
+**Aggregation: Wie wird ein Intervall zusammengefasst?** Der gefundene Lag-Code verwendet den arithmetischen Mittelwert pro Zeitintervall und Messspalte, anschließend lineare Interpolation fehlender Werte. Auf einem lückenlosen Sekundenraster enthält ein 10-Minuten-Intervall beispielsweise 600 Werte, aus denen ein Mittelwert wird. Es wird also nicht lediglich jeder 600. Messwert ausgewählt. Beispiel: 300 Sekunden mit 3,6 V und 300 Sekunden mit 3,8 V ergeben 3,7 V als Intervallmittel. Derselbe Mittelwert kann aus unterschiedlichen zeitlichen Verläufen entstehen.
+
+**Was bleibt erhalten, was geht verloren?** Erhalten bleiben mittlere Signalniveaus, die Reihenfolge der Zeitintervalle, ihr fester Abstand und Veränderungen zwischen ihnen. Die genaue Reihenfolge innerhalb eines Intervalls, kurze Spitzen und schnelle Wechsel sind aus dem Mittelwert nicht rekonstruierbar. Interpolation füllt Lücken durch angenommene Zwischenwerte; sie stellt den unbekannten Verlauf nicht wieder her. Das MLP erhält damit eine gröbere zeitliche Darstellung, nicht den ursprünglichen Sekundenverlauf.
+
+**Besonderheit der kumulierten Ströme:** Im gefundenen Lag-Code wird zuerst der Strom pro Intervall gemittelt. Danach werden positive und negative Intervallmittel getrennt aufsummiert und mit der Intervalllänge in Ah umgerechnet. Diese Summen werden anschließend ebenfalls verzögert als Features abgelegt. Sie tragen Nutzungsinformation von vor dem Lag-Fenster mit. Lade- und Entladeanteile innerhalb desselben Intervalls können sich allerdings schon beim Mitteln aufheben; ihre getrennte Integration vor dem Mitteln wäre nicht dieselbe Rechnung.
+
+**Warum diese Aufbereitung?** Statt Tausenden Sekundenwerten bekommt das MLP eine kompakte Historie. Das reduziert Eingangsgröße und glättet schnelle Schwankungen. Zu grobe Intervalle verlieren relevante Dynamik; zu feine Intervalle decken bei gleicher Lag-Zahl nur wenig Zeit ab. Deshalb wurden in der Arbeit mehrere Zeitauflösungen und Lag-Längen verglichen.
+
+@latex \clearpage
+@latex {\large\bfseries\color{accent}Abbildung 5.2 -- Lag-Fenster und Überlappung}\par
+**Frage:** Wie erhält ein MLP ohne Recurrent State eine Historie, wie überlappen die Fenster, und warum?
+
+**Konstruktion im gefundenen Code:** Für jede Featuregröße werden der aktuelle Intervallwert und verschobene Kopien angelegt: t, t-1, t-2 bis t-L. Die Schleife läuft einschließlich L; L = 16 bedeutet hier daher 16 vergangene Werte plus den aktuellen, insgesamt 17 Werte je Feature. Die Kapazität des aktuellen Intervalls dient als Zielwert. Im gezeigten Trainingsaufruf werden Kapazitätsspalten aus den Inputs entfernt. Die Arbeit beschreibt das Ziel als aktuellen SOH, nicht als Zukunftsprognose.
+
+**Konkrete Rechnung mit der in der Arbeit genannten Einstellung:** Bei 10 Minuten Abstand und L = 16 liegen zwischen ältestem und aktuellem Zeitindex 160 Minuten. Für Spannung, Temperatur sowie positive und negative kumulierte Ladung wären es nach dieser Code-Konvention 4 x 17 = 68 Eingabewerte. Das ist eine Ableitung aus der gefundenen Lag-Klasse, keine Bestätigung der Eingangsgröße des final trainierten Modells. 16 Werte einschließlich des aktuellen hätten dagegen nur 15 Abstände, also 150 Minuten zwischen den Zeitindizes. Bei Intervallmitteln muss zusätzlich zwischen Zeitindex-Abstand und der gesamten Breite der enthaltenen Intervalle unterschieden werden.
+
+**Überlappung bei einem Schritt Vorschub:** Jede nächste Zeile wird ein neues Beispiel; ein zusätzlicher größerer Stride ist in dieser Lag-Klasse nicht eingebaut. Bei 10-Minuten-Auflösung würde das nächste Fenster daher zehn Minuten später beginnen und enden:
+
+@latex \[\begin{aligned}A &: [0,10,20,\ldots,150,160]\ \text{min},\\B &: [10,20,30,\ldots,160,170]\ \text{min}.\end{aligned}\]
+
+**Was wird wiederverwendet?** Beide Fenster enthalten die 16 Zeitindizes von Minute 10 bis Minute 160. Ein alter Eintrag fällt heraus, ein neuer kommt hinzu. Nach dieser Code-Konvention überlappen somit 16 von 17 Einträgen, etwa 94 Prozent. Die Zeitangaben sind schematische Rasterindizes; aus der linken Beschriftung eines gemittelten Intervalls darf nicht abgeleitet werden, dass sein Mittelwert schon zu Intervallbeginn verfügbar war.
+
+**Warum überlappen lassen?** Nach jedem neuen Intervall kann eine Schätzung mit aktualisierter Historie entstehen, ohne auf einen komplett neuen, nicht überlappenden Datenblock zu warten. Im Training werden unterschiedliche Endzeitpunkte und Ausschnitte eines Verlaufs nutzbar. Die zeitliche Reihenfolge steckt in der festen Reihenfolge der Input-Spalten. Das MLP selbst behält zwischen zwei Aufrufen keinen Hidden State.
+
+**Grenze bei Training und Validation:** Überlappende Fenster sind stark abhängig und keine neuen unabhängigen Versuche. Im gefundenen Projekt werden die Lag-Zeilen vor dem Training gemischt; der gezeigte Aufruf reserviert anschließend 20 Prozent für Validation. Dadurch können stark ähnliche Fenster auf beiden Seiten liegen. Ein separater Test auf vollständig zurückgehaltenen Zellen ist davon zu unterscheiden. Eine rein zeitliche Trennung müsste zusätzlich die Fensterüberlappung an der Grenze berücksichtigen.
+
+**Quellenstatus:** Dissertation, Kapitel 4 (Sekundenraster) und 5 (Zeitauflösung/Lags); NMC-Projekt mg_farm_main_project, Klassen LagDataset und LagDataCollection sowie main.py; Vorverarbeitung resample_BX_SOH_Combined_to_second_v2.py. Die gefundene main.py nutzt einen älteren Aufruf mit 30 Minuten und unterschiedlichen Lag-Längen. Der finale 10-Minuten-/16-Lag-Trainingslauf ist damit nicht vollständig reproduziert. Die Code-Details sind deshalb ausdrücklich als Befund dieses Projektstands gekennzeichnet. Siehe F026 und F029.
 
 # Abbildung 5.3: Trainings- und Evaluationsworkflow
 @figure 5.3
@@ -137,14 +192,27 @@ Dieser Atlas folgt den 67 tatsächlich nummerierten Abbildungen der angegebenen 
 
 **Frage:** Warum sieht das Modell klein aus, während die Tabelle viele Schichten zeigt?
 
-**Antwort:** Das Bild erklärt Merkmalsgruppen und Vollvernetzung schematisch. Die tatsächlich gewählten Breiten stehen in Tabelle 5.1. Die Darstellung ist kein maßstabsgetreues Netz mit der richtigen Neuronenzahl. **Grenze:** Einfach meint feedforward und nachvollziehbare Featurebildung, nicht zwingend wenige Parameter. Den Unterschied zur Eingangssuche mit acht Neuronen erklären. Die bedingte Parameterrechnung in F030 bereithalten.
+**Antwort:** Das Bild erklärt Feature Groups und Vollvernetzung schematisch. Die tatsächlich gewählten Breiten stehen in Tabelle 5.1. Die Darstellung ist kein maßstabsgetreues Netz mit der richtigen Neuronenzahl. **Grenze:** Einfach meint feedforward und nachvollziehbare Featurebildung, nicht zwingend wenige Parameter. Den Unterschied zur Eingangssuche mit acht Neuronen erklären. Die bedingte Parameterrechnung in F030 bereithalten.
 
 # Abbildung 5.5: Historien-MAE-Matrix
 @figure 5.5
 
-**Frage:** Warum liegt das günstige Gebiet zwischen den Extremen?
+@latex \clearpage
+@latex {\Large\bfseries\color{blue} Abbildung 5.5 -- Einordnung und Prüfungsfragen}\par\medskip
 
-**Antwort:** Zu grobe Intervalle können relevante Lade-/Entladedynamik verwischen. Zu feine Intervalle liefern bei kurzer Sequenz wenig Gesamtzeit oder bei langer Sequenz hohe Redundanz. Das beobachtete Raster bevorzugt 16 Schritte mit zehn Minuten Aggregation. **Grenze:** Es ist ein diskretes datenabhängiges Optimum. Unterschiede zwischen Zellen und fehlende Trainingswiederholungen erlauben keinen universellen Optimalitätsbeweis. Prüfen, ob das Bild nachträgliche Sensitivität oder Auswahlgrundlage war. Siehe F029 und F031.
+**Was zeigt die Abbildung?** Drei MAE-Karten für Zelle 1, 7 und 9. Jedes Feld steht für eine Kombination aus Lag-Einstellung (8, 12, 16 oder 20) und Zeitauflösung (1, 10, 30 oder 60 Minuten). Blau steht auf der jeweiligen Skala für kleinere, Rot für größere Fehler. Die Kombination aus 16 Lag-Schritten und zehn Minuten liegt bei allen drei Zellen in einem günstigen Bereich; 60 Minuten sind häufig ungünstiger.
+
+**Warum ist eine feinere Zeitauflösung nicht automatisch besser?** Bei gleicher Lag-Anzahl reicht die Historie weniger weit zurück. Nach der Definition der Arbeit entsprechen 16 Schritte mit einer Minute Abstand 16 Minuten Historie, mit zehn Minuten Abstand dagegen 160 Minuten. Feinere Auflösung bewahrt mehr zeitliche Details, kann aber zu wenig vom Lade-/Entladeverlauf abdecken. Gröbere Mittelung deckt mehr Zeit ab, kann jedoch kurze Änderungen verwischen. Es besteht ein Kompromiss zwischen Detailtiefe und zeitlicher Reichweite.
+
+**Warum helfen mehr Lags nicht immer?** Bei gleicher Zeitauflösung verlängern sie die Historie und vergrößern den Eingabevektor. Ältere Werte können zusätzliche Information liefern, aber auch weitgehend redundant sein. Mehr Eingaben garantieren daher keinen kleineren Vorhersagefehler. Redundanz ist eine mögliche Erklärung, kein durch die Fehlerkarte allein nachgewiesener Mechanismus.
+
+**Kann man die Farben zwischen den Zellen direkt vergleichen?** Nein: Jede Teilgrafik hat eine eigene Farbskala. Ein blaues Feld bei Zelle 9 kann einen deutlich höheren MAE darstellen als ein blaues Feld bei Zelle 1. Für den Vergleich sind die Zahlen der jeweiligen Farbleiste maßgeblich. Der MAE wird hier in SOH-Prozentpunkten angegeben; Zelle 9 weist insgesamt deutlich höhere Fehler auf.
+
+**Sind zehn Minuten und 16 Lags allgemein optimal?** Nein. Sie sind eine günstige Kombination innerhalb des untersuchten diskreten Rasters und der dargestellten Zellen. Daraus folgt weder ein universelles Optimum noch, dass benachbarte, nicht getestete Einstellungen schlechter wären. Für andere Betriebsprofile oder Datensätze müsste die Wahl erneut bewertet werden. Die Grafik allein zeigt außerdem keine Streuung über wiederholte Trainingsläufe.
+
+**Welche Rolle dürfen die Testzellen bei dieser Wahl spielen?** Hyperparameter sollten anhand der Validation gewählt und danach auf zurückgehaltenen Testzellen bewertet werden. Zeigt die Grafik nur eine nachträgliche Analyse eines bereits festgelegten Modells, ist das von einer Auswahl anhand der Testfehler zu unterscheiden. Werden die Testzellen zur Auswahl der Lag-Einstellung benutzt, sind sie keine von dieser Auswahl unabhängige abschließende Bewertung mehr. Welcher Ablauf für diese Abbildung tatsächlich verwendet wurde, ist anhand der Grafik allein nicht geklärt. Siehe F029 und F031.
+
+**Hinweis zur X-Achse:** „Number of sequences“ ist missverständlich, weil hier die Historienlänge und nicht die Anzahl verschiedener Trainingsfenster variiert wird. „Number of lag steps“ wäre eindeutiger. Ob die dargestellte Einstellung den aktuellen Wert mitzählt, ist für den finalen Lauf noch offen; die inklusive Zählweise des gefundenen älteren Codes darf nicht ungeprüft übertragen werden. Siehe die Erläuterung zu Abbildung 5.2.
 
 # Abbildung 5.6: NMC-SOH-Trajektorien
 @figure 5.6
@@ -179,7 +247,7 @@ Dieser Atlas folgt den 67 tatsächlich nummerierten Abbildungen der angegebenen 
 
 **Frage:** Warum ein sauberes Vorfenster, gemeinsamer Scorebeginn und verlängertes Dropoutfenster?
 
-**Antwort:** Das SOH-Netz benötigt kausalen Kontext, die GRU ein gültiges Eingabefenster. Erst danach wird gleichzeitige Leistung verglichen. Dropout braucht ausreichend Nachbeobachtung und eine gleich lange Baseline. **Grenze:** Das ist keine Kaltstartvalidierung ohne Vorgeschichte. Der typische Fensterselektor erfasst nicht jeden seltenen ungünstigen Betriebspunkt. Auf Nachfrage die sechs Auswahlmerkmale und die Behandlung fehlender Zell-SOH-Kombinationen nennen. Siehe F023, F024 und F042.
+**Antwort:** Das SOH-Netz benötigt kausalen Kontext, die GRU ein gültiges Eingabefenster. Erst danach wird gleichzeitige Leistung verglichen. Dropout braucht ausreichend Nachbeobachtung und eine gleich lange Baseline. **Grenze:** Das ist keine Kaltstartvalidierung ohne Vorgeschichte. Der typische Fensterselektor erfasst nicht jeden seltenen ungünstigen Betriebspunkt. Auf Nachfrage die sechs Selection Features und die Behandlung fehlender Zell-SOH-Kombinationen nennen. Siehe F023, F024 und F042.
 
 # Abbildung 6.4: Nominale Accuracy
 @figure 6.4
@@ -198,9 +266,20 @@ Dieser Atlas folgt den 67 tatsächlich nummerierten Abbildungen der angegebenen 
 # Abbildung 6.6: Gain über Lebenszeit und Ladeanker
 @figure 6.6
 
-**Frage:** Akkumuliert der Fehler jetzt oder wird er zurückgesetzt?
+@latex \clearpage
+@latex {\Large\bfseries Abbildung 6.6 -- Fehleraufbau, Ladeanker und Alterung}\par\medskip
 
-**Antwort:** Zwischen Ladeankern kann sich der Beitrag aufbauen. An einem Anker ändert sich der Integrationszustand, aber der Sensorfehler bleibt und wirkt danach erneut. Die Panels zeigen zeitlich schwankende Zusatzlast, normierte Zwischenankerentwicklung und Gesamt-MAE. **Wichtige Aussage:** HECM hat in diesem einzelnen High-Load-Lebenszeitlauf die kleinste Zusatzlast. Das widerspricht nicht dem sechszelligen Fensterresultat zugunsten DD. **Grenze:** Unterschiedliche Datengrundlage und Gewichtung. Siehe F052.
+**Was zeigt die Abbildung?** Eine einzelne Hochlast-Testtrajektorie über den gesamten untersuchten Lebenszeitverlauf. (a) zeigt den zeitlichen Zusatzfehler durch den Strom-Gain, über 24 Stunden geglättet. (b) fasst 44 Abschnitte zwischen Vollladungen zusammen; die X-Achse ist der relative Fortschritt zwischen den Ereignissen, nicht der SOC. Die Linien zeigen Mittelwerte, die Balken den Min-Max-Bereich. (c) vergleicht den Zusatzfehler vor und nach Vollladungen. Erst (d) zeigt den absoluten Gesamt-MAE von Baseline und gestörter Berechnung.
+
+**Bedeutet ein höherer Gesamt-MAE, dass sich der Fehler aufkumuliert?** Nein. Auch eine dauerhaft gleich große zusätzliche Abweichung erhöht den MAE. Die Differenz MAE mit Gain minus MAE ohne Gain ist keine fortlaufende Summe aller bisherigen Fehler. Akkumulieren kann die SOC-Abweichung durch die Integration eines fehlerhaften Stromsignals, nicht der Strom selbst.
+
+**Was darf man aus Bild b über Akkumulation und Reset schließen?** Bei einigen Modellen steigt der zusätzliche Fehler zwischen Vollladungen an und nimmt im weiteren Verlauf wieder ab. Das ist mit zeitweisem Fehleraufbau und teilweiser Korrektur vereinbar. Die Abnahme schließt einen vorherigen Aufbau nicht aus. Weder ein vollständiger Reset noch ein unbegrenzt wachsender Fehler oder eine generell vernachlässigbare Akkumulation ist damit nachgewiesen. Auch ein Ladeanker beseitigt den Sensorfehler nicht; dieser wirkt anschließend weiter. Bei HECM ist der mittlere Beitrag nach der Vollladung in (c) sogar größer.
+
+**Beweist der spätere Anstieg, dass ältere Zellen generell schwerer vorherzusagen sind?** Nein. Bild a zeigt den Zusatzfehler gegenüber der jeweiligen ungestörten Berechnung, nicht deren gesamten MAE. Beispiel in SOC-Prozentpunkten: Anfangs Baseline 2 und gestört 3 ergibt Zusatzfehler 1; später Baseline weiterhin 2 und gestört 4 ergibt Zusatzfehler 2. Die Differenz wächst, obwohl die Baseline unverändert bleibt. Alterung kann die Empfindlichkeit mitverändern, aber auch Betriebsbedingungen und verbleibende Fehlerakkumulation kommen infrage. Die Darstellung trennt diese Ursachen nicht und belegt daher keine Hauptursache.
+
+**Kurze Formulierung für die Verteidigung:** Wir beobachten bei einigen Modellen einen zeitweisen Aufbau des zusätzlichen Fehlers und eine anschließende Abnahme. Das ist mit teilweise begrenzter Akkumulation vereinbar, aber kein Nachweis eines vollständigen Resets. Eine Mitwirkung der Alterung am späteren Anstieg bleibt eine Hypothese.
+
+**Einordnung:** HECM hat in diesem einzelnen Hochlast-Lebenszeitlauf den kleinsten zusätzlichen MAE durch den Gain-Fehler. Das widerspricht nicht dem Sechs-Zellen-Fenstervergleich zugunsten DD: Datengrundlage und Gewichtung unterscheiden sich. Siehe F052.
 
 # Abbildung 6.7: Lokales Stromrauschen
 @figure 6.7
@@ -226,7 +305,7 @@ Dieser Atlas folgt den 67 tatsächlich nummerierten Abbildungen der angegebenen 
 # Abbildung 6.10: Signalverlust und Jitter
 @figure 6.10
 
-**Frage:** Weshalb ist 2-Prozent-Sampleverlust gravierender als großer Zeitjitter?
+**Frage:** Weshalb ist 2-Prozent-Sample Loss gravierender als großer Zeitjitter?
 
 **Antwort:** Gefrorene Werte verlieren reale Signaländerung, während der Jittertest erhaltene Werte zeitbewusst verarbeitet. Die integrativen Modelle verlieren insbesondere Ladungsinformation. **Grenze:** Das hängt von der exakten Interventionssemantik ab. Asynchrone Spannung/Strom-Paare oder falsche Zeitstempel könnten viel kritischer sein und sind nicht automatisch durch diese Balken abgedeckt. Fehlerstriche sind Konfidenzintervalle, keine Worst-Case-Grenzen. Siehe F056.
 
@@ -251,12 +330,12 @@ Dieser Atlas folgt den 67 tatsächlich nummerierten Abbildungen der angegebenen 
 
 **Antwort:** Er beschreibt zusätzlichen absoluten Zielfehler gegenüber dem gepaarten sauberen Lauf. Er kann negativ sein, wenn die Störung eine bestehende Abweichung kompensiert. Davon verschieden ist der immer nichtnegative Betrag der Differenz zwischen gestörter und sauberer Ausgabe. **Prüfpunkt:** Ein kausaler Spike darf keine vorherige Wirkung verursachen. Bei vorgezogenen Unterschieden Zeitmarken, Rolling-Alignment, Vorereignisse und Mittelung prüfen. **Grenze:** Der plausible dU/dt-Pfad braucht Ablation zur isolierten Attribution. Siehe F053 und F054.
 
-# Abbildung 6.14: ADC-Quantisierung
+# Abbildung 6.14: ADC-Quantization
 @figure 6.14
 
 **Frage:** Warum sind Stufen im Sensorsignal sichtbar, aber nicht gleichermaßen im SOC?
 
-**Antwort:** Integration, Observer und zeitliche Lernabbildung übertragen Eingangsrundung unterschiedlich. Schritte von 0,01 A, 5 mV und 0,5 °C werden gemeinsam im gewählten Szenario geprüft. Alle Makrointervalle überlappen hier null. **Grenze:** Das ist Sensorquantisierung, nicht Gewichtsquantisierung. Es bewertet weder beliebige ADC-Bitzahlen noch Front-end-Kalibrierung vollständig. Full-scale-Bereich und effektive Auflösung wären nötig, um Bits aus Schrittweiten abzuleiten. Siehe F079 für den anderen Quantisierungsbegriff.
+**Antwort:** Integration, Observer und zeitliche Lernabbildung übertragen Eingangsrundung unterschiedlich. Schritte von 0,01 A, 5 mV und 0,5 °C werden gemeinsam im gewählten Szenario geprüft. Alle Makrointervalle überlappen hier null. **Grenze:** Das ist Sensor Quantization, nicht Weight Quantization. Es bewertet weder beliebige ADC-Bitzahlen noch Front-end-Kalibrierung vollständig. Full-scale-Bereich und effektive Auflösung wären nötig, um Bits aus Schrittweiten abzuleiten. Siehe F079 für den anderen Quantization-Begriff.
 
 # Abbildung 6.15: Cross-Scenario-Heatmap
 @figure 6.15
@@ -279,12 +358,36 @@ Dieser Atlas folgt den 67 tatsächlich nummerierten Abbildungen der angegebenen 
 
 **Antwort:** Nein. Verglichen werden zwei Implementierungen desselben Schätzers. Kleine MCU-zu-Software-Abweichung zeigt die numerische Konsistenz des Exports. Beide können gegenüber Dataset-SOC einen deutlich größeren Fehler besitzen. **Vertiefung:** Logarithmische Achse und Prozentpunkteinheit nennen. **Grenze:** Gleiche Ausgaben beweisen nicht die Richtigkeit der gemeinsamen Referenz oder des Modells. Siehe F084 und F089.
 
+@latex \clearpage
+
+## Warum rechnen DM, HDM und DD auf dem Mikrocontroller mit 32 Bit, HECM intern aber mit 64 Bit?
+
+**Antwort:** Der STM32H753 besitzt trotz seines 32-Bit-Prozessorkerns eine Gleitkommaeinheit für 32- und 64-Bit-Rechnungen. Im geprüften Firmware-Code verwenden DM und HDM eine 32-Bit-Ladungssumme; ihre Python-Referenz integriert intern mit 64 Bit. DD verwendet in der Software-Referenz und im C-Modell 32-Bit-Gleitkommazahlen. HECM nutzt intern 64 Bit für Filterzustände, Kovarianz und Parameterinterpolation; Ein- und Ausgabe der Rechenfunktion sind 32 Bit.
+
+**Einordnung:** Bei DD passt die 32-Bit-Implementierung zur vorhandenen Modellpräzision und benötigt weniger Speicher als eine 64-Bit-Darstellung. Bei DM und HDM können unterschiedliche Rundungen der fortlaufenden Ladungssumme zur Hardware-Software-Abweichung beitragen. Beim HECM kann höhere Genauigkeit für wiederholte Filter- und Matrixoperationen sinnvoll sein. Die gemessene Übereinstimmung ist für alle vier Implementierungen sehr gut. **Grenze:** Eine ausdrückliche historische Begründung dieser Datentypwahl und ein Nachweis ihrer Optimalität sind nicht dokumentiert. Weder die Notwendigkeit von 64 Bit beim HECM noch die vollständige Ursache der unterschiedlichen Balkenhöhen ist durch diesen Vergleich isoliert belegt.
+
 # Abbildung 6.18: Inferenzlatenzen
 @figure 6.18
 
 **Frage:** Warum sind DM/HDM nahezu deterministisch und DD breiter verteilt?
 
-**Antwort:** DM/HDM führen sehr wenige Operationen aus. DD berechnet zahlreiche Matrix- und Aktivierungsoperationen, HECM Lookup/Observer-Schritte. Wiederholte Zellreplays zeigen beobachtete Laufzeitstreuung. **Grenze:** Die hier gezeigte DD-Ausführung ist continuous, nicht die teure Rolling-Variante des primären Robustheitsbenchmarks. Der Maximalwert ist ein beobachteter Extremwert, kein formaler WCET-Beweis. Siehe F088 bis F090.
+**Antwort:** DM/HDM führen sehr wenige Operationen aus. DD berechnet zahlreiche Matrix- und Activation Operations, HECM Lookup/Observer-Schritte. Wiederholte Zellreplays zeigen beobachtete Laufzeitstreuung. **Grenze:** Die hier gezeigte DD-Ausführung ist continuous, nicht die teure Rolling-Variante des primären Robustheitsbenchmarks. Der Maximalwert ist ein beobachteter Extremwert, kein formaler WCET-Beweis. Siehe F088 bis F090.
+
+@latex \clearpage
+
+# Abbildung 6.18: Erklärungen der Laufzeitverteilungen
+
+## Warum zeigen DM und HDM zwei deutliche Laufzeitgruppen?
+
+**Antwort:** Die kleinere Spitze umfasst viele Messungen und ist kein einzelner Ausreißer. Im Code wird normalerweise die Ladungssumme durch Stromintegration fortgeschrieben. Nach mindestens 300 Sekunden oberhalb der Spannungsschwelle von 3,63 V wird sie stattdessen auf null gesetzt. Dann entfällt die Integrationsrechnung. Auch die SOC-Begrenzung erzeugt Verzweigungen. Diese unterschiedlichen Rechenwege sind eine plausible Erklärung. Die Zuordnung einer bestimmten Spitze zum Vollladezweig ist ohne Abgleich der einzelnen Laufzeiten mit den Betriebszuständen nicht bewiesen.
+
+## Warum ist die Laufzeitverteilung des HECM breiter?
+
+**Antwort:** Die Parametersuche durchläuft die SOC- und SOH-Stützstellen vom Tabellenanfang bis zum passenden Intervall. Je nach Zustand sind unterschiedlich viele Suchschritte erforderlich. An oder außerhalb der Tabellengrenzen liefert die Funktion das Randintervall unmittelbar. Das könnte schnelle Gruppen und breiter verteilte längere Laufzeiten erklären. Wie häufig ein Zeitbereich vorkommt, hängt auch von den Betriebszuständen der Testsequenzen ab. Der konkrete Beitrag dieser Suche zur beobachteten Verteilung ist nicht isoliert nachgewiesen.
+
+## Warum schwankt die DD-Laufzeit trotz gleicher Matrizen und Schleifenlängen?
+
+**Antwort:** Gewichtsmatrizen, Dimensionen und Schleifenlängen bleiben bei der kontinuierlichen GRU-Ausführung gleich. Eingaben und Zwischenwerte ändern sich jedoch. Die Sigmoid-Funktion verwendet je nach Vorzeichen unterschiedliche Zweige; außerdem werden Exponentialfunktion, Tangens hyperbolicus und ReLU berechnet. Wertabhängige Rechenwege sowie mögliche Cache- und Interrupt-Effekte können kleine Laufzeitunterschiede verursachen. Die mittleren 90 Prozent liegen bei etwa 423,8 bis 426,1 Mikrosekunden, der Median bei 424,9 Mikrosekunden. Die Streuung ist damit relativ klein. Die glockenartige Form beweist weder eine Normalverteilung noch eine einzelne Ursache. Welche Effekte dominieren, wurde nicht separat gemessen.
 
 # Abbildung 6.19: Flash und RAM
 @figure 6.19
@@ -292,6 +395,22 @@ Dieser Atlas folgt den 67 tatsächlich nummerierten Abbildungen der angegebenen 
 **Frage:** Warum braucht HECM viel Flash, aber wenig RAM?
 
 **Antwort:** Seine voridentifizierten Parameterflächen liegen als persistente Tabellen im Flash. Die aktuellen Observerzustände bleiben klein. DD speichert Gewichte im Flash und Zustände/Arbeitsdaten im RAM. Das Ergebnis betrifft die konkrete Tabellendichte und Firmware, nicht jede ECM-Implementierung. **Grenze:** Das gemeinsame SOH-LSTM ist nicht Teil dieser MCU-Messung. Ein vollständiger SOC/SOH-Systembedarf wäre größer und müsste separat gemessen werden. Siehe F087.
+
+@latex \clearpage
+
+## Warum braucht HECM trotz großer Kennfelder kaum mehr RAM als DM und HDM?
+
+**Antwort:** Die Kennfelder sind im geprüften C-Code als konstante Daten angelegt und durch die Linker-Konfiguration dem Flash zugeordnet. Der Prozessor liest die benötigten Einträge direkt aus diesem Speicher. Eine vollständige Kopie der Tabellen im RAM ist nicht erforderlich. Bei der Interpolation werden nur benachbarte Tabellenwerte verwendet; Parameter und Zwischenwerte liegen vorübergehend in Registern oder im RAM.
+
+**Warum liegen die RAM-Balken nahe beieinander?** HECM speichert zusätzlich einen kleinen Zustandsvektor und eine kleine Kovarianzmatrix, aber keine großen veränderlichen Tabellen. Alle drei Implementierungen enthalten zudem gemeinsamen Speicherbedarf der Firmware und Laufzeitumgebung. Die dokumentierte Messung ergibt 2432 Byte für DM und HDM sowie 2528 Byte für HECM, also 96 Byte Unterschied. Das entspricht gerundet 2,4 beziehungsweise 2,5 KiB.
+
+**Einordnung:** HECM nutzt ebenfalls Strom zur SOC-Fortschreibung, berechnet aber zusätzlich RC-Zustände und eine Spannungskorrektur. Mehr Rechenarbeit bedeutet nicht automatisch viel mehr RAM. Die Spitzenwerte gelten für die vermessene Firmware und die geprüften Abläufe; sie sind kein universeller Worst-Case-Nachweis.
+
+## Warum zeigt Abbildung 6.19 den Speicher in Kibibyte statt in Byte oder Megabyte?
+
+**Antwort:** Speicher wird binär adressiert: Zehn Adressbits unterscheiden beispielsweise 1024 Adressen. Deshalb sind Speicherkapazitäten häufig in Zweierpotenzen organisiert. Dazu passt die binäre Einheit Kibibyte: 1 KiB entspricht zwei hoch zehn, also exakt 1024 Byte. KiB bezeichnet diese Umrechnung eindeutig und vermeidet die Verwechslung mit 1000 Byte pro Kilobyte. Zusätzlich bleiben die Zahlen gut lesbar: 2432 Byte sind 2,375 KiB, gerundet 2,4 KiB.
+
+**Begriffe unterscheiden:** 1 KiB = 1024 Byte, 1 MiB = 1 048 576 Byte. Dagegen bedeuten die dezimalen Einheiten 1 kB = 1000 Byte und 1 MB = 1 000 000 Byte. KiB macht die verwendete Basis eindeutig. Byte ist die Grundeinheit und selbst weder ein dezimaler noch ein binärer Vorsatz. Ein Byte besteht aus acht Bit. Für diese Abbildung sind KiB eine Darstellungsentscheidung, keine technische Pflicht.
 
 # Abbildung 6.20: DD-Ausführungsmodi
 @figure 6.20
@@ -328,7 +447,7 @@ Dieser Atlas folgt den 67 tatsächlich nummerierten Abbildungen der angegebenen 
 
 **Antwort:** Alle vier Gates, der recurrent input, Bias, Zustände und MLP-Eingänge beziehen sich auf denselben Kanal. Entfernen muss diese Abhängigkeiten gemeinsam berücksichtigen. Im Beispiel hat h2 den kleinsten aggregierten L2-Score. **Grenze:** Die kleinen Matrixzahlen sind illustrativ, keine echten trainierten Gewichte. Der Score misst Gewichtsmagnitude, nicht direkt Sensitivität des SOH/SOC-Ausgangs. Siehe F075.
 
-# Abbildung 7.5: Quantisierung und Export
+# Abbildung 7.5: Quantization und Export
 @figure 7.5
 
 **Frage:** Was bleibt grün/rot beziehungsweise als Ganzzahl oder Float gespeichert?
@@ -382,14 +501,14 @@ Dieser Atlas folgt den 67 tatsächlich nummerierten Abbildungen der angegebenen 
 
 **Frage:** Warum stimmen theoretischer Gewichtsspeicher und gelinkter Flash nicht überein?
 
-**Antwort:** Die Theorie zählt Parameterrepräsentationen. Die Firmware enthält zusätzlich Code, Skalierung, konstante Tabellen und Laufzeitunterstützung. RAM ist wiederum ein anderer Speicherbereich mit Zuständen, Puffern und Stack. **Grenze:** Weight-only-Quantisierung lässt viele FP32-Daten unverändert. Die genauen RAM-Unterschiede nicht allein mit einem Viertel pro Gewicht erklären. Für vollständige Attribution Linker-Sektionen und Stackmessung zeigen. Siehe F081 und F087.
+**Antwort:** Die Theorie zählt Parameterrepräsentationen. Die Firmware enthält zusätzlich Code, Skalierung, konstante Tabellen und Laufzeitunterstützung. RAM ist wiederum ein anderer Speicherbereich mit Zuständen, Puffern und Stack. **Grenze:** Weight-only-Quantization lässt viele FP32-Daten unverändert. Die genauen RAM-Unterschiede nicht allein mit einem Viertel pro Gewicht erklären. Für vollständige Attribution Linker-Sektionen und Stackmessung zeigen. Siehe F081 und F087.
 
 # Abbildung 7.13: Hostlatenzverteilungen
 @figure 7.13
 
 **Frage:** Warum steht Quantized weiter rechts und weshalb sind SOH-Abstände größer?
 
-**Antwort:** Der Mixed-Precision-Kernel erhöht hier den Aufwand, und SOH besitzt den größeren recurrent core. Hostlatenz umfasst aber auch UART und Rücktransport. **Grenze:** Ein fester Kommunikationsanteil kann Kernelunterschiede relativ verkleinern. Es sind keine unabhängigen Energieverteilungen. Bei einem Vergleich mit Kapitel 6 zuerst Messgrenzen und Modellsemantik klären. Siehe F082, F083 und F089.
+**Antwort:** Der Mixed-Precision-Kernel erhöht hier den Aufwand, und SOH besitzt den größeren recurrent core. Host Latency umfasst aber auch UART und Rücktransport. **Grenze:** Ein fester Kommunikationsanteil kann Kernelunterschiede relativ verkleinern. Es sind keine unabhängigen Energieverteilungen. Bei einem Vergleich mit Kapitel 6 zuerst Messgrenzen und Modellsemantik klären. Siehe F082, F083 und F089.
 
 # Abbildung A.1: Vollständige Testmatrix
 @figure A.1
@@ -422,9 +541,9 @@ Dieser Atlas folgt den 67 tatsächlich nummerierten Abbildungen der angegebenen 
 # Abbildung A.5: Zehn Zeitsegmente
 @figure A.5
 
-**Frage:** Ist der steigende Fehler rechts im Leben ein Quantisierungs-Driftproblem?
+**Frage:** Ist der steigende Fehler rechts im Leben ein Quantization-Drift-Problem?
 
-**Antwort:** Nicht zwingend. Sowohl Base als auch Quantized werden gegenüber dem Ziel schlechter, während ihre gegenseitige Abweichung nicht entsprechend wächst. Das spricht in diesem Replay gegen akkumulierte Quantisierungsabweichung als Hauptursache. **Grenze:** Die Segmente sind gleich viele Samples, nicht unabhängige Wiederholungen. Veränderungen von SOH, Last und Labelqualität können gemeinsam wirken. Siehe F095.
+**Antwort:** Nicht zwingend. Sowohl Base als auch Quantized werden gegenüber dem Ziel schlechter, während ihre gegenseitige Abweichung nicht entsprechend wächst. Das spricht in diesem Replay gegen akkumulierte Quantization-Abweichung als Hauptursache. **Grenze:** Die Segmente sind gleich viele Samples, nicht unabhängige Wiederholungen. Veränderungen von SOH, Last und Labelqualität können gemeinsam wirken. Siehe F095.
 
 # Abbildung A.6: SOH-Filterstufen
 @figure A.6
@@ -452,19 +571,19 @@ Dieser Atlas folgt den 67 tatsächlich nummerierten Abbildungen der angegebenen 
 
 **Frage:** Warum steigen die MAC-Kurven quadratisch und die Reduktionskurve nähert sich einer Grenze?
 
-**Antwort:** Recurrent-Matrizen enthalten H mal H-Verbindungen pro Gate. Bei festem Input und Kopf dominiert dieser Term für große H. Entfernt man einen Anteil p, beträgt die asymptotische Einsparung 2p-p². Die endlichen tatsächlich gewählten Architekturen liegen darunter. **Grenze:** Analytische MACs sind keine direkte Hardwarezeit und enthalten Aktivierungsfunktionen nicht. Siehe F077 und R07.
+**Antwort:** Recurrent-Matrizen enthalten H mal H-Verbindungen pro Gate. Bei festem Input und Kopf dominiert dieser Term für große H. Entfernt man einen Anteil p, beträgt die asymptotische Einsparung 2p-p². Die endlichen tatsächlich gewählten Architekturen liegen darunter. **Grenze:** Analytische MACs sind keine direkte Hardwarezeit und enthalten Activation Functions nicht. Siehe F077 und R07.
 
 # Abbildung A.10: Reichweite des L2-Kriteriums
 @figure A.10
 
 **Frage:** Warum nicht Gradient oder Aktivierung statt Gewichtsnorm?
 
-**Antwort:** Der gewählte Score ist deterministisch aus den trainierten Gewichten berechenbar und passt zur Kanalstruktur. Gradientenkriterien benötigen Daten und Rückwärtsrechnung, Aktivierungskriterien einen repräsentativen Kalibrierstream und eine zeitliche Aggregation. **Grenze:** Die Tabelle vergleicht Informationsbedarf und Methodenscope, nicht experimentell gemessene Überlegenheit. Keine Aussage L2 ist am besten ohne Vergleichsexperiment. Siehe F075 und F076.
+**Antwort:** Der gewählte Score ist deterministisch aus den trainierten Gewichten berechenbar und passt zur Kanalstruktur. Gradientenkriterien benötigen Daten und Backward Pass, Activation-Kriterien einen repräsentativen Kalibrierstream und eine zeitliche Aggregation. **Grenze:** Die Tabelle vergleicht Informationsbedarf und Methodenscope, nicht experimentell gemessene Überlegenheit. Keine Aussage L2 ist am besten ohne Vergleichsexperiment. Siehe F075 und F076.
 
 # Abbildung A.11: Mixed-Precision-Grenze
 @figure A.11
 
-**Frage:** Weshalb verbleibt ein erheblicher FP32-Anteil nach Quantisierung?
+**Frage:** Weshalb verbleibt ein erheblicher FP32-Anteil nach Quantization?
 
 **Antwort:** Nur Wih und Whh werden als INT8 gespeichert. Kopf, Bias, Skalen und sämtliche dynamischen Zustände bleiben Float. Der gestapelte Speichervergleich macht diese Grenze sichtbar. **Grenze:** Die Grafik betrifft Modellkonstanten, nicht zwangsläufig denselben Gesamtumfang wie Firmware-Flash in Abbildung 7.12. Beide Größen nicht gegeneinander als Widerspruch lesen. Siehe F080 und F081.
 
@@ -473,7 +592,7 @@ Dieser Atlas folgt den 67 tatsächlich nummerierten Abbildungen der angegebenen 
 
 **Frage:** Warum ist der statische Quantized/Base-Faktor etwa 1,81, aber der Zeitfaktor nicht?
 
-**Antwort:** Das vereinfachte Zählen zusätzlicher Skalierungs-Multiplikationen bildet nicht alle Instruktionen, Konversionen, Speicherzugriffe, Schleifen und Aktivierungsfunktionen ab. Eine MAC und eine zusätzliche Multiplikation sind auch nicht zwingend zeitlich identisch teuer. **Grenze:** Ohne Profiling kann die genaue Diskrepanz nicht einer einzelnen Ursache zugeordnet werden. Das Bild belegt gerade die Grenze einer naiven FLOP-zu-Latenz-Umrechnung. Siehe F082 und F083.
+**Antwort:** Das vereinfachte Zählen zusätzlicher Skalierungs-Multiplikationen bildet nicht alle Instruktionen, Konversionen, Speicherzugriffe, Schleifen und Activation Functions ab. Eine MAC und eine zusätzliche Multiplikation sind auch nicht zwingend zeitlich identisch teuer. **Grenze:** Ohne Profiling kann die genaue Diskrepanz nicht einer einzelnen Ursache zugeordnet werden. Das Bild belegt gerade die Grenze einer naiven FLOP-zu-Latenz-Umrechnung. Siehe F082 und F083.
 
 # 14. Abschließende Selbstprüfung
 
