@@ -473,13 +473,23 @@ Fragenkatalog, begründete Antwortvorschläge, Rechenübungen und Abbildungsatla
 
 **Praktischer Ablauf:** Erst Roh- und Baselinekurven paaren, dann Ereigniszeitpunkt und Kausalität prüfen, dann lokale und globale Metriken unterscheiden, zuletzt interpretieren. Wenn sich die Story dadurch ändert, ändert man die Aussage und nicht die Daten. Explorative Analysen dürfen Teil einer kohärenten Arbeit sein, müssen aber nicht fälschlich als vorab registrierte Bestätigung bezeichnet werden.
 
+@latex \input{ECM_Kalman_Lernkapitel.tex}
+
 # 7. Neuronale Grundlagen, Pruning und Quantization
+
+@latex \input{Aktivierungsfunktionen_Uebersicht.tex}
 
 ## F071. Wie erklären Sie LSTM und GRU an der Tafel?
 
 **Antwort:** Ein LSTM besitzt einen Cell State c und einen Hidden State h. Forget-, Input- und Output-Gates steuern Behalten, Schreiben und Ausgeben. Die Kandidateninformation wird typischerweise mit tanh berechnet. Eine GRU hat nur einen Recurrent State und verwendet Reset- und Update-Gate, um alte und neue Information zu mischen.
 
 **Prüfpunkt:** Update-Gate-Konventionen unterscheiden sich. Im Grundlagenbild der Dissertation gewichtet z den Kandidaten, während beispielsweise PyTorch in seiner Dokumentation z den alten Zustand gewichten lässt. Das kann durch z gegen 1-z mathematisch äquivalent sein, wenn Parameter und Gleichungen konsistent sind. Auch reset-before und reset-after unterscheiden sich. Beim C-Export zählt die konkret trainierte Framework-Semantik, nicht nur der Name GRU. **Beleg:** Abbildungen 3.3 und 3.4, PyTorch-Quelle im Quellenabschnitt.
+
+@latex \input{LSTM_MLP_Begruendung.tex}
+
+@latex \input{Trainingsmethoden_Uebersicht.tex}
+
+@latex \input{Trainingsschritt_Backprop_AdamW.tex}
 
 ## F072. Warum helfen Gates gegen Vanishing Gradients, ohne Stabilität zu garantieren?
 

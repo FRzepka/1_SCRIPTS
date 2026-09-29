@@ -433,11 +433,21 @@ Niedriger SOC & Anteil der Messpunkte mit Referenz-SOC $<20\,\%$ \\\bottomrule\e
 
 \textbf{Praktischer Ablauf:} Erst Roh- und Baselinekurven paaren, dann Ereigniszeitpunkt und Kausalität prüfen, dann lokale und globale Metriken unterscheiden, zuletzt interpretieren. Wenn sich die Story dadurch ändert, ändert man die Aussage und nicht die Daten. Explorative Analysen dürfen Teil einer kohärenten Arbeit sein, müssen aber nicht fälschlich als vorab registrierte Bestätigung bezeichnet werden.
 
+\input{ECM_Kalman_Lernkapitel.tex}
+
 \topic{7. Neuronale Grundlagen, Pruning und Quantization}
+
+\input{Aktivierungsfunktionen_Uebersicht.tex}
 \question{F071. Wie erklären Sie LSTM und GRU an der Tafel?}
 \textbf{Antwort:} Ein LSTM besitzt einen Cell State c und einen Hidden State h. Forget-, Input- und Output-Gates steuern Behalten, Schreiben und Ausgeben. Die Kandidateninformation wird typischerweise mit tanh berechnet. Eine GRU hat nur einen Recurrent State und verwendet Reset- und Update-Gate, um alte und neue Information zu mischen.
 
 \textbf{Prüfpunkt:} Update-Gate-Konventionen unterscheiden sich. Im Grundlagenbild der Dissertation gewichtet z den Kandidaten, während beispielsweise PyTorch in seiner Dokumentation z den alten Zustand gewichten lässt. Das kann durch z gegen 1-z mathematisch äquivalent sein, wenn Parameter und Gleichungen konsistent sind. Auch reset-before und reset-after unterscheiden sich. Beim C-Export zählt die konkret trainierte Framework-Semantik, nicht nur der Name GRU. \textbf{Beleg:} Abbildungen 3.3 und 3.4, PyTorch-Quelle im Quellenabschnitt.
+
+\input{LSTM_MLP_Begruendung.tex}
+
+\input{Trainingsmethoden_Uebersicht.tex}
+
+\input{Trainingsschritt_Backprop_AdamW.tex}
 
 \question{F072. Warum helfen Gates gegen Vanishing Gradients, ohne Stabilität zu garantieren?}
 \textbf{Antwort:} Der additive Cell-State-Pfad im LSTM erleichtert den Informationstransport über viele Schritte gegenüber einer ausschließlichen wiederholten nichtlinearen Transformation. Gates können steuern, wie viel Information erhalten bleibt. Dennoch können Activations sättigen, Gradienten verschwinden oder wachsen und lange Extrapolationen problematisch sein.
@@ -1481,6 +1491,8 @@ Originalseite der Dissertation: PDF-Seite 222. Die folgende Interpretation bezie
 
 \textbf{Antwort:} Das entspricht der implementierten deterministischen Saliency-Regel für 64 auf 45 SOC-Kanäle. Rechts wird eine zentrale Gewichtungsverteilung vor und nach Auswahl verglichen. \textbf{Grenze:} Eine ähnliche Verteilungsform bedeutet weder ähnliche Funktion noch bewiesene Regularisierung. Rekurrente Struktur und Vorzeichen-/\allowbreak{}Kanalzusammenhänge gehen im Histogramm verloren. Für Kausalität braucht es zusätzliche Kontrollen. Siehe F075 und F078.
 
+\input{Abbildung_A4_Dichte.tex}
+
 \topic{Abbildung A.5: Zehn Zeitsegmente}
 \begin{center}\includegraphics[width=\linewidth,height=0.60\textheight,keepaspectratio]{figures/thesis-page-223.pdf}\end{center}
 Originalseite der Dissertation: PDF-Seite 223. Die folgende Interpretation bezieht sich auf die bezeichnete Abbildung.
@@ -1505,6 +1517,8 @@ Originalseite der Dissertation: PDF-Seite 225. Die folgende Interpretation bezie
 
 \textbf{Antwort:} Es gewinnt für einen großen Teil der untersuchten diskreten Prioritätskombinationen, insbesondere beim SOC. Beim SOH können Accuracy-Priorität Base und Flash-Priorität Quantized attraktiv machen. \textbf{Grenze:} Die Häufigkeit über ein künstliches Gitter ist keine Nutzer- oder Einsatzwahrscheinlichkeit. Harte Grenzen gehören vor den gewichteten Score. \textbf{Rechenfrage:} 1771 Kombinationen über Stars-and-bars erklären. Siehe F098 und R11.
 
+\input{Abbildung_A7_Gewichtungen.tex}
+
 \topic{Abbildung A.8: Eingangsbuffer-Fehler}
 \begin{center}\includegraphics[width=\linewidth,height=0.60\textheight,keepaspectratio]{figures/thesis-page-226.pdf}\end{center}
 Originalseite der Dissertation: PDF-Seite 226. Die folgende Interpretation bezieht sich auf die bezeichnete Abbildung.
@@ -1520,6 +1534,8 @@ Originalseite der Dissertation: PDF-Seite 227. Die folgende Interpretation bezie
 \textbf{Frage:} Warum steigen die MAC-Kurven quadratisch und die Reduktionskurve nähert sich einer Grenze?
 
 \textbf{Antwort:} Recurrent-Matrizen enthalten H mal H-Verbindungen pro Gate. Bei festem Input und Kopf dominiert dieser Term für große H. Entfernt man einen Anteil p, beträgt die asymptotische Einsparung 2p-p². Die endlichen tatsächlich gewählten Architekturen liegen darunter. \textbf{Grenze:} Analytische MACs sind keine direkte Hardwarezeit und enthalten Activation Functions nicht. Siehe F077 und R07.
+
+\input{Abbildung_A9_Einsparung.tex}
 
 \topic{Abbildung A.10: Reichweite des L2-Kriteriums}
 \begin{center}\includegraphics[width=\linewidth,height=0.60\textheight,keepaspectratio]{figures/thesis-page-228.pdf}\end{center}
@@ -1667,8 +1683,12 @@ Dieser Teil ergänzt die Fragen F001 bis F100 um häufige Nachfragen zur Methode
 \question{Tabelle A.3: Gepaarte Tests}
 \textbf{PDF-Seite 220.} \textbf{Prüfungsfrage:} Warum durchweg pHolm = 0,1875? \textbf{Antwort:} Diskrete exakte Tests mit sechs Zellen und Korrektur über sechs Vergleiche liefern eine grobe Ergebnisauflösung. Die Tabelle enthält etwa HECM gegen DD mit Mittelwertdifferenz -0,0079 und einem punktweisen Intervall unter null, aber exaktem p = 0,0938. \textbf{Grenze:} Standardisiertes dz kann bei kleiner Stichprobe instabil sein. Rohe Differenzen und Einheiten ebenfalls nennen. Siehe F063 und F064.
 
+\input{Statistik_A3_Rechenweg.tex}
+
 \question{Tabelle A.4: Ausgewählte Störungspenalties}
 \textbf{PDF-Seite 220.} \textbf{Prüfungsfrage:} Ist -0,0000 eine reale Verbesserung? \textbf{Antwort:} Es ist ein gerundeter sehr kleiner negativer Wert. Für Interpretation ungerundete Daten und Unsicherheit prüfen. Die Tabelle fasst globale MAE-Kontraste zusammen und ersetzt keine lokale Spikeanalyse. Die Offsetwerte sind zusätzliche MAE, nicht gesamte MAE. Siehe F048 und F053.
+
+\textbf{Schlussfolgerung für die Verteidigung:} DD zeigt bei vielen der getesteten Störungen kleinere mittlere Fehlerzuwächse, besitzt aber ebenfalls spezifische Schwachstellen. Kein Modell ist gegenüber allen Störungen überlegen. Besonders wichtig bleibt bei allen eine genaue Strommessung. Diese Schlussfolgerung gilt für die getesteten Störstärken und die beobachteten mittleren Zusatzfehler; eine statistisch abgesicherte Rangfolge liefert Tabelle A.4 allein nicht.
 
 \question{Tabelle A.5: Score-Sensitivität}
 \textbf{PDF-Seite 220.} \textbf{Prüfungsfrage:} Warum ändern sich Abstände stark mit Gewichtung? \textbf{Antwort:} Familien, Severity-Level und Einzelszenarien erhalten unterschiedliche relative Bedeutung. DD bleibt im dargestellten Kandidatensatz führend, was begrenzte Rankingstabilität zeigt. \textbf{Grenze:} Kein frei gewähltes Gewichtungssystem ist eine gemessene Häufigkeit von Feldfehlern. Siehe F068.

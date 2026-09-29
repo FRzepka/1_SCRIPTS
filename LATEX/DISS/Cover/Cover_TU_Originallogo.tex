@@ -1,0 +1,59 @@
+% !TeX program = pdflatex
+\documentclass[a4paper,12pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{tgtermes}
+\usepackage[a4paper,left=25mm,right=25mm,top=35mm,bottom=26mm]{geometry}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage[hidelinks]{hyperref}
+
+\hypersetup{
+  pdftitle={Deployment-Oriented Neural Network State-Estimation Methods for Battery Management Systems: Ageing Estimation, Robustness Benchmarking, Embedded Optimization, and Hardware Integration},
+  pdfauthor={Florian Rzepka},
+  pdfsubject={Dissertation cover}
+}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+
+% Schriftgroessen und Zeilenumbrueche hier anpassen.
+\newcommand{\CoverHeading}{Dissertation}
+\newcommand{\CoverTitle}{%
+  Deployment-Oriented Neural Network State-Estimation\\
+  Methods for Battery Management Systems:}
+\newcommand{\CoverSubtitle}{%
+  Ageing Estimation, Robustness Benchmarking,\\
+  Embedded Optimization, and Hardware Integration}
+\newcommand{\CoverAuthor}{Florian Rzepka}
+% Originale TU-Langversion: Zeichen und Schriftzug liegen als Vektorpfade vor.
+\newcommand{\CoverLogo}{%
+  \includegraphics[width=96mm]{TU_BERLIN_Logo_Lang_schwarz.pdf}%
+}
+% Festes Datum, damit spaeteres Kompilieren den Stand nicht veraendert.
+\newcommand{\CoverDate}{Berlin\\[2mm]29. September 2026}
+
+% Positionen in mm ab Blattoberkante; keine abhaengigen Absatzabstaende.
+\newcommand{\CoverAt}[4]{%
+  \node[anchor=north,inner sep=0pt,outer sep=0pt,
+    text width=160mm,align=center,
+    font=\fontsize{#2}{#3}\selectfont]
+    at ([yshift=-#1mm]current page.north) {#4};%
+}
+
+\begin{document}
+\null
+\begin{tikzpicture}[remember picture,overlay]
+  \CoverAt{46}{12}{15}{\CoverLogo}
+  \CoverAt{116}{44}{51}{\CoverHeading}
+  \CoverAt{142}{20}{28}{\CoverTitle}
+  \CoverAt{165}{15}{20}{\CoverSubtitle}
+  \draw[line width=0.45pt]
+    ([xshift=-20mm,yshift=-192mm]current page.north) --
+    ([xshift=20mm,yshift=-192mm]current page.north);
+  \CoverAt{214}{14}{18}{submitted by}
+  \CoverAt{225}{20}{25}{\CoverAuthor}
+  \CoverAt{259}{14}{18}{\CoverDate}
+\end{tikzpicture}
+
+\end{document}

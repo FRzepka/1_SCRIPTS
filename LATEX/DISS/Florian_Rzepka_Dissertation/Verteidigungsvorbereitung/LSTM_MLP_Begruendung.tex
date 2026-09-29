@@ -1,0 +1,28 @@
+\clearpage
+\question{F071a. Warum kombinieren wir das LSTM mit einem MLP?}
+\textbf{Kernaussage für die Verteidigung:} Wir wollen das interne Gedächtnis nicht auf eine Komponente beschränken, nur weil am Ende eine einzige Zahl benötigt wird. Deshalb behalten wir eine größere interne Darstellung im LSTM und bilden sie anschließend auf SOC beziehungsweise SOH ab.
+
+\textbf{Was wird weitergegeben?} Der MLP erhält den Hidden State $\mathbf h_t$ mit $H$ Komponenten. Darin stehen gelernte Merkmale des zeitlichen Verlaufs, nicht bereits der fertige SOC oder SOH. Der Cell State $\mathbf c_t$ trägt ebenfalls relevante Informationen, wird aber nicht direkt an den MLP gegeben. Beide Zustände werden innerhalb des LSTM zeitlich fortgeführt.
+
+\textbf{Ginge es ohne nachgeschaltete Schicht?} Ja: Bei Hidden Size $H=1$ sind Hidden State und Cell State jeweils einkomponentig. Der direkte Ausgang $h_t$ ist dann eine Zahl. Das LSTM bleibt rekurrent und kann weiterhin zeitliche Zusammenhänge lernen, bei einfachen Aufgaben durchaus gut. Die Darstellungskapazität ist jedoch eingeschränkt. Mehr Komponenten bieten mehr Freiheitsgrade, garantieren aber weder längeres Erinnern noch bessere Genauigkeit.
+
+\question{F071b. Warum ein MLP statt nur einer linearen Ausgabeschicht?}
+\textbf{Eine einzelne Ausgabeschicht wäre grundsätzlich möglich:}
+\[
+\hat y_t=\mathbf w^\top\mathbf h_t+b
+=\sum_{j=1}^{H}w_jh_{t,j}+b.
+\]
+Sie bildet den Vektor durch eine gelernte gewichtete Summe auf eine Zahl ab. Die Gewichte bleiben während der Inferenz fest. Eine zusätzliche Sigmoid-Funktion könnte den Ausgang auf null bis eins begrenzen.
+
+\textbf{Unser MLP fügt eine nichtlineare Zwischenverarbeitung hinzu:}
+\[
+\mathbf a_t=\operatorname{ReLU}(\mathbf W_1\mathbf h_t+\mathbf b_1),
+\qquad
+\hat y_t=g(\mathbf W_2\mathbf a_t+b_2).
+\]
+Beim eingebetteten SOC-Modell ist $g$ die Sigmoid-Funktion, beim eingebetteten SOH-Modell die Identität. Je nach Merkmalskombination werden unterschiedliche versteckte ReLU-Neuronen aktiv. Dadurch kann der MLP die LSTM-Merkmale flexibler kombinieren als eine einzelne affine Abbildung.
+
+\textbf{Anschaulich:} Schon $\max(0,h_1-h_2)$ kann als verstecktes Merkmal ausdrücken, dass nur der positive Überschuss einer Komponente gegenüber einer anderen zählt. Eine einzelne gewichtete Summe kann diesen Knick nicht direkt darstellen. Die Komponenten sind dabei gelernte Merkmale; ihnen wird hier keine feste physikalische Bedeutung zugeschrieben.
+
+\textbf{Grenze der Begründung:} Auch ein LSTM mit linearem Ausgang ist insgesamt bereits nichtlinear. Das zusätzliche MLP erhöht die Flexibilität der Ausgangsabbildung, kostet aber Parameter und Rechenzeit und kann Overfitting begünstigen. Beide Teile werden gemeinsam trainiert. Ein Vorteil gegenüber einem ansonsten vergleichbar trainierten Modell mit linearem Ausgang müsste durch eine gezielte Ablation nachgewiesen werden; er folgt nicht allein aus der Architektur.
+\clearpage

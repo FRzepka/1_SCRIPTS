@@ -1,0 +1,61 @@
+\clearpage
+\question{Methodenübersicht: Was steckt in unseren Trainingsskripten?}
+\textbf{Leseschlüssel:} Diese Übersicht bündelt die im Gespräch geprüften Methoden aus mehreren Trainings- und Optimierungszweigen. Nicht alle gehören zum selben Modell. Ein vorhandener Codepfad oder eine gespeicherte Einstellung ist noch kein Nachweis, dass ein bestimmter veröffentlichter Lauf diesen Pfad tatsächlich ausgeführt hat.
+
+\textbf{1. Modellsuche, Optimierung und Trainingssteuerung}
+\begingroup\footnotesize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.08}
+\begin{longtable}{@{}p{0.20\linewidth}p{0.34\linewidth}p{0.40\linewidth}@{}}\toprule\textbf{Methode} & \textbf{Wozu?} & \textbf{Zuordnung und Nachweisgrenze}\\\midrule\endhead
+\textbf{Hyperparameter-Tuning} & Sucht etwa Hidden Size, Schichtzahl, Lernrate, Batchgröße und Dropout. & Optuna-Suchskripte vorhanden. Für den MLP aus Kapitel 5 ist Hyperband im Text belegt; der ursprüngliche Suchcode wurde hier noch nicht zugeordnet.\\[5pt]\midrule
+\textbf{TPE-Suche} & Wählt anhand bisheriger Versuchsergebnisse weitere vielversprechende Einstellungen. & Im geprüften Optuna-Suchskript als Sampler ausgewählt.\\[5pt]\midrule
+\textbf{Median Pruner} & Beendet wenig aussichtsreiche Suchversuche früh und spart Trainingszeit. & Im Optuna-Suchskript enthalten. Das ist Abbruch ganzer Versuche, kein Entfernen von Netzgewichten.\\[5pt]\midrule
+\textbf{MSE und Backpropagation} & Bildet den quadratischen Trainingsfehler und berechnet daraus Gradienten. & In den geprüften LSTM-Trainingsschleifen. Beim erweiterten SOH-Zweig kann ein Zusatzverlust hinzukommen.\\[5pt]\midrule
+\textbf{AdamW} & Optimiert Gewichte mit adaptiven Schrittweiten und entkoppeltem Weight Decay. & Optimierer in den geprüften SOC-/SOH-LSTM-Trainingsskripten.\\[5pt]\midrule
+\textbf{Weight Decay} & Regularisiert, indem es dem Anwachsen der Gewichte entgegenwirkt. & In den geprüften Konfigurationen mit positivem Wert aktiviert.\\[5pt]\midrule
+\textbf{Dropout} & Unterdrückt im Training zufällig Aktivierungen; reduziert die Abhängigkeit von einzelnen Merkmalen. & In den MLP-Teilen mit positiver Rate konfiguriert. Bei gewöhnlicher Inferenz deaktiviert.\\[5pt]\midrule
+\textbf{Gradient Clipping} & Begrenzt die Gradientennorm vor dem Optimierungsschritt. & In den geprüften Einstellungen aktiviert. Hilft gegen große, nicht gegen verschwindende Gradienten.\\[5pt]\midrule
+\textbf{Lernraten-Scheduler} & Verändert die Lernrate während des Trainings. & Kosinus-Scheduler mit vorgesehenen Neustarts ausgewählt. Ein tatsächlicher Neustart hängt von Laufdauer und Aufrufen ab.\\[5pt]\midrule
+\textbf{Early Stopping} & Bricht nach ausbleibender Verbesserung auf der Validierung ab. & Im Trainingsablauf implementiert. Ob ein konkreter Lauf dadurch endete, erfordert dessen Protokoll.\\[5pt]\midrule
+\textbf{Best Checkpoint} & Wählt den besten bewerteten Trainingsstand statt automatisch den letzten. & Im Trainingsablauf enthalten; beim geprüften eingebetteten SOH-Training ist RMSE die Auswahlmetrik.\\[5pt]\midrule
+\end{longtable}\endgroup
+
+\clearpage
+\question{Methodenübersicht: Datenaufbereitung und erweiterter SOH-Zweig}
+Die ersten vier Einträge betreffen die Datenpipeline. Die weiteren Einträge gehören zum umfangreicheren SOH-Zweig; sie dürfen nicht pauschal den einfacheren eingebetteten LSTM-Modellen zugeschrieben werden.
+\begingroup\footnotesize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.08}
+\begin{longtable}{@{}p{0.20\linewidth}p{0.34\linewidth}p{0.40\linewidth}@{}}\toprule\textbf{Methode} & \textbf{Wozu?} & \textbf{Zuordnung und Nachweisgrenze}\\\midrule\endhead
+\textbf{Robuste Skalierung} & Skaliert Features anhand von Median und Quantilabstand. & RobustScaler wird auf Trainingsdaten angepasst und gespeichert. Dieselben Parameter gelten später bei der Anwendung.\\[5pt]\midrule
+\textbf{Feature Engineering} & Ergänzt Rohmessungen um nutzbare abgeleitete Informationen. & Je nach Modell beispielsweise kumulierte Ladung, EFC sowie Spannungs- und Stromableitungen.\\[5pt]\midrule
+\textbf{Sequenz-/Fensterbildung} & Stellt zeitlichen Kontext für die Trainingsbeispiele zusammen. & Konfigurierbare Sequenzlängen und teilweise Schrittweiten zwischen Fenstern.\\[5pt]\midrule
+\textbf{Getrennte Zellen} & Trennt Gewichtsanpassung von der Validierung an anderen Zellen. & Getrennte Zelllisten in den Einstellungen. Der endgültige Test bleibt unabhängig von der Modellwahl.\\[5pt]\midrule
+\textbf{Layer Normalization} & Normalisiert interne Merkmalsvektoren. & Im umfangreicheren SOH-Modell. Von der einmal angepassten Eingangsskalierung zu unterscheiden.\\[5pt]\midrule
+\textbf{Residualverbindungen} & Addieren einen unveränderten Eingangsanteil zum berechneten Blockausgang. & In den Residual-MLP-Blöcken des umfangreicheren SOH-Modells.\\[5pt]\midrule
+\textbf{Zeitliche Aggregation} & Verdichtet viele Messpunkte zu gröberen Zeitabschnitten. & Im geprüften SOH-Zweig stundenweise, unter anderem Mittelwert, Standardabweichung, Minimum und Maximum.\\[5pt]\midrule
+\textbf{Glättungsverlust} & Bestraft starke Änderungen zwischen aufeinanderfolgenden Vorhersagen. & In der geprüften Konfiguration des erweiterten SOH-Zweigs aktiviert. Eine Ergänzung zum MSE, kein nachgeschalteter Filter.\\[5pt]\midrule
+\textbf{Ausgeblendete Anfangsschritte} & Lässt den Zustand zunächst aufbauen, bevor Vorhersagen zum Verlust beitragen. & In dieser SOH-Konfiguration werden frühe Schritte eines Fensters bei Verlust und Metriken ausgelassen.\\[5pt]\midrule
+\textbf{Lernraten-Warm-up} & Erhöht die Lernrate während der ersten Epochen von einem kleineren Startwert. & Im geprüften erweiterten SOH-Zweig vorgesehen. Nicht mit den ausgeblendeten Anfangsschritten verwechseln.\\[5pt]\midrule
+\end{longtable}\endgroup
+
+\clearpage
+\question{Methodenübersicht: Bedingte Funktionen und Kompression}
+\begingroup\footnotesize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.08}
+\begin{longtable}{@{}p{0.20\linewidth}p{0.34\linewidth}p{0.40\linewidth}@{}}\toprule\textbf{Methode} & \textbf{Wozu?} & \textbf{Zuordnung und Nachweisgrenze}\\\midrule\endhead
+\textbf{Mixed Precision} & Verwendet beim Training gemischte Zahlenpräzision, um GPU-Ressourcen effizienter zu nutzen. & Im geprüften Code an den CUDA-/GPU-Pfad gebunden; nicht pauschal für jeden Lauf belegt. Keine INT8-Gewichtsquantisierung.\\[5pt]\midrule
+\textbf{Gradient Accumulation} & Sammelt Gradienten mehrerer Batches vor einem Optimierungsschritt. & Implementiert. Bei accum\_steps = 1 werden keine mehreren Batches zusammengefasst.\\[5pt]\midrule
+\textbf{Strukturiertes Pruning} & Entfernt ganze Hidden-Komponenten samt abhängigen Matrixzeilen und -spalten. & Im Kompressionsworkflow anhand von L2-Scores; bereits bei F075 und den Pruning-Abbildungen erläutert.\\[5pt]\midrule
+\textbf{Fine-Tuning} & Passt die verbleibenden Gewichte nach einem Eingriff erneut mit Trainingsdaten an. & Teil des Pruning-Workflows. Es ist ein weiterer Trainingsabschnitt.\\[5pt]\midrule
+\textbf{INT8-Gewichtsquantisierung} & Speichert ausgewählte Gewichte kompakter mit zugehörigen Skalen. & In den eingebetteten Varianten bleiben wesentliche Berechnungen FP32. Nicht mit vollständig ganzzahliger Inferenz gleichsetzen.\\[5pt]\midrule
+\end{longtable}\endgroup
+
+\question{Welche Unterscheidungen muss ich erklären können?}
+\textbf{Hyperparameter versus Gewichte:} Die Suche wählt etwa Architektur und Lernrate. Innerhalb jedes Trainingsversuchs passt der Optimierer die Gewichte an. Die Güte einer Einstellung wird auf der Validierung bewertet, nicht durch wiederholte Auswahl nach dem finalen Test.
+
+\textbf{Zwei Bedeutungen von Pruning:} Der Optuna-Pruner beendet einen Suchversuch. Strukturiertes Netz-Pruning entfernt Modellkomponenten. Beide sparen Ressourcen, greifen aber an unterschiedlichen Stellen ein.
+
+\textbf{Drei unterschiedliche Steuerungen:} Ein Scheduler verändert die Lernrate. Early Stopping beendet das Training. Best-Checkpoint-Auswahl entscheidet, welcher gespeicherte Trainingsstand verwendet wird.
+
+\textbf{Skalierung versus Normalisierung:} Der RobustScaler verarbeitet die Eingangsfeatures mit gespeicherten Trainingsstatistiken. LayerNorm normalisiert interne Merkmalsvektoren während der Modellberechnung.
+
+\textbf{Empfohlene Lernreihenfolge:} Hyperparameter-Tuning, AdamW und Lernrate, Dropout und Weight Decay, Gradient Clipping, Early Stopping und Checkpoint-Auswahl, danach die SOH-spezifischen Zusatzmethoden. Die Aktivierungsfunktionen stehen bereits am Anfang von Kapitel 7.
+
+\textbf{Quellenbasis der Prüfung, 29.09.2026:} LFP\_LSTM\_MLP: SOC-Training 1.5.0.0 und SOH-Training 2.1.0.0, jeweils Skript und Konfiguration; LFP\_SOC\_SOH\_Model: SOH-Trainingszweig 0.1.2.3; Optuna-Suche in LFP\_SOH\_Optimization\_Study. Hyperband ist hier aus Kapitel 5 der Dissertation eingeordnet. Für den Nachweis eines konkreten Trainingslaufs sind dessen gespeicherte Konfiguration und Protokolle maßgeblich.
+\clearpage

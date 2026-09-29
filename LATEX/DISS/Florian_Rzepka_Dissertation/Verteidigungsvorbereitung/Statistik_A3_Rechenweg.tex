@@ -1,0 +1,173 @@
+\topic{Tabelle A.3 erklärt: 1. Zellen, Modelle und MAE}
+\textbf{Ziel:} Vom Fehler eines Modells bis zur Holm-Korrektur verstehen, welche Zahl was bedeutet. Bezug: Tabelle A.3 der Dissertation und Präsentationsanhang 21.
+
+\question{Welche beiden Anzahlen darf ich nicht verwechseln?}
+\begin{center}\begin{tabular}{lll}\toprule
+Symbol & Bedeutung & In dieser Auswertung\\\midrule
+$n$ & Unabhängige Testzellen & $n=6$\\
+$K$ & Verglichene Modelle & $K=4$\\
+$m$ & Paarweise Modellvergleiche & $m=\binom K2=K(K-1)/2=6$\\\bottomrule
+\end{tabular}\end{center}
+\textbf{Merken:} $n$ kommt aus den Zellen, $m$ aus den Modellpaaren. Auch bei acht Zellen bleiben vier Modelle sechs Paarvergleiche. Viele Zeitpunkte und Fenster ersetzen keine zusätzlichen unabhängigen Zellen.
+
+\question{Wie berechnet man den MAE auf einer Zelle?}
+Für Modell A, Zelle $i$ und zunächst ein Auswertungsfenster gilt:
+\[
+\mathrm{MAE}_{A,i}=\frac{1}{N_i}\sum_{t=1}^{N_i}
+\left|\widehat y_{A,i,t}-y_{i,t}\right|.
+\]
+$N_i$ ist die Anzahl der Zeitpunkte, $t$ deren Index, $\widehat y$ die SOC-Schätzung und $y$ die Referenz. Die Betragsstriche machen Abweichungen in beide Richtungen positiv. Das Summenzeichen addiert sie; die Division durch $N_i$ ergibt ihren Durchschnitt.
+
+Bei mehreren ausgewerteten Fenstern werden die Fensterkennwerte zuerst innerhalb jeder Zelle zusammengefasst. Im folgenden Rechenweg bezeichnet $\mathrm{MAE}_{A,i}$ diesen Zellkennwert. Anschließend werden die Zellen gleich gewichtet:
+\[
+\mathrm{MAE}_{A,\mathrm{macro}}=\frac1n\sum_{i=1}^{n}\mathrm{MAE}_{A,i}.
+\]
+\textbf{Einheiten:} Die Tabelle nutzt SOC auf der Skala 0 bis 1. Deshalb entsprechen $0{,}0690$ MAE genau $6{,}90$ Prozentpunkten SOC. Das ist nicht ein relativer Fehler von 6,90 Prozent gegenüber dem jeweiligen Referenzwert.
+
+\question{Wozu überhaupt ein paarweiser Test?}
+Ein kleinerer beobachteter Mittelwert ist zunächst ein Ergebnis auf den getesteten Zellen. Ein Test prüft die Evidenz gegen eine festgelegte Nullhypothese. Praktische Fehlergröße, Unsicherheit und statistische Signifikanz sind unterschiedliche Aussagen.
+
+\topic{Tabelle A.3 erklärt: 2. Differenz, Streuung und Intervall}
+\question{Was bedeutet Mean difference?}
+Für jede Zelle vergleichen wir dieselben beiden Modelle:
+\[
+d_i=\mathrm{MAE}_{B,i}-\mathrm{MAE}_{A,i},\qquad
+\overline d=\frac1n\sum_{i=1}^{n}d_i.
+\]
+Negativ heißt: B hat weniger Fehler. Positiv heißt: A hat weniger Fehler. Es entstehen sechs gepaarte Zellunterschiede, keine voneinander unabhängigen Einzelzeitpunkt-Unterschiede.
+
+\textbf{Erfundenes Beispiel:} A hat 7 Prozentpunkte MAE, B hat 3. Dann ist $d_i=3-7=-4$ Prozentpunkte. \textbf{Echte Tabellenangabe:} Für A = DM und B = DD ist $\overline d=-0{,}0431$, also im Mittel 4,31 Prozentpunkte weniger Fehler bei DD.
+
+\question{Was sind Streuung und standardisierte Effektgröße?}
+\[
+s_d=\sqrt{\frac{1}{n-1}\sum_{i=1}^{n}(d_i-\overline d)^2},
+\qquad \boxed{d_z=\frac{\overline d}{s_d}}.
+\]
+Rechenfolge: Von jeder Differenz den Mittelwert abziehen, quadrieren, addieren, durch $n-1$ teilen und die Wurzel ziehen. $s_d$ ist die Stichprobenstandardabweichung der Zellunterschiede. Sie hat dieselbe Einheit wie $\overline d$.
+
+$d_z$ ist dagegen einheitenlos. Bei DM gegen DD steht $d_z=-2{,}29$: Die mittlere Differenz beträgt rund minus 2,29 Standardabweichungen. Aus den gerundeten Angaben ergibt sich näherungsweise $s_d=(-0{,}0431)/(-2{,}29)=0{,}0188$. Das ist \textbf{kein p-Wert}. Bei nur sechs Zellen ist auch die Effektgröße unsicher.
+
+\question{Wie entsteht das Konfidenzintervall der Differenz?}
+Im Paarvergleich zieht der Code wiederholt $n$ Zellunterschiede \textbf{mit Zurücklegen} aus $d_1,\ldots,d_n$ und berechnet jeweils einen Mittelwert $\overline d^{*(b)}$. Die Modellpaarung bleibt dabei erhalten. Die Grenzen sind:
+\[
+\mathrm{KI}_{95\%}=
+\left[Q_{0{,}025}(\overline d^*),\;Q_{0{,}975}(\overline d^*)\right].
+\]
+Für DM gegen DD: $[-0{,}0558;-0{,}0286]$, entsprechend $[-5{,}58;-2{,}86]$ Prozentpunkten. Das Intervall beschreibt die Unsicherheit der mittleren Differenz, weder Min/Max noch einen Bereich für 95 Prozent der einzelnen Fehler. Die hierarchischen Intervalle anderer Benchmarktabellen sind von diesem Bootstrap der bereits aggregierten Zellunterschiede zu unterscheiden.
+
+\topic{Tabelle A.3 erklärt: 3. Woher kommt der exakte p-Wert?}
+\question{Was macht der zweiseitige Sign-Flip-Test?}
+Vereinfacht lautet die Nullhypothese: kein systematischer Vorteil. Für den exakten Vorzeichenwechseltest müssen die unabhängigen Zellunterschiede unter der Nullhypothese vorzeichensymmetrisch sein. Dann werden alle Vorzeichenmuster als gleich wahrscheinlich behandelt.
+
+Der Code nimmt als beobachtete Testgröße den Betrag der mittleren Differenz:
+\[
+T_{\mathrm{obs}}=\left|\frac1n\sum_{i=1}^{n}d_i\right|.
+\]
+Er behält die Beträge $|d_i|$ bei und probiert für jede Zelle Plus oder Minus. Für $n$ Zellen sind das $2^n$ Muster. Für jedes Muster $s$ gilt:
+\[
+T_s=\left|\frac1n\sum_{i=1}^{n}s_i|d_i|\right|,
+\qquad s_i\in\{-1,+1\}.
+\]
+Dann wird gezählt, wie viele Muster mindestens so extrem wie die Beobachtung sind:
+\[
+\boxed{p_{\mathrm{exact}}=
+\frac{\#\{s:T_s\geq T_{\mathrm{obs}}\}}{2^n}}.
+\]
+Das Zeichen $\#$ bedeutet Anzahl. $2^n$ ist die Anzahl der möglichen Muster, nicht selbst der p-Wert. Der p-Wert ist auch nicht die Wahrscheinlichkeit, dass die Nullhypothese wahr ist.
+
+\question{Warum steht manchmal genau 0,03125 dort?}
+\textbf{Erfundenes Beispiel wie auf Anhang 21:} Die sechs Zellunterschiede sind $+1,+2,+1,+2,+1,+2$ Prozentpunkte. Der Mittelwert ist $+1{,}5$; sein Betrag ist 1,5. Nur alle Pluszeichen und alle Minuszeichen erreichen diesen maximalen Betrag. Gemischte Vorzeichen führen zu teilweiser Aufhebung.
+\[
+p_{\mathrm{exact}}=\frac2{64}=0{,}03125\approx0{,}0313.
+\]
+Bei gemischten beobachteten Vorzeichen können mehr Muster mindestens so extrem sein. In eurer Tabelle: HECM gegen DD $6/64=0{,}09375$; HDM gegen HECM $10/64=0{,}15625$. \textbf{Der Nenner ist durch die sechs Zellen festgelegt, der Zähler hängt von den Daten ab.}
+
+\topic{Tabelle A.3 erklärt: 4. Holm Schritt für Schritt}
+\question{Warum korrigiert man überhaupt?}
+Bei mehreren Tests steigt das Risiko, irgendwo einen tatsächlich nicht vorhandenen Unterschied als signifikant zu bezeichnen. Holm kontrolliert dieses gemeinsame Fehlalarmrisiko für die Testfamilie. Hier ist $\alpha=0{,}05$ gewählt. Alpha ist eine vorab festgelegte Entscheidungsgrenze, keine Naturkonstante und kein aus den Daten berechneter Wert.
+
+Die $m=6$ p-Werte werden aufsteigend sortiert. Für Rang $k$ lautet die Schwelle:
+\[
+p_{(k)}\leq\frac{\alpha}{m-k+1}.
+\]
+Man prüft vom kleinsten Wert aus und stoppt beim ersten Nichtbestehen. Dieser und alle folgenden Tests werden nicht verworfen. Die erste Hürde ist $0{,}05/6=0{,}008333\ldots$.
+
+\question{Warum sind alle korrigierten p-Werte gleich?}
+Gleichwertig kann man korrigierte p-Werte berechnen und diese mit $\alpha$ vergleichen:
+\[
+p^{\mathrm{Holm}}_{(k)}=
+\min\left(1,\;\max_{1\leq j\leq k}[(m-j+1)p_{(j)}]\right).
+\]
+Erst mit dem rangabhängigen Faktor multiplizieren; dann den größten bisher erreichten Wert übernehmen. \textbf{Nicht jeden p-Wert einfach mal sechs nehmen!}
+
+\begin{center}\small\begin{tabular}{rrrrr}\toprule
+Rang & $p_{\mathrm{exact}}$ & Faktor & Produkt & $p_{\mathrm{Holm}}$\\\midrule
+1 & 0,03125 & 6 & 0,18750 & 0,18750\\
+2 & 0,03125 & 5 & 0,15625 & 0,18750\\
+3 & 0,03125 & 4 & 0,12500 & 0,18750\\
+4 & 0,03125 & 3 & 0,09375 & 0,18750\\
+5 & 0,09375 & 2 & 0,18750 & 0,18750\\
+6 & 0,15625 & 1 & 0,15625 & 0,18750\\\bottomrule
+\end{tabular}\end{center}
+Bei den vier gleichen kleinsten p-Werten ist deren Reihenfolge untereinander unerheblich. Am Ende werden die korrigierten Werte wieder den ursprünglichen Modellpaaren zugeordnet.
+
+\textbf{Lesart der Tabelle:} $0{,}0313\;/\;0{,}1875$ bedeutet unbereinigter p-Wert / Holm-korrigierter p-Wert. Der Schrägstrich ist hier \textbf{keine Division}. $0{,}1875>0{,}05$: Kein Paarvergleich ist nach Holm auf diesem Niveau signifikant.
+
+\topic{Tabelle A.3 erklärt: 5. Sechs oder acht Zellen?}
+\question{Was legt die erreichbare Signifikanz fest?}
+Für diesen zweiseitigen exakten Test ist der günstigste Fall, dass nur zwei Muster mindestens so extrem wie beobachtet sind. Ohne degenerierte Bindungen gilt:
+\[
+p_{\min}=\frac2{2^n}.
+\]
+Mit $m=6$ Vergleichen und $\alpha=0{,}05$ muss mindestens gelten:
+\[
+\frac2{2^n}\leq\frac{0{,}05}{6}
+\quad\Longleftrightarrow\quad
+2^n\geq240.
+\]
+\begin{center}\begin{tabular}{rrrrl}\toprule
+Zellen $n$ & Muster $2^n$ & Kleinstes $p$ & Erste Holm-Hürde & Erreichbar?\\\midrule
+6 & 64 & 0,0312500 & 0,0083333 & Nein\\
+7 & 128 & 0,0156250 & 0,0083333 & Nein\\
+8 & 256 & 0,0078125 & 0,0083333 & Ja, rechnerisch\\\bottomrule
+\end{tabular}\end{center}
+\textbf{Acht Zellen ermöglichen das Bestehen der ersten Hürde; sie garantieren es nicht.} Entscheidend bleiben die tatsächlich beobachteten Unterschiede. Acht ist hier die kleinste rechnerisch mögliche Zellzahl, keine ausreichend begründete Stichprobenplanung für eine gewünschte Teststärke.
+
+\question{War die Auswertung mit sechs Zellen dann vergeblich?}
+Nein: Sie quantifiziert beobachtete Vorteile, Effektgrößen und Unsicherheit. Allerdings ist ein Holm-Signifikanznachweis bei dieser Kombination aus sechs Zellen, sechs Vergleichen und zweiseitigem exaktem Test grundsätzlich nicht erreichbar. Das ist eine Grenze des Versuchsplans, nicht der Beweis, dass die Modelle gleich gut sind.
+
+Vorab hätte man mehr unabhängige Zellen oder einen fachlich begründeten Hauptvergleich planen können. Ein höheres Alpha wäre eine weniger strenge Fehlerkontrolle; es sollte nicht nach Betrachtung der Ergebnisse erhöht werden, um Signifikanz zu erhalten.
+
+\question{Warum schließen manche Intervalle null aus, obwohl Holm nicht signifikant ist?}
+Das punktweise Bootstrap-Intervall und der diskrete exakte Test sind unterschiedliche Verfahren. Zusätzlich korrigiert Holm über sechs Tests. Deshalb sind diese Aussagen nicht gleichwertig und müssen nicht dieselbe Entscheidung liefern.
+
+\textbf{Antwort für die Verteidigung:} DD zeigt auf den sechs Testzellen den kleinsten mittleren Baseline-MAE. Die Paarunterschiede sind nach Holm bei fünf Prozent nicht signifikant. Bei diesem Testdesign konnte bereits der kleinste mögliche p-Wert die erste Holm-Hürde nicht erreichen.
+
+\textbf{Quellenabgleich:} Tabelle A.3; Präsentation Anhang 21; Funktionen für exakten Sign-Flip-Test, gepaarten Bootstrap und Holm-Korrektur im Benchmark-Auswertungscode. Die sechs Differenzen des Zahlenbeispiels sind erfunden, die angegebenen Tabellenkennwerte nicht.
+\clearpage
+\topic{Tabelle A.3 erklärt: 6. Warum nicht einfach die Glockenkurve?}
+\question{Verzichten wir auf die Standardabweichung?}
+Nein. Die Standardabweichung $s_d$ beschreibt die Streuung der sechs Zellunterschiede und wird für $d_z=\overline d/s_d$ verwendet. Man darf sie auch ohne Normalverteilung berechnen. Eine Standardabweichung ist eine Kennzahl; die Gaußsche Glockenkurve ist eine Verteilungsannahme. Das sind zwei verschiedene Dinge.
+
+\question{Was wäre die Alternative mit Normalverteilungsannahme?}
+Beim gepaarten t-Test würde man aus den Zellunterschieden berechnen:
+\[
+\mathrm{SE}(\overline d)=\frac{s_d}{\sqrt n},\qquad
+ t=\frac{\overline d}{s_d/\sqrt n}=d_z\sqrt n.
+\]
+$\mathrm{SE}$ ist der geschätzte Standardfehler des Mittelwerts. Für normalverteilte, unabhängige Zellunterschiede folgt diese Testgröße unter der Nullhypothese einer t-Verteilung mit $n-1$ Freiheitsgraden. Der zweiseitige p-Wert wäre dann
+\[
+p_t=2\bigl[1-F_{t_{n-1}}(|t|)\bigr].
+\]
+$F$ bezeichnet die Verteilungsfunktion. \textbf{So wurde der p-Wert in Tabelle A.3 jedoch nicht berechnet.} Deshalb darf man aus $d_z=-2{,}29$ nicht einen t-Test-p-Wert berechnen und erwarten, dass er dem dortigen exakten p-Wert entspricht.
+
+\question{Warum ist der Sign-Flip-Test hier eine nachvollziehbare Wahl?}
+Mit nur sechs unabhängigen Zellen lässt sich eine Normalverteilungsannahme nur eingeschränkt beurteilen. Der verwendete Test benötigt diese spezielle Verteilungsform nicht und zählt alle $2^6=64$ Vorzeichenmuster vollständig aus. Er benötigt keine große Stichprobe für eine asymptotische Näherung.
+
+\textbf{Er ist aber nicht annahmefrei:} Die Zellunterschiede müssen unabhängig und unter der Nullhypothese vorzeichensymmetrisch sein. Nur ein Mittelwert von null reicht dafür nicht aus. Die exakte Berechnung gilt unter diesen Annahmen. Kleine Stichproben bedeuten weiterhin geringe Auflösung der p-Werte und begrenzte Teststärke. Ein t-Test ist bei sechs Zellen nicht grundsätzlich verboten; er wäre eine andere, zu begründende Modellannahme. Man sollte den Test nicht nachträglich danach auswählen, welcher signifikant wird.
+
+\question{Und warum dann zusätzlich Holm?}
+\textbf{Sign-Flip} beantwortet: Wie berechnen wir den p-Wert eines einzelnen Modellvergleichs? \textbf{Holm} beantwortet: Wie kontrollieren wir das Fehlalarmrisiko, wenn wir sechs Modellpaare testen? Holm ist keine Reaktion auf eine fehlende Normalverteilung. Die Mehrfachtestfrage bestünde auch bei sechs t-Tests.
+
+\textbf{Merksatz für die Verteidigung:} Die Standardabweichung beschreibt die Streuung. Der exakte Sign-Flip-Test prüft den einzelnen Paarvergleich ohne Normalverteilungsannahme, aber unter Vorzeichensymmetrie. Holm berücksichtigt anschließend die Anzahl der Modellvergleiche.
+\clearpage

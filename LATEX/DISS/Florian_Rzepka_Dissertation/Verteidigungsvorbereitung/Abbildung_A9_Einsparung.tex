@@ -1,0 +1,127 @@
+\topic{Abbildung A.9: Warum bedeutet eins minus neu durch alt eine Einsparung?}
+\question{Was bedeuten die Funktionsausdrücke in Gleichung 7.10?}
+$N_{\mathrm{MAC}}(H)$ bezeichnet die Anzahl der MAC-Operationen bei der Hidden Size $H$. Die Klammer ist das Argument der Funktion, keine zusätzliche Multiplikation mit $N_{\mathrm{MAC}}$.
+\[
+\underbrace{N_{\mathrm{MAC}}(H)}_{\text{alter Aufwand}},\qquad
+\underbrace{N_{\mathrm{MAC}}((1-p)H)}_{\text{neuer Aufwand}}.
+\]
+$p$ ist der entfernte Anteil der Hidden-Kanäle. Deshalb ist $(1-p)H$ die verbleibende Hidden Size. $D$ (Eingangsbreite) und $M$ (MLP-Breite) bleiben hier unverändert.
+
+\question{Wie wird daraus alt minus neu, geteilt durch alt?}
+Ausgangspunkt ist die Formel aus der Dissertation:
+\[
+R_{\mathrm{MAC}}=1-\frac{\text{neu}}{\text{alt}}.
+\]
+\textbf{Schritt 1:} Weil der alte Aufwand positiv ist, dürfen wir die Eins als gleichwertigen Bruch schreiben:
+\[
+1=\frac{\text{alt}}{\text{alt}}.
+\]
+\textbf{Schritt 2:} Diesen Bruch einsetzen:
+\[
+R_{\mathrm{MAC}}=\frac{\text{alt}}{\text{alt}}-\frac{\text{neu}}{\text{alt}}.
+\]
+\textbf{Schritt 3:} Bei gleichem Nenner werden die Zähler subtrahiert:
+\[
+\boxed{R_{\mathrm{MAC}}=\frac{\text{alt}-\text{neu}}{\text{alt}}.}
+\]
+Mit den Modellbezeichnungen:
+\[
+1-\frac{N_{\mathrm{MAC}}((1-p)H)}{N_{\mathrm{MAC}}(H)}
+=\frac{N_{\mathrm{MAC}}(H)-N_{\mathrm{MAC}}((1-p)H)}{N_{\mathrm{MAC}}(H)}.
+\]
+Es wird nichts zusätzlich abgezogen: Beide Schreibweisen sind mathematisch identisch. Der Zähler rechts ist die eingesparte Anzahl an Operationen; die Division durch den alten Aufwand macht daraus einen relativen Anteil.
+
+\question{Ein Zahlenbeispiel zum Merken}
+Vorher 100 Operationen, nachher 60:
+\[
+1-\frac{60}{100}=\frac{100}{100}-\frac{60}{100}
+=\frac{100-60}{100}=0{,}4=40\,\%.
+\]
+\textbf{Merksatz:} Neu durch alt ist der verbleibende Anteil. Eins minus diesen Anteil ist die Einsparung. Für den Prozentwert wird das Ergebnis mit 100 multipliziert.
+
+\topic{Gleichung 7.10: Vollständige Herleitung}
+\question{1. Ausgangspunkt: Welche Operationen werden gezählt?}
+$H$ bezeichnet die ursprüngliche LSTM-Hidden-Size, $D$ die Anzahl der Eingangsfeatures, $M$ die MLP-Hidden-Breite und $p$ den entfernten Kanalanteil. $D$ und $M$ bleiben beim betrachteten Pruning konstant.
+\[
+N_{\mathrm{MAC}}(H)=\underbrace{4H(D+H)}_{\text{LSTM}}+
+\underbrace{HM+M}_{\text{MLP}}.
+\]
+Das ist Gleichung 7.9: vier LSTM-Gates, die Abbildung vom Hidden State auf den MLP und dessen skalarer Ausgang. Bias-Additionen, Aktivierungsfunktionen und Speicherzugriffe werden hier nicht als MACs gezählt.
+\[
+N_{\mathrm{MAC}}(H)=4HD+4H^2+HM+M
+=\boxed{4H^2+(4D+M)H+M}.
+\]
+\question{2. Neue Hidden Size einsetzen}
+Nach Entfernen des Anteils $p$ bleibt $H'=(1-p)H$. Jedes $H$ in der MAC-Formel wird dadurch ersetzt:
+\[
+\begin{aligned}
+N_{\mathrm{MAC}}(H')
+&=4\bigl((1-p)H\bigr)^2+(4D+M)(1-p)H+M\\
+&=4(1-p)^2H^2+(4D+M)(1-p)H+M.
+\end{aligned}
+\]
+\question{3. Alten und neuen Aufwand in die Einsparung einsetzen}
+\[
+R(H,p)=1-\frac{N_{\mathrm{MAC}}(H')}{N_{\mathrm{MAC}}(H)}
+=\frac{N_{\mathrm{MAC}}(H)-N_{\mathrm{MAC}}(H')}{N_{\mathrm{MAC}}(H)}.
+\]
+Ausgeschrieben:
+\[
+R(H,p)=\frac{4H^2+(4D+M)H+M-\left[4(1-p)^2H^2+(4D+M)(1-p)H+M\right]}
+{4H^2+(4D+M)H+M}.
+\]
+\question{4. Den Zähler nach gleichen Termen gruppieren}
+\[
+\begin{aligned}
+\text{Zähler}={}&4H^2\left[1-(1-p)^2\right]\\
+&+(4D+M)H\left[1-(1-p)\right]+(M-M).
+\end{aligned}
+\]
+Die drei Klammern werden einzeln vereinfacht:
+\[
+1-(1-p)^2=1-(1-2p+p^2)=2p-p^2,
+\]
+\[
+1-(1-p)=p,\qquad M-M=0.
+\]
+\textbf{Ergebnis: Gleichung 7.10}
+\[
+\boxed{R(H,p)=\frac{4(2p-p^2)H^2+p(4D+M)H}{4H^2+(4D+M)H+M}.}
+\]
+
+\topic{Gleichung 7.10: Grenzwert und konkrete Modelle}
+\question{5. Warum ergibt sich für große Hidden Sizes der Grenzwert $2p-p^2$?}
+Wir teilen Zähler und Nenner durch $H^2$:
+\[
+R(H,p)=\frac{4(2p-p^2)+\dfrac{p(4D+M)}{H}}
+{4+\dfrac{4D+M}{H}+\dfrac{M}{H^2}}.
+\]
+Für $H\to\infty$ bei festem $D$, $M$ und $p$ verschwinden die Terme mit $H$ oder $H^2$ im Nenner:
+\[
+\lim_{H\to\infty}R(H,p)=\frac{4(2p-p^2)}4=\boxed{2p-p^2}.
+\]
+Der MLP ist in der vollständigen Rechnung enthalten. Der Grenzwert entsteht, weil der quadratische rekurrente LSTM-Anteil schließlich dominiert. Der Eingangsteil und der MLP wachsen bei festen Breiten nur linear mit $H$.
+
+\question{6. Warum sind es bei 30 Prozent Pruning theoretisch 51 Prozent?}
+\[
+p=0{,}30\quad\Rightarrow\quad 2p-p^2=0{,}60-0{,}09=0{,}51=51\,\%.
+\]
+Anschaulich bleiben bei einer rekurrenten Matrix 70 Prozent der Zeilen und 70 Prozent der Spalten: $0{,}7\cdot0{,}7=0{,}49$. Es bleiben 49 Prozent dieses quadratischen Anteils, also werden 51 Prozent eingespart. Beim Gesamtmodell ist das der Grenzwert, nicht die tatsächliche Einsparung jeder endlichen Architektur.
+
+\question{7. Was ergibt sich für eure tatsächlich verwendeten Größen?}
+Beide Modelle haben $D=6$. Beim SOC ist $M=64$, beim SOH $M=128$. Die ganzzahligen Hidden Sizes sind SOC $64\to45$ und SOH $128\to90$, also jeweils etwa 30 Prozent Pruning.
+\[
+\begin{aligned}
+N_{\mathrm{SOC,alt}}&=4\cdot64(6+64)+64\cdot64+64=22\,080,\\
+N_{\mathrm{SOC,neu}}&=4\cdot45(6+45)+45\cdot64+64=12\,124,\\
+R_{\mathrm{SOC}}&=1-\frac{12\,124}{22\,080}\approx45{,}1\,\%.
+\end{aligned}
+\]
+\[
+\begin{aligned}
+N_{\mathrm{SOH,alt}}&=4\cdot128(6+128)+128\cdot128+128=85\,120,\\
+N_{\mathrm{SOH,neu}}&=4\cdot90(6+90)+90\cdot128+128=46\,208,\\
+R_{\mathrm{SOH}}&=1-\frac{46\,208}{85\,120}\approx45{,}7\,\%.
+\end{aligned}
+\]
+\textbf{Abgrenzung:} $4H(D+H+1)$ ist die LSTM-Parameterzahl bei einem Biasvektor pro Gate, nicht die hier verwendete MAC-Zahl des gesamten Modells. Der MLP fehlt darin. In Abbildung A.9 liegen die MAC-Kurven bei gleichem $H$ verschieden, weil die MLP-Breite beim SOH größer bleibt. Eine MAC-Einsparung ist außerdem nicht automatisch die gleiche prozentuale Laufzeiteinsparung.

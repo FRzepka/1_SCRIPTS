@@ -1,0 +1,38 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage{fontspec}
+\setmainfont{Arial}
+\setsansfont{Arial}
+\usepackage[ngerman]{babel}
+\usepackage[margin=20mm,headheight=14pt]{geometry}
+\usepackage{graphicx,xcolor,longtable,array,booktabs,needspace}
+\usepackage[unicode,hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\definecolor{accent}{HTML}{17364A}
+\definecolor{teal}{HTML}{087C83}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small Dissertation | Fragenkatalog und Lernskript}
+\fancyfoot[L]{\small Überarbeitete Fachbegriffe | 23.09.2026}
+\fancyfoot[R]{\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\setlength{\parindent}{0pt}\setlength{\parskip}{6pt}
+\setlength{\emergencystretch}{4em}
+\raggedright
+\renewcommand{\contentsname}{Inhaltsverzeichnis}
+\setcounter{tocdepth}{1}
+\newcommand{\topic}[1]{\clearpage\section*{\color{accent}#1}\addcontentsline{toc}{section}{#1}}
+\newcommand{\question}[1]{\Needspace{6\baselineskip}\par\vspace{6pt}{\large\bfseries\color{accent}#1}\par\nobreak}
+\begin{document}
+\begin{titlepage}
+\vspace*{22mm}{\Huge\bfseries\color{accent}Dissertation\par}
+\vspace{6mm}{\LARGE Fragenkatalog und Lernskript\par}
+\vspace{12mm}{\large Vorbereitung für Florian Rzepka\par}
+\vspace{16mm}
+Einheitlicher LaTeX-Satz mit englischen Fachbegriffen und deutschen Erklärungen.
+
+Enthalten sind die Fragen und Antworten, Rechenübungen, der Abbildungsatlas, die Tabellenprüfung, die Modellübersicht und ein Begriffsschlüssel.
+
+Frage F075 wurde verständlicher formuliert. Die Modellübersicht und ihre offenen Nachweispunkte bleiben erhalten. Die Abbildungen zeigen unveränderte Originalausschnitte der Dissertation.
+
+\vfill Stand der Überarbeitung: 23. September 2026.
+\end{titlepage}
+\tableofcontents

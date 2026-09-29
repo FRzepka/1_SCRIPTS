@@ -538,6 +538,8 @@ Dieser Atlas folgt den 67 tatsächlich nummerierten Abbildungen der angegebenen 
 
 **Antwort:** Das entspricht der implementierten deterministischen Saliency-Regel für 64 auf 45 SOC-Kanäle. Rechts wird eine zentrale Gewichtungsverteilung vor und nach Auswahl verglichen. **Grenze:** Eine ähnliche Verteilungsform bedeutet weder ähnliche Funktion noch bewiesene Regularisierung. Rekurrente Struktur und Vorzeichen-/Kanalzusammenhänge gehen im Histogramm verloren. Für Kausalität braucht es zusätzliche Kontrollen. Siehe F075 und F078.
 
+@latex \input{Abbildung_A4_Dichte.tex}
+
 # Abbildung A.5: Zehn Zeitsegmente
 @figure A.5
 
@@ -559,6 +561,8 @@ Dieser Atlas folgt den 67 tatsächlich nummerierten Abbildungen der angegebenen 
 
 **Antwort:** Es gewinnt für einen großen Teil der untersuchten diskreten Prioritätskombinationen, insbesondere beim SOC. Beim SOH können Accuracy-Priorität Base und Flash-Priorität Quantized attraktiv machen. **Grenze:** Die Häufigkeit über ein künstliches Gitter ist keine Nutzer- oder Einsatzwahrscheinlichkeit. Harte Grenzen gehören vor den gewichteten Score. **Rechenfrage:** 1771 Kombinationen über Stars-and-bars erklären. Siehe F098 und R11.
 
+@latex \input{Abbildung_A7_Gewichtungen.tex}
+
 # Abbildung A.8: Eingangsbuffer-Fehler
 @figure A.8
 
@@ -572,6 +576,8 @@ Dieser Atlas folgt den 67 tatsächlich nummerierten Abbildungen der angegebenen 
 **Frage:** Warum steigen die MAC-Kurven quadratisch und die Reduktionskurve nähert sich einer Grenze?
 
 **Antwort:** Recurrent-Matrizen enthalten H mal H-Verbindungen pro Gate. Bei festem Input und Kopf dominiert dieser Term für große H. Entfernt man einen Anteil p, beträgt die asymptotische Einsparung 2p-p². Die endlichen tatsächlich gewählten Architekturen liegen darunter. **Grenze:** Analytische MACs sind keine direkte Hardwarezeit und enthalten Activation Functions nicht. Siehe F077 und R07.
+
+@latex \input{Abbildung_A9_Einsparung.tex}
 
 # Abbildung A.10: Reichweite des L2-Kriteriums
 @figure A.10

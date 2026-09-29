@@ -142,9 +142,13 @@ Dieser Teil ergänzt die Fragen F001 bis F100 um häufige Nachfragen zur Methode
 
 **PDF-Seite 220.** **Prüfungsfrage:** Warum durchweg pHolm = 0,1875? **Antwort:** Diskrete exakte Tests mit sechs Zellen und Korrektur über sechs Vergleiche liefern eine grobe Ergebnisauflösung. Die Tabelle enthält etwa HECM gegen DD mit Mittelwertdifferenz -0,0079 und einem punktweisen Intervall unter null, aber exaktem p = 0,0938. **Grenze:** Standardisiertes dz kann bei kleiner Stichprobe instabil sein. Rohe Differenzen und Einheiten ebenfalls nennen. Siehe F063 und F064.
 
+@latex \input{Statistik_A3_Rechenweg.tex}
+
 ## Tabelle A.4: Ausgewählte Störungspenalties
 
 **PDF-Seite 220.** **Prüfungsfrage:** Ist -0,0000 eine reale Verbesserung? **Antwort:** Es ist ein gerundeter sehr kleiner negativer Wert. Für Interpretation ungerundete Daten und Unsicherheit prüfen. Die Tabelle fasst globale MAE-Kontraste zusammen und ersetzt keine lokale Spikeanalyse. Die Offsetwerte sind zusätzliche MAE, nicht gesamte MAE. Siehe F048 und F053.
+
+**Schlussfolgerung für die Verteidigung:** DD zeigt bei vielen der getesteten Störungen kleinere mittlere Fehlerzuwächse, besitzt aber ebenfalls spezifische Schwachstellen. Kein Modell ist gegenüber allen Störungen überlegen. Besonders wichtig bleibt bei allen eine genaue Strommessung. Diese Schlussfolgerung gilt für die getesteten Störstärken und die beobachteten mittleren Zusatzfehler; eine statistisch abgesicherte Rangfolge liefert Tabelle A.4 allein nicht.
 
 ## Tabelle A.5: Score-Sensitivität
 
