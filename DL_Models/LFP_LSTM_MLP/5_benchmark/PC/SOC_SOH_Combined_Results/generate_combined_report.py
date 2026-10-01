@@ -458,7 +458,48 @@ def load_stm32_soc_json_results(dir_path):
                 print(f"Error loading {fpath}: {e}")
     return results
 
+def update_flash_from_elf():
+    """Count flash-backed PT_LOAD bytes, including initialized RAM data.
+
+    Reads existing builds; these are not asserted to be the historical timing builds.
+    Fail rather than silently use old hardcoded model-storage values.
+    """
+    from pathlib import Path
+    import struct
+    import hashlib
+    workspace = Path(BASE_DIR) / "STM32/workspace_1.17.0"
+    audit = {}
+    for task, sizes in [("SOC", SOC_SIZES), ("SOH", SOH_SIZES)]:
+        audit[task] = {}
+        for variant in ["Base", "Pruned", "Quantized"]:
+            files = list((workspace / f"AI_Project_LSTM_{task}_{variant.lower()}" / "Debug").glob("*.elf"))
+            if len(files) != 1:
+                raise RuntimeError(f"Expected one ELF for {task} {variant}, found {len(files)}")
+            blob = files[0].read_bytes()
+            if blob[:6] != b"\x7fELF\x01\x01":
+                raise ValueError("Expected little-endian ELF32")
+            header = struct.unpack_from("<16sHHIIIIIHHHHHH", blob)
+            segments = []
+            for index in range(header[10]):
+                kind, offset, virtual, physical, size, memory, flags, alignment = struct.unpack_from(
+                    "<IIIIIIII", blob, header[5] + index * header[9])
+                if kind == 1 and size and 0x08000000 <= physical < 0x08200000:
+                    if physical + size > 0x08200000:
+                        raise ValueError("Flash segment exceeds device range")
+                    segments.append({"address": hex(physical), "bytes": size})
+            if not segments:
+                raise ValueError("No flash load segments")
+            total = sum(segment["bytes"] for segment in segments)
+            sizes[variant]["Flash"] = total
+            audit[task][variant] = {"elf": str(files[0].relative_to(BASE_DIR)),
+                "sha256": hashlib.sha256(blob).hexdigest(), "flash_bytes": total,
+                "flash_KiB": total / 1024, "segments": segments}
+    Path(OUT_DIR).mkdir(parents=True, exist_ok=True)
+    (Path(OUT_DIR) / "flash_build_audit.json").write_text(json.dumps(audit, indent=2), encoding="utf-8")
+
+
 def plot_model_sizes_combined():
+    update_flash_from_elf()
     print("Generating Combined Model Sizes Plot...")
     
     # SOC RAM: keep values from SOC_SIZES (from map/static analysis).
@@ -537,6 +578,7 @@ def plot_model_sizes_combined():
 
         ax.set_xticks(x)
         ax.set_xticklabels(models)
+        ax.set_ylim(0, max(max(data_soc), max(data_soh)) * 1.22)
         ax.set_title(title)
         ax.set_ylabel(ylabel)
         ax.grid(axis='y', alpha=0.3)
@@ -553,13 +595,13 @@ def plot_model_sizes_combined():
     plot_grouped(axes[0, 0], soc_params, soh_params, "Parameter Count", "Count")
     
     # Plot 2: Estimated Flash
-    plot_grouped(axes[0, 1], soc_est, soh_est, "Estimated Flash (Weights Only)", "Size [KB]")
+    plot_grouped(axes[0, 1], soc_est, soh_est, "Idealized Parameter Storage (All FP32 / All INT8)", "Size [KiB]")
     
     # Plot 3: Actual Flash
-    plot_grouped(axes[1, 0], soc_flash, soh_flash, "Actual Flash Usage (Binary)", "Size [KB]")
+    plot_grouped(axes[1, 0], soc_flash, soh_flash, "Firmware Flash (Existing ELF Builds)", "Size [KiB]")
     
     # Plot 4: RAM
-    plot_grouped(axes[1, 1], soc_ram, soh_ram, "RAM Usage (Static + Stack)", "Size [KB]")
+    plot_grouped(axes[1, 1], soc_ram, soh_ram, "RAM Usage (Static + Stack)", "Size [KiB]")
     
     plt.tight_layout()
     plt.savefig(os.path.join(OUT_DIR, "combined_model_sizes.png"), dpi=300)

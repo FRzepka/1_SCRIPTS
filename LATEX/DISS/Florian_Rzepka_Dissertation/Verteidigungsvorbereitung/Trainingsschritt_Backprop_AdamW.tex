@@ -1,0 +1,109 @@
+\clearpage
+\question{Rechenbeispiel: Ein vollständiger Trainingsschritt (1/3)}
+\textbf{Ziel:} Backpropagation berechnet Gradienten, Clipping begrenzt sie, Adam bestimmt die adaptive Änderung und Weight Decay regularisiert die Gewichte. Wir verfolgen dieselben Zahlen durch alle Schritte.
+
+\textbf{Modell und Beispielwerte.} Ein Eingang, ein trainierbares Gewicht, kein Bias:
+\[\boxed{\hat y=wx},\qquad x=2,\quad y=1,\quad w_{\mathrm{alt}}=3.\]
+$\hat y$ ist die Vorhersage, $y$ der feste Zielwert und das kleine $w$ das Gewicht (kein Omega). Für das Beispiel: Lernrate $\eta=0{,}1$, Clipping-Grenze $G=2$, Weight Decay $\lambda=0{,}1$. Der große Decay-Wert dient der Sichtbarkeit. Dies sind keine übernommenen Trainingsparameter eurer Modelle.
+
+\question{1. Vorwärtsrechnung: Vorhersage und Verlust}
+\[\hat y=3\cdot2=6,\qquad L=\frac12(\hat y-y)^2=\frac12(6-1)^2=\boxed{12{,}5}.\]
+Der Faktor $1/2$ vereinfacht die Ableitung. Beim gewöhnlichen MSE für dieses einzelne Beispiel ohne den Faktor wäre der Gradient doppelt so groß.
+
+\question{2. Backpropagation: Wie beeinflusst das Gewicht den Verlust?}
+Die Kettenregel verbindet den Einfluss des Gewichts auf die Vorhersage mit dem Einfluss der Vorhersage auf den Verlust:
+\[
+\underbrace{\frac{\partial L}{\partial w}}_{\text{gesuchter Gradient}}
+=
+\underbrace{\frac{\partial L}{\partial\hat y}}_{\hat y-y=5}
+\underbrace{\frac{\partial\hat y}{\partial w}}_{x=2}
+=5\cdot2=\boxed{10}.
+\]
+\textbf{So spricht man das:} ,,Partielle Ableitung des Verlusts L nach dem Gewicht w.'' Die rechte Seite: ,,Ableitung von L nach y-Dach, mal Ableitung von y-Dach nach w.'' Das ist keine gewöhnliche Division zweier Zahlen, sondern Ableitungsschreibweise.
+
+\textbf{Was bedeutet das Vorzeichen?} Bei kleinen Änderungen am aktuellen Punkt und sonst unveränderten Größen erhöht ein positiver Gradient den Verlust, wenn $w$ steigt. Einfacher Gradientenabstieg verkleinert deshalb $w$. Bei negativem Gradienten ist die absteigende Richtung umgekehrt. Der Betrag beschreibt die lokale Steilheit; ,,zehn'' ist ohne Skalierungskontext nicht automatisch groß.
+
+\textbf{Kontrolle:} Würde $w$ von 3 auf 3,1 steigen, würde $\hat y$ von 6 auf 6,2 steigen. Der Zielwert bleibt 1; der Verlust steigt von 12,5 auf 13,52. Das passt zum positiven Gradienten. Bis hier wurde das Gewicht noch nicht aktualisiert.
+
+\question{3. Gradient Clipping: Den Gradienten begrenzen}
+\[g_{\mathrm{clip}}=10\cdot\min\left(1,\frac{2}{|10|}\right)=\boxed{2}.\]
+Bei einem Gewicht ist die Norm sein Betrag. Bei vielen Gewichten begrenzt das verwendete Norm-Clipping die gemeinsame Gradientennorm und skaliert die Gradienten entsprechend; es schneidet nicht jedes Gewicht ab.
+\clearpage
+\question{Rechenbeispiel: Ein vollständiger Trainingsschritt (2/3)}
+\textbf{Zwischenstand:} Das Gewicht ist weiterhin 3. Der ursprüngliche Gradient war 10, nach Clipping beträgt er 2. Nun folgt der erste AdamW-Schritt.
+
+\question{4. Adam: Richtung und Größenordnung speichern}
+Die Speicher starten mit $m_0=v_0=0$. Wir wählen $\beta_1=0{,}9$ und $\beta_2=0{,}999$. $m$ ist ein exponentiell geglätteter Gradient, $v$ ein exponentiell geglätteter quadrierter Gradient:
+\[
+\begin{aligned}
+m_1&=\beta_1m_0+(1-\beta_1)g_{\mathrm{clip}}
+=0{,}9\cdot0+0{,}1\cdot2=\boxed{0{,}2},\\
+v_1&=\beta_2v_0+(1-\beta_2)g_{\mathrm{clip}}^2
+=0{,}999\cdot0+0{,}001\cdot4=\boxed{0{,}004}.
+\end{aligned}
+\]
+$m$ erfasst eine geglättete Änderungsrichtung; $v$ dient zur Skalierung anhand der bisherigen Gradientengröße. $v$ ist kein zentrierter Varianzschätzer.
+
+\question{5. Startkorrektur und adaptiver Adam-Schritt}
+Die Nullinitialisierung verzerrt die Speicher am Anfang. Adam korrigiert das beim Optimierungsschritt $t$ durch Division durch $1-\beta^t$. Hier ist $t=1$:
+\[
+\hat m_1=\frac{m_1}{1-\beta_1^1}=\frac{0{,}2}{0{,}1}=\boxed{2},
+\qquad
+\hat v_1=\frac{v_1}{1-\beta_2^1}=\frac{0{,}004}{0{,}001}=\boxed{4}.
+\]
+\[
+\Delta w_{\mathrm{Adam}}
+=\eta\frac{\hat m_1}{\sqrt{\hat v_1}+\varepsilon}
+=0{,}1\frac{2}{2+\varepsilon}\approx\boxed{0{,}1}.
+\]
+$\varepsilon$ ist eine sehr kleine positive Zahl, etwa $10^{-8}$, die eine Division durch null verhindert. Der Index $t$ zählt hier Optimierungsschritte, nicht LSTM-Messzeitpunkte. Ab dem zweiten Schritt enthalten $m$ und $v$ bereits die Vorgeschichte.
+
+\question{6. AdamW: Getrenntes Weight Decay und Gewichtsupdate}
+Der Decay-Anteil wird aus dem bisherigen Gewicht berechnet:
+\[
+\Delta w_{\mathrm{Decay}}=\eta\lambda w_{\mathrm{alt}}
+=0{,}1\cdot0{,}1\cdot3=\boxed{0{,}03}.
+\]
+Damit lautet der gemeinsame Update-Schritt:
+\[
+\boxed{
+ w_{\mathrm{neu}}
+ =(1-\eta\lambda)w_{\mathrm{alt}}
+ -\eta\frac{\hat m_1}{\sqrt{\hat v_1}+\varepsilon}
+ \approx3-0{,}03-0{,}1=2{,}87.
+}
+\]
+Erst jetzt wird das Gewicht geändert. Der Decay-Anteil zieht dieses positive Gewicht Richtung null; bei einem negativen Gewicht wirkt derselbe multiplikative Schrumpffaktor ebenfalls Richtung null. Weight Decay ist Regularisierung, keine feste Gewichtsobergrenze und keine gezielte Reparatur explodierender Gradienten.
+\clearpage
+\question{Rechenbeispiel: Ein vollständiger Trainingsschritt (3/3)}
+\question{7. Ergebnis mit demselben Eingang überprüfen}
+\[
+\hat y_{\mathrm{neu}}=2{,}87\cdot2=5{,}74,
+\qquad L_{\mathrm{neu}}=\frac12(5{,}74-1)^2=\boxed{11{,}2338}.
+\]
+\begin{center}\begin{tabular}{lrr}\toprule & Vorher & Nach einem Update\\\midrule
+Gewicht & 3 & 2,87\\
+Vorhersage & 6 & 5,74\\
+Zielwert & 1 & 1\\
+Verlust & 12,5 & 11,2338\\\bottomrule\end{tabular}\end{center}
+Der Verlust ist in diesem Beispiel gesunken. AdamW garantiert weder eine Verbesserung nach jedem einzelnen Schritt noch das globale Optimum oder die beste Leistung auf unbekannten Daten.
+
+\question{Welche Aufgabe hat welcher Baustein?}
+\begin{center}\begin{tabular}{@{}p{0.29\linewidth}p{0.65\linewidth}@{}}\toprule
+\textbf{Baustein} & \textbf{Aufgabe in diesem Beispiel}\\\midrule
+Backpropagation & Berechnet den Gradienten 10 über die Kettenregel.\\[4pt]
+Gradient Clipping & Begrenzt den Gradienten auf 2.\\[4pt]
+Adam & Berechnet mit den Momentenspeichern den adaptiven Schritt von ungefähr 0,1.\\[4pt]
+Weight Decay & Zieht das positive Gewicht zusätzlich um 0,03 Richtung null.\\\bottomrule
+\end{tabular}\end{center}
+
+\textbf{Besonderheit des ersten Adam-Schritts:} Bei Nullinitialisierung und einem einzelnen von null verschiedenen Gradienten gilt näherungsweise $\hat m_1/\sqrt{\hat v_1}=g/|g|$. Deshalb hätte hier auch der ungeclippte positive Gradient ungefähr denselben Adam-Schritt ergeben. Clipping begrenzt Gradienten, legt aber keine feste Obergrenze für die endgültige Adam-Gewichtsänderung fest. Später wirkt außerdem die gespeicherte Gradientenvorgeschichte mit.
+
+\question{Wo entstehen Vanishing und Exploding Gradients?}
+Während der Backpropagation, vor Clipping und Update. Entlang langer Rechenwege werden viele lokale Ableitungen beziehungsweise Ableitungsmatrizen multipliziert. Dabei können Beiträge sehr klein oder sehr groß werden. Clipping begrenzt zu große Gradienten; verschwundene macht es nicht wieder groß. Der Wert 10 allein ist noch kein Nachweis von Exploding Gradients.
+
+\question{Wie überträgt sich das auf LSTM-Gates?}
+Jede trainierbare Zahl in den Gewichten und Bias der Gates und des Kandidaten erhält ihren eigenen Gradienten aus dem gemeinsamen Vorhersageverlust. Es gibt normalerweise keinen eigenen Zielverlust pro Gate. Weil dieselben Parameter in mehreren Zeitschritten verwendet werden, sammeln sich ihre Beiträge aus dem durchgerechneten zeitlichen Verlauf. Die laufenden Zustände $h_t$ und $c_t$ sind dabei von den trainierbaren Gewichten zu unterscheiden.
+
+\textbf{Einordnung:} Das Beispiel isoliert einen Trainingsschritt ohne Mixed Precision und ohne Gradient Accumulation. Es dient der Herleitung, nicht als Protokoll eines konkreten Trainingslaufs. Die Rechnungen wurden numerisch geprüft.
+\clearpage

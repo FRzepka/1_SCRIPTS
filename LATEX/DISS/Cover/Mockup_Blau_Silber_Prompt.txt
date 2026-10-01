@@ -1,0 +1,41 @@
+Generation: Built-in image_gen, 2026-09-29
+Approved artwork: Cover_Dissertation_Logobreite.pdf
+Material reference: user's navy linen / silver foil photograph
+
+Use case: product-mockup.
+Create one high-resolution photorealistic product photograph of the user's finished dissertation as a closed, premium dark navy-blue linen hardcover book with metallic silver foil stamping.
+
+INPUT ROLES:
+Image 1 is the approved final cover artwork. It is the authoritative exact artwork to transfer to the front cover: preserve its original TU Berlin long logo, every letter, line break, relative size, centered alignment, vertical placement and whitespace. All black artwork becomes silver foil; the white page becomes navy cloth. The large word "Dissertation" must remain almost exactly as wide as the entire TU logo above, as in Image 1. Do not redesign, simplify, re-typeset, shrink or rearrange the approved artwork.
+Image 2 is ONLY a reference for dark blue cloth, realistic silver foil material, desk setting and photographic mood. Its old title, old cover typography and smaller heading must NOT be used.
+
+SCENE AND CAMERA:
+The book lies on a pale natural oak desk, in an elegant close product photograph, viewed from above at a gentle three-quarter angle. Show the entire front cover with all four corners in frame, a narrow spine edge and a realistic off-white page block of about 20 mm. The physical book has A4 portrait proportions. The book fills most of the photograph with a small comfortable margin around it. A black fountain pen can sit near the right edge of the desk as in the material reference. No other readable books or extra text in the surroundings. Soft natural side light, clean realistic shadows, sharply resolved front-cover lettering and fine linen weave. Moderate perspective so even the small subtitle is readable. Landscape composition, polished editorial product photography.
+
+MATERIALS:
+Deep navy blue woven book cloth, subtle tactile linen grain. Crisp metallic silver hot-foil lettering and TU logo with restrained real reflections and extremely subtle impressed edges. Silver, never gold. Avoid glare that erases lettering. Not white ink and not plastic metallic letters.
+
+ALL COVER TEXT, EXACTLY AS IN IMAGE 1, with these line breaks:
+[Original TU logo at top, including the authentic vector-shaped wordmark:]
+TECHNISCHE
+UNIVERSITÄT
+BERLIN
+
+Dissertation
+
+Deployment-Oriented Neural Network State-Estimation
+Methods for Battery Management Systems:
+
+Ageing Estimation, Robustness Benchmarking,
+Embedded Optimization, and Hardware Integration
+
+[a short thin centered silver divider line]
+
+submitted by
+Florian Rzepka
+
+Berlin
+29. September 2026
+
+CRITICAL CONSTRAINTS:
+Faithfully composite the complete artwork from Image 1 onto the book surface, with a single consistent perspective across logo and all text. Preserve the TU symbol without "berlin" inside the symbol. Keep the original lettering shapes and proportions of the supplied TU long logo. The two title lines and two smaller subtitle lines must remain as provided. No invented text, no missing words, no duplicated letters, no changed name or date, no added borders, graphics or watermarks. The source cover is already approved and must remain visually recognizable in its exact layout.

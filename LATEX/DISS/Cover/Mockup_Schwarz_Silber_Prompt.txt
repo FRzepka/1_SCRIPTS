@@ -1,0 +1,7 @@
+Generation: Built-in image_gen
+Input image: Mockup_Schwarz_Gold.png
+
+Use case: precise-object-edit.
+Edit the supplied photorealistic dissertation book mockup. Change ONLY the metallic foil color on the front cover from gold to cool neutral SILVER. This applies to the TU Berlin logo and wordmark, Dissertation, the full main title and subtitle, the divider line, submitted by, Florian Rzepka, Berlin, and 29. September 2026. Use realistic silver hot-foil stamping with subtle metallic highlights, not flat white ink. Remove all gold/yellow tint from the book's printed artwork.
+
+Keep the existing deep neutral BLACK linen book cover, spine and back cover completely unchanged, with no blue tint. Preserve the identical composition, perspective, crop, camera, lighting, natural oak desk, plant, fountain pen (including its own gold trim), page block, book texture, and all typography. Preserve every letter, word, line break, size, spacing, original TU logo shape and alignment exactly. The heading Dissertation remains as wide as the logo. No additions, omissions, spelling changes, layout changes or watermark. High-resolution photographic black-and-silver color variant of this same image.

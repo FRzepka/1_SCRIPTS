@@ -222,10 +222,24 @@ The parameter footprints differ more clearly than the prediction errors. As show
 
 \begin{figure*}[t]
     \centering
-    \includegraphics[width=\textwidth]{figures/baseline_model_comparison.pdf}
+    \captionsetup[subfigure]{font=scriptsize,skip=2pt}
+    \begin{subfigure}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/baseline_model_accuracy.pdf}
+        \caption{Prediction accuracy}
+        \label{fig:baseline_model_accuracy}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/baseline_model_fp32_weights.pdf}
+        \caption{FP32 weight memory}
+        \label{fig:baseline_model_fp32_weights}
+    \end{subfigure}
     \caption{Comparison of the uncompressed FP32 baseline models. (a) Cell-macro MAE and RMSE across the three held-out test cells using continuous causal inference and the dimensionless 0--1 SOH scale. Each test cell contributes equally to the reported values, and an error of 0.01 corresponds to one SOH percentage point. (b) Parameter-only FP32 memory calculated with four bytes per trainable parameter.}
     \label{fig:baseline_model_comparison}
 \end{figure*}
+\FloatBarrier
 
 Figure~\ref{fig:selected_baseline_trajectory} complements the aggregated errors with a continuous-context visualization for one held-out test cell. All selected baseline models reproduce the long-term \ac{soh} decline and the principal local variations. Their deviations from the reference nevertheless differ over time, which explains why the aggregate ranking cannot be inferred from a single operating interval. This view is illustrative, while Figure~\ref{fig:baseline_model_comparison}(a) remains the quantitative comparison across the complete test set.
 

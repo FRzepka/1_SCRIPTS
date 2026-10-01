@@ -1,0 +1,9 @@
+Generation: Built-in image_gen
+Input image: Mockup_Blau_Silber.png
+
+Use case: precise-object-edit.
+Edit the supplied dissertation book mockup. Change ONLY the material colors of the book:
+1. Change the navy-blue woven linen cover, spine and back cover to deep neutral BLACK linen, with no blue tint. Preserve the fine cloth weave, realistic highlights and shadows.
+2. Change ALL silver foil on the book front, including the TU Berlin logo, its wordmark, the large "Dissertation", both title lines, both subtitle lines, divider, "submitted by", "Florian Rzepka", "Berlin" and "29. September 2026", to elegant warm metallic GOLD foil. Make the gold physically realistic with restrained metallic reflections, not flat yellow ink or glitter.
+
+Keep the identical photograph and approved cover design: same camera position, perspective, crop, book dimensions, desk, plant, pen, lighting, page block, every text line, all typography, original logo shape, font sizes, spacing and placement. Do not add or remove anything. The word Dissertation remains almost exactly as wide as the TU logo above. Preserve all existing spelling and punctuation exactly. Preserve the fully legible text. No watermark. Output a high-resolution photorealistic black-and-gold edition of this same book.

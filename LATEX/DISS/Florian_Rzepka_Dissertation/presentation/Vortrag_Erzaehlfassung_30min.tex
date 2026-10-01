@@ -1,118 +1,100 @@
 \documentclass[11pt,a4paper]{article}
-%TC:macro \original [ignore,ignore,ignore,ignore]
-%TC:macro \hinweis [ignore]
-%TC:macro \station [ignore,ignore,ignore]
-%TC:macro \weiter [ignore]
-%TC:macro \rahmenbild [ignore,ignore]
+%TC:envir sprechtext 1
+%TC:macro \folie [ignore,ignore,ignore,ignore,ignore]
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage[ngerman]{babel}
-\usepackage{lmodern,microtype,amsmath,amssymb}
-\usepackage[margin=22mm,top=20mm,bottom=21mm,headheight=15pt]{geometry}
-\usepackage{graphicx,float,booktabs,tabularx,array,caption,tikz}
-\usepackage{xcolor,fancyhdr,enumitem,hyperref}
-\graphicspath{{../pictures/eaai_palette/}{../pictures/}{../pictures/jes_final/}}
+\usepackage{lmodern,microtype}
+\usepackage[margin=21mm,top=20mm,bottom=21mm,headheight=15pt]{geometry}
+\usepackage{graphicx,booktabs,tabularx,array,xcolor,fancyhdr,hyperref}
 \definecolor{tured}{HTML}{B6302D}
 \definecolor{ink}{HTML}{333333}
-\definecolor{secondaryfocus}{HTML}{39738E}
-\hypersetup{colorlinks=true,linkcolor=ink,urlcolor=ink,
-  pdftitle={Dissertationsvortrag: illustrierte Erzaehlfassung mit Formeln},
-  pdfauthor={Florian Rzepka},bookmarksnumbered=true}
-\captionsetup{font=small,labelfont=bf,justification=raggedright,singlelinecheck=false}
+\definecolor{quiet}{HTML}{626262}
+\hypersetup{colorlinks=true,linkcolor=tured,urlcolor=tured,
+ pdftitle={Dissertationsvortrag: Erzählfassung für 30 Minuten, Präsentation v1.12},
+ pdfauthor={Florian Rzepka},bookmarksopen=false}
 \setlength{\parindent}{0pt}
-\setlength{\parskip}{6pt plus 1pt}
-\setlength{\intextsep}{9pt}
-\setlength{\textfloatsep}{10pt}
-\setlist[itemize]{leftmargin=*,itemsep=4pt,topsep=5pt}
+\setlength{\parskip}{7pt}
+\setlength{\emergencystretch}{1em}
+\linespread{1.06}
+\raggedbottom
 \pagestyle{fancy}
 \fancyhf{}
-\fancyhead[L]{\small Florian Rzepka\enspace |\enspace Dissertationsvortrag}
-\fancyhead[R]{\small Illustrierte Erz\"ahlfassung}
-\fancyfoot[L]{\small Arbeitsfassung vom 7. September 2026}
-\fancyfoot[R]{\small\thepage}
+\fancyhead[L]{\small Florian Rzepka | Dissertationsvortrag}
+\fancyhead[R]{\small Erzählfassung zu v1.12}
+\fancyfoot[L]{\footnotesize Stand: 1. Oktober 2026}
+\fancyfoot[R]{\footnotesize\thepage}
 \renewcommand{\headrulewidth}{0.3pt}
-\newcommand{\station}[3]{\clearpage\section{#1}\label{station:\thesection}
-  {\small\textit{#2\enspace |\enspace #3}}\par\vspace{3pt}}
-\newcommand{\weiter}[1]{\clearpage{\large\bfseries #1}\par\vspace{4pt}}
-\newcommand{\original}[4]{\begin{figure}[H]\centering
-  \includegraphics[width=0.98\linewidth,height=#3mm,keepaspectratio]{#2}
-  \caption*{\textbf{Dissertation, Abbildung #1.} #4}\end{figure}}
-\newcommand{\hinweis}[1]{\par\vspace{2pt}{\small\color{ink}\textit{Vorbereitung:} #1}\par}
-% The focus outlines are document annotations. The original bitmap is unchanged.
-\newcommand{\rahmenbild}[2]{\begin{figure}[H]\centering
-  \begin{tikzpicture}
-    \node[anchor=south west,inner sep=0] (framework) at (0,0)
-      {\includegraphics[width=.94\linewidth]{bms_requirements.png}};
-    \begin{scope}[x={(framework.south east)},y={(framework.north west)}]
-      \ifnum#1=1
-        \draw[tured,line width=1.6pt] (.448,.470)--(.311,.692)--(.500,.998)--(.692,.692)--(.552,.470);
-        \draw[tured,line width=1.2pt] (.502,.754) ellipse[x radius=.047,y radius=.075];
-        \draw[secondaryfocus,line width=1.2pt,dashed] (.808,.133) ellipse[x radius=.041,y radius=.057];
-      \fi
-      \ifnum#1=2
-        \draw[tured,line width=1.6pt] (.663,.391)--(.806,.619)--(.998,.313)--(.806,.007)--(.663,.235);
-        \draw[tured,line width=1.6pt] (.350,.390)--(.208,.616)--(.018,.310)--(.208,.004)--(.350,.230);
-      \fi
-      \ifnum#1=3
-        \draw[tured,line width=1.6pt] (.448,.470)--(.311,.692)--(.500,.998)--(.692,.692)--(.552,.470);
-        \draw[tured,line width=1.6pt] (.350,.390)--(.208,.616)--(.018,.310)--(.208,.004)--(.350,.230);
-        \draw[secondaryfocus,line width=1.2pt,dashed] (.808,.133) ellipse[x radius=.041,y radius=.057];
-      \fi
-    \end{scope}
-  \end{tikzpicture}
-  \caption*{\textbf{Dissertation, Abbildung 2.1.} #2 Rot markiert den Hauptschwerpunkt.\ifnum#1=2\else\ Ein gestrichelter blauer Kreis markiert die erg\"anzend betrachtete Genauigkeit.\fi}
-  \end{figure}}
-\newcommand{\clip}{\operatorname{clip}}
-\newcommand{\MAE}{\operatorname{MAE}}
-\newcommand{\SOH}{\operatorname{SOH}}
-\newcommand{\SOC}{\operatorname{SOC}}
+\newenvironment{sprechtext}{}{}
+\newcommand{\folie}[5]{\clearpage
+  \pdfbookmark[1]{Folie #1: #2}{folie#1}
+  {\color{tured}\large\bfseries Folie #1: #2\par}
+  {\small\color{quiet}Zielzeit #3 min nach Beginn | Für diese Folie: #4 min\par}
+  \vspace{2mm}
+  \begin{center}\includegraphics[width=\linewidth]{assets/erzaehlfassung_v1_12/slide\ifnum#1<10 00\else 0\fi#1.png}\end{center}
+  {\small\color{quiet}\textit{Regiehinweis, nicht mitsprechen:} #5\par}
+  \vspace{3mm}
+}
 \begin{document}
 %TC:ignore
-\thispagestyle{empty}
-{\small\color{tured} DISPUTATION\enspace /\enspace INHALTLICHE ARBEITSFASSUNG}
-\vspace{6mm}
-
-{\LARGE\bfseries Neuronale Zustandsbestimmung\par
-f\"ur eingebettete\par
-Batteriemanagementsysteme\par}
+\pdfbookmark[0]{Vorbereitung und Zeitplan}{vorbereitung}
+{\small\color{tured} DISPUTATION | SPRECHMANUSKRIPT}
 \vspace{4mm}
-{\large Illustrierte Erz\"ahlfassung mit Modellgrundlagen und Formeln}
 
-\vspace{5mm}
-\textbf{Leitgedanke.} Welche Information ben\"otigt ein neuronales Modell, wie zuverl\"assig verarbeitet es diese Information und wie wird daraus eine kompakte, praktisch einsetzbare BMS-Implementierung? Diese drei Fragen verbinden Datenrepr\"asentation, Robustheit und Embedded-Optimierung zu einer gemeinsamen Arbeit.
+{\LARGE\bfseries Erzählfassung für 30 Minuten\par}
+{\large Zur Präsentation \texttt{Diss\_Presentation\_FR\_v1.12.pptx}\par}
+\vspace{3mm}
 
-\textbf{Lesart.} Die Erz\"ahlung folgt 27 Bildstationen mit drei vorgeschalteten Schwerpunktansichten. Die Abbildungsnummern sind durchg\"angig die Nummern der \emph{Dissertation}. Die Bilder stammen aus der aktuellen Dissertation. Beim BMS-Anforderungsbild markieren zus\"atzliche Konturen den jeweiligen Schwerpunkt, ohne die Originaldatei zu ver\"andern. Die Stationen sind noch keine fertigen Folien.
+\textbf{Umfang.} Die Fassung folgt den 40 Vortragsfolien der aktuellen
+Präsentation. Jede Folie hat einen Sprechtext, eine Abbildung der tatsächlichen
+Folie und einen kurzen Regiehinweis. Die Foliennummern beziehen sich auf die
+Position in PowerPoint. Der Anhang ab Folie 41 ist für Rückfragen vorgesehen.
 
-\renewcommand{\arraystretch}{1.3}
+\textbf{Zeitplanung.} 29 Minuten für Begrüßung und Vortrag, eine Minute Reserve.
+Die ungefähr 3\,428 Sprechwörter ergeben bei 125--130 Wörtern pro Minute
+etwa 26--27{,}5 Minuten reine Sprechzeit. Die verbleibende Zeit innerhalb des
+29-Minuten-Plans ist für Bildverweise, kurze Pausen und Folienwechsel gedacht.
+Die endgültige Dauer ergibt sich erst in der laut gesprochenen Generalprobe.
+
+\renewcommand{\arraystretch}{1.28}
 \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}Xrr@{}}
 \toprule
-Abschnitt & Stationen & Zeit \\
+Abschnitt & Folien & Zielzeit \\
 \midrule
-BMS und experimentelle Grundlage & 1 bis 3 & 3:30 \\
-Zeitliche Repr\"asentation mit einem MLP & 4 bis 8 & 6:30 \\
-Rekurrente Modelle und Robustheitsbenchmark & 9 bis 17 & 8:15 \\
-Ausf\"uhrung auf dem Mikrocontroller & 18 bis 19 & 1:45 \\
-Pruning, Quantisierung und gemessene Effekte & 20 bis 26 & 6:45 \\
-Gesamtergebnis und Ausblick & 27 & 2:15 \\
+Begrüßung, Motivation und Datengrundlage & 1--7 & 0:00--5:05 \\
+SOH-Schätzung mit MLP und Lag Sequences & 8--12 & 5:05--8:50 \\
+Schätzer, Störungen und Auswertung & 13--21 & 8:50--14:00 \\
+Ergebnisse des Robustheitsbenchmarks & 22--26 & 14:00--18:10 \\
+Architektur, Pruning und Quantisierung & 27--34 & 18:10--24:15 \\
+Genauigkeit, Speicher und Laufzeit & 35--38 & 24:15--27:40 \\
+Fazit und Übergang zur Diskussion & 39--40 & 27:40--29:00 \\
 \midrule
-Erz\"ahlung & & 29:00 \\
-Puffer & & 1:00 \\
+Reserve & & 29:00--30:00 \\
 \bottomrule
 \end{tabularx}
 
-\vspace{3mm}
-\textbf{Roter Faden.} Modell gestalten, Verhalten pr\"ufen, Implementierung optimieren. Beim MLP liegt der Schwerpunkt auf Deployment und Modellkomplexit\"at. Der Benchmark verbindet Performance und Hardware. Die Optimierung verbindet Deployment und Hardware mit Accuracy als Kontrollgr\"o\ss e. Die Bereiche bleiben miteinander verbunden.
+\vspace{4mm}
+\textbf{Kommission}\par
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright\arraybackslash}X@{}}
+Vorsitz & Prof. Dr.-Ing. Kai Strunz \\
+Gutachterin & Prof. Dr.-Ing. Julia Kowal, TU Berlin \\
+Gutachter & Prof. Dr.-Ing. Frank Opferkuch, TH Nürnberg \\
+Gutachter & Prof. Dr.-Ing. Weihan Li, RWTH Aachen \\
+\end{tabularx}
 
-\textbf{Zeitliche Konsequenz.} Die Zeitbl\"ocke schlie\ss en die kurzen Schwerpunktwechsel ein. Pro Ergebnisbild wird eine Beobachtung erkl\"art, nicht jedes Teilpanel. Die Zeit ist ein Probenziel. Rauschvertiefung und vollst\"andige Gate-Gleichungen stehen als Reserve am Ende. Bei einer zu langen Generalprobe lassen sich die Syntheseansichten 6.15 und 6.16 gemeinsam besprechen.
+\textbf{Begrüßung.} Auf Folie 1 ist ein etwa einminütiger Einstieg enthalten.
+Der persönliche Bezug zu Professor Opferkuch bleibt bei einem Satzpaar.
+Gesprochen reicht die Anrede \glqq Frau Professor Kowal\grqq{} beziehungsweise
+\glqq Herr Professor\grqq{}; die vollständigen akademischen Titel stehen hier
+zur Orientierung.
 
-\vfill
-{\small Bildauswahl und fachliche Pr\"ufhinweise am Ende geh\"oren nicht zum gesprochenen Vortrag. Dissertation, Originalgrafiken und PowerPoint bleiben unver\"andert.}
+\textbf{Lesart.} Nur die Absätze unter dem Regiehinweis sind Sprechtext.
+Die Hinweise auf dieser Seite und die Vorbereitung am Ende werden nicht
+mitgesprochen. Die vollständigen Gleichungsherleitungen bleiben im Anhang.
 %TC:endignore
-% BEGIN SPOKEN NARRATIVE
 \input{Vortrag_Erzaehlfassung_Grundlagen.tex}
 \input{Vortrag_Erzaehlfassung_Benchmark.tex}
 \input{Vortrag_Erzaehlfassung_Optimierung.tex}
-% END SPOKEN NARRATIVE
 %TC:ignore
 \input{Vortrag_Erzaehlfassung_Reserve.tex}
 %TC:endignore

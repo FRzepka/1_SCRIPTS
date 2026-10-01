@@ -1,0 +1,13 @@
+\topic{Abbildung A.7: Warum ist A ganz rot, aber C auch blau?}
+\question{Zeigen A und C dieselben Gewichtskombinationen?}
+Nein. Teil A zeigt ausgewählte Prioritätsreihen für SOC: Ein Kriterium erhält ein Gewicht zwischen 25 und 85 Prozent; der Rest wird gleich auf die anderen drei Kriterien verteilt. Beispiel: 85 Prozent Flash sowie jeweils fünf Prozent Genauigkeit, RAM und Laufzeitproxy. In allen dort dargestellten Kombinationen gewinnt Pruned (rot).
+
+Teil C umfasst dagegen sämtliche 1771 Kombinationen des verwendeten Rasters mit Schritten von fünf Prozentpunkten und insgesamt 100 Prozent Gewicht. Dazu gehören auch ungleich verteilte Restgewichte und Extremfälle mit 100 Prozent für ein einziges Kriterium. A ist deshalb nur eine begrenzte Auswahl, C eine umfassendere Untersuchung innerhalb des festgelegten Rasters.
+
+\question{Warum gewinnt Quantized beim SOC trotzdem in einem Teil der Fälle?}
+Quantized benötigt weniger Flash als Pruned. Wird dieser Vorteil sehr stark gewichtet und erhalten insbesondere seine Laufzeitnachteile wenig Gewicht, kann Quantized den günstigeren Gesamtwert erreichen. Ein eindeutiges Beispiel ist die reine Flash-Priorität: 100 Prozent Flash, null Prozent für die übrigen Kriterien. Diese Kombination liegt außerhalb des in A gezeigten Bereichs. Der blaue Anteil in C widerspricht den roten Punkten in A also nicht.
+
+\question{Welche Zahlen gelten nach der Flash-Korrektur?}
+Mit den korrigierten Flash-Werten aus den vorhandenen Firmware-Builds gewinnt beim SOC Pruned in rund 93,8 Prozent und Quantized in rund 6,2 Prozent der untersuchten Gewichtskombinationen. Diese Anteile beschreiben die Verteilung der Gewinner auf dem gewählten Raster, keine Wahrscheinlichkeit für einen Vorteil im realen Einsatz. Sie sind auch kein Prozentmaß für die Größe des Vorteils.
+
+\textbf{Antwort für die Verteidigung:} Teil A zeigt ausgewählte Gewichtungsreihen mit gleich verteilten Restgewichten. Dort gewinnt beim SOC durchgehend Pruned. Teil C untersucht zusätzlich andere und extremere Kombinationen. Bei stark dominierender Flash-Priorität kann Quantized gewinnen; daher erscheint dort ein blauer Anteil.

@@ -1,0 +1,24 @@
+\topic{Abbildung A.4: Die Dichtekurve richtig lesen}
+\question{Was wird links und rechts verglichen?}
+Links erhält jeder ganze Hidden-Kanal einen L2-Saliency-Score aus vielen Gewichten. Die x-Achse zeigt seinen Rangplatz, nicht einen Gewichtswert. Rechts werden dagegen einzelne rekurrente Gewichte betrachtet: Die x-Achse zeigt ihren Zahlenwert, die y-Achse eine normierte Dichte. Viele kleine Einzelgewichte können zusammen einen deutlich positiven Kanal-Score ergeben.
+
+\question{Bedeutet die Spitze bei null, dass viele Gewichte exakt null sind?}
+Nein. Sie zeigt eine starke Konzentration in einem Bereich um null. Den Anteil exakt null gesetzter Gewichte müsste man in den ursprünglichen Gewichten zählen:
+\[
+\text{Anteil exakt null}=\frac{\text{Anzahl der Gewichte mit Wert null}}{\text{Anzahl aller Gewichte}}.
+\]
+Beim strukturierten Pruning werden ganze Kanäle samt zugehörigen Zeilen und Spalten entfernt. Ihre Gewichte bleiben nicht als zusätzliche Nullen stehen.
+
+\question{Wie wird aus einer Dichte ein Prozentanteil?}
+Die Höhe allein ist kein Anteil. Entscheidend ist die Fläche unter der Dichte $f(w)$ in einem festgelegten Bereich:
+\[
+P(a\leq w\leq b)=\int_a^b f(w)\,\mathrm dw.
+\]
+Bei nahezu konstanter Höhe $h$ gilt näherungsweise: Anteil $\approx(b-a)h$. Beispiel: Zwischen $-0{,}01$ und $+0{,}01$ ist die Breite $0{,}02$. Bei ungefähr konstanter Dichte $2{,}5$ ergibt das $0{,}02\cdot2{,}5=0{,}05$, also fünf Prozent. Das ist ein Rechenbeispiel, kein aus der Abbildung bestimmter Anteil.
+
+Die Breite ergibt sich aus der Differenz der x-Werte. Die Unterkante liegt bei null; die Kurvenhöhen werden nicht voneinander abgezogen. Für einen schmalen Bereich kann man unterschiedliche Randhöhen mitteln (Trapeznäherung). Bei stärker gekrümmtem Verlauf braucht man mehrere Teilbereiche oder eine Integration. Die Gesamtfläche der normierten Verteilung ist eins; die Dichtehöhe darf größer als eins sein. Der gezeigte zentrale Ausschnitt muss nicht die gesamte Fläche enthalten.
+
+\question{Was bedeutet die niedrigere rote Spitze nach dem Pruning?}
+Die verbleibenden Gewichte sind im gezeigten zentralen Bereich weniger stark um null konzentriert; die Verteilung wirkt etwas breiter. Die Kurven sind normiert: Es geht um relative Anteile, nicht direkt um absolute Anzahlen. Um den Anteil kleiner Gewichte konkret zu vergleichen, muss man denselben Bereich um null festlegen und die Flächen vergleichen. Eine niedrigere Spitze allein beweist keinen kleineren Anteil in jedem beliebig breiten Bereich.
+
+\textbf{Antwort für die Verteidigung:} Nach dem Pruning ist die Gewichtsverteilung um null weniger stark konzentriert und etwas breiter. Entfernt wurden ganze Kanäle mit niedrigem Gesamtscore, nicht gezielt jedes einzelne kleine Gewicht. Die Grafik dokumentiert die strukturelle Auswahl; sie beweist weder eine Vergrößerung der verbleibenden Einzelgewichte noch die Ursache eines niedrigeren MAE.

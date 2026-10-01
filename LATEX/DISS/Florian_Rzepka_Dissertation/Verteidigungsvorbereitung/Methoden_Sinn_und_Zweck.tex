@@ -1,0 +1,114 @@
+\topic{Methoden verstehen: Was tun sie und warum?}
+\textbf{1/4 · Daten aufbereiten und darstellen}
+
+\textbf{Leseschlüssel:} Der Einsatz der folgenden Bausteine ist in Modellcode und Konfigurationen nachvollziehbar. Die Erklärung ihres Zwecks ist eine fachliche Begründung. Ohne einen kontrollierten Vergleich mit und ohne Baustein ist damit kein einzelner Genauigkeitsgewinn nachgewiesen. Die Beispiele beziehen sich vor allem auf das stündliche SOH-Modell aus Abschnitt 6.2.3.
+
+\question{Hourly Aggregation: Warum aus fünf Größen zwanzig Features werden}
+\textbf{Was passiert?} Spannung, Strom, Temperatur, EFC und kumulierte Ladung werden pro Stunde jeweils durch Mittelwert, Standardabweichung, Minimum und Maximum beschrieben: fünf Größen mal vier Kennzahlen ergibt zwanzig Features.
+
+\textbf{Warum hier?} SOH beschreibt langsame Alterung. Die Zusammenfassung reduziert die Zahl der Zeitschritte und macht lange Betriebszeiträume mit kürzeren Sequenzen verarbeitbar. Neben dem durchschnittlichen Niveau bleiben Schwankungen und Extremwerte als Hinweise auf die Belastung erhalten.
+
+\textbf{Beispiel und Grenze:} Zwei Stunden können denselben mittleren Strom haben, aber unterschiedlich starke Stromspitzen. Standardabweichung und Maximum unterscheiden diese Fälle. Die genaue Reihenfolge der Ereignisse innerhalb der Stunde geht trotzdem verloren. Stündliche Daten sind deshalb nicht automatisch besser als sekündliche Daten.
+
+\question{Input Scaling / RobustScaler: Warum vor dem Netz skalieren?}
+\textbf{Was passiert?} Jedes der zwanzig Features wird mit festen, aus den Trainingsdaten bestimmten Kennwerten umgerechnet. Der verwendete RobustScaler zentriert standardmäßig am Median und skaliert mit dem Interquartilsabstand:
+\[
+x'_j=\frac{x_j-\operatorname{Median}_{\rm train}(x_j)}{Q_{75,\rm train}(x_j)-Q_{25,\rm train}(x_j)}.
+\]
+\textbf{Warum hier?} Spannung, Temperatur und kumulierte Größen haben sehr unterschiedliche Zahlenbereiche. Scaling erleichtert die Optimierung, weil reine Einheitenunterschiede nicht die Größenordnung der Eingangswerte bestimmen. Median und Quartile sind weniger empfindlich gegenüber einzelnen Extremwerten als Mittelwert und Standardabweichung.
+
+\textbf{Beispiel und Grenze:} Ein Wert von 30 bei Median 20 und Interquartilsabstand 10 wird zu 1. Das entfernt weder einen Sensorfehler noch neue Ausreißer. Im Betrieb bleiben die Trainingskennwerte fest; sie werden nicht auf Testzellen neu angepasst.
+
+\question{Feature Embedding: Warum noch ein kleines MLP vor dem LSTM?}
+\textbf{Was passiert?} Zwei Linear Layers mit Aktivierungen bilden die skalierten zwanzig Features auf 128 interne Werte ab. Diese Gewichte werden gemeinsam mit dem restlichen Modell trainiert.
+
+\textbf{Warum hier?} Das Netz kann bereits vor der zeitlichen Verarbeitung Kombinationen von Stundenkennzahlen lernen. Das LSTM erhält eine auf die Vorhersageaufgabe trainierte Darstellung. Die 128 Werte enthalten keine zusätzlichen Messinformationen; sie sind berechnete Merkmale. Die Breite 128 ist eine Architekturwahl, keine notwendige Eigenschaft eines Embeddings.
+
+\clearpage
+\section*{\color{accent}Methoden verstehen: Schichten im Embedding}
+\textbf{2/4 · Kombinieren, normalisieren und nichtlinear verarbeiten}
+
+\textbf{Der geprüfte Inferenzpfad:} 20 skalierte Features $\rightarrow$ Linear 20 auf 128 $\rightarrow$ LayerNorm $\rightarrow$ GELU $\rightarrow$ Linear 128 auf 128 $\rightarrow$ GELU. Dropout kommt nur während des Trainings hinzu.
+
+\question{Linear Layer: Was wird hier eigentlich gelernt?}
+Jeder Ausgabewert ist eine gewichtete Summe der Eingaben plus Bias:
+\[
+u_j=\sum_{i=1}^{D}w_{ji}x_i+b_j.
+\]
+\textbf{Warum hier?} Die Gewichte lernen, welche Eingaben in welcher Kombination zur SOH-Schätzung beitragen. Die erste Matrix hat 128 Zeilen und 20 Spalten: Jede der 128 Zeilen berechnet eine andere Kombination der gleichen zwanzig Eingaben. Der Bias erlaubt zusätzlich eine Verschiebung.
+
+\textbf{Anschaulich:} Ein Zwischenwert könnte Spannung und Temperatur gemeinsam berücksichtigen. Welche Bedeutung ein einzelner gelernter Wert tatsächlich hat, ist ohne Analyse offen. Nur mehrere Linear Layers ohne dazwischenliegende Nichtlinearität wären wieder zu einer einzigen affinen Abbildung zusammenfassbar.
+
+\question{LayerNorm: Warum zusätzlich zum Input Scaling?}
+\textbf{Was passiert?} Nach der ersten Linear Layer werden Mittelwert und Varianz über die 128 Zwischenwerte desselben Stundenvektors berechnet. Jeder Wert wird normalisiert und danach mit gelernten Parametern skaliert und verschoben:
+\[
+y_j=\gamma_j\frac{u_j-\mu_u}{\sqrt{v_u+\varepsilon}}+\beta_j.
+\]
+Hier sind $\mu_u$ und $v_u$ Mittelwert und Varianz dieses Vektors; $\varepsilon$ stabilisiert die Division. $\gamma_j$ und $\beta_j$ werden gelernt.
+
+\textbf{Warum hier?} Auch aus skalierten Inputs können die trainierbaren Gewichte sehr unterschiedlich große Aktivierungen erzeugen. LayerNorm kontrolliert deren Größenordnung und kann dadurch die Optimierung stabilisieren. Sie verwendet keine Statistik über zukünftige Stunden und benötigt keine große Batch zur Statistikschätzung.
+
+\textbf{Abgrenzung:} Input Scaling nutzt feste Trainingskennwerte pro Eingangsfeature. LayerNorm nutzt die aktuellen Zwischenwerte innerhalb eines einzelnen Vektors. Es wird also nicht nochmals über die Stunde gemittelt und das Input Scaling nicht ersetzt. [L]
+
+\question{GELU: Warum diese Aktivierung?}
+\textbf{Was passiert?} GELU verändert jeden Wert nichtlinear und glatt. Anders als ReLU, die negative Werte auf null setzt, kann GELU kleine negative Ausgaben erhalten. Die genaue Definition lautet $\operatorname{GELU}(u)=u\Phi(u)$, wobei $\Phi$ die Verteilungsfunktion der Standardnormalverteilung ist.
+
+\textbf{Warum hier?} Die Aktivierung ermöglicht eine nichtlineare Merkmalsaufbereitung vor dem LSTM. Der glatte Übergang ist eine plausible Motivation für GELU. Ein Vorteil gegenüber ReLU wurde für dieses konkrete SOH-Modell durch die hier geprüften Unterlagen aber nicht isoliert belegt. [G]
+
+\clearpage
+\section*{\color{accent}Methoden verstehen: Gedächtnis und Residual Blocks}
+\textbf{3/4 · Warum mehrere unterschiedliche Netzbausteine?}
+
+\question{Zwei LSTM Layers: Warum nicht nur ein großes MLP?}
+\textbf{Was passiert?} Das erste LSTM verarbeitet die 128 Embedding-Werte einer Stunde und seinen bisherigen Zustand. Sein Hidden State mit 112 Werten wird zum Input des zweiten LSTM, das eigene Hidden und Cell States mit jeweils 112 Werten hat.
+
+\textbf{Warum hier?} Ein einzelner Stundenvektor beschreibt die aktuelle Stunde, Alterung hängt aber von der bisherigen Nutzung ab. Recurrent States ermöglichen eine gelernte Zusammenfassung dieser Historie. Das zweite LSTM kann zeitliche Muster der ersten Darstellung weiterverarbeiten. Zwei Layers sind eine Wahl der Modellkapazität, kein Beleg, dass zwei immer besser als eines sind.
+
+\textbf{Wichtig:} Hidden Size 112 bedeutet 112 interne Werte pro State und Layer, nicht 112 gespeicherte Stunden. Im stündlichen Betrieb werden die States zwischen den Updates weitergegeben.
+
+\question{Residual MLP Block / Skip Connection: Warum die Eingabe addieren?}
+\textbf{Was passiert?} Ein MLP-Zweig verarbeitet 112 Werte über eine Zwischenbreite von 160 zurück auf 112. Danach wird der ursprüngliche Input hinzugefügt und das Ergebnis normalisiert. Ohne Trainings-Dropout geschrieben:
+\[
+F(u)=W_2\operatorname{GELU}(W_1u+b_1)+b_2,
+\qquad y=\operatorname{LayerNorm}(u+F(u)).
+\]
+\textbf{Warum hier?} Der Zweig kann eine Ergänzung zur schon vorhandenen Darstellung lernen, statt sie vollständig neu erzeugen zu müssen. Der zusätzliche direkte Rechenweg kann außerdem den Gradientenfluss beim Training erleichtern. Deshalb heißt es Residual: Der lernbare Zweig liefert eine Änderung zum Input. Im Modell stehen drei solche Blöcke hintereinander. [R]
+
+\textbf{Zahlenbeispiel:} Input $(0{,}4;0{,}8)$ plus gelernte Änderung $(0{,}1;-0{,}2)$ ergibt $(0{,}5;0{,}6)$ vor LayerNorm. Für die Addition müssen beide Vektoren gleich lang sein. Deshalb geht der Block von 112 über 160 wieder auf 112 zurück.
+
+\textbf{Grenze:} Wegen der anschließenden LayerNorm ist der vollständige Block bei $F(u)=0$ nicht zwingend die unveränderte Identität. Die Skip Connection ist auch kein zusätzlicher Speicher über die Zeit; diese Aufgabe übernehmen die LSTM-States.
+
+\question{Output Head, ReLU, Sigmoid und linearer Output}
+\textbf{Was passiert?} Der SOH-Head aus Kapitel 6 bildet die Darstellung über 112 auf 160 auf 160 auf einen SOH-Wert ab. GELU liegt zwischen den Linear Layers. Der letzte Output ist linear.
+
+\textbf{Warum hier?} Der Head übersetzt die interne Darstellung in die gesuchte Zielgröße. Ein linearer SOH-Output erzwingt keine Sättigung nahe null oder eins, kann dafür aber auch außerhalb dieses Bereichs liegen. Die SOC-Heads verwenden Sigmoid, um die Ausgabe auf null bis eins zu begrenzen. Die einfacheren Embedded-Heads aus Kapitel 7 verwenden ReLU im Inneren. Das sind verschiedene Architekturentscheidungen, keine austauschbaren Namen für denselben Schritt.
+
+\clearpage
+\section*{\color{accent}Methoden verstehen: Training und Aussagegrenzen}
+\textbf{4/4 · Warum die Ausführung genauso wichtig ist wie die Architektur}
+
+\question{Dropout: Warum im Training absichtlich Werte ausblenden?}
+\textbf{Was passiert?} Während des Trainings werden zufällig Aktivierungen auf null gesetzt; die übrigen werden entsprechend skaliert. Bei der Inferenz ist Dropout deaktiviert.
+
+\textbf{Warum hier?} Das soll eine zu starke Abhängigkeit von einzelnen Aktivierungen reduzieren und Overfitting begrenzen. Es ist eine Regularisierung des Trainings. Es simuliert weder automatisch fehlende Sensorwerte noch löscht es dauerhaft Gewichte wie beim Pruning. Ob die konkrete Dropout-Rate optimal ist, erfordert einen Vergleich.
+
+\question{Training Chunk, Batch und Backpropagation-Horizont}
+\textbf{Was passiert?} Ein Chunk ist ein begrenzter zeitlicher Trainingsabschnitt. Eine Batch fasst mehrere solcher Beispiele für ein gemeinsames Gewichtsupdate zusammen. Beim stündlichen SOH-Modell ist die Chunk-Länge 192 Stunden, also acht Tage.
+
+\textbf{Warum hier?} Begrenzte Sequenzen halten Speicherbedarf und Rechenaufwand beim Training beherrschbar. Der Backpropagation-Horizont beschreibt, über wie viele Zeitschritte der Fehler rückwärts verfolgt wird. Daraus folgt nicht automatisch, dass ein Zustand nach acht Tagen gelöscht werden muss. Ein Zustandsreset ist eine separate Entscheidung der Implementierung.
+
+\question{Stateful Streaming und Rolling Window: Warum unterscheiden?}
+\textbf{Stateful Streaming:} Jeder neue Input wird mit dem bisherigen State verarbeitet. Beim stündlichen SOH-Modell werden Hidden und Cell States fortgeführt. Das nutzt die vorherige Rechnung und vermeidet vollständige Wiederholungen.
+
+\textbf{Rolling Window:} Beim SOC-DD-Hauptbenchmark wird für jede Schätzung das letzte Fenster von 2.024 Samples neu verarbeitet; zwischen Fenstern wird der State zurückgesetzt. Das erhält die trainierte Fenstersemantik, verursacht aber deutlich mehr Rechenarbeit. Schnelleres Streaming ist deshalb nicht automatisch numerisch derselbe Schätzer.
+
+\question{So begründe ich die Auswahl, ohne zu viel zu behaupten}
+\textbf{Belegt:} Die Architektur enthält Input Scaling, ein gelerntes Embedding, LayerNorm, GELU, zwei LSTM Layers und Residual Blocks. Jeder Baustein besitzt eine nachvollziehbare technische Funktion.
+
+\textbf{Plausible Motivation:} Stundenaggregation erschließt lange Zeiträume; das Embedding bereitet Features auf; Normalisierung und Residual Connections können die Optimierung erleichtern; die LSTMs verarbeiten Historie.
+
+\textbf{Nicht allein dadurch belegt:} Dass jeder Baustein den MAE senkt oder die beste Wahl ist. Dafür wäre eine Ablation nötig: einen Baustein gezielt ändern, unter vergleichbaren Bedingungen neu trainieren und auf denselben unabhängigen Daten auswerten. Die Auswahl erfolgt auf Trainings-/Validierungsdaten, nicht durch wiederholtes Optimieren auf dem Holdout.
+
+\textbf{Quellen und Codebezug.} Dissertation Abschnitt 6.2.3, gedruckte Seite 89; Modellkonfiguration und README von SOH\_JES2\_0.1.0; SOH-Modellklasse in train\_soh.py (0.1.2.3); shared\_soh\_trace.py für Stundenfeatures, Scaling und State-Weitergabe. Funktionsprüfung: 25.09.2026. Keine neue Ablationsstudie.
+
+\textbf{Methodenliteratur:} [L] Ba et al., \href{https://arxiv.org/abs/1607.06450}{Layer Normalization (2016)}. [G] Hendrycks und Gimpel, \href{https://arxiv.org/abs/1606.08415}{Gaussian Error Linear Units (2016)}. [R] He et al., \href{https://arxiv.org/abs/1512.03385}{Deep Residual Learning for Image Recognition (2015)}; allgemeines Residual-Prinzip, kein Wirksamkeitsnachweis für dieses SOH-Modell.

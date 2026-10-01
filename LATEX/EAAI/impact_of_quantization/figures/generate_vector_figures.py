@@ -109,8 +109,10 @@ def render_model_comparison() -> None:
     inventory = inventory.set_index("model")
     inventory = inventory.loc[MODEL_ORDER]
 
-    fig, (ax_error, ax_size) = plt.subplots(1, 2, figsize=(20, 9.2))
-    fig.subplots_adjust(left=0.073, right=0.985, top=0.91, bottom=0.18, wspace=0.23)
+    fig_error, ax_error = plt.subplots(figsize=(10, 9.2))
+    fig_size, ax_size = plt.subplots(figsize=(10, 9.2))
+    for figure in (fig_error, fig_size):
+        figure.subplots_adjust(left=0.17, right=0.975, top=0.85, bottom=0.18)
     positions = np.arange(len(MODEL_ORDER))
     width = 0.25
 
@@ -179,13 +181,16 @@ def render_model_comparison() -> None:
     ax_size.set_xticks(positions, [MODEL_LABELS[name] for name in MODEL_ORDER], fontweight="bold", fontsize=20)
     ax_size.tick_params(axis="y", labelsize=25)
 
-    for label, axis in zip(("(a)", "(b)"), (ax_error, ax_size)):
-        axis.text(-0.055, 1.045, label, transform=axis.transAxes, fontsize=17)
+    for axis in (ax_error, ax_size):
         axis.grid(axis="y", color="#D5D8DC", linestyle=(0, (4, 3)), linewidth=1.0)
         axis.spines["top"].set_visible(False)
         axis.spines["right"].set_visible(False)
 
-    save_pdf(fig, "baseline_model_comparison")
+    # Equal canvases keep the panels aligned when LaTeX adds subcaptions.
+    for figure, name in ((fig_error, "baseline_model_accuracy"),
+                         (fig_size, "baseline_model_fp32_weights")):
+        figure.savefig(FIGURES_DIR / f"{name}.pdf", format="pdf")
+        plt.close(figure)
 
 
 def render_selected_trajectory() -> None:
@@ -225,8 +230,8 @@ def render_selected_trajectory() -> None:
         edgecolor="#AFAFAF",
         fontsize=31,
     )
-    axis.set_xlim(0, float(trajectory["time_h"].max()))
-    axis.set_ylim(0.62, 1.00)
+    axis.set_xlim(0, float(trajectory["time_h"].max()) * 1.02)
+    axis.set_ylim(0.62, 1.02)
     axis.set_xlabel("Time [h]", fontsize=30, labelpad=17)
     axis.set_ylabel("SOH [0-1]", fontsize=30)
     axis.tick_params(axis="both", labelsize=26)

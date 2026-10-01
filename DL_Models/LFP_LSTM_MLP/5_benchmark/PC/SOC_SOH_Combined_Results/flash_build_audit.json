@@ -1,0 +1,102 @@
+{
+  "SOC": {
+    "Base": {
+      "elf": "STM32\\workspace_1.17.0\\AI_Project_LSTM_SOC_base\\Debug\\AI_Project_LSTM_SOC_base.elf",
+      "sha256": "238b3abe5104a98a7fcef4b73c6f4598cae0c3def1ee96e1b8620664e58c8f32",
+      "flash_bytes": 108924,
+      "flash_KiB": 106.37109375,
+      "segments": [
+        {
+          "address": "0x8000000",
+          "bytes": 108824
+        },
+        {
+          "address": "0x801a918",
+          "bytes": 100
+        }
+      ]
+    },
+    "Pruned": {
+      "elf": "STM32\\workspace_1.17.0\\AI_Project_LSTM_SOC_pruned\\Debug\\AI_Project_LSTM_SOC_pruned.elf",
+      "sha256": "dff58679cd5c3214448c2b04915d694c03ce8d00419daf7de65c5062332b0961",
+      "flash_bytes": 68436,
+      "flash_KiB": 66.83203125,
+      "segments": [
+        {
+          "address": "0x8000000",
+          "bytes": 68336
+        },
+        {
+          "address": "0x8010af0",
+          "bytes": 100
+        }
+      ]
+    },
+    "Quantized": {
+      "elf": "STM32\\workspace_1.17.0\\AI_Project_LSTM_SOC_quantized\\Debug\\AI_Project_LSTM_SOC_quantized.elf",
+      "sha256": "17b6af0630be5cd6132532dead929d947162454bbe8368f5b2b15d1089c9c084",
+      "flash_bytes": 54820,
+      "flash_KiB": 53.53515625,
+      "segments": [
+        {
+          "address": "0x8000000",
+          "bytes": 54720
+        },
+        {
+          "address": "0x800d5c0",
+          "bytes": 100
+        }
+      ]
+    }
+  },
+  "SOH": {
+    "Base": {
+      "elf": "STM32\\workspace_1.17.0\\AI_Project_LSTM_SOH_base\\Debug\\AI_Project_LSTM.elf",
+      "sha256": "7f2c6b03f5cffec41376f568a59a434390a8e224e31baa29dd5fa527dffddea4",
+      "flash_bytes": 359572,
+      "flash_KiB": 351.14453125,
+      "segments": [
+        {
+          "address": "0x8000000",
+          "bytes": 359472
+        },
+        {
+          "address": "0x8057c30",
+          "bytes": 100
+        }
+      ]
+    },
+    "Pruned": {
+      "elf": "STM32\\workspace_1.17.0\\AI_Project_LSTM_SOH_pruned\\Debug\\AI_Project_LSTM.elf",
+      "sha256": "22aa2ddcf7def41aa20d31b120923287ef2bad71a056de3f4dd7a028651d123e",
+      "flash_bytes": 203924,
+      "flash_KiB": 199.14453125,
+      "segments": [
+        {
+          "address": "0x8000000",
+          "bytes": 203824
+        },
+        {
+          "address": "0x8031c30",
+          "bytes": 100
+        }
+      ]
+    },
+    "Quantized": {
+      "elf": "STM32\\workspace_1.17.0\\AI_Project_LSTM_SOH_quantized\\Debug\\AI_Project_LSTM.elf",
+      "sha256": "566a4b49a867054c70041d4445d681487dc8dfb5d4f6e6a7c94031ae75051dbb",
+      "flash_bytes": 158532,
+      "flash_KiB": 154.81640625,
+      "segments": [
+        {
+          "address": "0x8000000",
+          "bytes": 158432
+        },
+        {
+          "address": "0x8026ae0",
+          "bytes": 100
+        }
+      ]
+    }
+  }
+}
