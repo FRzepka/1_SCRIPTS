@@ -1,0 +1,8 @@
+assets/
+__pycache__/
+*.aux
+*.log
+*.out
+*.toc
+*.xdv
+backup_vor_latex_*/

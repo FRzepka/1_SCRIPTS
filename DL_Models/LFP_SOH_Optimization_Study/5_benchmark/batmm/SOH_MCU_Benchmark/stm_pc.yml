@@ -1,0 +1,19 @@
+name: stm_pc
+channels:
+  - defaults
+  - conda-forge
+  - pytorch
+dependencies:
+  - python=3.10
+  - pip
+  - joblib==1.5.2
+  - numpy==1.26.4
+  - pandas==2.1.4
+  - pyserial==3.5
+  - PyYAML==6.0
+  - tensorflow==2.19.0
+  - pip:
+      - torch==2.4.0
+      - torch_pruning==1.6.1
+      - scikit-learn==1.7.2
+      - pyarrow==24.0.0

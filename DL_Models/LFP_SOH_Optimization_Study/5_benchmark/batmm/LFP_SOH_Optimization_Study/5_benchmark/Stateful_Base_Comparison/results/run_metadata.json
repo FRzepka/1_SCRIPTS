@@ -1,0 +1,22 @@
+{
+  "data_directory": "MGFarm_18650_FE",
+  "data_files": [
+    "df_FE_C11.parquet",
+    "df_FE_C23.parquet",
+    "df_FE_C29.parquet"
+  ],
+  "device": "cpu",
+  "test_cells": [
+    "C11",
+    "C23",
+    "C29"
+  ],
+  "sampling_interval_seconds": 3600,
+  "feature_aggregation": [
+    "mean",
+    "std",
+    "min",
+    "max"
+  ],
+  "target_aggregation": "last"
+}

@@ -1,0 +1,5153 @@
+Performance and Robustness Benchmarking of Battery
+SOC Estimation Methods for Embedded Applications
+Florian Rzepkaa,∗, Qinnan Chena , Julia Kowala
+a Technical University of Berlin, Chair of Electrical Energy Storage
+
+Technology, Einsteinufer 11, Berlin, 10587, Germany
+
+Abstract
+Robustness of battery State-of-Charge (SOC) estimation requires evidence beyond nominal accuracy. This study compares representatives of four major SOCestimation classes under one causal and cell-disjoint protocol: fixed-capacity
+Coulomb counting (DM), SOH-adaptive Coulomb counting (HDM), a secondorder equivalent-circuit observer (HECM), and a recurrent data-driven estimator (DD). LFP aging trajectories span multiple load, thermal, and SOH conditions. The evaluation combines nominal accuracy against the dataset ground
+truth, robustness under corrupted or unavailable measurements, recovery after
+an initialization mismatch, and embedded execution cost. The six-cell macro
+MAE under nominal inputs is 0.0690 for DM, 0.0412 for HDM, 0.0337 for
+HECM, and 0.0258 for DD. DD also leads several disturbance cases, whereas
+HECM provides the strongest observed recovery profile with a mean observed
+time to persistent recovery or censoring of 1.20 h compared with 2.60 h for
+DD. DM and HDM retain a cell-macro persistent-censor fraction of 0.89. The
+changing order across disturbance families and score aggregations reveals complementary strengths instead of one consistently dominant implementation. On
+the STM32 target, all isolated SOC cores reproduce their software references
+and meet the one-second deadline, while direct measurements of latency, flash,
+∗ Corresponding author.
+
+Email addresses: florian.rzepka@tu-berlin.de (Florian Rzepka),
+qinnan.chen@campus.tu-berlin.de (Qinnan Chen), julia.kowal@tu-berlin.de (Julia
+Kowal)
+
+and runtime RAM expose substantial implementation trade-offs. The results
+establish a deployment-oriented evaluation framework that connects accuracy,
+disturbance-specific robustness, recovery, and embedded feasibility.
+Keywords: Battery management system, State of charge, Robustness
+benchmark, Fault tolerance, Equivalent circuit model, Recurrent neural
+network, Embedded implementation, Microcontroller
+
+1
+
+Nomenclature
+
+2
+
+Acronyms
+
+3
+
+BMS
+
+Battery management system
+
+4
+
+SOC
+
+State of charge
+
+5
+
+SOH
+
+State of health
+
+6
+
+DM
+
+Direct-measurement model
+
+7
+
+HDM
+
+Hybrid direct-measurement model
+
+8
+
+HECM
+
+Hybrid equivalent-circuit model
+
+9
+
+DD
+
+Data-driven neural model
+
+10
+
+ECM
+
+Equivalent circuit model
+
+11
+
+EKF
+
+Extended Kalman filter
+
+12
+
+MAE
+
+Mean absolute error
+
+13
+
+RMSE
+
+Root-mean-square error
+
+14
+
+ADC
+
+Analog-to-digital converter
+
+15
+
+CV
+
+Constant-voltage phase
+
+16
+
+OCV
+
+Open-circuit voltage
+
+17
+
+GRU
+
+Gated recurrent unit
+
+18
+
+LSTM
+
+Long short-term memory
+
+19
+
+LFP
+
+Lithium iron phosphate
+
+2
+
+20
+
+Symbols
+
+21
+
+t
+
+Time
+
+22
+
+I(t)
+
+Current signal at time t
+
+23
+
+U (t)
+
+Voltage signal at time t
+
+24
+
+T (t)
+
+Temperature signal at time t
+
+25
+
+d
+SOC(t)
+
+Estimated state of charge at time t
+
+26
+
+d
+SOH(t)
+
+Estimated state of health at time t
+
+27
+
+SOCref (t)
+
+Dataset SOC ground truth at time t
+
+28
+
+SOHref (t)
+
+Reference SOH target at time t
+
+29
+
+bI
+
+Multiplicative current-gain error
+
+30
+
+∆U
+
+Voltage bias or offset
+
+31
+
+∆T
+
+Temperature bias or offset
+
+32
+
+σI
+
+Standard deviation of injected current noise
+
+33
+
+σU
+
+Standard deviation of injected voltage noise
+
+34
+
+σT
+
+Standard deviation of injected temperature noise
+
+35
+
+Qc
+
+Online cumulative charge state used by the SOC models
+
+36
+
+Cnom
+
+Nominal capacity
+
+37
+
+Ceff
+
+Effective capacity used inside the estimator
+
+38
+
+Umax
+
+Upper voltage threshold used for full-charge detection
+
+39
+
+Utol
+
+Voltage tolerance used in the full-charge condition
+
+40
+
+U1 , U2
+
+Polarization voltages of the first and second RC branch
+
+41
+
+∆MAE
+
+Error increase relative to baseline
+
+42
+
+1. Introduction
+
+43
+
+1.1. Motivation and practical relevance
+
+44
+
+Reliable battery state estimation is a core BMS function because SOC and
+
+45
+
+SOH determine safety margins, usable energy, operating limits, charge con-
+
+46
+
+trol, and degradation-aware system management in both mobile and stationary
+3
+
+47
+
+lithium-ion battery applications [1, 2, 3]. Practical deployment quality is not
+
+48
+
+defined by clean-condition accuracy alone, because real BMS operation is ex-
+
+49
+
+posed to sensor gain and offset errors, additive noise, initialization uncertainty
+
+50
+
+after restart, missing samples, irregular sampling, communication interruptions,
+
+51
+
+and transient signal spikes caused by measurement-chain limitations or distur-
+
+52
+
+bances in the surrounding system [4, 5, 6]. The relevant engineering question
+
+53
+
+is therefore not only whether an estimator achieves low MAE under nominal
+
+54
+
+measurements, but also whether it converges back to a reliable state after dis-
+
+55
+
+turbed initialization and whether it remains stable under physically plausible
+
+56
+
+measurement corruption.
+
+57
+
+As summarized conceptually in Figure 1, the present benchmark treats
+
+58
+
+deployment-facing estimator quality as a three-dimensional problem consisting
+
+59
+
+of nominal accuracy, recovery after state inconsistency, and robustness against
+
+60
+
+disturbed measurements and signal-integrity faults, embedded within broader
+
+61
+
+constraints on memory and execution time. The central question is how four
+
+62
+
+structurally different SOC-estimation classes, represented by the implementa-
+
+63
+
+tions studied here, respond to common failure mechanisms and microcontroller
+
+64
+
+constraints, and whether their nominal ranking remains informative under those
+
+65
+
+conditions. This distinction is essential because one implementation can be ac-
+
+66
+
+curate under clean measurements yet difficult to re-anchor, sensitive to a specific
+
+67
+
+input fault, or too costly under its trained inference semantics.
+
+68
+
+1.2. State of the art in battery state estimation
+
+69
+
+The literature commonly groups battery-state estimators into direct-measurement
+
+70
+
+or integration-based approaches, model-based approaches based on equivalent-
+
+71
+
+circuit or electrochemical models, hybrid approaches that combine physical
+
+72
+
+structure with learned components, and purely data-driven models based on
+
+73
+
+neural sequence learning [7, 1, 2, 3]. Direct-measurement approaches, typically
+
+74
+
+based on Coulomb counting, are attractive because they are simple, compu-
+
+75
+
+tationally inexpensive, and easy to deploy. However, they remain structurally
+
+76
+
+sensitive to current-gain error, missing data, and initialization errors because
+4
+
+Figure 1: Conceptual overview of deployment-oriented requirements for embedded BMS state
+estimation. The broader requirement space includes implementation effort, hardware constraints, and estimator performance, whereas the present study focuses on the performance
+branch and evaluates baseline accuracy, convergence behavior, and robustness under measurement disturbances.
+
+77
+
+they lack an internal correction mechanism [7, 4]. Model-based approaches,
+
+78
+
+especially ECM- and observer-based estimators, offer physical interpretability
+
+79
+
+and voltage-based correction capability, but their practical behavior depends
+
+80
+
+strongly on the quality of model parametrization, operating-point observability,
+
+81
+
+and measurement quality [8, 2, 4].
+
+82
+
+Hybrid estimators seek to combine physical state propagation with learned
+
+83
+
+adaptation of capacity, parameters, or auxiliary states, which has made joint
+
+84
+
+SOC/SOH estimation an active research direction [9, 10, 11]. This combination
+
+85
+
+can improve baseline calibration, while it does not necessarily eliminate struc-
+
+86
+
+tural sensitivity to measurement disturbances. Data-driven approaches based
+
+87
+
+on recurrent or sequence models can exploit nonlinear cross-relations between
+
+88
+
+current, voltage, temperature, and derived online features, and recent work has
+
+89
+
+also demonstrated their embedded feasibility through TinyML-oriented imple5
+
+90
+
+mentations, pruning, and quantization [12, 13, 14, 15, 3].
+
+91
+
+1.3. Performance and embedded deployment gap
+
+92
+
+A large share of the SOC estimation literature still emphasizes clean-data ac-
+
+93
+
+curacy, average error metrics, or computational efficiency, while comparatively
+
+94
+
+fewer studies analyze how estimators behave under realistic measurement faults
+
+95
+
+and timing corruption [1, 13, 14, 15]. Existing robustness studies often remain
+
+96
+
+confined to a single model family, for example observer-based robustness against
+
+97
+
+modeling and measurement errors [4] or robust estimation concepts for specific
+
+98
+
+BMS architectures under noise and uncertainty [5], whereas cross-family com-
+
+99
+
+parisons under the same disturbance protocol and under comparable embedded
+
+100
+
+constraints remain limited. Benchmarking studies in the broader BMS con-
+
+101
+
+text underline the importance of reproducible scenario design and deployment-
+
+102
+
+relevant validation, but they do not by themselves close the gap between clean-
+
+103
+
+data estimator comparison and measurement-level performance benchmarking
+
+104
+
+across fundamentally different estimator classes [6]. This gap is especially rele-
+
+105
+
+vant in embedded BMS design, where estimator selection must jointly consider
+
+106
+
+nominal accuracy, convergence, robustness under disturbed measurements, and
+
+107
+
+computational constraints.
+
+108
+
+1.4. Contribution and study objectives
+
+109
+
+This work addresses the gap through three linked questions: whether clean-
+
+110
+
+data accuracy predicts performance under measurement and signal-integrity dis-
+
+111
+
+turbances, which structural mechanisms govern degradation and recovery, and
+
+112
+
+how the resulting behavior trades against embedded execution cost. To an-
+
+113
+
+swer them, four deployment-oriented representatives are executed under one
+
+114
+
+causal protocol on cell-disjoint LFP aging data covering multiple load and SOH
+
+115
+
+states. The campaign combines physically interpretable measurement, timing,
+
+116
+
+availability, quantization, and initialization disturbances with a common recov-
+
+117
+
+ery criterion, cell-level uncertainty analysis, a paired SOH-input ablation, and
+
+118
+
+STM32 measurements of the isolated SOC cores.
+6
+
+Table 1: Estimator-class envelope and implementation scope. The last column defines the
+representative evaluated for each dominant SOC update and correction mechanism.
+Class
+
+Minimum defining mechanism
+
+Broader class can include
+
+Representative used in this study
+
+Direct measurement
+
+Causal integration of measured
+
+Coulombic efficiency, capacity adaptation,
+
+Fixed-capacity Coulomb counting with a sus-
+
+current using an assumed capac-
+
+OCV or end-point anchoring, plausibility
+
+tained full-charge CV reset and no voltage-
+
+ity
+
+logic, and reset thresholds
+
+residual correction
+
+augmented
+
+Learned capacity or efficiency, residual cor-
+
+Same Coulomb-counting and reset logic as DM,
+
+or
+
+rection, multi-sensor fusion, and adaptive
+
+with effective capacity supplied by the shared
+
+state/parameter
+
+anchoring
+
+causal LSTM-SOH estimate
+
+Coulomb-counted SOC propaga-
+
+Higher RC order,
+
+thermal
+
+Second-order RC model with EKF correction,
+
+tion plus a voltage model and
+
+states, SOC/SOH/temperature maps, and
+
+charge/discharge SOC–SOH lookup surfaces, and
+
+feedback correction
+
+different nonlinear observers
+
+shared causal SOH input
+
+Learned mapping from measured
+
+Feed-forward,
+
+signals or their history to SOC
+
+attention-based,
+
+Hybrid direct mea-
+
+Integration
+
+surement
+
+by
+
+ECM observer
+
+Data driven
+
+an
+
+core
+
+estimated
+
+learned
+
+hysteresis,
+
+convolutional,
+
+recurrent,
+
+physics-informed,
+
+raw-
+
+signal, or engineered-feature models
+
+Structurally pruned rolling-window GRU using
+voltage, current, temperature, SOH, Qc , derivatives, and ∆t
+
+119
+
+The four evaluated implementations provide distinct update and correction
+
+120
+
+mechanisms whose behavior can be traced across the same disturbances, re-
+
+121
+
+covery criterion, and hardware measurements. The resulting comparison links
+
+122
+
+estimator selection to the fault profile and resource constraints of the target
+
+123
+
+BMS application.
+
+124
+
+2. Methodology
+
+125
+
+2.1. Estimator representatives and class boundaries
+
+126
+
+Figure 2 summarizes the causal benchmark chain, from measured signals
+
+127
+
+and online feature reconstruction to disturbance injection and global and local
+
+128
+
+evaluation. The four estimators were selected because their dominant SOC
+
+129
+
+update and correction mechanisms differ. Table 1 relates these mechanisms to
+
+130
+
+the broader design space and specifies the implementation evaluated for each
+
+131
+
+class. Learned corrections, higher-order dynamics, richer sensing, and more
+
+132
+
+complex sequence architectures extend these class envelopes while also changing
+
+133
+
+deployment cost.
+
+134
+
+All SOH-dependent representatives, namely HDM, HECM, and DD, receive
+
+135
+
+the same causal LSTM-SOH trace so that differences arise from how the SOC
+
+136
+
+branch consumes that context. DM is the low-complexity integration reference.
+
+137
+
+HDM isolates the effect of learned capacity adaptation without adding volt-
+
+138
+
+age feedback. HECM adds model-based voltage-residual correction to current-
+
+139
+
+driven state propagation. DD represents compact temporal learning. The GRU
+7
+
+Figure 2: Methodology overview for the causal benchmark chain. Measured battery signals are
+converted into online auxiliary features, processed by representative estimator implementations, exposed to measurement and initialization interventions, and finally evaluated through
+global and local performance metrics.
+
+140
+
+was selected because SOC and disturbance recovery depend on recent signal his-
+
+141
+
+tory while its gated single-state structure is lighter than a comparable LSTM.
+
+142
+
+Because DD also consumes the engineered Qc feature, it is a data-driven se-
+
+143
+
+quence estimator with physics-informed inputs rather than a raw-signal-only
+
+144
+
+neural model.
+
+145
+
+2.2. SOC estimation methods
+
+146
+
+2.2.1. Direct-measurement model (DM)
+
+147
+
+The direct-measurement SOC formulation used in DM, HDM, and as an
+
+148
+
+explicit auxiliary feature in DD follows the same online cumulative-charge state,
+
+149
+
+denoted here uniformly as Qc . It is updated causally from the measured current
+
+150
+
+stream as
+Qc (k) = Qc (k − 1) +
+
+Ik ∆tk
+,
+3600 s h−1
+
+(1)
+
+151
+
+where Ik is given in ampere and ∆tk in seconds, so that the factor 3600 s h−1
+
+152
+
+converts the increment to ampere-hours. The sign convention is fixed by the
+
+153
+
+benchmark implementation and the state is reset to Qc = 0 after a sustained
+
+154
+
+constant-voltage full-charge event. In the DM, this same charge state is mapped
+
+155
+
+directly to SOC through the fixed nominal capacity
+
+
+[ DM (k) = clip 1 + Qc (k) , 0, 1 .
+SOC
+Cnom
+
+8
+
+(2)
+
+156
+
+157
+
+158
+
+159
+
+2.2.2. Hybrid direct-measurement model (HDM)
+The HDM preserves exactly the same Coulomb-counting core and differs
+only in the capacity term. The SOH estimate rescales the usable capacity as
+[
+Ceff (k) = Cnom · SOH(k),
+
+(3)
+
+
+
+Qc (k)
+[
+SOCHDM (k) = clip 1 +
+, 0, 1 .
+Ceff (k)
+
+(4)
+
+which yields
+
+160
+
+This formulation makes the relation between DM and HDM explicit: both use
+
+161
+
+the same online charge state Qc , while only the denominator changes through
+
+162
+
+online SOH support. In both direct-measurement variants, a sustained near-
+
+163
+
+maximum voltage condition is interpreted as a constant-voltage full-charge event.
+
+164
+
+If the voltage remains above Umax −Utol , where Utol denotes the admissible volt-
+
+165
+
+age margin below the upper threshold Umax , for the configured CV duration,
+
+166
+
+[ = 1. This rethe internal charge state is reset so that Qc = 0 and therefore SOC
+
+167
+
+flects the practical assumption that a completed CV phase provides a physically
+
+168
+
+anchored full-charge reference.
+
+169
+
+2.2.3. Hybrid equivalent-circuit model (HECM)
+
+170
+
+171
+
+The hybrid ECM model is implemented as a second-order RC model with
+the state vector
+h
+[k
+xk = SOC
+
+U1,k
+
+U2,k
+
+i⊤
+
+(5)
+
+,
+
+172
+
+where U1 and U2 denote the polarization voltages of the two RC branches. The
+
+173
+
+prediction step propagates the state according to
+x−
+k = Ak xk−1 + bk Ik−1 ,
+
+174
+
+(6)
+
+with
+
+
+
+Ak = diag 1, e−∆tk /τ1 , e−∆tk /τ2 ,
+
+9
+
+η∆tk /Cb
+
+
+
+
+
+
+
+bk = R1 1 − e−∆tk /τ1  ,
+
+
+R2 1 − e−∆tk /τ2
+
+(7)
+
+175
+
+[ is the SOH-scaled available capacity. The corrected terminalwhere Cb = C0 SOH
+
+176
+
+voltage estimate is written as
+bk = OCV(SOC
+[ k , SOH
+[ k , Ik ) + U1,k + U2,k + Ri Ik ,
+U
+
+(8)
+
+177
+
+bk and the measured terminal
+and the Kalman update uses the residual between U
+
+178
+
+voltage to correct the internal state. In the present implementation, the state
+
+179
+
+propagation is driven by the previous current sample Ik−1 , whereas the mea-
+
+180
+
+surement equation uses the current sample Ik available at the correction step.
+
+181
+
+The ECM parameters are not constant. The implementation interpolates Ri ,
+
+182
+
+R1 , R2 , τ1 , τ2 , OCV, and dOCV/dSOC from a preidentified lookup table over
+
+183
+
+SOC and SOH, with separate charge and discharge parameter surfaces. The
+
+184
+
+HECM is implemented as a two-RC observer with SOH-dependent parameter
+
+185
+
+scheduling.
+
+186
+
+2.2.4. Data-driven SOC model (DD)
+
+187
+
+The data-driven SOC model is a GRU-based recurrent estimator with the
+
+188
+
+feature vector {U [V], I [A], T [◦ C], SOH, Qc , dU/dt, dI/dt, ∆t}. The bench-
+
+189
+
+marked, structurally pruned and fine-tuned model consists of a single-layer GRU
+
+190
+
+with hidden size 67 followed by an MLP head with one hidden layer of size 96
+
+191
+
+and a sigmoid output layer. During optimization, the recurrent core is exposed
+
+192
+
+to causal sequence segments of length LSOC = 2024 samples. Within this fea-
+
+193
+
+ture set, Qc is exactly the same online cumulative-charge state defined in (1).
+
+194
+
+It is included explicitly so that the neural estimator receives the same charge-
+
+195
+
+throughput information that also drives DM and HDM. The derivative channels
+
+196
+
+are computed online as the finite differences dI/dt(k) = (Ik − Ik−1 )/∆tk and
+
+197
+
+dU/dt(k) = (Uk − Uk−1 )/∆tk . They provide local transient information that is
+
+198
+
+not captured by the absolute channels alone. The additional feature ∆tk allows
+
+199
+
+the network to distinguish amplitude changes from sampling-interval changes
+
+200
+
+under irregular timing. During the primary benchmark, each output is calcu-
+
+201
+
+lated from the latest causal 2024-sample window and recurrent state is reset
+
+202
+
+between windows, matching training and validation. This configuration uses
+10
+
+203
+
+measured and causally reconstructed inputs up to the current sample. The
+
+204
+
+hardware analysis additionally evaluates continuous hidden-state forwarding as
+
+205
+
+a deployment variant and reports its accuracy and resource demand separately.
+
+206
+
+2.3. SOH estimation method
+
+207
+
+The shared SOH estimator is an LSTM-based sequence-to-sequence model
+
+208
+
+that operates on hourly aggregated online features derived from {U [V], I [A],
+
+209
+
+T [◦ C], EFC, Qc }, where the aggregation uses the statistics mean, standard
+
+210
+
+deviation, minimum, and maximum for each feature [16, 17, 18, 19]. This
+
+211
+
+transforms the five base channels into a 20-dimensional hourly feature vector.
+
+212
+
+Architecturally, the SOH network first projects the aggregated input through
+
+213
+
+a two-layer feature embedding block with size 128, layer normalization, GELU
+
+214
+
+activations, and dropout, then processes the sequence with a two-layer unidirec-
+
+215
+
+tional LSTM of hidden size 112, and finally maps the recurrent output through
+
+216
+
+three residual MLP blocks and a prediction head with hidden size 160 to obtain
+
+217
+
+the SOH estimate for each hourly step.
+
+218
+
+During optimization, the SOH estimator is exposed to causal hourly se-
+
+219
+
+quence segments, and benchmark execution processes one hourly aggregate at a
+
+220
+
+time with causal hidden- and cell-state forwarding. This allows the estimator to
+
+221
+
+accumulate degradation context without access to future information. The first
+
+222
+
+hourly output is anchored with the configured initial SOH value before subse-
+
+223
+
+quent hourly predictions are taken directly from the recurrent model output.
+
+224
+
+The SOH prediction is updated at hourly cadence and held piecewise constant
+
+225
+
+between update points. This online update structure matches the gradually
+
+226
+
+evolving capacity fade in the dataset and supplies the latest SOH context to
+
+227
+
+the faster SOC estimators. In the HDM, the predicted SOH enters the SOC
+
+228
+
+[ so the
+computation through the effective capacity relation Ceff = Cnom · SOH,
+
+229
+
+method remains structurally close to direct measurement while replacing the
+
+230
+
+fixed-capacity assumption. In the HECM, the predicted SOH affects the capac-
+
+231
+
+ity scaling and the lookup-based ECM parametrization, while in the DD model
+
+232
+
+it is provided as an explicit SOC input feature that contextualizes the current
+11
+
+233
+
+measurement trajectory.
+
+234
+
+2.4. Model and target-hardware preparation
+
+235
+
+The software benchmark uses trained floating-point model parameters and
+
+236
+
+input scalers fixed before holdout evaluation. Neural training, validation, hyper-
+
+237
+
+parameter selection, scaler fitting, pruning, model selection, and HECM param-
+
+238
+
+eter identification use the declared training and validation cells. The HPPC-
+
+239
+
+derived HECM lookup surfaces were identified from this model-development
+
+240
+
+subset and fixed without retuning before benchmark evaluation. The cells C09,
+
+241
+
+C13, C15, C25, C27, and C29 are reserved for holdout evaluation. The compact
+
+242
+
+SOC-GRU has hidden size 67 and the shared SOH-LSTM has hidden size 112.
+
+243
+
+The continuous C29 lifecycle replay is identified separately as a mechanism-
+
+244
+
+focused diagnostic.
+
+245
+
+The target-hardware experiment evaluates the isolated SOC cores on a NUCLEO-
+
+246
+
+H753ZI board with a 480 MHz STM32H753 Cortex-M7. To separate SOC imple-
+
+247
+
+mentation cost from the shared SOH service, the board receives the precomputed
+
+248
+
+causal SOH trace used by the software reference. The SOH-LSTM itself is not
+
+249
+
+executed on the microcontroller. Numerical equivalence and inference latency
+
+250
+
+are measured directly on the board. Execution time is recorded for every valid
+
+251
+
+inference with the processor-integrated hardware cycle counter, and each cell
+
+252
+
+sequence is replayed three times. Flash occupancy is calculated from the com-
+
+253
+
+piled firmware regions that must be stored in the microcontroller’s non-volatile
+
+254
+
+program memory.
+
+255
+
+Runtime RAM is divided into statically allocated variable storage, dynam-
+
+256
+
+ically allocated memory, and temporary memory used during nested function
+
+257
+
+calls. The static component includes both initialized variables and variables
+
+258
+
+set to zero during system startup. Maximum temporary function-call mem-
+
+259
+
+ory is measured by filling the available stack region with a known pattern be-
+
+260
+
+fore initialization. After a representative 2025-sample replay of cell C09, the
+
+261
+
+deepest overwritten address identifies the maximum function-call memory used.
+
+262
+
+Dynamic-memory management is instrumented to record the maximum cumu12
+
+263
+
+lative allocation reached during execution. The reported peak RAM combines
+
+264
+
+these three contributions and covers startup, protocol handling, and estimator
+
+265
+
+execution. An unused compilation-time memory reserve is kept separate from
+
+266
+
+the measured demand. The exact rolling-window DD produces two valid calls
+
+267
+
+after its 2023-sample warm-up in this memory replay, so its measured stack
+
+268
+
+maximum applies to those calls, while its dominant static window allocation
+
+269
+
+is determined at link time. Predictions are compared with both the software
+
+270
+
+implementation and dataset SOC. These measurements quantify the resource
+
+271
+
+demand of the isolated SOC implementations with SOH supplied as an external
+
+272
+
+causal trace.
+
+273
+
+2.5. Robustness benchmark design
+
+274
+
+The primary cross-model benchmark manipulates current, voltage, tempera-
+
+275
+
+ture, sample availability, and sampling time, all of which are measured or recon-
+
+276
+
+structed online by a BMS. A separate initialization branch acts on deployment-
+
+277
+
+accessible estimator states. Parameter mismatch is excluded from this common
+
+278
+
+ranking and examined separately through the HECM lookup-table sensitivity.
+
+279
+
+Figure 3 groups the primary scenarios into input disturbances, initialization
+
+280
+
+errors, and signal-integrity faults, while Table 2 defines their implementation
+
+281
+
+[6].
+
+282
+
+The disturbance magnitudes follow three practical levels of justification:
+
+283
+
+deployment-level sensing limits, adverse measurement corruption, and signal-
+
+284
+
+integrity stress conditions [20, 21, 22, 23, 24, 25]. Input disturbances include
+
+285
+
+gain error, sensor noise, voltage spikes, and ADC quantization. The remaining
+
+286
+
+scenarios address estimator initialization, sample availability, and sampling-time
+
+287
+
+integrity. Together they form a controlled and reproducible benchmark matrix
+
+288
+
+for exposing estimator-specific failure mechanisms under a common protocol.
+
+13
+
+Figure 3: Taxonomy of the disturbance scenarios used in the performance benchmark, grouped
+into input disturbances, initialization errors, and signal-integrity faults.
+
+Table 2: Disturbance configurations used in the benchmark and their practical rationale. Exact numeric values are fixed benchmark settings. The cited
+sources motivate disturbance type and magnitude range.
+
+Scenario
+
+Benchmark setup
+
+Practical origin / rationale
+
+ADC
+
+∆I = 0.01 A,
+
+ADC steps, sensor scaling, rounding, and
+
+quantization ∆U = 0.005 V, and
+∆T = 0.5 ◦ C
+Current gain Imeas = I(1 + b) with
+error
+
+b = ±0.5%, ±1.5%, and
+
+coarse deployment-level discretization
+[20, 21, 26]
+Sensor gain error, miscalibration, drift, and
+upper bound as stress case [21, 22, 23]
+
+±3.0%. Both signs are
+evaluated at each
+magnitude
+Current
+
+Gaussian with σI = 0.02 A
+
+Sensing-chain noise, EMI pickup, and low
+
+noise
+
+and 0.10 A
+
+and high sensor-noise levels [4, 5]
+
+Voltage
+
+Gaussian with σU = 0.01 V Wiring noise, front-end noise, poor
+
+noise
+
+filtering, and EMI [4, 20, 24]
+
+Temperature Gaussian with σT = 1.0 ◦ C Sensor tolerance, conversion noise, thermal
+noise
+
+gradients, and sensor-to-cell mismatch
+[26, 11]
+
+14
+
+Table 2: Disturbance configurations used in the benchmark and practical rationale (continued).
+
+Scenario
+
+Benchmark setup
+
+Practical origin / rationale
+
+Voltage
+
+Additive
+
+Front-end offset, calibration residual,
+
+offset
+
+Umeas = U + 0.02 V
+
+wiring contribution, and adverse sensing
+stress
+
+Temperature Additive Tmeas = T + 3 ◦ C Sensor placement error, calibration
+offset
+
+residual, and cell-to-sensor thermal
+mismatch
+
+Initial SOC
+
+Initial mismatch of −0.10
+
+Restart, storage, missing recent history,
+
+error
+
+SOC, with DD perturbed
+
+and weak LFP OCV anchoring [4, 8]
+
+through online Qc
+Missing
+
+Every 50th sample frozen
+
+Packet loss, blocked updates, logger
+
+and separate random 2%
+
+dropouts, and periodic and random data
+
+loss
+
+freeze [5, 25]
+
+Irregular
+
+Uniform jitter: ±0.1 s,
+
+Scheduling jitter, bus latency, and
+
+sampling
+
+±0.5 s, and ±0.9 s around
+
+asynchronous acquisition [6, 5, 25]
+
+samples
+
+nominal 1 s grid
+Burst
+
+One frozen 3600 s interval
+
+Communication interruption, frozen task,
+
+dropout
+
+selected by maximum
+
+stuck data stream, and measurement-only
+
+absolute net charge, with
+
+severe case [6, 5]
+
+at least 12 h before and
+24 h after the interval
+Voltage
+
+Single-sample spikes of
+
+EMI, switching disturbance, and corrupted
+
+spikes
+
+±0.20 V every 1000
+
+voltage samples [24]
+
+samples (1000 s)
+
+289
+
+2.6. Metrics and evaluation criteria
+
+290
+
+For deployment-oriented interpretation, the benchmark results are synthe-
+
+291
+
+sized along three performance dimensions: nominal accuracy under baseline con-
+
+292
+
+ditions, recovery after initialization mismatch, and robustness under sustained
+
+293
+
+or transient measurement corruption and signal unavailability. Disturbance-
+
+294
+
+related global performance is quantified through MAE, RMSE, bias, maximum
+15
+
+295
+
+error, and the 95th percentile absolute error, because these metrics provide a
+
+296
+
+compact view of average performance, systematic deviation, and tail behavior
+
+297
+
+across the selected evaluation windows. Local disturbance performance is an-
+
+298
+
+alyzed through scenario-specific metrics such as jump counts, output variance,
+
+299
+
+absolute-error variance, and excess rolling MAE, because several disturbances do
+
+300
+
+not primarily manifest as window-wide MAE collapse but as short-term output
+
+301
+
+fluctuations, delayed drift, or slow re-synchronization. Whenever a disturbance
+
+302
+
+mask exists, the analysis further separates pre-disturbance, disturbed, and post-
+
+303
+
+disturbance behavior in order to quantify disturbance-window error growth and
+
+304
+
+residual post-disturbance error.
+
+305
+
+ADC quantization, current-gain error, voltage and temperature disturbances,
+
+306
+
+missing samples, and irregular sampling are interpreted primarily through global
+
+307
+
+metrics. Burst dropout, voltage spikes, current-noise detail, and initialization
+
+308
+
+mismatch additionally use dedicated local evidence because their most relevant
+
+309
+
+effects are episodic. The canonical initialization-recovery analysis compares each
+
+310
+
+perturbed estimator trajectory with its cell-, window-, model-, SOH-, and seed-
+
+311
+
+matched correctly initialized trajectory. The resulting paired trajectory differ-
+
+312
+
+ence is the recovery signal, while absolute error against dataset SOC remains
+
+313
+
+the accuracy measure. A first qualifying entry occurs when the paired differ-
+
+314
+
+ence enters a 0.02 SOC band for at least 300 s. Persistent recovery is the first
+
+315
+
+subsequent point after which the difference remains within this band for the
+
+316
+
+rest of the 24-h observation horizon. Runs without this endpoint are right-
+
+317
+
+censored. First-entry time, later departure from the band, censored and relapse
+
+318
+
+fractions, and excess-error area under the curve provide complementary recov-
+
+319
+
+ery diagnostics. The protocol maps a −0.10 SOC-equivalent mismatch into the
+
+320
+
+coulomb-counting SOC initialization for DM and HDM, the EKF SOC state
+
+321
+
+for HECM, and the capacity-equivalent Qc offset for DD. The DD interven-
+
+322
+
+tion passes through the recurrent network, so its realized paired difference is
+
+323
+
+recorded at the first commonly scored sample. Common observation starts at
+
+324
+
+source sample 2023, approximately 0.562 h after the intervention. Endpoints
+
+325
+
+already satisfied at this boundary are left-censored and recorded as conserva16
+
+326
+
+tive upper bounds. The comparison therefore measures observable re-anchoring
+
+327
+
+after deployment-accessible, estimator-specific initialization interventions.
+
+328
+
+Each holdout cell is treated as one independent statistical unit. Protocol-
+
+329
+
+defined SOH windows and random seeds are first summarized within each cell,
+
+330
+
+after which the six cells receive equal macro weight. Hierarchical bootstrap
+
+331
+
+resampling with seeds nested inside cells and 10,000 repetitions provides 95%
+
+332
+
+confidence intervals. Scenario effects are evaluated as paired, cell-matched dif-
+
+333
+
+ferences from baseline, and estimator pairs are compared using exact two-sided
+
+334
+
+sign-flip tests, raw mean and median differences, paired standardized effect sizes,
+
+335
+
+and Holm-adjusted p-values. Holm correction is applied within each reported
+
+336
+
+scenario family. With six independent cells, effect magnitudes and confidence
+
+337
+
+intervals provide the primary evidence and p-values support their interpretation.
+
+338
+
+The full machine-readable tests accompany the result tables, while the baseline
+
+339
+
+pair tests are reproduced in the Appendix.
+
+340
+
+The rolling DD implementation first emits an SOC estimate at source sample
+
+341
+
+2023 because it requires a 2024-sample causal input window. All global accuracy,
+
+342
+
+robustness, stratified, confidence-interval, and paired-test calculations therefore
+
+343
+
+use the common source-sample mask k ≥ 2023 for every estimator. Each 24-
+
+344
+
+h window contributes 84,377 matched evaluation points per estimator, while
+
+345
+
+each 48-h dropout window contributes 170,777. The common mask gives every
+
+346
+
+estimator the same source interval and number of scored samples.
+
+347
+
+The decision synthesis provides a relative summary of the four implemen-
+
+348
+
+tations. Accuracy combines baseline MAE, RMSE, and 95th-percentile error.
+
+349
+
+Robustness assigns equal weight to eight evaluated disturbance families: sensor
+
+350
+
+noise, current-gain error, sensor offsets, quantization, missing samples, timing
+
+351
+
+jitter, burst dropout, and voltage spikes. The current-gain family uses the ad-
+
+352
+
+verse direction from the matched signed sweep. Non-positive ∆MAE values con-
+
+353
+
+tribute zero disturbance penalty. Levels within a family are averaged before the
+
+354
+
+family scores are combined, giving every disturbance family equal influence. Re-
+
+355
+
+covery combines observed persistent recovery-or-censor time, excess-error area,
+
+356
+
+and persistent censored fraction from the canonical paired initialization analy17
+
+357
+
+sis. Relapse after a first qualifying entry remains a separate diagnostic because
+
+358
+
+it is defined only for runs that enter the recovery band. Equal-scenario and
+
+359
+
+high-severity weighting variants quantify the sensitivity of the summary to al-
+
+360
+
+ternative deployment priorities.
+
+361
+
+3. Experimental Setup
+
+362
+
+3.1. Dataset and data acquisition
+
+363
+
+The benchmark uses the MGFarm LFP 18650 dataset because its controlled
+
+364
+
+design-of-experiments aging study provides long 1-Hz full-cell trajectories, re-
+
+365
+
+peated capacity checkups, multiple operating conditions, and enough indepen-
+
+366
+
+dent cells for a cell-disjoint comparison [27, 28, 29]. Model development and
+
+367
+
+holdout testing use a fixed split. SOC and SOH training use C01, C03, C05,
+
+368
+
+C11, C17, and C23. Validation uses C07, C19, and C21. The independent hold-
+
+369
+
+out benchmark uses C09, C13, C15, C25, C27, and C29. Figure A.26 shows the
+
+370
+
+complete SOH trajectories together with their charge-rate, discharge-rate, and
+
+371
+
+depth-of-discharge aging conditions. Table A.4 identifies every cell and its split
+
+372
+
+and reports measured duration, SOH, temperature, and load coverage. The
+
+373
+
+six holdout cells are summarized separately in Figure A.21. This presentation
+
+374
+
+makes both the cell-disjoint development boundary and the diversity of the test
+
+375
+
+cells explicit. LFP’s flat mid-SOC OCV and chemistry-specific aging behavior
+
+376
+
+are integral to the tested problem.
+
+377
+
+The holdout cells are assigned to descriptive load groups using the mea-
+
+378
+
+sured 95th-percentile absolute C-rate: C25 and C27 form the low-load group,
+
+379
+
+C09, C13, and C15 the middle-load group, and C29 the high-load case. C29
+
+380
+
+provides an exploratory high-load trajectory, whereas the low- and middle-load
+
+381
+
+groups support multi-cell summaries. Within each trajectory, performance is
+
+382
+
+additionally stratified by reference SOH (fresh at SOH ≥ 0.90, mid-life at
+
+383
+
+0.80 ≤ SOH < 0.90, and aged at SOH < 0.80), instantaneous absolute C-
+
+384
+
+rate (< 0.5, 0.5–1.5, and ≥ 1.5), temperature (≤ 30 ◦ C, 30–35 ◦ C, and > 35 ◦ C),
+
+18
+
+385
+
+and SOC (< 0.20, 0.20–0.80, and > 0.80). Unobserved cell-state combinations
+
+386
+
+are marked as not available.
+
+387
+
+3.2. Dataset ground truth and preprocessing
+
+388
+
+389
+
+390
+
+The reference preprocessing first computes the signed transferred charge as
+Qk = Ik ∆tk /3600 and the absolute transferred charge as |Qk |, from which the
+P
+capacity during dedicated capacity-test intervals is obtained as Cref = k |Qk |.
+
+391
+
+The reference SOH target is then defined offline as SOHref = Cref /Cref,0 , where
+
+392
+
+Cref,0 denotes the first measured reference capacity of the trajectory, and the
+
+393
+
+resulting capacity and SOH columns are interpolated between the dedicated
+
+394
+
+capacity-test anchors. The dataset SOC ground truth used in the benchmark
+
+395
+
+is reconstructed offline as SOCref = 1 + Qc /Cref,0 , where the cumulative charge
+
+396
+
+state Qc is propagated from the signed charge and reset to 0 at the upper
+
+397
+
+voltage anchor and to −Cref,0 at the lower voltage anchor during preprocessing.
+
+398
+
+This reconstructed SOC serves as the common dataset ground truth for every
+
+399
+
+reported SOC error. It is an offline evaluation quantity because its dataset-side
+
+400
+
+processing and anchor logic are not fully available to an online estimator during
+
+401
+
+deployment. All nominal accuracy values therefore refer to this consistently
+
+402
+
+applied dataset ground truth. Paired ∆MAE compares each disturbed run with
+
+403
+
+its matched baseline under the same ground truth.
+
+404
+
+3.3. Test trajectory and benchmark scenarios
+
+405
+
+All estimators are evaluated on every available holdout-cell/SOH combina-
+
+406
+
+tion under the same disturbance protocol. One representative 24-h window is
+
+407
+
+frozen for each available fresh, mid-life, and aged state, yielding 16 windows.
+
+408
+
+C27 contributes only a fresh window because its measured SOH does not fall
+
+409
+
+below 0.90. Windows start at a measured full-charge anchor (SOC ≥ 0.98,
+
+410
+
+U ≥ 3.58 V) and are selected as measured-feature medoids without using es-
+
+411
+
+timator outputs or errors. The one-hour dropout uses 48 h from the same
+
+412
+
+anchor to retain approximately 24 h of post-gap observation. The shared SOH
+
+19
+
+413
+
+LSTM receives 192 h of undisturbed causal context before every scored window,
+
+414
+
+matching its trained sequence length. Figure A.23 summarizes this protocol.
+
+415
+
+The benchmark contains 19 scenario definitions: the nominal baseline, two
+
+416
+
+current-noise levels, voltage and temperature noise, three signed current-gain
+
+417
+
+magnitudes, voltage and temperature offsets, ADC quantization, initial SOC
+
+418
+
+mismatch, periodic and random sample loss, three timing-jitter levels, a one-
+
+419
+
+hour burst dropout, and randomized-sign voltage spikes. Each current-gain
+
+420
+
+magnitude contains matched positive and negative sign sublevels. Adverse-
+
+421
+
+direction summaries report the larger paired ∆MAE of the two signs at each
+
+422
+
+magnitude, capturing the larger sensor-gain penalty when signed compensation
+
+423
+
+with baseline error occurs. Gaussian sensor-noise cases use 10 deterministic
+
+424
+
+seeds. Random sample loss, jitter, and spike cases use 5 seeds. Deterministic
+
+425
+
+cases run once. Figure A.22 maps the scenario definitions to the manipulated
+
+426
+
+measurement or state and marks the selected paired reference-SOH ablations.
+
+427
+
+Input disturbances act directly on measured channels, initialization interven-
+
+428
+
+tions act on each estimator’s deployment-accessible state, and signal-integrity
+
+429
+
+scenarios alter sample availability or timing while preserving causal execution.
+
+430
+
+3.4. Implementation details
+
+431
+
+Every estimator is executed causally, and all auxiliary quantities required
+
+432
+
+by the models are rebuilt directly from disturbed inputs. This applies to Qc ,
+
+433
+
+EFC, dU/dt, dI/dt, and hourly SOH aggregates, ensuring that estimator inputs
+
+434
+
+originate from the causal measurement path. The SOH LSTM forwards hidden
+
+435
+
+and cell states across hourly updates after its 192-h initialization context. The
+
+436
+
+primary SOC-GRU evaluation preserves its trained sequence-to-one semantics:
+
+437
+
+each prediction uses the latest 2024-sample rolling window with recurrent state
+
+438
+
+reset between windows. The continuous-stateful stream forms a separate de-
+
+439
+
+ployment configuration whose full-trajectory accuracy and resource demand are
+
+440
+
+reported alongside the rolling implementation. In freeze and dropout scenar-
+
+441
+
+ios, disturbed or frozen measurements propagate consistently into derived online
+
+442
+
+features. The dropout start is selected from measured current as the eligible one20
+
+443
+
+hour interval with the largest absolute integrated net charge. Selection enforces
+
+444
+
+at least 12 h of pre-gap observations and 24 h of post-gap observations and re-
+
+445
+
+mains independent of dataset SOC and estimator output. Direct-measurement
+
+446
+
+estimators use the same CV-triggered reset that defines the full-charge start,
+
+447
+
+whereas the DD initial-SOC test uses an equivalent offset of online Qc because
+
+448
+
+the network exposes no explicit SOC state. The environment enforces common
+
+449
+
+nominal-capacity metadata, disturbed streams, targets, masks, and metrics.
+
+450
+
+Model-specific capacity handling remains part of the estimator definitions.
+
+451
+
+3.5. HECM lookup-table sensitivity
+
+452
+
+A separate HECM-only analysis quantifies whether its current-gain response
+
+453
+
+depends on exact lookup-table calibration. It applies one systematic perturba-
+
+454
+
+tion at a time to the fixed charge and discharge surfaces. The Ri , R1 , and R2
+
+455
+
+surfaces are jointly scaled by −10% or +10%, while the OCV surfaces are shifted
+
+456
+
+by −10 mV or +10 mV. The OCV derivative and time-constant surfaces remain
+
+457
+
+fixed. Each of these four perturbations and the nominal lookup are evaluated
+
+458
+
+under baseline current and matched −3% and +3% current-gain errors over all
+
+459
+
+16 frozen windows, yielding 240 HECM runs. The analysis uses the scenario-
+
+460
+
+matched causal SOH traces and common source-sample mask. Windows are
+
+461
+
+averaged within each cell before equal-weight six-cell aggregation and a 10,000-
+
+462
+
+draw cell bootstrap. For each lookup condition, the adverse gain penalty is the
+
+463
+
+larger cell-level ∆MAE from the two gain signs. The lookup–gain interaction
+
+464
+
+subtracts the nominal-lookup adverse penalty from the perturbed-lookup ad-
+
+465
+
+verse penalty. These one-at-a-time shifts are controlled local sensitivity probes
+
+466
+
+rather than probabilistic uncertainty bounds. They remain outside the cross-
+
+467
+
+model robustness score.
+
+468
+
+4. Results
+
+469
+
+4.1. Baseline performance
+
+470
+
+Figure 4 summarizes nominal accuracy against the dataset ground truth
+
+471
+
+across the 16 predefined windows on the common source-sample interval. Equal
+21
+
+Figure 4: Baseline accuracy against the dataset SOC ground truth across six independent
+holdout cells. Dots show cell/SOH-window values. Bars and error bars show the equal-weight
+cell-macro mean and hierarchical 95% confidence interval. DD has the lowest macro MAE
+and RMSE, while DM has the largest error and between-cell spread.
+
+472
+
+weighting of the six holdout cells gives the lowest baseline MAE to DD at 0.0258
+
+473
+
+(95% CI 0.0189–0.0325), followed by HECM at 0.0337 (0.0246–0.0434), HDM at
+
+474
+
+0.0412 (0.0301–0.0515), and DM at 0.0690 (0.0499–0.0823). The RMSE rank-
+
+475
+
+ing is identical, with values of 0.0300, 0.0388, 0.0442, and 0.0740, respectively.
+
+476
+
+Cell-level points reveal substantial between-cell variation, particularly for DM,
+
+477
+
+and place the cell-macro means in the context of heterogeneous trajectories. Ex-
+
+478
+
+act paired sign-flip tests support the magnitude and direction of the principal
+
+479
+
+contrasts. With six independent cells, the Holm-adjusted values remain above
+
+480
+
+0.05, so confidence intervals and paired effect sizes provide the main statistical
+
+481
+
+evidence reported in the Appendix. These values quantify accuracy against the
+
+482
+
+consistently reconstructed dataset ground truth.
+
+483
+
+4.2. Current-gain sensitivity
+
+484
+
+Figure 5 summarizes the matched signed current-gain sweep at ±0.5%, ±1.5%,
+
+485
+
+and ±3.0%. For each magnitude and holdout cell, the adverse-direction sum-
+
+486
+
+mary uses the larger MAE change from the two signs because one direction
+
+487
+
+can partially compensate a pre-existing baseline error. The resulting degra-
+
+488
+
+dation increases monotonically with gain-error magnitude for every estimator.
+
+489
+
+DM and HDM show the strongest response, HECM is less sensitive, and DD is
+22
+
+Figure 5: Current-gain sensitivity. (a) Six-cell adverse-direction ∆MAE for each matched ±b
+pair with hierarchical 95% confidence intervals. (b) Representative current before and after
+the +3% gain error. (c) C29 SOC trajectories over three charge–discharge intervals. The
+adverse-pair summary reports the larger penalty from each matched sign pair.
+
+490
+
+least sensitive. At 3%, the cell-macro MAE increases by 0.0108 for DM, 0.0101
+
+491
+
+for HDM, 0.0060 for HECM, and 0.0038 for DD. The complete signed sweep
+
+492
+
+remains available for interpreting direction-specific behavior.
+
+493
+
+The HECM lookup-table analysis in Figure A.25 separates baseline cali-
+
+494
+
+bration effects from current-gain robustness. The nominal lookup produces a
+
+495
+
+baseline MAE of 0.0337 and an adverse 3% current-gain penalty of 0.00602. Re-
+
+496
+
+sistance scaling changes baseline MAE to 0.0351 at −10% and 0.0327 at +10%,
+
+497
+
+while the corresponding gain penalties remain 0.00614 and 0.00610. OCV shifts
+
+498
+
+change baseline MAE to 0.0314 at −10 mV and 0.0373 at +10 mV, while their
+
+499
+
+gain penalties are 0.00628 and 0.00580. Relative to the nominal lookup, the
+
+500
+
+four macro interaction effects range only from −0.00022 to +0.00026 MAE,
+
+501
+
+and every 95% interval includes zero. Within these local perturbation ranges,
+
+502
+
+lookup calibration affects absolute HECM accuracy more than its incremental
+
+503
+
+current-gain penalty.
+
+23
+
+504
+
+The continuous C29 analysis in Figure 6 complements the window-based
+
+505
+
+benchmark and separates three mechanisms that independent 24-h windows
+
+506
+
+cannot resolve. The gain-error contribution varies over life because its signed
+
+507
+
+Coulomb-counting error interacts with charge direction and operating state. Be-
+
+508
+
+tween full charges, the penalty often grows within an interval, but full-charge
+
+509
+
+anchoring can partially reduce or restructure it. The process is therefore neither
+
+510
+
+an unrestricted monotonic drift nor a complete reset. Across this single full-life
+
+511
+
+replay, the adverse 3% gain error increases MAE by 0.0102 for DM, 0.0072 for
+
+512
+
+HDM, 0.0037 for HECM, and 0.0048 for DD. HECM therefore has the small-
+
+513
+
+est full-life gain-error contribution in C29, while DM and HDM remain most
+
+514
+
+exposed. This diagnostic is not a six-cell lifecycle ranking.
+
+515
+
+4.3. Noise sensitivity
+
+516
+
+Repeated sensor noise produces smaller global penalties than persistent cur-
+
+517
+
+rent gain error, with a response that depends on the disturbed channel and
+
+518
+
+estimator structure.
+
+519
+
+penalty (∆MAE = 0.0038), although its interval spans zero. DM changes by
+
+520
+
+−0.0009, while HDM and DD remain near zero. These small signed changes
+
+521
+
+arise from finite-window compensation around imperfect baseline trajectories.
+
+522
+
+Voltage noise (σU = 0.01 V) produces a 0.0014 penalty for DM and 0.0013 for
+
+523
+
+HDM, while HECM and DD remain below 0.0003. Temperature noise is neutral
+
+524
+
+for DM and small for the SOH-aware models. Figure 7 shows the local trans-
+
+525
+
+mission of current noise, while Figure 8 reports repeated six-cell effects with
+
+526
+
+hierarchical uncertainty.
+
+At σI = 0.10 A, HECM has the largest mean macro
+
+527
+
+The offset cases expose a different pattern from zero-mean noise. A +3 ◦ C
+
+528
+
+temperature offset increases DD MAE by 0.0074 (95% CI 0.0027–0.0125), while
+
+529
+
+the corresponding changes for DM, HDM, and HECM are 0.0000, 0.0002, and
+
+530
+
+0.0002. A +0.02 V voltage offset increases DD by 0.0038 and HDM by 0.0005,
+
+531
+
+leaves DM effectively unchanged, and changes HECM by −0.0040 in these finite
+
+532
+
+windows. The signed HECM result reflects compensation relative to its baseline
+
+533
+
+trajectory. These offset results are included in the cross-scenario heatmap and
+24
+
+Figure 6: Current-gain-error diagnostic over the continuous C29 life replay. (a) Rolling 24h gain-error contribution over elapsed life. (b) Mean and range over normalized intervals
+between consecutive full-charge events. (c) Penalty immediately before and after full-charge
+events. (d) Full-life baseline and adverse-gain MAE. Full-charge events reduce or restructure
+accumulated error but do not erase the lifetime penalty uniformly.
+
+534
+
+in the family-balanced robustness synthesis.
+
+535
+
+4.4. Initialization error and recovery
+
+536
+
+Initialization performance uses the paired criterion defined above. The pro-
+
+537
+
+tocol maps the same −0.10 SOC-equivalent mismatch to the explicit DM/HDM
+
+538
+
+Coulomb-counting state, the HECM EKF SOC state, and a Qc offset of −0.10Cnom
+
+539
+
+for DD. Figure 9 reports the resulting paired trajectory differences for these
+
+540
+
+estimator-specific interventions. All four trajectories use source samples 2023
+
+541
+
+onward, while time remains referenced to the intervention at sample 0. The
+
+542
+
+observed first-entry and persistent-recovery-or-censor means are 1.12 and 1.20 h
+
+25
+
+Figure 7: Noise sensitivity under additive current noise. (a) Baseline and noisy current in
+a reset-free 30 min C29 example. (b) Matched baseline and noisy SOC trajectories in the
+same window. (c) Cell-macro ∆MAE with hierarchical 95% confidence intervals across six
+holdout cells. (d) Local C29 transmission measured as the 95th percentile of the change in
+noise-induced output deviation between consecutive samples. The local panels illustrate the
+mechanism, while panel (c) provides the population-level comparison.
+
+543
+
+for HECM and 1.29 and 2.60 h for DD. HECM and DD already satisfy the
+
+544
+
+persistent endpoint at the first common observation in cell-macro fractions of
+
+545
+
+0.39 and 0.22, respectively. These endpoints are left-censored and enter the cor-
+
+546
+
+responding means as conservative upper bounds. DD’s 0.78 cell-macro relapse
+
+547
+
+fraction explains the difference between its first observed entry and persistent
+
+548
+
+return, compared with 0.17 for HECM. DM first-entry and persistent recovery-
+
+549
+
+or-censor times are both 22.28 h. HDM’s first-entry value of 17.21 h increases
+
+550
+
+to 22.28 h under the persistent criterion because temporary entries do not con-
+
+26
+
+Figure 8: Repeated noise robustness across six holdout cells. Bars show cell-macro ∆MAE and
+error bars show hierarchical 95% confidence intervals with random seeds nested within cells.
+HECM is most affected by high current noise, while most other channel–model combinations
+remain close to baseline relative to the between-cell uncertainty.
+
+551
+
+stitute re-anchoring. The cell-macro persistent-censor fraction is 0.89 for both
+
+552
+
+DM and HDM, compared with zero for HECM and DD. HECM also has the
+
+553
+
+smallest excess-error area at 0.078 SOC h, compared with 0.116 SOC h for DD.
+
+554
+
+Together, the observable paired trajectories, excess-error area, censoring, and
+
+555
+
+relapse identify HECM as the strongest recovery implementation under this pro-
+
+556
+
+tocol. The common observation boundary defines the reported time resolution,
+
+557
+
+while integration-based states generally require a later physical anchor.
+
+558
+
+4.5. Missing samples and signal integrity
+
+559
+
+Figure 10 compares the six-cell effects of periodic and random sample loss
+
+560
+
+with those of timing jitter. Sample loss is substantially more consequential
+
+561
+
+than timing jitter. Periodic freezing of every 50th sample increases MAE by
+
+562
+
+0.0072, 0.0065, 0.0028, and 0.0011 for DM, HDM, HECM, and DD, respectively.
+
+563
+
+Random 2% loss produces corresponding increases of 0.0080, 0.0081, 0.0039, and
+
+564
+
+0.0026. By contrast, even the ±0.9 s jitter case remains within approximately
+
+565
+
+6 × 10−4 SOC of baseline for every model, with confidence intervals generally
+
+566
+
+spanning zero. DD therefore has the smallest sample-loss penalty, while DM and
+
+567
+
+HDM retain their structural dependence on uninterrupted charge integration.
+27
+
+Figure 9: Response to a 10% SOC-equivalent initialization mismatch. (a) Correctly and
+incorrectly initialized trajectories for the dedicated C29 mid-life pair. (b) Absolute paired
+differences over the first 6 h. The DD trajectory enters the 2% band for 5 min, leaves it again,
+and only later returns persistently. The vertical gray marker denotes the first commonly
+scored sample at 0.562 h. (c) Observed first qualifying entry and persistent recovery-or-censor
+time across the six holdout cells with hierarchical 95% confidence intervals. Endpoints already
+satisfied at the common start are left-censored.
+
+568
+
+The one-hour burst dropout creates a distinct availability problem. Against
+
+569
+
+the duration-matched 48-h baseline, its macro ∆MAE is largest for HECM
+
+570
+
+(0.0239, 95% CI 0.0155–0.0366), followed by HDM (0.0209, 0.0098–0.0313) and
+
+571
+
+DM (0.0050, −0.0029–0.0138). DD changes by −0.0093 (−0.0288–0.0099), re-
+
+572
+
+flecting finite-window compensation between its baseline and frozen-input tra-
+
+573
+
+jectories. The interval is placed where the absolute unobserved net charge
+
+574
+
+is largest among starts that retain the required pre- and post-gap context.
+
+575
+
+Figure 11 compares each disturbed C29 output with its duration-matched no-
+
+576
+
+dropout trajectory and reports the six-cell global effect. The paired local devia-
+
+577
+
+tion has model-specific origins: DM/HDM retain the unobserved charge deficit
+
+578
+
+until a physical anchor, HECM corrects through weak LFP voltage observabil-
+
+28
+
+Figure 10: Six-cell signal-integrity and timing stress. Bars show cell-macro ∆MAE and hierarchical 95% confidence intervals for periodic and random sample loss and three timing-jitter
+levels. Sample loss clearly dominates timing jitter under the tested protocol.
+
+579
+
+ity, and DD changes as its rolling input context is replaced by valid samples.
+
+580
+
+Dropout contributes to the robustness dimension, while the recovery dimension
+
+581
+
+uses the canonical paired initialization experiment.
+
+582
+
+4.6. Spike sensitivity
+
+583
+
+Single voltage spikes demonstrate why local and global metrics must be re-
+
+584
+
+ported together. Full-window ∆MAE remains below 4 × 10−4 SOC for every
+
+585
+
+estimator and is effectively zero for DM, HDM, and DD. Event-aligned analysis,
+
+586
+
+however, identifies a reproducible DD transient: its mean spike-sample penalty
+
+587
+
+across cells is approximately 7.7 × 10−3 SOC, compared with near-zero direct
+
+588
+
+penalties for the other representatives. Figures 12 and 13 further show that the
+
+589
+
+DD response varies across cells and SOH states and then decays after the event.
+
+590
+
+This pattern is consistent with a one-sample voltage impulse entering both the
+
+591
+
+absolute voltage and dU/dt channels and perturbing the rolling recurrent pre-
+
+592
+
+diction. A channel-removal ablation would separate the individual contributions
+
+593
+
+of the absolute and derivative inputs.
+
+29
+
+Figure 11: One-hour burst-dropout transition. (a) Estimator outputs around the shaded
+missing-input interval. (b) Absolute deviation from the paired duration-matched no-dropout
+output after measurements resume, with the 2% trajectory-difference line shown for context.
+(c) Six-cell global ∆MAE with hierarchical 95% confidence intervals.
+
+594
+
+4.7. ADC quantization
+
+595
+
+Figure 14 compares representative raw and quantized current and voltage
+
+596
+
+signals and summarizes the resulting six-cell ∆MAE. The tested ADC steps
+
+597
+
+(∆I = 0.01 A, ∆U = 0.005 V, and ∆T = 0.5 ◦ C) preserve the local signal shape
+
+598
+
+but affect the tested representatives differently. DM and HDM increase by
+
+599
+
+0.0038 and 0.0035 MAE, respectively. HECM changes by −0.0018 and DD by
+
+600
+
++0.0002. All four confidence intervals overlap zero. At the selected coarse reso-
+
+601
+
+lution, quantization produces smaller penalties than current gain error, sample
+
+602
+
+loss, and burst dropout, while the integration-based representatives retain a
+
+603
+
+measurable response.
+
+604
+
+4.8. Shared-SOH ablation
+
+605
+
+The primary comparison supplies one common causal LSTM-SOH trace to
+
+606
+
+HDM, HECM, and DD. A paired ablation repeats selected scenarios with dataset
+30
+
+Figure 12: Voltage-spike sensitivity across six cells. (a) Mean event-sample MAE penalty with
+hierarchical 95% confidence intervals. (b,c) Cell- and SOH-state-resolved penalties for HECM
+and DD, respectively. Absent cell/state combinations are left blank. The event-aligned metric
+exposes the local DD response that is obscured in full-window ∆MAE.
+
+607
+
+reference SOH to isolate the influence of this shared service. Reference SOH
+
+608
+
+reduces baseline MAE by 0.0370 for HDM and 0.0166 for HECM, while DD
+
+609
+
+MAE increases by 0.0049 on average. The same direction persists for most
+
+610
+
+noise, sample-loss, and dropout cases. At 3% current gain error, reference SOH
+
+611
+
+improves HDM and HECM and changes DD by +0.0091. For temperature noise,
+
+612
+
+the reference-minus-LSTM difference changes from its baseline value by 0.0016
+
+613
+
+for HDM and less than 10−4 for HECM and DD, indicating that the incremental
+
+614
+
+temperature-noise response is largely independent of the shared SOH service.
+
+615
+
+The reversed DD response reflects calibration and feature interaction with its
+
+616
+
+SOH input. The primary LSTM-SOH results represent the complete causal
+
+617
+
+estimator pipelines, while the reference-SOH runs explain how each SOC branch
+
+618
+
+consumes health information.
+
+619
+
+4.9. Robustness synthesis across representatives
+
+620
+
+Figure 15 condenses 17 measurement-corruption and signal-integrity rows
+
+621
+
+and shows how degraded-input behavior changes the nominal-accuracy pic-
+
+622
+
+ture. Persistent gain error and missing information create large global penalties.
+
+623
+
+Current-gain sensitivity increases with magnitude for every representative in the
+
+624
+
+matched signed sweep, periodic and random sample loss particularly affect DM
+
+31
+
+Figure 13: Event-aligned voltage-spike response. (a) Representative SOC trajectories around
+the injected spike, with the dashed black line showing dataset ground-truth SOC. (b) Modelwise 95th percentile peak excess error. (c) Mean excess absolute error aligned across repeated
+spikes, with the DD uncertainty envelope. The local response decays rapidly and is therefore
+weakly represented by full-window MAE.
+
+625
+
+and HDM, and the one-hour dropout produces the largest point penalty for
+
+626
+
+HECM. Timing jitter remains nearly neutral. Voltage spikes reveal a distinct
+
+627
+
+DD transient through event alignment despite their small full-window MAE.
+
+628
+
+The alternative score aggregations then quantify how different priorities change
+
+629
+
+the combined robustness order. Together, the heatmap and sensitivity analysis
+
+630
+
+provide the scenario-specific evidence required for estimator selection.
+
+631
+
+Under the family-balanced definition, the robustness scores are 0.562 for
+
+632
+
+DM, 0.468 for HDM, 0.428 for HECM, and 0.842 for DD. Equal weighting per
+
+633
+
+evaluated scenario yields 0.574, 0.504, 0.560, and 0.781, while the highest-level-
+
+634
+
+plus-offset variant yields 0.615, 0.512, 0.576, and 0.665. DD leads all three aggre-
+
+635
+
+gations, while the changing score distances and HDM–HECM order demonstrate
+
+636
+
+the influence of deployment priorities. The individual scenario results identify
+
+32
+
+Figure 14: ADC quantization. (a,b) Representative raw and quantized current and voltage.
+(c) Six-cell ∆MAE with hierarchical 95% confidence intervals and resulting quantized-signal
+MAE annotations.
+
+637
+
+the disturbance mechanisms behind these aggregate changes.
+
+638
+
+4.10. Embedded performance benchmark
+
+639
+
+The STM32 experiment first verifies numerical equivalence before compar-
+
+640
+
+ing speed or memory. Across the six nominal cell sequences, mean hardware–
+
+641
+
+software MAE remains below 4 × 10−4 percentage points for every SOC core
+
+642
+
+and reaches 3.41 × 10−6 percentage points for DD (Figure 17). These differences
+
+643
+
+are orders of magnitude below the estimator-to-dataset errors and show that the
+
+644
+
+float32 C implementations reproduce their software references sufficiently closely
+
+645
+
+for deployment measurements.
+
+646
+
+The isolated DM and HDM SOC updates both have sub-microsecond median
+
+647
+
+latency (0.171 and 0.165 µs), HECM requires 23.9 µs, and continuous-state DD
+
+648
+
+requires 424.9 µs (Figure 18). At the nominal 1-Hz update rate, these medians
+
+649
+
+occupy less than 0.043% of one sampling period. This deadline share describes
+
+650
+
+the isolated estimator task and provides the execution margin available for inte-
+
+651
+
+gration with other BMS functions. The DD value in the cross-model comparison
+
+33
+
+Figure 15: Cell-macro ∆MAE across 17 measurement-corruption and signal-integrity rows
+on six holdout cells. Current-gain rows use the adverse direction from the matched signed
+sweep. Positive values denote degradation relative to each model’s paired baseline, while small
+negative values arise from finite-window signed compensation. The initialization-mismatch
+response is evaluated separately in Figure 9.
+
+Figure 16: Decision-oriented synthesis for the four tested representatives. (a) Relative min–
+max-normalized accuracy, family-balanced robustness across eight evaluated disturbance families, and observed persistent paired recovery. The current-gain component uses the adverse
+direction from the matched signed sweep. (b) Composite scores under three 60/20/20 priority
+profiles. The profiles are interpreted together with the scenario-level evidence in Figure 15.
+
+652
+
+is the continuous-state deployment variant. Exact 2024-sample rolling-window
+
+653
+
+semantics are evaluated separately because they recompute the full sequence at
+
+654
+
+every sample.
+
+655
+
+For the cross-model embedded performance comparison, DD denotes the
+
+656
+
+continuous-state deployment variant used in the latency analysis. The compiled
+34
+
+Figure 17: Numerical equivalence of STM32 and software execution over six cell sequences.
+Bars show mean hardware–software MAE in percentage points, dots show cells, and whiskers
+show the cell range. The logarithmic scale emphasizes that all implementation differences are
+negligible relative to model error.
+
+657
+
+DM, HDM, HECM, and DD firmware occupies 27.0, 27.1, 470.1, and 115.9 KiB
+
+658
+
+of flash, respectively. The corresponding measured peak runtime RAM from the
+
+659
+
+representative C09 replay is 2.4, 2.4, 2.5, and 4.1 KiB (Figure 19). In bytes,
+
+660
+
+DM and HDM each combine 872 B of statically allocated variable storage with a
+
+661
+
+320 B maximum dynamic-memory allocation and 1240 B of maximum call-stack
+
+662
+
+use, yielding 2432 B. HECM reaches 2528 B because its static variable allocation
+
+663
+
+increases to 968 B. Continuous-state DD combines 2588 B of static variable
+
+664
+
+storage with 320 B of maximum dynamic-memory allocation and 1248 B of
+
+665
+
+maximum call-stack use, yielding 4156 B. HECM flash occupancy is dominated
+
+666
+
+by its parameter surfaces, whereas the DD parameter storage accounts for most
+
+667
+
+of its flash demand. These values describe the SOC benchmark firmware with
+
+668
+
+the shared SOH trace provided externally and leave explicit resource margin for
+
+669
+
+additional BMS tasks.
+
+670
+
+Figure 20 makes the DD deployment trade-off explicit, while Figure A.24
+35
+
+Figure 18: On-device SOC-core latency distributions across six cells and three replay rounds.
+Panels (a–d) show per-inference distributions. Panel (e) compares minimum, 5th percentile,
+median, 95th percentile, and maximum on a logarithmic scale. DD denotes continuous-state
+inference in this cross-model latency comparison.
+
+671
+
+provides the corresponding latency distributions over all six hardware cell se-
+
+672
+
+quences. Exact rolling-window inference preserves the trained software seman-
+
+673
+
+tics but requires roughly 724 ms median inference time, or 72.4% of the one-
+
+674
+
+second period, and 67.3 KiB peak runtime RAM. Continuous-state inference
+
+675
+
+reduces latency to approximately 0.425 ms and peak RAM to 4.1 KiB while
+36
+
+Figure 19: Embedded memory requirements of the isolated STM32 SOC implementations. (a)
+Compiled flash occupancy. (b) Peak runtime RAM measured during a representative 2025sample C09 replay, combining statically allocated variable storage with maximum dynamicmemory allocation and call-stack use. DD denotes continuous-state execution, matching Figure 18. Exact rolling-window execution is compared separately in Figure 20.
+
+676
+
+retaining similar error on the six nominal sequences. Periodically resetting that
+
+677
+
+state has a comparable 4.1 KiB peak but creates much larger transient errors,
+
+678
+
+with a maximum SOC error near 28 percentage points. Continuous-state ex-
+
+679
+
+ecution therefore provides the practical hardware configuration. Its forwarded
+
+680
+
+recurrent state defines a deployment mode that is evaluated separately from the
+
+681
+
+primary rolling-window benchmark.
+
+682
+
+5. Discussion
+
+683
+
+5.1. Structural interpretation of the representatives
+
+684
+
+The four implementations expose distinct relationships between their update
+
+685
+
+mechanisms and observed disturbance responses. DM has the largest nominal
+
+686
+
+error and reacts strongly to persistent gain error and missing samples because
+
+687
+
+its current-integration structure lacks voltage-residual correction. Its practi-
+
+688
+
+cal full-charge anchor limits accumulated drift, while the lifecycle experiment
+
+689
+
+shows that the reset restructures the gain-error contribution without removing
+
+690
+
+it uniformly. HDM adapts the capacity denominator through learned SOH and
+
+37
+
+Figure 20: DD inference-mode trade-off on the STM32.
+
+The panels compare maximum
+
+dataset-SOC error, median latency, compiled flash occupancy, and measured peak runtime
+RAM for exact rolling-window, continuous-state, and periodically reset recurrent execution.
+Cell points show that periodic resets, not continuous forwarding, create the dominant accuracy loss.
+
+691
+
+thereby reduces capacity mismatch, yet it retains the same charge-integration
+
+692
+
+core. Its similar response to current-gain error, missing charge information, and
+
+693
+
+ADC quantization follows directly from this shared structure.
+
+694
+
+HECM combines current-driven state propagation with a voltage residual
+
+695
+
+and has the strongest observed recovery profile under the tested initialization
+
+696
+
+mapping. The common observation starts after 0.562 h and resolves subsequent
+
+697
+
+re-anchoring behavior. High current noise and burst dropout produce its largest
+
+698
+
+point penalties because corrupted or frozen inputs affect both state propaga-
+
+699
+
+tion and observer correction. The confidence interval for high current noise
+
+700
+
+includes zero and shows substantial between-cell uncertainty. The dedicated
+
+701
+
+lookup analysis shows that the lower HECM current-gain penalty is retained
+
+702
+
+under systematic ±10% resistance scaling and ±10 mV OCV shifts. The largest
+
+703
+
+absolute macro interaction is 0.00026 MAE. Because the same perturbations
+
+704
+
+affect baseline accuracy more visibly, lookup calibration remains relevant even
+
+705
+
+though the incremental current-gain response is locally stable. This table depen-
+
+706
+
+dence and the associated flash footprint form the central deployment trade-off
+
+707
+
+of HECM.
+
+708
+
+DD has the lowest nominal cell-macro error and the best adverse current-
+
+38
+
+709
+
+gain score in this comparison. It is also comparatively resilient to isolated
+
+710
+
+sample loss. Event-aligned voltage spikes expose a recurrent transient that full-
+
+711
+
+window MAE hides. The selected voltage and derivative features and the rolling
+
+712
+
+recurrent context provide a plausible transmission path for this response and
+
+713
+
+identify a concrete target for feature ablation and disturbance-aware training.
+
+714
+
+5.2. Why nominal accuracy is insufficient
+
+715
+
+Nominal MAE describes average agreement with the dataset ground truth
+
+716
+
+under clean inputs. The disturbance and recovery experiments add the DD
+
+717
+
+voltage-spike transient, HECM re-anchoring behavior, shared-SOH feature cou-
+
+718
+
+pling, and model-specific responses to gain error and missing information. Em-
+
+719
+
+bedded measurements add latency, memory, and inference-state semantics. These
+
+720
+
+dimensions create a deployment profile for each implementation, while the weight-
+
+721
+
+ing analysis shows how application priorities reshape their combined scores.
+
+722
+
+Estimator selection can therefore begin with the relevant fault and recovery
+
+723
+
+requirements and then incorporate the available compute, memory, and state-
+
+724
+
+service architecture.
+
+725
+
+5.3. Implications for BMS deployment
+
+726
+
+Among the tested representatives, DD has the lowest nominal error against
+
+727
+
+the dataset ground truth and remains a strong candidate when its recurrent
+
+728
+
+implementation cost and voltage-spike response fit the application. HECM is
+
+729
+
+preferable when persistent correction after a state mismatch has high priority
+
+730
+
+and a larger flash image is available. DM and HDM remain attractive when
+
+731
+
+deterministic sub-microsecond execution and small memory dominate. Their
+
+732
+
+integration structure places correspondingly greater requirements on current
+
+733
+
+calibration, reliable sampling, and full-charge anchoring. These mechanism-
+
+734
+
+based trade-offs connect the benchmark results directly to BMS deployment
+
+735
+
+priorities.
+
+736
+
+The STM32 results connect algorithmic behavior with deployment cost. All
+
+737
+
+four isolated SOC cores meet the one-second deadline in the tested replay, while
+39
+
+738
+
+their timing margins span more than six orders of magnitude between DM/HDM
+
+739
+
+and exact rolling-window DD. Continuous-state DD removes most of the rolling-
+
+740
+
+window cost by forwarding its recurrent state. The firmware measurements
+
+741
+
+include flash, maximum call-stack use, dynamic-memory demand, and numerical
+
+742
+
+equivalence. Integration of the shared SOH-LSTM, energy measurement, pack
+
+743
+
+communication, and concurrent BMS scheduling forms the next system-level
+
+744
+
+validation stage. Table 3 relates the measured estimator profiles to concrete
+
+745
+
+deployment priorities.
+
+746
+
+Figure 16 complements the recommendation map by combining the mea-
+
+747
+
+sured accuracy, robustness, and recovery dimensions into relative priority pro-
+
+748
+
+files. The three profiles assign 60% to their named dimension and 20% to each
+
+749
+
+remaining dimension. Family-balanced, equal-scenario, and high-severity ag-
+
+750
+
+gregations produce different score distances and change the HDM–HECM or-
+
+751
+
+der. This sensitivity turns the score into a configurable decision aid, while the
+
+752
+
+scenario heatmap identifies the disturbance-specific strengths and weaknesses
+
+753
+
+behind each profile.
+
+754
+
+5.4. Limitations and future extensions
+
+755
+
+The conclusions are grounded in four specified implementations and six hold-
+
+756
+
+out cells from one controlled LFP aging dataset. Alternative reset logic, ECM
+
+757
+
+structures, neural architectures, features, and training data can produce differ-
+
+758
+
+ent estimator profiles. The low- and middle-load strata contain multiple cells,
+
+759
+
+whereas C29 supplies one exploratory high-load trajectory and C27 contributes
+
+760
+
+no mid-life or aged window. The reported confidence intervals therefore quan-
+
+761
+
+tify the available between-cell variation within this design. Transfer to other
+
+762
+
+chemistries, cell formats, pack configurations, thermal environments, and field
+
+763
+
+duty cycles requires corresponding cell-disjoint validation. Nominal accuracy is
+
+764
+
+referenced to one consistently reconstructed offline SOC ground truth based on
+
+765
+
+Coulomb counting and voltage anchors.
+
+766
+
+The primary cross-model campaign concentrates on the BMS measurement
+
+767
+
+chain, signal availability and timing, and deployment-accessible initialization
+40
+
+Table 3: Decision-oriented recommendation map derived from the benchmark results. The
+table identifies the strongest observed representative under one dominant deployment priority
+and the stated protocol boundaries.
+Primary deployment pri-
+
+Selected repre-
+
+Main supporting benchmark evi-
+
+ority
+
+sentative
+
+dence
+
+Lowest nominal SOC er-
+
+DD
+
+ror
+
+Lowest
+
+six-cell
+
+macro
+
+MAE
+
+(0.0258) and RMSE (0.0300)
+
+Strongest observed re-
+
+HECM
+
+Lowest
+
+observed
+
+Rolling-window execution is the most computationally expensive implementation
+
+persistenttime
+
+Main trade-off to consider
+
+covery from initialization
+
+recovery-or-censor
+
+and
+
+mismatch
+
+substantially fewer first-entry re-
+
+Recovery observation begins at the common 0.562-h boundary after estimatorspecific interventions
+
+lapses than DD
+Lowest adverse current-
+
+DD
+
+gain penalty
+
+Matched signed sensitivity gives
+
+Temperature-offset and local voltage-spike
+
+∆MAE
+
+sensitivity remain visible
+
+0.0038
+
+at
+
+3%,
+
+below
+
+HECM, HDM, and DM
+Smallest
+
+observed
+
+riodic/random
+
+pe-
+
+DD
+
+∆MAE 0.0011/0.0026
+
+sample-
+
+non-positive but highly variable across
+
+loss penalty
+Lowest
+
+deterministic
+
+The duration-matched dropout effect is
+
+cells
+DM/HDM
+
+compute cost
+
+Sub-microsecond median SOC-core
+
+Integration structure is sensitive to gain er-
+
+latency and approximately 27 KiB
+
+ror and missing charge information
+
+flash
+Practical fast neural de-
+
+DD continuous
+
+Approximately 0.425 ms median
+
+Different recurrent semantics from the pri-
+
+ployment
+
+state
+
+and 4.1 KiB peak runtime RAM
+
+mary rolling-window benchmark
+
+768
+
+states. The separate HECM lookup analysis probes uniform local resistance and
+
+769
+
+OCV deviations, while broader parameter mismatch, pack-level interactions,
+
+770
+
+and supervisory BMS faults form a separate validation layer. The initialization
+
+771
+
+experiment maps an SOC-equivalent offset into each estimator’s available state
+
+772
+
+and observes recovery from the common 0.562-h boundary. These times char-
+
+773
+
+acterize operational re-anchoring under class-specific interventions rather than
+
+774
+
+identical latent-state convergence. The continuous C29 replay complements the
+
+775
+
+six-cell windows with a mechanism-focused lifecycle view. The hourly SOH ser-
+
+776
+
+vice represents gradual capacity fade, and channel-removal experiments would
+
+777
+
+further isolate the DD voltage-spike transmission path. HECM uses HPPC-
+
+778
+
+derived parameter surfaces identified from the development cells and held fixed
+
+779
+
+throughout evaluation. The sensitivity analysis therefore characterizes local ro-
+
+780
+
+bustness around this calibrated model rather than arbitrary lookup-table error.
+
+781
+
+The hardware profile covers the isolated SOC firmware with SOH supplied
+
+782
+
+as an external causal trace. Runtime-RAM watermarks come from the repre41
+
+783
+
+sentative C09 replay, and the rolling DD stack maximum is based on its valid
+
+784
+
+post-warm-up calls. The next hardware stage combines the SOC and SOH
+
+785
+
+services, measures energy demand, and evaluates estimator scheduling along-
+
+786
+
+side communication and supervisory BMS tasks. Broader data campaigns can
+
+787
+
+then extend the disturbance protocol to interacting faults, additional operating
+
+788
+
+environments, and pack-level closed-loop behavior.
+
+789
+
+6. Conclusion
+
+790
+
+This study establishes a common robustness and embedded-performance
+
+791
+
+benchmark for four structurally different SOC-estimation implementations. DD
+
+792
+
+achieves the lowest nominal cell-macro error and the strongest results across sev-
+
+793
+
+eral disturbance families, while local and hardware-specific analyses reveal its
+
+794
+
+voltage-spike transient and rolling-window cost. HECM provides the strongest
+
+795
+
+observed recovery profile and voltage-residual correction, together with the
+
+796
+
+largest flash demand and pronounced responses to current noise and prolonged
+
+797
+
+dropout. Its lower current-gain penalty remains stable under the tested local
+
+798
+
+resistance and OCV lookup perturbations, although lookup calibration con-
+
+799
+
+tinues to affect nominal accuracy. DM and HDM provide deterministic sub-
+
+800
+
+microsecond execution with minimal memory, while their current-integration
+
+801
+
+structure increases sensitivity to gain error, missing charge information, and
+
+802
+
+physical re-anchoring.
+
+803
+
+The combined evidence turns estimator selection into a deployment-oriented
+
+804
+
+comparison of accuracy, disturbance-specific robustness, recovery, latency, flash,
+
+805
+
+and runtime RAM. The STM32 measurements confirm numerical equivalence
+
+806
+
+with the software implementations and one-second execution of all isolated SOC
+
+807
+
+cores, while the DD deployment variants show how recurrent-state handling
+
+808
+
+changes both cost and transient behavior. Scenario-level evidence remains cen-
+
+809
+
+tral because the preferred implementation changes with the sensing fault profile,
+
+810
+
+recovery requirement, and available hardware margin. This framework provides
+
+811
+
+a direct basis for extending validation to complete SOC–SOH execution, concur-
+
+42
+
+812
+
+rent BMS tasks, additional operating environments, and pack-level applications.
+
+813
+
+Appendix A. Dataset Split, Holdout Coverage, and Evaluation Pro-
+
+814
+
+tocol
+
+Figure A.21: Quantitative coverage of the six independent holdout cells. Panels show observed
+SOH, the descriptive load-class assignment, thermal envelope, and full-trajectory SOH-state
+coverage. High-load evidence consists only of C29 and is exploratory.
+
+43
+
+Figure A.22: Complete 19-scenario benchmark matrix. Red markers identify the manipulated
+measurement, timing, availability, or initialization channel. Blue-gray markers denote repeated stochastic cases. Rose markers identify paired reference-SOH ablations. Each currentgain magnitude contains matched positive and negative sign sublevels.
+
+44
+
+Figure A.23: Representative-window protocol. Sixteen cell/SOH windows are selected using
+measured-feature medoids. Every estimator is scored from source sample 2023, yielding 84,377
+matched points per 24-h window after a 192-h causal SOH context. The dropout case uses
+48 h, places the gap at the eligible one-hour interval with maximum absolute net charge, and
+contributes 170,777 matched points.
+
+Figure A.24: DD latency distributions over the six hardware cell sequences. Exact rollingwindow execution is shown separately from continuous-state and periodically reset execution
+because their scales and recurrent semantics differ substantially.
+
+45
+
+Figure A.25: HECM lookup-table sensitivity over all 16 frozen windows. (a) Baseline MAE
+under the nominal lookup, joint ±10% scaling of Ri , R1 , and R2 , and uniform ±10 mV OCV
+shifts. (b) Adverse current-gain penalty from matched −3% and +3% gain errors relative
+to the baseline under the same lookup condition. (c) Lookup–gain interaction relative to
+the nominal-table penalty. Bars show equal-weight six-cell means, error bars show 95% cellbootstrap intervals, and points show cell means.
+
+Figure A.26: Measured SOH trajectories across the complete LFP aging campaign. The
+legend reports the applied charge C-rate, discharge C-rate, and depth of discharge for each
+trajectory. The plotted SOH values originate from repeated capacity checkups and are interpolated between checkup anchors. The fixed training, validation, and holdout assignments
+and their measured coverage are reported in Table A.4.
+
+46
+
+Table A.4: Measured coverage of all cells in the fixed model-development and holdout split.
+The 95th-percentile absolute C-rate is calculated over each complete 1-Hz trajectory. Load
+classes are defined only for the six holdout cells. The high-load class contains C29 only and
+is exploratory.
+Duration [d]
+
+SOH range
+
+T range [◦ C]
+
+P95 |Crate |
+
+Training
+
+198.6
+
+0.922–1.000
+
+24.3–29.4
+
+1.01
+
+–
+
+Training
+
+153.3
+
+0.921–1.000
+
+25.9–30.7
+
+1.00
+
+–
+
+C05
+
+Training
+
+166.1
+
+0.917–1.000
+
+25.2–30.6
+
+1.00
+
+–
+
+C11
+
+Training
+
+113.2
+
+0.656–1.000
+
+25.6–42.8
+
+2.48
+
+–
+
+C17
+
+Training
+
+158.7
+
+0.719–1.000
+
+25.8–34.9
+
+1.75
+
+–
+
+C23
+
+Training
+
+167.8
+
+0.837–1.000
+
+26.1–37.2
+
+1.74
+
+–
+
+C07
+
+Validation
+
+167.6
+
+0.874–1.000
+
+25.2–32.0
+
+1.01
+
+–
+
+C19
+
+Validation
+
+160.4
+
+0.840–1.000
+
+26.3–33.9
+
+1.75
+
+–
+
+C21
+
+Validation
+
+160.8
+
+0.824–1.000
+
+26.2–37.6
+
+1.75
+
+–
+
+C09
+
+Holdout
+
+102.6
+
+0.682–1.000
+
+25.0–41.1
+
+2.51
+
+Middle
+
+C13
+
+Holdout
+
+44.7
+
+0.623–1.000
+
+24.9–42.0
+
+2.50
+
+Middle
+
+C15
+
+Holdout
+
+60.7
+
+0.627–1.000
+
+25.1–43.6
+
+2.53
+
+Middle
+
+C25
+
+Holdout
+
+127.1
+
+0.655–1.000
+
+25.8–37.1
+
+1.76
+
+Low
+
+C27
+
+Holdout
+
+152.0
+
+0.930–1.000
+
+26.0–31.9
+
+0.70
+
+Low
+
+C29
+
+Holdout
+
+56.0
+
+0.604–1.000
+
+25.5–49.4
+
+3.00
+
+High*
+
+Cell
+
+Split
+
+C01
+C03
+
+47
+
+Holdout load
+
+815
+
+Appendix B. Supplementary Numerical Results
+
+Table B.5: Six-cell baseline cell-macro statistics with hierarchical 95% confidence intervals.
+
+Estimator
+
+MAE [SOC]
+
+RMSE [SOC]
+
+P95 error [SOC]
+
+DM
+
+0.0690 [0.0499, 0.0823]
+
+0.0740 [0.0532, 0.0881]
+
+0.1088 [0.0768, 0.1307]
+
+HDM
+
+0.0412 [0.0301, 0.0515]
+
+0.0442 [0.0319, 0.0557]
+
+0.0649 [0.0449, 0.0846]
+
+HECM
+
+0.0337 [0.0246, 0.0434]
+
+0.0388 [0.0286, 0.0493]
+
+0.0644 [0.0468, 0.0821]
+
+DD
+
+0.0258 [0.0189, 0.0325]
+
+0.0300 [0.0223, 0.0366]
+
+0.0508 [0.0375, 0.0619]
+
+Table B.6: Exact paired baseline-MAE comparisons across the six holdout cells. Differences
+are defined as estimator B minus estimator A. Holm correction is applied across the six modelpair tests.
+
+Mean difference [SOC]
+
+95% CI
+
+dz
+
+pexact / pHolm
+
+HDM
+
+-0.0278
+
+[-0.0381, -0.0171]
+
+-1.93
+
+0.0313 / 0.1875
+
+DM
+
+HECM
+
+-0.0352
+
+[-0.0470, -0.0224]
+
+-2.00
+
+0.0313 / 0.1875
+
+DM
+
+DD
+
+-0.0431
+
+[-0.0558, -0.0286]
+
+-2.29
+
+0.0313 / 0.1875
+
+HDM
+
+HECM
+
+-0.0075
+
+[-0.0162, 0.0015]
+
+-0.61
+
+0.1563 / 0.1875
+
+HDM
+
+DD
+
+-0.0154
+
+[-0.0243, -0.0084]
+
+-1.39
+
+0.0313 / 0.1875
+
+HECM
+
+DD
+
+-0.0079
+
+[-0.0176, -0.0005]
+
+-0.68
+
+0.0938 / 0.1875
+
+Estimator A
+
+Estimator B
+
+DM
+
+48
+
+Table B.7: Selected cell-macro scenario penalties relative to paired baseline. Current-gain
+values use the adverse sign from the matched ±3% sweep.
+
+Scenario
+
+DM
+
+HDM
+
+HECM
+
+DD
+
+Current noise, σI = 0.10 A
+
+-0.0009
+
++0.0000
+
++0.0038
+
+-0.0000
+
+Current gain, adverse 3%
+
++0.0108
+
++0.0101
+
++0.0060
+
++0.0038
+
+Voltage offset, +0.02 V
+
++0.0000
+
++0.0005
+
+-0.0040
+
++0.0038
+
+Temperature offset, +3 C
+
++0.0000
+
++0.0002
+
++0.0002
+
++0.0074
+
+ADC quantization
+
++0.0038
+
++0.0035
+
+-0.0018
+
++0.0002
+
+Random missing samples, 2%
+
++0.0080
+
++0.0081
+
++0.0039
+
++0.0026
+
+Timing jitter, ±0.9 s
+
+-0.0003
+
++0.0003
+
++0.0006
+
++0.0003
+
+Burst dropout, 1 h
+
++0.0050
+
++0.0209
+
++0.0239
+
+-0.0093
+
+Voltage spikes, ±0.20 V
+
++0.0000
+
+-0.0003
+
++0.0002
+
+-0.0001
+
+◦
+
+Table B.8: Sensitivity of the illustrative normalized robustness score to the aggregation rule.
+
+Estimator
+
+Family balanced
+
+Equal scenario
+
+Highest level plus offsets
+
+DM
+
+0.562
+
+0.574
+
+0.615
+
+HDM
+
+0.468
+
+0.504
+
+0.512
+
+HECM
+
+0.428
+
+0.560
+
+0.576
+
+DD
+
+0.842
+
+0.781
+
+0.665
+
+49
+
+Table B.9: Canonical paired initialization recovery and target-hardware summary. Recovery values are equal-weight cell means on the common source-sample interval, which begins
+0.562 h after the intervention. Endpoints already satisfied at this boundary are recorded at
+the boundary as conservative upper bounds.
+
+Metric
+
+DM
+
+HDM
+
+HECM
+
+DD
+
+First 300-s entry/censor time [h]
+
+22.28
+
+17.21
+
+1.12
+
+1.29
+
+Persistent recovery/censor time [h]
+
+22.28
+
+22.28
+
+1.20
+
+2.60
+
+Recovery excess-error AUC [SOC h]
+
+1.735
+
+1.738
+
+0.078
+
+0.116
+
+First-entry censored fraction
+
+0.89
+
+0.67
+
+0.00
+
+0.00
+
+Persistent-recovery censored fraction
+
+0.89
+
+0.89
+
+0.00
+
+0.00
+
+Relapse fraction after first hold
+
+0.00
+
+0.22
+
+0.17
+
+0.78
+
+Median SOC-core latency [µs]
+
+0.171
+
+0.165
+
+23.9
+
+424.9a
+
+Flash [KiB]
+
+27.0
+
+27.1
+
+470.1
+
+115.9a
+
+Peak runtime RAM [KiB]
+
+2.4
+
+2.4
+
+2.5
+
+4.1a
+
+a Continuous-state DD. Exact rolling-window execution requires approximately 724 ms and 67.3 KiB peak RAM.
+
+50
+
+816
+
+817
+
+818
+
+819
+
+820
+
+821
+
+Funding
+Funding details are omitted for double-blind review.
+Acknowledgements
+Acknowledgements are omitted for double-blind review.
+CRediT authorship contribution statement
+The author contribution statement is provided in the non-blinded submission
+
+822
+
+materials.
+
+823
+
+Declaration of competing interest
+
+824
+
+The authors declare that they have no known competing financial interests or
+
+825
+
+personal relationships that could have appeared to influence the work reported
+
+826
+
+in this paper.
+
+827
+
+Declaration of generative AI and AI-assisted technologies
+
+828
+
+in the manuscript preparation process
+
+829
+
+During the preparation of this work the author(s) used ChatGPT, DeepL,
+
+830
+
+and Grammarly in order to improve the linguistic quality and style of the
+
+831
+
+manuscript. After using these tools, the author(s) reviewed and edited the
+
+832
+
+content as needed and take(s) full responsibility for the content of the published
+
+833
+
+article.
+
+834
+
+Data availability
+
+835
+
+The dataset is publicly available through its cited TU Berlin repository
+
+836
+
+record [28]. Code, model configurations, benchmark definitions, random seeds,
+
+837
+
+result summaries, hardware timing records, and analysis procedures are main-
+
+838
+
+tained in a public GitHub repository. The repository contains the neural model
+
+839
+
+assets and HECM parameterization used for the reported experiments.
+51
+
+840
+
+References
+
+841
+
+[1] P. Shrivastava, P. A. Naidu, S. Sharma, B. K. Panigrahi, A. Garg, Re-
+
+842
+
+view on technological advancement of lithium-ion battery states estima-
+
+843
+
+tion methods for electric vehicle applications, Journal of Energy Storage 64
+
+844
+
+(2023) 107159. doi:10.1016/j.est.2023.107159.
+
+845
+
+[2] F. Guo, L. D. Couto, G. Mulder, K. Trad, G. Hu, O. Capron, K. Haghverdi,
+
+846
+
+A systematic review of electrochemical model-based lithium-ion battery
+
+847
+
+state estimation in battery management systems, Journal of Energy Storage
+
+848
+
+101 (2024) 113850. doi:10.1016/j.est.2024.113850.
+
+849
+
+[3] J. Yao, J. Kowal, Towards a smarter battery management system: A critical
+
+850
+
+review on deep learning-based state of charge estimation of lithium-ion
+
+851
+
+batteries, Energy and AI 21 (2025) 100585. doi:10.1016/j.egyai.2025.
+
+852
+
+100585.
+
+853
+
+[4] X. Li, J. Jiang, C. Zhang, L. Y. Wang, L. Zheng, Robustness of SOC
+
+854
+
+Estimation Algorithms for EV Lithium-Ion Batteries against Modeling Er-
+
+855
+
+rors and Measurement Noise, Mathematical Problems in Engineering 2015
+
+856
+
+(2015) 1–14. doi:10.1155/2015/719490.
+
+857
+
+[5] F. Naseri, C. Barbu, A. Jensen, P. Setoodeh, J. R. Baena, N. Hevele,
+
+858
+
+E. Schaltz, Toward Reliable Wireless BMS: Robust Battery State Estima-
+
+859
+
+tion Under Noise and Uncertainty, IEEE Transactions on Vehicular Tech-
+
+860
+
+nology (2025) 1–12doi:10.1109/TVT.2025.3638613.
+
+861
+
+[6] F. Berger, D. Joest, E. Barbers, K. Quade, Z. Wu, D. U. Sauer, P. Dechent,
+
+862
+
+Benchmarking battery management system algorithms - Requirements,
+
+863
+
+scenarios and validation for automotive applications, eTransportation 22
+
+864
+
+(2024) 100355. doi:10.1016/j.etran.2024.100355.
+
+865
+
+[7] Z. A. Khan, P. Shrivastava, S. M. Amrr, S. Mekhilef, A. A. Algethami,
+
+866
+
+M. Seyedmahmoudian, A. Stojcevski, A Comparative Study on Different
+
+52
+
+867
+
+Online State of Charge Estimation Algorithms for Lithium-Ion Batteries,
+
+868
+
+Sustainability 14 (12) (2022) 7412. doi:10.3390/su14127412.
+
+869
+
+[8] Y. Gao, G. L. Plett, G. Fan, X. Zhang, Enhanced state-of-charge estima-
+
+870
+
+tion of LiFePO4 batteries using an augmented physics-based model, Jour-
+
+871
+
+nal of Power Sources 544 (2022) 231889. doi:10.1016/j.jpowsour.2022.
+
+872
+
+231889.
+
+873
+
+[9] Y. Gao, K. Liu, C. Zhu, X. Zhang, D. Zhang, Co-Estimation of State-of-
+
+874
+
+Charge and State-of- Health for Lithium-Ion Batteries Using an Enhanced
+
+875
+
+Electrochemical Model, IEEE Transactions on Industrial Electronics 69 (3)
+
+876
+
+(2022) 2684–2696. doi:10.1109/TIE.2021.3066946.
+
+877
+
+[10] J. Shen, W. Ma, J. Xiong, X. Shu, Y. Zhang, Z. Chen, Y. Liu, Alterna-
+
+878
+
+tive combined co-estimation of state of charge and capacity for lithium-
+
+879
+
+ion batteries in wide temperature scope, Energy 244 (2022) 123236. doi:
+
+880
+
+10.1016/j.energy.2022.123236.
+
+881
+
+[11] C. Wang, N. Cui, Z. Cui, H. Yuan, C. Zhang, Fusion estimation of lithium-
+
+882
+
+ion battery state of charge and state of health considering the effect of
+
+883
+
+temperature, Journal of Energy Storage 53 (2022) 105075. doi:10.1016/
+
+884
+
+j.est.2022.105075.
+
+885
+
+[12] P. Mondal, D. Bhavsar, K. Mittal, M. Mittal, Estimating State-of-Charge in
+
+886
+
+Lithium-Ion Batteries Through Deep Learning Techniques: A Comparative
+
+887
+
+Evaluation, IEEE Access 12 (2024) 78773–78786. doi:10.1109/ACCESS.
+
+888
+
+2024.3408220.
+
+889
+
+[13] D. P. Pau, A. Aniballi, Tiny Machine Learning Battery State-of-Charge
+
+890
+
+Estimation Hardware Accelerated, Applied Sciences 14 (14) (2024) 6240.
+
+891
+
+doi:10.3390/app14146240.
+
+892
+
+[14] S. Giazitzis, M. Sakwa, S. Leva, E. Ogliari, S. Badha, F. Rosetti, A
+
+893
+
+Case Study of a Tiny Machine Learning Application for Battery State-
+
+53
+
+894
+
+of-Charge Estimation, Electronics 13 (10) (2024) 1964.
+
+895
+
+electronics13101964.
+
+doi:10.3390/
+
+896
+
+[15] Y. Mazzi, H. Ben Sassi, A. Gaga, F. Errahimi, State of charge estima-
+
+897
+
+tion of an electric vehicle’s battery using tiny neural network embedded
+
+898
+
+on small microcontroller units, International Journal of Energy Research
+
+899
+
+46 (6) (2022) 8102–8119. doi:10.1002/er.7713.
+
+900
+
+[16] M. A. Kamali, A. C. Caliwag, W. Lim, Novel SOH Estimation of Lithium-
+
+901
+
+Ion Batteries for Real-Time Embedded Applications, IEEE Embedded Sys-
+
+902
+
+tems Letters 13 (4) (2021) 206–209. doi:10.1109/LES.2021.3078443.
+
+903
+
+[17] B. Gou, Y. Xu, X. Feng, An Ensemble Learning-Based Data-Driven
+
+904
+
+Method for Online State-of-Health Estimation of Lithium-Ion Batteries,
+
+905
+
+IEEE Transactions on Transportation Electrification 7 (2) (2021) 422–436.
+
+906
+
+doi:10.1109/TTE.2020.3029295.
+
+907
+
+[18] W. Li, N. Sengupta, P. Dechent, D. Howey, A. Annaswamy, D. U. Sauer,
+
+908
+
+Online capacity estimation of lithium-ion batteries with deep long short-
+
+909
+
+term memory networks, Journal of Power Sources 482 (2021) 228863. doi:
+
+910
+
+10.1016/j.jpowsour.2020.228863.
+
+911
+
+[19] F. Rzepka, P. Hematty, M. Schmitz, J. Kowal, Neural Network Architecture
+
+912
+
+for Determining the Aging of Stationary Storage Systems in Smart Grids,
+
+913
+
+Energies 16 (17) (2023) 6103. doi:10.3390/en16176103.
+
+914
+
+915
+
+916
+
+917
+
+918
+
+919
+
+[20] BQ79616 16-Series Battery Monitor, Balancer, and Integrated Hardware
+Protector (2023).
+[21] Design Considerations of Current Sensing With BQ769x2 Family for Battery Management System (2022).
+[22] TMCS1108 3% Functional Isolation Hall-Effect Current Sensor With ±100V Working Voltage (2024).
+
+54
+
+920
+
+921
+
+[23] TLE4972 high precision coreless current sensor for automotive applications
+(2023).
+
+922
+
+[24] O. Aiello, Electromagnetic Susceptibility of Battery Management Systems’
+
+923
+
+ICs for Electric Vehicles: Experimental Study, Electronics 9 (3) (2020) 510.
+
+924
+
+doi:10.3390/electronics9030510.
+
+925
+
+[25] M. Liu, D. Geißler, S. Bian, B. Zhou, P. Lukowicz, Assessing the Impact of
+
+926
+
+Sampling Irregularity in Time Series Data: Human Activity Recognition
+
+927
+
+As A Case Study (Jan. 2025). arXiv:2501.15330, doi:10.48550/arXiv.
+
+928
+
+2501.15330.
+
+929
+
+930
+
+[26] 10s battery pack monitoring, balancing, and comprehensive protection, 50A discharge reference design (2024).
+
+931
+
+[27] A. Aqachtoul, K. Karam, A. Elamrani, Y. Alidrissi, M. Najib, A. Rochd,
+
+932
+
+M. Bakhouya, MGFARM: An IoT and Edge-Driven Framework for Smart
+
+933
+
+and Sustainable Agricultural Practices, in: Y. Mejdoub, A. Elamri, M. Kar-
+
+934
+
+douchi (Eds.), Connected Objects, Artificial Intelligence, Telecommunica-
+
+935
+
+tions and Electronics Engineering, Vol. 1584, Springer Nature Switzerland,
+
+936
+
+Cham, 2026, pp. 419–425. doi:10.1007/978-3-032-01536-5_64.
+
+937
+
+[28] F. Rzepka, Design of Experiments for Cyclic Aging of LFP 18650 Cells: Im-
+
+938
+
+pact of Charge/Discharge C-Rates, Depth of Discharge, and Temperature
+
+939
+
+on Battery Degradation (Nov. 2025). doi:10.14279/DEPOSITONCE-24800.
+
+940
+
+[29] K. Siebertz, D. Van Bebber, T. Hochkirchen, Statistische Versuchspla-
+
+941
+
+nung, Springer Berlin Heidelberg, Berlin, Heidelberg, 2017. doi:10.1007/
+
+942
+
+978-3-662-55743-3.
+
+55
+
+

@@ -1,0 +1,7 @@
+joblib
+numpy
+pandas
+pyarrow
+PyYAML
+scikit-learn==1.5.2
+torch

@@ -1,0 +1,1 @@
+{"layersInExternalFlash":[],"layersInInternalFlash":[],"useExternalFlash":false,"useExternalRam":false,"memoryFootprint":{"activations":90448,"io":[0,0],"kernel_flash":44492,"kernel_ram":4060,"series":"stm32h7","toolchain":"arm-none-eabi-gcc (GNU Tools for STM32 14.3.rel1.20251027-0700) 14.3.1 20250623","toolchain_flash":104,"toolchain_ram":0,"weights":1488196}}
