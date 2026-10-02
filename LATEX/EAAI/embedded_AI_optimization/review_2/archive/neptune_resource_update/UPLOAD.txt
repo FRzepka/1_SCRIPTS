@@ -1,0 +1,59 @@
+NEPTUNE-KORREKTUREN, 01.10.2026
+
+Dieses Paket ersetzt nur den Text und zwei Abbildungen. Es ist kein
+vollstaendiges, lokal kompilierbares Verlagspaket.
+
+Zu ersetzen:
+  Neptune.tex  - aktualisierte Fassung des gelieferten Verlagstextes
+  gr14.pdf     - Figure 14: Parameter, Flash und RAM
+  gr19.pdf     - Figure 19: Utility-Gewichtungsanalyse
+
+Die vorhandenen Befehle \includegraphics{gr14} und \includegraphics{gr19}
+bleiben unveraendert. Bei einem dateibasierten LaTeX-Upload liegen die
+beiden Ersatzdateien direkt neben Neptune.tex. Alle anderen Abbildungen
+gr1 bis gr24 bleiben aus dem bestehenden Verlagspaket erhalten.
+
+Falls das Online-System Abbildungen getrennt verwaltet, muessen dort
+Figure 14 und Figure 19 durch diese Dateien ersetzt werden. Ob das Portal
+PDF oder PNG erwartet, wurde nicht geprueft. Hochaufloesende PNG-Versionen
+liegen als Alternative im Unterordner PNG_alternative des ZIP-Pakets.
+Pro Abbildung nur eines der beiden Formate verwenden.
+
+Lokal fehlt die Verlagsklasse neptune.cls sowie das vollstaendige
+Neptune-Paket. Deshalb wurde kein erfolgreicher Gesamt-PDF-Build behauptet.
+Die beiden Abbildungen sind unabhaengig davon aus den Quelldaten erzeugt.
+
+Berechnungsgrundlage:
+  Flash: sechs vorhandene ELF-Builds, gegen gespeicherte SHA-256 geprueft.
+  RAM: static_ram_bytes + max_stack_bytes aus den archivierten STM32-JSONs.
+  Laufzeit: unveraenderte archivierte STM32-Messungen.
+  MAE: unveraenderte Genauigkeitswerte der bisherigen Utility-Auswertung.
+  Utility: 1771 Gewichtungen, berechnet vor dem Runden der Anzeigewerte.
+  Parameter: exportierte Gewichte und zusammengefuehrte Bias-Vektoren.
+
+Die bisherigen festen SOC-Parameterzahlen 22785 und ca. 13500 stimmen
+nicht mit den C-Exports ueberein. Figure 14 verwendet jetzt einheitlich
+die exportierten Parameter: SOC 22401 / 12369 / 22401 und
+SOH 85761 / 46697 / 85761 (Base / Pruned / Quantized).
+Die idealisierte Parameterablage im zweiten Panel folgt diesen Zahlen.
+Das ist keine Aenderung der Modelle, sondern eine Korrektur der Zaehldaten.
+Die Differenz der unveraenderten SOH-MAE-Werte fuer Pruned und Base ist
+0.6049616 Prozentpunkte, gerundet 0.60 statt 0.61 aus gerundeten MAE-Werten.
+
+SOC Quantized RAM ist 476 + 3584 = 4060 Byte = 3.96484375 KiB.
+Der bisherige Plotwert 3576 Byte war ein veralteter, fest eingetragener Wert.
+Bei SOC Base und Pruned wurden ebenfalls die JSON-Summen 5048 und 4124
+anstelle der veralteten Plotkonstanten 5036 und 4112 Byte verwendet.
+
+Die exakte RAM-/Laufzeitbasis ergibt fuer SOC Pruned 1662 von 1771
+Gewichtungen (93.85 Prozent). Die vorangegangene Diss-Auswertung mit
+gerundeten KPI-Eingaben ergab 93.79 Prozent. Das ist kein neuer Modelllauf.
+
+Die archivierten Laufzeitdaten enthalten keine ELF-Hashes. Eine Identitaet
+dieser historischen Mess-Binaries mit den jetzt ausgewerteten Flash-Builds
+ist daher nicht belegt und wird im Manuskript nicht behauptet.
+
+Weitere Quelldaten, CSV-Auswertungen und das Reproduktionsskript liegen
+neben dieser Datei in neptune_resource_update. Die alte Neptune-Fassung
+liegt separat als Neptune.before_resource_update_20261001.tex.bak vor.
+Die Dissertation und die alten Paper-Ordner wurden nicht angepasst.

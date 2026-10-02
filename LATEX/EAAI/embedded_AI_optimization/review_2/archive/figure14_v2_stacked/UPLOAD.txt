@@ -1,0 +1,68 @@
+REVIEW 2 - FIGURE 14, EINSPALTIGE VARIANTE V2 - 01.10.2026
+
+Aktuelle Arbeitsfassung: Neptune.tex in diesem Ordner.
+Das uebergeordnete Neptune.tex und die bisherigen PDFs bleiben unveraendert.
+
+Ersatzdateien:
+  gr14.pdf    Neue Figure 14, Vektorgrafik, 85 mm breit und 180 mm hoch.
+  gr14.png    Rasteralternative mit 400 dpi; nur ein Format hochladen.
+  gr19.pdf    Unveraenderte Kopie der bisherigen korrigierten Figure 19.
+  Neptune.tex Arbeitskopie mit einspaltiger Figure 14 und expliziter
+              Seitenbreite fuer Figure 19.
+
+Figure 14:
+  \begin{figure}[,abovefloat=15pt,belowfloat=15pt]
+  ... bisherige Caption unveraendert ...
+  \includegraphics[width=\columnwidth]{gr14}
+  \end{figure}
+
+Figure 19 bleibt zweispaltig (figure*) und verwendet:
+  \includegraphics[width=\textwidth]{gr19}
+
+Neptune_review_2_replacements.zip enthaelt nur die Ersatzdateien, kein
+vollstaendiges Verlagspaket. Alle anderen Figuren bleiben beim Verlag
+unveraendert. Die lokal fehlende Verlagsklasse neptune.cls verhindert
+einen vollstaendigen lokalen Satz des Manuskripts.
+
+Vorschau: preview/figure14_paper_preview.pdf zeigt die neue gestapelte
+Figure 14 neben der ersten einspaltigen 2x2-Variante bei jeweils 85 mm
+Breite sowie die Latenz-Grafik als Stilvorlage.
+Dies ist eine Groessen-/Lesbarkeitsvorschau, kein verbindlicher Verlagssatz.
+Bei 100 Prozent drucken, um die physische Schriftgroesse zu beurteilen.
+
+Aenderungen dieser Runde:
+  - Vier Teilpanels stehen jetzt untereinander, jeweils volle Spaltenbreite.
+  - Schrift in der finalen Spaltengroesse: 10 pt, Paneltitel 11 pt.
+    Zahlen und Achsenbeschriftungen waren in V1 nur 7 pt gross.
+  - Kuerzere Paneltitel; Methodendetails bleiben in der Caption.
+  - Eine gemeinsame SOC/SOH-Legende statt vier wiederholter Legenden.
+  - Zahlenwerte und Modellnamen stehen wieder waagerecht.
+  - Alle Parameter-, Flash- und RAM-Werte bleiben unveraendert.
+  - Farben und dezentes Gitter orientieren sich an der Latenz-Abbildung.
+    Diese heisst im vorliegenden Neptune.tex Figure 15 / gr15, nicht gr16.
+  - Im Begleittext verweist "panel (d)" auf RAM statt "lower right panel".
+  - Die Abbildung wird fuer die groessere Schrift hoeher; Spaltenbreite
+    bleibt unveraendert. Endgueltigen Seitenumbruch im Verlagsproof pruefen.
+
+Nachvollziehbarkeit:
+  archive/ enthaelt den vorherigen Neptune-Stand, beide bisherigen PDFs,
+  das bisherige Upload-ZIP, die Sicherungsfassungen und eine vollstaendige
+  Kopie von neptune_resource_update mit Skripten und Zahlenpruefungen.
+  Die alten Dateien werden archiviert, nicht geloescht oder verschoben.
+
+  archive/figure14_v1_2x2/ sichert die vorherige einspaltige Variante mit
+  PDFs, Skript, Vorschau, Arbeitsmanuskript, Upload-ZIP und Pruefprotokoll.
+  Aktuelle PNG-Pruefansichten tragen im Ordner preview/ das Suffix _v2.
+
+  sources/ enthaelt die unveraenderte KPI-Tabelle und Latenz-Stilvorlage.
+  tools/build_figure14.py erzeugt Figur, Vorschau, ZIP und Pruefergebnisse
+  ausschliesslich innerhalb dieses review_2-Ordners.
+  validation.json protokolliert Daten-, PDF- und Manuskriptpruefungen.
+  manifest.json enthaelt SHA-256-Pruefsummen fuer diesen Arbeitsstand.
+
+Die Skripte unter archive/ sind historische Originale; fuer diese Runde
+nur tools/build_figure14.py ausfuehren. Benoetigt Python mit matplotlib,
+pymupdf und Poppler/pdftoppm im PATH. Passende lokale Umgebung: Conda ml1.
+
+WICHTIG: Die Anweisung im archivierten alten UPLOAD.txt, die Einbindung
+ohne Breitenangabe beizubehalten, ist durch diese Anleitung ersetzt.

@@ -1,0 +1,14 @@
+{
+  "column_width_mm": 85,
+  "height_mm": 110,
+  "minimum_figure_font_pt": 7.0,
+  "value_labels_verified": 24,
+  "vector_graphics": true,
+  "embedded_fonts": true,
+  "no_value_label_overlap": true,
+  "resource_data_unchanged": true,
+  "original_files_unchanged": true,
+  "manuscript_changes": "Only Figure 14 environment/width and explicit Figure 19 width",
+  "publisher_proof_compiled": false,
+  "proof_limitation": "neptune.cls and complete publisher figure package unavailable"
+}

@@ -1,0 +1,79 @@
+REVIEW 2 - FIGURE 14, ORIGINALSTIL 2X2, VARIANTE V3 - 01.10.2026
+
+Aktuelle Arbeitsfassung: Neptune.tex in diesem Ordner.
+Das uebergeordnete Neptune.tex und die bisherigen PDFs bleiben unveraendert.
+
+Ersatzdateien:
+  gr14.pdf    Figure 14, Vektorgrafik, 85 mm breit und 60.71 mm hoch.
+  gr14.png    Rasteralternative mit 400 dpi; nur ein Format hochladen.
+  gr19.pdf    Unveraenderte Kopie der bisherigen korrigierten Figure 19.
+  Neptune.tex Arbeitskopie mit einspaltiger Figure 14 und expliziter
+              Seitenbreite fuer Figure 19.
+
+Figure 14:
+  \begin{figure}[,abovefloat=15pt,belowfloat=15pt]
+  ... bisherige Caption unveraendert ...
+  \includegraphics[width=\columnwidth]{gr14}
+  \end{figure}
+
+Figure 19 bleibt zweispaltig (figure*) und verwendet:
+  \includegraphics[width=\textwidth]{gr19}
+
+Neptune_review_2_replacements.zip enthaelt nur die Ersatzdateien, kein
+vollstaendiges Verlagspaket. Alle anderen Figuren bleiben beim Verlag
+unveraendert. Die lokal fehlende Verlagsklasse neptune.cls verhindert
+einen vollstaendigen lokalen Satz des Manuskripts.
+
+Vorschau: preview/figure14_paper_preview.pdf zeigt die aktuelle Figure 14,
+Figure 10 als Schriftreferenz und die originale Figure 14 als Stilvorlage,
+jeweils bei 85 mm Breite. Die Originalgrafik enthaelt ueberholte Werte und
+dient nur dem Stilvergleich, nicht als Datenquelle fuer die neue Grafik.
+Dies ist eine Groessen-/Lesbarkeitsvorschau, kein verbindlicher Verlagssatz.
+Bei 100 Prozent drucken, um die physische Schriftgroesse zu beurteilen.
+
+Aenderungen dieser Runde:
+  - Originale 2x2-Matrix und Seitenverhaeltnis 14:10 wiederhergestellt.
+  - SOC/SOH-Balken stehen je Modell direkt nebeneinander wie im Original.
+  - Zentrierte Titel, Achsenbeschriftungen, Farben und Legenden in jedem
+    Teilplot entsprechen wieder dem urspruenglichen Stil.
+  - Zahlenwerte und Modellnamen bleiben waagerecht. Die Zahlentexte sind
+    von der gemeinsamen Balkenkante weg ausgerichtet, damit kein hoeherer
+    Nachbarbalken die Beschriftung verdeckt.
+  - Schriftgroessen entsprechen Figure 10 bei gleicher Spaltenbreite:
+    Titel 5.58 pt, Achsentitel 5.02 pt, Ticks 4.18 pt, Legenden 3.63 pt;
+    Zahlenlabels 3.90 pt. Keine 10-11-pt-Schrift und keine Stapelanordnung.
+    Grundlage: Figure 10 mit 12-Zoll-Canvas und 20/18/15/13 pt Schrift,
+    physisch umgerechnet auf 85 mm Breite: Faktor 85 / (12 * 25.4).
+  - Alle Parameter-, Flash- und RAM-Werte bleiben unveraendert.
+  - Originaler Textverweis "lower right panel" fuer RAM wiederhergestellt.
+  - Ausreichend Platz oberhalb der Balken verhindert, dass die Legenden
+    Daten oder Zahlenlabels ueberdecken.
+
+Nachvollziehbarkeit:
+  archive/ enthaelt den vorherigen Neptune-Stand, beide bisherigen PDFs,
+  das bisherige Upload-ZIP, die Sicherungsfassungen und eine vollstaendige
+  Kopie von neptune_resource_update mit Skripten und Zahlenpruefungen.
+  Die alten Dateien werden archiviert, nicht geloescht oder verschoben.
+
+  archive/figure14_v1_2x2/ sichert die erste einspaltige Variante mit
+  PDFs, Skript, Vorschau, Arbeitsmanuskript, Upload-ZIP und Pruefprotokoll.
+  archive/figure14_v2_stacked/ sichert die danach verworfene Stapelvariante.
+  Aktuelle PNG-Pruefansichten tragen im Ordner preview/ das Suffix _v3.
+
+  sources/ enthaelt die unveraenderte KPI-Tabelle und Stilvorlagen:
+    figure10_style_reference.png: verwendete Schriftreferenz.
+    figure14_original_style.png: originale 2x2-Gestaltung, alte Daten.
+    original_plot_style.py: archivierter Generator der Referenzgrafiken;
+      nur Stilquelle, nicht fuer die neuen Ressourcenzahlen ausfuehren.
+    latency_style_reference.png: fruehere Referenz, weiterhin archiviert.
+  tools/build_figure14.py erzeugt Figur, Vorschau, ZIP und Pruefergebnisse
+  ausschliesslich innerhalb dieses review_2-Ordners.
+  validation.json protokolliert Daten-, PDF- und Manuskriptpruefungen.
+  manifest.json enthaelt SHA-256-Pruefsummen fuer diesen Arbeitsstand.
+
+Die Skripte unter archive/ sind historische Originale; fuer diese Runde
+nur tools/build_figure14.py ausfuehren. Benoetigt Python mit matplotlib,
+pymupdf und Poppler/pdftoppm im PATH. Passende lokale Umgebung: Conda ml1.
+
+WICHTIG: Die Anweisung im archivierten alten UPLOAD.txt, die Einbindung
+ohne Breitenangabe beizubehalten, ist durch diese Anleitung ersetzt.
