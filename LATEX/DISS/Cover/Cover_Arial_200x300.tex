@@ -1,0 +1,60 @@
+% !TeX program = xelatex
+\documentclass[12pt]{article}
+\usepackage{fontspec}
+\setmainfont{Arial}
+\usepackage[paperwidth=200mm,paperheight=300mm,left=20mm,right=20mm,top=35mm,bottom=26mm]{geometry}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage[hidelinks]{hyperref}
+
+\hypersetup{
+  pdftitle={Deployment-Oriented Neural Network State-Estimation Methods for Battery Management Systems: Ageing Estimation, Robustness Benchmarking, Embedded Optimization, and Hardware Integration},
+  pdfauthor={Florian Rzepka},
+  pdfsubject={Dissertation cover}
+}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+
+% Schriftgroessen und Zeilenumbrueche hier anpassen.
+\newcommand{\CoverHeading}{Dissertation}
+\newcommand{\CoverTitle}{%
+  Deployment-Oriented Neural Network State-Estimation\\
+  Methods for Battery Management Systems:}
+\newcommand{\CoverSubtitle}{%
+  Ageing Estimation, Robustness Benchmarking,\\
+  Embedded Optimization, and Hardware Integration}
+\newcommand{\CoverAuthor}{Florian Rzepka}
+% Originale TU-Langversion: Zeichen und Schriftzug liegen als Vektorpfade vor.
+\newcommand{\CoverLogo}{%
+  \includegraphics[width=96mm]{TU_BERLIN_Logo_Lang_schwarz.pdf}%
+}
+% Festes Datum, damit spaeteres Kompilieren den Stand nicht veraendert.
+\newcommand{\CoverDate}{Berlin\\[2mm]23.10.2026}
+
+% Praegevorlage 200 x 300 mm: Inhalt ohne Skalierung zentriert.
+% Gegenueber A4 sind alle Positionen um 1.5 mm nach unten verschoben.
+% Positionen in mm ab Blattoberkante; keine abhaengigen Absatzabstaende.
+\newcommand{\CoverAt}[4]{%
+  \node[anchor=north,inner sep=0pt,outer sep=0pt,
+    text width=160mm,align=center,
+    font=\fontsize{#2}{#3}\selectfont]
+    at ([yshift=-#1mm]current page.north) {#4};%
+}
+
+\begin{document}
+\null
+\begin{tikzpicture}[remember picture,overlay]
+  \CoverAt{47.5}{12}{15}{\CoverLogo}
+  \CoverAt{117.5}{56}{65}{\CoverHeading}
+  \CoverAt{143.5}{18.5}{28}{\CoverTitle}
+  \CoverAt{166.5}{15}{20}{\CoverSubtitle}
+  \draw[line width=0.45pt]
+    ([xshift=-20mm,yshift=-193.5mm]current page.north) --
+    ([xshift=20mm,yshift=-193.5mm]current page.north);
+  \CoverAt{215.5}{14}{18}{submitted by}
+  \CoverAt{226.5}{20}{25}{\CoverAuthor}
+  \CoverAt{260.5}{14}{18}{\CoverDate}
+\end{tikzpicture}
+
+\end{document}
