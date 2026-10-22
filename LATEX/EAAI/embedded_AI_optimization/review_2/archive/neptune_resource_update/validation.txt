@@ -1,0 +1,12 @@
+Unchanged figure inclusions: 24
+Unchanged labels: 54
+Unchanged citations: 38
+Unchanged environment boundaries: 142
+Unchanged headings: 45
+All six KPI rows match source data before display rounding
+Utility scores, weight-grid shares, flash savings, and MAE deltas appear in text
+Base/Pruned parameter counts agree with all 28 array symbols in the four ELF builds
+gr14.pdf: single-page vector PDF, embedded font, numerical labels verified
+gr19.pdf: single-page vector PDF, embedded font, numerical labels verified
+ZIP: all six entries intact and identical to the current source files
+Full Neptune typesetting remains unverified: proprietary neptune.cls unavailable locally

@@ -1,0 +1,16 @@
+{
+  "column_width_mm": 85,
+  "height_mm": 180,
+  "minimum_figure_font_pt": 10.0,
+  "value_labels_verified": 24,
+  "vector_graphics": true,
+  "embedded_fonts": true,
+  "no_value_label_overlap": true,
+  "no_value_labels_intersect_bars": true,
+  "resource_data_unchanged": true,
+  "original_files_unchanged": true,
+  "panel_layout": "4 rows x 1 column; horizontal values and model labels",
+  "manuscript_changes": "Figure 14 environment/width and panel (d) reference; Figure 19 width",
+  "publisher_proof_compiled": false,
+  "proof_limitation": "neptune.cls and complete publisher figure package unavailable"
+}

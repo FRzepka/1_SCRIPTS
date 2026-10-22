@@ -1,0 +1,341 @@
+{
+  "source_pdf_sha256": "e0877299e1ce54a8dde6d880a691d028754fa215aa772c49fbeba0fac79b8d9f",
+  "source_pages": 230,
+  "figures": [
+    {
+      "id": "2.1",
+      "pdf_page": 36,
+      "caption_start": "Battery-management requirement framework used throughout this work. The three connected dimensions cover estimator performance, the hardware resource envelope, and the engineering path to deploy- ment. 2.1 Performance requirements Performance requirements describe whether the estimated SOC or SOH signal is suitable for BMS decisions during operation. In this work, performance is not reduced to average error under clean measurements. It also includes robustness against disturbed input"
+    },
+    {
+      "id": "3.1",
+      "pdf_page": 42,
+      "caption_start": "Main families of battery-state estimators. Hybrid methods combine elements of direct measurement, physical model structure, and data- driven adaptation. 3.3 Model-Based Estimation and Kalman Filtering Equivalent-circuit models (ECMs) represent the terminal behaviour of a cell through an open-circuit-voltage source, an ohmic resistance, and one or more resistor- capacitor branches. The SOC and polarization voltages form the model state. Measured current is the input, while the"
+    },
+    {
+      "id": "3.2",
+      "pdf_page": 46,
+      "caption_start": "General structure and layer-wise mathematical mapping of a fully connected multilayer perceptron. The input vector x = a(0) is prop- agated through hidden representations a(ℓ) to the output ˆy = a(L). The highlighted connection from neuron i to neuron j represents the scalar entry w(1) ji of the matrix W(1). The bias is added separately at the target neuron. An MLP applies the same static"
+    },
+    {
+      "id": "3.3",
+      "pdf_page": 48,
+      "caption_start": "Detailed data flow through an LSTM cell corresponding to Equa- tion (3.12). The forget gate controls the retained cell state, the input gate controls the candidate write operation, and the output gate con- trols the exposed hidden state. Blue paths indicate the directed state and gate signals, ⊙denotes element-wise multiplication, and the ad- dition node forms the updated cell state. Figure 3.3 separates the recurrent"
+    },
+    {
+      "id": "3.4",
+      "pdf_page": 50,
+      "caption_start": "Detailed data flow through a GRU cell corresponding to Equa- tion (3.14). The reset gate controls the historical contribution to the candidate state. In the convention used here, zt weights the newly computed candidate and 1 −zt weights the previous hidden state. Unlike the LSTM, the GRU propagates only one recurrent state. Equation (3.14) and Figure 3.4 use the candidate-weight convention and the reset- before"
+    },
+    {
+      "id": "3.5",
+      "pdf_page": 55,
+      "caption_start": "Comparison of pruning granularities. Panel (a) shows two dense weight matrices connected through an intermediate representation. In panel (b), unstructured pruning suppresses individual weights while retaining the original tensor dimensions. Panel (c) illustrates struc- tured pruning, where complete output structures and the correspond- ing inputs of the following layer are removed. The resulting tensors and intermediate representation are smaller but remain dense. Table 3.3 summarizes"
+    },
+    {
+      "id": "3.6",
+      "pdf_page": 57,
+      "caption_start": "Dependency constraints in structured pruning. Panel (a) shows two compatible branches whose outputs can be added. Panel (b) illus- trates an invalid result when the branches are independently reduced to different output dimensions. Panel (c) uses a shared retained struc- ture so that both branches remain compatible. Similar consistency constraints apply between successive layers and between the coupled gates of recurrent networks. Figure 3.6 illustrates"
+    },
+    {
+      "id": "3.7",
+      "pdf_page": 65,
+      "caption_start": "Quantizable quantities and representative uniform 8-bit grids. Panel (a) distinguishes stored weights and biases, dynamic inputs, outputs and recurrent states, and the summation and activation operations of a neural computation. From top to bottom, panel (b) shows signed symmetric INT8 with z = 0, unsigned zero-anchored UINT8 with z = 0 for non-negative values, and asymmetric UINT8 with z̸ = 0. Labels above each grid"
+    },
+    {
+      "id": "4.1",
+      "pdf_page": 82,
+      "caption_start": "SOH progression of the 14 investigated NMC cells: top over equivalent full cycles and bottom over absolute time in days. Colors denote the seven ageing scenarios, with two cells per scenario. This dataset is used exclusively in Chapter 5. The present section defines the cells, test scenarios, and SOH labels, while the contribution chapter concentrates on the cumulative-current and lag-sequence feature engineering. 4.1.2 LFP Dataset"
+    },
+    {
+      "id": "4.2",
+      "pdf_page": 84,
+      "caption_start": "Design-of-experiments cube of the LFP ageing dataset. The three axes correspond to charge C-rate, discharge C-rate, and depth of discharge. The highlighted points define the factorial test matrix assigned to the 15 ageing cells. Figure 4.3: Representative SOC trajectory illustrating the experimental structure of the LFP campaign. The sequence combines cyclic ageing operation, diagnostic check-up blocks, and an approximately one-day stationary- storage load-profile segment that"
+    },
+    {
+      "id": "4.3",
+      "pdf_page": 84,
+      "caption_start": "Representative SOC trajectory illustrating the experimental structure of the LFP campaign. The sequence combines cyclic ageing operation, diagnostic check-up blocks, and an approximately one-day stationary- storage load-profile segment that provides one application-oriented example within the broader use-case-dependent profile space. 54"
+    },
+    {
+      "id": "4.4",
+      "pdf_page": 85,
+      "caption_start": "Measured SOH progression across the 15 LFP cells over the complete ageing campaign. Colors distinguish the fixed training, validation, and independent holdout test sets. The legend reports the charge C-rate, discharge C-rate, and depth of discharge assigned to each trajectory. Every SOH trajectory is constructed from discrete capacity check-ups and interpolated between the measured anchors. The local upward movements in Figure 4.4 require a distinction"
+    },
+    {
+      "id": "4.5",
+      "pdf_page": 87,
+      "caption_start": "Measured coverage of the six-cell independent holdout test set. The panels show observed SOH, the descriptive load-class assignment, the thermal envelope, and full-trajectory SOH-state coverage. The high- load group contains one exploratory trajectory, while the low- and middle-load groups contain multiple cells. 4.1.3 SOC and SOH Reference-Label Construction The LFP dataset contains measurements from which the labels for Chapters 6 and 7 are constructed. For"
+    },
+    {
+      "id": "4.6",
+      "pdf_page": 91,
+      "caption_start": "Board-level view of the Custom BMS Platform with integrated sens- ing, controller, communication, and auxiliary interfaces. 4.3.2 Hardware Architecture The Custom BMS Platform can be understood as three tightly coupled hard- ware domains: the TLE9012DQU-based sensing and balancing stage, the current- measurement and protection interface, and the controller/communication island around the dual-core STM32H755. The board layout keeps the high-current zone, shunt, and relay path physically"
+    },
+    {
+      "id": "4.7",
+      "pdf_page": 92,
+      "caption_start": "Reduced system-level block view of the Custom BMS Platform show- ing the interaction between current sensing, BMS front-end, and mi- crocontroller domain. 4.3.3 Firmware and Execution Concept The firmware concept is intentionally centred on the dual-core STM32 architecture. The Cortex-M4 core handles the conventional BMS tasks, including measurement acquisition, limit supervision, protective actuation, balancing coordination, com- munication, and general system management. The Cortex-M7 core is"
+    },
+    {
+      "id": "5.1",
+      "pdf_page": 99,
+      "caption_start": "Pairwise Pearson correlation coefficients between SOH and the candi- date input variables, including temperature and the separate cumu- lative currents Qpos(t) and Qneg(t). Only the non-redundant lower triangular part of the symmetric matrix is shown. The symmetric OKLAB scale maps zero correlation to blue and increasing absolute correlation magnitude toward red. Consequently, coefficients of −1 and +1 receive the same red endpoint colour, while the"
+    },
+    {
+      "id": "5.2",
+      "pdf_page": 100,
+      "caption_start": "Illustration of lag-sequence construction from raw cell measurements into supervised MLP samples. Voltage, temperature, and cumulative current form the structured input history, while the SOH at the cur- rent time step serves as the corresponding label. A configuration of ∆t = 30 min and L = 12, corresponding to 6 h of history, is used as the initial search point. It provides a broad window"
+    },
+    {
+      "id": "5.3",
+      "pdf_page": 102,
+      "caption_start": "Workflow of the proposed MLP-based SOH estimation approach, from raw-cell preprocessing and data splitting through training and hyper- parameter tuning to prediction and final evaluation. 5.2.5 Data Scaling All input features are scaled to the interval between 0 and 1 before training.[108] This step is necessary because the numerical ranges of the features differ strongly: voltage remains in a narrow interval between 2,75 V and"
+    },
+    {
+      "id": "5.4",
+      "pdf_page": 104,
+      "caption_start": "Study-specific MLP structure for SOH estimation. The flattened in- put layer contains voltage, temperature, and cumulative-current val- ues from the lag sequence. These feature–time entries are fully con- nected to the dense hidden layers, and a single linear output provides the SOH estimate. The displayed node counts are schematic, while the tuned layer widths are reported in Table 5.1. 74"
+    },
+    {
+      "id": "5.5",
+      "pdf_page": 108,
+      "caption_start": "Matrix of MAE values shown in percentage points of SOH on the 0 to 100% SOH scale. The corresponding normalized MAE on a 0 to 1 SOH scale is obtained by scaling the displayed values accordingly. The colour scale indicates the magnitude of the prediction error and highlights that the most favourable operating region is found at inter- mediate temporal aggregation rather than at the"
+    },
+    {
+      "id": "5.6",
+      "pdf_page": 109,
+      "caption_start": "Comparison of predicted and measured SOH trajectories over time for three representative test cells. Cells 7 and 1 show the typical ageing progression most frequently observed in the dataset and are estimated accurately by the network, whereas Cell 9 was intentionally chosen as an atypical example with a pronounced U-shaped SOH curve. A post-rolling filter is applied to reduce visual noise and to make the"
+    },
+    {
+      "id": "5.7",
+      "pdf_page": 109,
+      "caption_start": "Scatter comparison between predicted and measured SOH values for the three representative test cells. Cells 7 and 1 remain close to the identity line and therefore exhibit low prediction errors. For Cell 9, the model follows parts of the qualitative SOH development, but the larger distances from the identity line show that the absolute SOH values are reproduced less accurately. The atypical trajectory alone does"
+    },
+    {
+      "id": "6.1",
+      "pdf_page": 116,
+      "caption_start": "Methodology overview of the causal benchmark chain. Measured bat- tery signals are converted into online auxiliary features, processed by the four estimator representatives, exposed to measurement and initialization interventions, and evaluated through global and local performance metrics. 6.2.2 SOC estimation methods Direct-measurement model (DM) The direct-measurement formulation used in DM, HDM, and as an explicit auxiliary input to DD follows the same causal cumulative-charge state"
+    },
+    {
+      "id": "6.2",
+      "pdf_page": 121,
+      "caption_start": "Taxonomy of the benchmark scenarios, grouped into input distur- bances, initialization errors, and signal-integrity faults. Table 6.2: Disturbance configurations and practical rationale. The numerical val- ues are fixed benchmark settings, while the cited sources motivate the disturbance mechanisms and magnitude ranges. Scenario Benchmark setup Practical origin and rationale ADC quantization ∆I = 0,01 A, ∆U = 0,005 V, and ∆T = 0,5 ◦C ADC steps,"
+    },
+    {
+      "id": "6.3",
+      "pdf_page": 126,
+      "caption_start": "Representative-window protocol for the robustness benchmark. Six- teen cell/SOH windows are selected using measured-feature medoids. Every estimator is scored over the same interval after the causal SOH and rolling DD input contexts are available. Standard scenarios cover 24 h, while the dropout case uses 48 h and places its one-hour gap in the eligible interval with maximum absolute net charge. The benchmark contains 20 scenario"
+    },
+    {
+      "id": "6.4",
+      "pdf_page": 128,
+      "caption_start": "Baseline accuracy against dataset SOC across the independent hold- out test set. Dots show cell and SOH-window values. Bars and error bars show the equal-weight cell-macro mean and hierarchical 95% con- fidence interval. DD has the lowest macro MAE and RMSE, while DM has the largest error and between-cell spread. 6.4.2 Current-gain sensitivity Current-gain error is a systematic sensor error that persists over time and"
+    },
+    {
+      "id": "6.5",
+      "pdf_page": 129,
+      "caption_start": "Current-gain sensitivity. Panel (a) reports six-cell adverse-direction ∆MAE for every matched signed gain pair with hierarchical 95% con- fidence intervals. Panel (b) compares representative current before and after the +3% gain error. Panel (c) shows SOC trajectories from the representative high-load holdout trajectory over three charge and discharge intervals. The continuous high-load lifecycle analysis in Figure 6.6 complements the inde- pendent 24-h windows. The gain-error"
+    },
+    {
+      "id": "6.6",
+      "pdf_page": 130,
+      "caption_start": "Current-gain diagnostic over the continuous high-load holdout tra- jectory. The panels report the rolling 24-h gain-error contribution over elapsed life, its normalized development between consecutive full- charge events, its value immediately before and after those events, and the full-life baseline and adverse-gain MAE. Full-charge anchor- ing changes accumulated error but does not eliminate the lifetime penalty uniformly. 6.4.3 Additive sensor offsets The signed current-offset experiment"
+    },
+    {
+      "id": "6.7",
+      "pdf_page": 132,
+      "caption_start": "Noise sensitivity under additive current noise. Panels (a) and (b) compare current and SOC over a reset-free 30-min example. Panel (c) reports the cell-macro ∆MAE with hierarchical 95% confidence intervals. Panel (d) quantifies local output transmission. DD shows the largest short-term transmission because raw current and its deriva- tive enter the recurrent input directly, while integration in DM and HDM smooths zero-mean sample-level fluctuations. 102"
+    },
+    {
+      "id": "6.8",
+      "pdf_page": 133,
+      "caption_start": "Repeated noise robustness across the holdout test set. Bars show cell- macro ∆MAE and error bars show hierarchical 95% confidence inter- vals with random seeds nested within cells. HECM is most affected by high current noise, while most other channel and model combinations remain close to baseline relative to the between-cell uncertainty. Figures 6.7 and 6.8 together show that zero-mean sensor noise changes window- wide"
+    },
+    {
+      "id": "6.9",
+      "pdf_page": 134,
+      "caption_start": "Response to a ten-percentage-point SOC-equivalent initialization mis- match. Panels (a) and (b) show correctly and incorrectly initialized trajectories and their absolute paired differences for a representative mid-life window. Panel (c) reports observed first qualifying entry and persistent recovery-or-censor time across the holdout test set with hi- erarchical 95% confidence intervals. 6.4.6 Missing samples and signal integrity Figure 6.10 compares periodic and random sample loss with"
+    },
+    {
+      "id": "6.10",
+      "pdf_page": 136,
+      "caption_start": "Six-cell signal-integrity and timing stress. Bars show cell-macro ∆MAE and hierarchical 95% confidence intervals for periodic and random sample loss and three timing-jitter levels. Sample loss dom- inates timing jitter under the tested protocol. Figure 6.11: One-hour burst-dropout transition. Panel (a) shows estimator out- put around the shaded missing-input interval. Panel (b) reports ab- solute deviation from the duration-matched no-dropout output after measurements resume. Panel"
+    },
+    {
+      "id": "6.11",
+      "pdf_page": 136,
+      "caption_start": "One-hour burst-dropout transition. Panel (a) shows estimator out- put around the shaded missing-input interval. Panel (b) reports ab- solute deviation from the duration-matched no-dropout output after measurements resume. Panel (c) gives the six-cell global ∆MAE with hierarchical 95% confidence intervals. 106"
+    },
+    {
+      "id": "6.12",
+      "pdf_page": 137,
+      "caption_start": "Voltage-spike sensitivity across six cells. Panel (a) reports the mean event-sample MAE penalty with a hierarchical 95% confidence inter- val. Panels (b) and (c) resolve HECM and DD penalties by cell and SOH state. The event-aligned metric exposes the local DD response that is obscured by full-window ∆MAE. 107"
+    },
+    {
+      "id": "6.13",
+      "pdf_page": 138,
+      "caption_start": "Event-aligned voltage-spike response. Panel (a) compares represen- tative SOC trajectories with dataset SOC. Panel (b) reports the model-wise 95th percentile peak excess error. Panel (c) shows mean excess absolute error aligned across repeated spikes. The local DD response decays rapidly and is therefore weakly represented by full- window MAE. 6.4.8 ADC quantization Figure 6.14 compares representative raw and quantized current and voltage signals and summarizes"
+    },
+    {
+      "id": "6.14",
+      "pdf_page": 139,
+      "caption_start": "ADC quantization. Panels (a) and (b) compare representative raw and quantized current and voltage signals. Panel (c) reports six-cell ∆MAE with hierarchical 95% confidence intervals and the resulting quantized-signal MAE. 6.4.9 Diagnostic comparison with ground-truth SOH The primary comparison supplies the same causally estimated LSTM-SOH trace to HDM, HECM, and DD. This is the health information available to the complete causal pipelines during online operation."
+    },
+    {
+      "id": "6.15",
+      "pdf_page": 141,
+      "caption_start": "Cell-macro ∆MAE across 18 measurement-corruption and signal- integrity rows. Current-gain and current-offset rows use adverse di- rections from matched signed sweeps. Positive values denote degra- dation relative to each model’s paired baseline, while small negative values arise from finite-window compensation. Initialization recov- ery is evaluated separately. Figure 6.16 combines relative accuracy, family-balanced robustness, and recovery and illustrates how deployment priorities alter the combined assessment. Under"
+    },
+    {
+      "id": "6.16",
+      "pdf_page": 142,
+      "caption_start": "Decision-oriented synthesis for the four representatives. Panel (a) compares min–max-normalized accuracy, family-balanced robustness across eight disturbance families, and observed persistent recovery. Panel (b) applies three illustrative priority profiles that assign 60% to one dimension and 20% to each remaining dimension. The sum- mary must be interpreted together with the scenario-level evidence in Figure 6.15. 6.4.12 Embedded performance and recurrent execution modes The hardware experiment first"
+    },
+    {
+      "id": "6.17",
+      "pdf_page": 143,
+      "caption_start": "Numerical equivalence of STM32 and software execution over six cell sequences. Bars show mean hardware-to-software MAE in per- centage points, dots show cells, and whiskers show the cell range. The logarithmic scale emphasizes that implementation differences are negligible relative to estimator error. DM and HDM have sub-microsecond median latency at 0.171 and 0.165 µs. HECM requires 23.9 µs, while continuous-state DD requires 424.9 µs. Figure"
+    },
+    {
+      "id": "6.18",
+      "pdf_page": 144,
+      "caption_start": "On-device SOC-core latency distributions across six cells and three replay rounds. Panels (a) to (d) show per-inference distributions. Panel (e) compares the minimum, 5th percentile, median, 95th percentile, and maximum on a logarithmic scale. DD denotes continuous-state inference in this cross-model comparison. The compiled DM, HDM, HECM, and continuous-state DD firmware occupies 27.0, 27.1, 470.1, and 115.9 KiB of flash. Measured peak runtime RAM is"
+    },
+    {
+      "id": "6.19",
+      "pdf_page": 145,
+      "caption_start": "Embedded memory requirements of the isolated STM32 SOC imple- mentations. Panel (a) reports compiled flash occupancy. Panel (b) reports peak runtime RAM, combining statically allocated variable storage, maximum dynamic allocation, and call-stack demand. DD denotes continuous-state execution. The DD execution-mode comparison in Figure 6.20 makes the deployment trade- off explicit. The same pruned network weights are used in every mode. Exact rolling-window inference preserves the"
+    },
+    {
+      "id": "6.20",
+      "pdf_page": 146,
+      "caption_start": "DD inference-mode trade-off on the STM32. The panels compare maximum dataset-SOC error, median latency, compiled flash occu- pancy, and measured peak runtime RAM for exact rolling-window, continuous-state, and periodically reset recurrent execution. Cell points show that periodic resets, rather than continuous forwarding, create the dominant accuracy loss. 6.5 Discussion 6.5.1 Structural interpretation across estimator classes The four implementations expose distinct relationships between update mechanism, available"
+    },
+    {
+      "id": "7.1",
+      "pdf_page": 157,
+      "caption_start": "Stateful LSTM + MLP estimator structure used for both SOC and SOH estimation. Preprocessed feature streams are processed step by step by a single-layer LSTM whose hidden and cell states are prop- agated across time. A lightweight MLP head then maps the hidden representation to either SOC or SOH. The SOC instance uses hidden size 64 with an MLP width of 64 and a sigmoid"
+    },
+    {
+      "id": "7.2",
+      "pdf_page": 158,
+      "caption_start": "Task-specific architectures of the two embedded estimators. (a) The SOC estimator combines six online input channels with a single-layer LSTM of hidden size 64 and an MLP head with sigmoid output. (b) The SOH estimator processes its six online input channels with a single-layer LSTM of hidden size 128 and an MLP head with lin- ear output. Both models operate statefully on the sample-wise 1"
+    },
+    {
+      "id": "7.3",
+      "pdf_page": 160,
+      "caption_start": "End-to-end deployment pipeline from the LFP ageing dataset and Py- Torch training to pruning, quantization, C-header export, and final STM32 benchmarking. The same trained SOC and SOH parameter sets form the basis of the floating-point, pruned, and quantized de- ployments, which keeps the later comparisons numerically consistent. 7.4 Structured Pruning Configuration The grouped magnitude criterion in Equation 3.21 and the local ranking principle in Equation"
+    },
+    {
+      "id": "7.4",
+      "pdf_page": 162,
+      "caption_start": "Illustrative numerical example of gate-consistent LSTM pruning. Red cells identify the rows included in the L2 saliency score, blue cells identify dependent columns that must be removed with the selected channel, and purple cells belong to both groups. Removing the lowest- scoring channel h2 and retaining R = {h1, h3} produces the smaller dense tensors shown on the right. The numerical values are provided to"
+    },
+    {
+      "id": "7.5",
+      "pdf_page": 164,
+      "caption_start": "Row-wise weight-only INT8 quantization and embedded export used for the recurrent matrices. Floating-point matrix rows are represented by integer codes and individual floating-point scales. Biases and ac- tivations remain in floating point, while the stored recurrent weight matrices require fewer bytes. The complete mixed-precision gate pre-activation can be written as at = sih ⊙ \u0010 W int8 ih xt \u0011 + shh ⊙ \u0010 W"
+    },
+    {
+      "id": "7.6",
+      "pdf_page": 169,
+      "caption_start": "Streaming SOC dashboard for the base, pruned, and quantized SOC deployments over the full ageing trajectory. The upper panel com- pares the three stateful predictions with the SOC reference label, while the lower panel shows the instantaneous prediction error. The near-overlap of the dense and quantized traces is one of the central observations of the chapter. 7.8 Temporal Stability and SOH Filter Interaction The complete"
+    },
+    {
+      "id": "7.7",
+      "pdf_page": 170,
+      "caption_start": "Streaming SOH dashboard with causal filtering for the three deploy- ment variants. The upper panel shows the reference SOH together with the base, pruned, and quantized predictions after online smooth- ing, while the lower panel displays the corresponding prediction errors. The figure highlights the much slower degradation dynamics and the stronger role of causal post-processing in the SOH task. 7.9 Error Distribution and Local Transient"
+    },
+    {
+      "id": "7.8",
+      "pdf_page": 171,
+      "caption_start": "SOC error distribution for the embedded SOC deployments. The absolute-error boxplots on the left show that the Pruned model has the smallest median and interquartile range. The signed-error histograms on the right show the distribution relative to the SOC reference and the substantial overlap between the three variants. 141"
+    },
+    {
+      "id": "7.9",
+      "pdf_page": 172,
+      "caption_start": "SOH error distribution for the embedded SOH deployments. The absolute-error boxplots on the left compare the median and interquar- tile range of the three variants. The signed-error histograms on the right show the broader and less regular error structure produced by the slowly varying SOH task. Figure 7.10: Detailed pulse-region analysis of embedded SOC streaming replay. The figure focuses on a highly dynamic load segment"
+    },
+    {
+      "id": "7.10",
+      "pdf_page": 172,
+      "caption_start": "Detailed pulse-region analysis of embedded SOC streaming replay. The figure focuses on a highly dynamic load segment and shows how the three deployment variants capture fast transients and voltage- recovery behaviour under identical stateful inference conditions. 142"
+    },
+    {
+      "id": "7.11",
+      "pdf_page": 173,
+      "caption_start": "Detailed check-up-region analysis of embedded SOC streaming re- play. The figure covers a representative diagnostic interval with long integration horizons and illustrates the stability of the stateful de- ployments during extended charge/discharge behaviour. 7.10 Software-Level Fault-Sensitivity Results Holding the last valid estimate during randomly unavailable output reports has almost no effect on aggregate accuracy for report-loss rates up to 10 %. In every model, the"
+    },
+    {
+      "id": "7.12",
+      "pdf_page": 177,
+      "caption_start": "Resource landscape of the embedded SOC and SOH variants. The figure compares parameter count, idealized flash estimates from weight storage alone, measured flash on the STM32 firmware, and measured RAM usage. The separation between estimated and mea- sured flash clarifies the additional code and runtime overhead of the embedded implementation. 147"
+    },
+    {
+      "id": "7.13",
+      "pdf_page": 178,
+      "caption_start": "End-to-end host-latency distributions for repeated STM32H753ZI streaming measurements. Each observation includes UART commu- nication and the on-device estimator update. The larger absolute Base–Pruned separation for SOH reflects the larger recurrent kernel, while the Quantized variants include the overhead of the mixed- precision weight reconstruction. Table 7.3: Composite pruning and quantization summary. Values are reported as SOC/SOH. ∆MAE is given in percentage points of full scale."
+    },
+    {
+      "id": "A.1",
+      "pdf_page": 216,
+      "caption_start": "Complete 20-scenario benchmark matrix. Red markers identify ma- nipulated measurements, timing, availability, or initialization states. Blue-gray markers denote repeated stochastic cases. Rose mark- ers identify paired ground-truth-SOH diagnostic runs. Current-gain magnitudes and the additive current-offset case contain matched pos- itive and negative sign levels. 186"
+    },
+    {
+      "id": "A.2",
+      "pdf_page": 217,
+      "caption_start": "DD latency distributions over the six hardware cell sequences. Exact rolling-window execution is shown separately from continuous-state and periodically reset execution because their scales and recurrent semantics differ substantially. A.1.1 HECM lookup-table sensitivity The cross-model benchmark evaluates one fixed HECM implementation whose lookup surfaces are identified exclusively from training and validation data. The supplementary HECM-only analysis tests whether its disturbance response depends strongly on local"
+    },
+    {
+      "id": "A.3",
+      "pdf_page": 218,
+      "caption_start": "HECM lookup sensitivity across the complete disturbance bench- mark. Panel (a) reports the largest lookup interaction in each ro- bustness family under local resistance, time-constant, and OCV per- turbations. Panel (b) reports the corresponding change in persistent initialization recovery-or-censor time. Open red points identify cell means containing a censored recovery window. 188"
+    },
+    {
+      "id": "A.4",
+      "pdf_page": 222,
+      "caption_start": "Diagnostics of the one-shot SOC pruning step. Panel (a) orders hid- den channels by the L2 gate-group saliency from Equation 7.11. The 19 lowest-ranked channels are removed, leaving 45 channels. Panel (b) compares the central range of the recurrent-weight distributions before and after this structural selection. 192"
+    },
+    {
+      "id": "A.5",
+      "pdf_page": 223,
+      "caption_start": "Segment-wise errors over ten consecutive parts of the natural replay sequence. Recurrent states continue across all boundaries. Target MAE and P95 describe accuracy against the reference labels, while the model-to-Base deviation isolates the relative movement of each compressed output. 193"
+    },
+    {
+      "id": "A.6",
+      "pdf_page": 224,
+      "caption_start": "SOH output and error at successive stages of the causal post- processing chain for Base, Pruned, and Quantized. Comparing raw, stage-1, and final trajectories shows that filtering affects absolute ac- curacy, ordering between variants, and temporal response. 194"
+    },
+    {
+      "id": "A.7",
+      "pdf_page": 225,
+      "caption_start": "Sensitivity of the composite utility ranking to different application priorities. The priority sweeps increase one weight while distributing the remaining importance equally. The ranking summary covers all 1771 weight combinations on the 0.05 simplex grid. 195"
+    },
+    {
+      "id": "A.8",
+      "pdf_page": 226,
+      "caption_start": "Transient response of the clean and faulted model branches after a one-sample FP32 fraction-bit change in voltage, current, or temper- ature. The panels report peak disturbed-to-clean deviation, recovery within the following 60 s, and the target-error change over the com- plete 61-sample event window. Table A.7: Median and P95 of the event-wise change in target MAE over each 61-sample fault window. All entries are percentage"
+    },
+    {
+      "id": "A.9",
+      "pdf_page": 227,
+      "caption_start": "Analytical MAC count and relative reduction for structured hidden- channel pruning. The finite-size curves follow Equation 7.10. Their large-model limits are 2p −p2, and the evaluated 30 % pruning con- figuration is marked for the SOC and SOH architectures. 197"
+    },
+    {
+      "id": "A.10",
+      "pdf_page": 228,
+      "caption_start": "Definition and methodological scope of the L2 gate-group saliency used for hidden-channel selection. The diagram distinguishes the implemented deterministic criterion from gradient- and activation- based alternatives that would require additional data-dependent evaluation. 198"
+    },
+    {
+      "id": "A.11",
+      "pdf_page": 229,
+      "caption_start": "Numerical path of the weight-only quantized implementation and composition of the stored model constants. Only the recurrent ma- trices use INT8 storage. Row scales, biases, recurrent states, acti- vations, MLP parameters, and output processing remain in FP32. 199"
+    },
+    {
+      "id": "A.12",
+      "pdf_page": 230,
+      "caption_start": "Comparison of model MACs, additional source-level FP32 scale mul- tiplications, and measured cycle-counter kernel times. The static count captures the explicit mixed-precision arithmetic but excludes conversion, indexing, loop, memory, activation-function, cache, and compiler effects. 200"
+    }
+  ]
+}
