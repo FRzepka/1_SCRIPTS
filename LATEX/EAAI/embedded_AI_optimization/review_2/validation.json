@@ -1,0 +1,28 @@
+{
+  "column_width_mm": 85,
+  "height_mm": 67,
+  "minimum_figure_font_pt": 3.63,
+  "value_labels_verified": 24,
+  "vector_graphics": true,
+  "embedded_fonts": true,
+  "no_value_label_overlap": true,
+  "no_value_labels_intersect_bars": true,
+  "no_legends_intersect_data": true,
+  "resource_data_unchanged": true,
+  "original_files_unchanged": true,
+  "panel_layout": "2x2 matrix; adjacent SOC/SOH bars; horizontal labels; one shared top legend",
+  "type_sizes_unchanged_vs_v3": true,
+  "number_format_unchanged": true,
+  "plot_width_change_percent": 5.959302325581395,
+  "plot_height_change_percent": 8.137018662886852,
+  "figure10_equivalent_font_pt": {
+    "title": 5.577427821522311,
+    "axis": 5.01968503937008,
+    "tick": 4.183070866141733,
+    "legend": 3.6253280839895017
+  },
+  "value_label_font_pt": 3.9041994750656173,
+  "manuscript_changes": "Figure 14 environment/width; Figure 19 width; original panel reference restored",
+  "publisher_proof_compiled": false,
+  "proof_limitation": "neptune.cls and complete publisher figure package unavailable"
+}
